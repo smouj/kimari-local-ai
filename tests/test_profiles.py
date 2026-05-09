@@ -1,5 +1,5 @@
 """
-Tests for Kimari profile management and recommendation.
+Tests for GPU profile listing and management.
 """
 
 import sys
@@ -9,54 +9,56 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(PROJECT_ROOT / "cli"))
 
-from kimari_cli import get_profile, recommend_profile
+from kimari.config.loader import load_config, get_profile
 
 
-def test_get_profile_valid(sample_config):
-    """get_profile returns correct profile for known name."""
+def test_get_profile_gtx1060(sample_config):
+    """get_profile returns the gtx1060 profile."""
     profile = get_profile(sample_config, "gtx1060")
     assert profile["name"] == "GTX 1060 (6 GB)"
     assert profile["quantization"] == "Q4_K_M"
 
 
+def test_get_profile_gtx1080(sample_config):
+    """get_profile returns the gtx1080 profile."""
+    profile = get_profile(sample_config, "gtx1080")
+    assert profile["name"] == "GTX 1080 (8 GB)"
+    assert profile["quantization"] == "Q5_K_M"
+
+
+def test_get_profile_test(sample_config):
+    """get_profile returns the test profile."""
+    profile = get_profile(sample_config, "test")
+    assert profile["name"] == "Test Model"
+
+
+def test_get_profile_turbo(sample_config):
+    """get_profile returns the turbo profile."""
+    profile = get_profile(sample_config, "turbo")
+    assert profile["name"] == "Turbo (IQ4_XS)"
+
+
+def test_get_profile_docker(sample_config):
+    """get_profile returns the docker profile."""
+    profile = get_profile(sample_config, "docker")
+    assert profile["name"] == "Docker/Open WebUI"
+    assert profile["host"] == "0.0.0.0"
+
+
 def test_get_profile_invalid(sample_config):
-    """get_profile with invalid name calls sys.exit."""
+    """get_profile raises SystemExit for invalid profile name."""
     with pytest.raises(SystemExit):
-        get_profile(sample_config, "nonexistent_profile")
+        get_profile(sample_config, "nonexistent")
 
 
-def test_profiles_has_gtx1060(sample_config):
-    """gtx1060 profile exists."""
-    assert "gtx1060" in sample_config["profiles"]
+def test_all_five_profiles_exist(sample_config):
+    """All five expected profiles exist in config."""
+    expected = {"gtx1060", "gtx1080", "turbo", "test", "docker"}
+    assert expected == set(sample_config["profiles"].keys())
 
 
-def test_profiles_has_gtx1080(sample_config):
-    """gtx1080 profile exists."""
-    assert "gtx1080" in sample_config["profiles"]
-
-
-def test_profiles_has_test(sample_config):
-    """test profile exists."""
-    assert "test" in sample_config["profiles"]
-
-
-def test_recommended_profile_with_no_gpu(sample_config):
-    """Returns default when no GPU is detected."""
-    result = recommend_profile(sample_config, None)
-    assert result == sample_config["default_profile"]
-
-
-def test_recommended_profile_with_8gb(sample_config):
-    """Returns gtx1080 for 8GB VRAM GPU."""
-    gpu = {"name": "Some GPU", "vram_mb": 8192, "driver": "550.0"}
-    result = recommend_profile(sample_config, gpu)
-    assert result == "gtx1080"
-
-
-def test_recommended_profile_with_6gb(sample_config):
-    """Returns gtx1060 for 6GB VRAM GPU."""
-    gpu = {"name": "Some GPU", "vram_mb": 6144, "driver": "550.0"}
-    result = recommend_profile(sample_config, gpu)
-    assert result == "gtx1060"
+def test_docker_profile_uses_0000(sample_config):
+    """Docker profile binds to 0.0.0.0."""
+    docker = sample_config["profiles"]["docker"]
+    assert docker["host"] == "0.0.0.0"

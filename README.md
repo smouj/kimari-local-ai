@@ -23,65 +23,46 @@
 
 ---
 
-<p align="center">
-  <a href="https://smouj.github.io/kimari-local-ai/">
-    <img src="docs/assets/site/screenshot-hero.png" alt="Kimari Website" width="800">
-  </a>
-</p>
-
-<p align="center"><em>Visit <a href="https://smouj.github.io/kimari-local-ai/">smouj.github.io/kimari-local-ai</a> for the full experience</em></p>
-
----
-
 ## Overview
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. No cloud. No subscriptions. Your data stays on your machine.
 
-Kimari-4B is the **target model** currently under development (planned — not released yet). Until the final fine-tuned weights are released, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)** — delivering maximum useful intelligence per GiB of VRAM through intelligent quantization and the KimariFit scoring system.
+**Important:** Kimari is the *framework*, not the model. Kimari-4B is a **target model** currently under development (planned — not released yet). Until the final fine-tuned weights are released, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)** — delivering maximum useful intelligence per GiB of VRAM through intelligent quantization and the KimariFit scoring system.
 
 Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari provides an OpenAI-compatible API, a full-featured CLI, and integrations for Open WebUI and Continue (VS Code / JetBrains).
 
 ## Project Status
 
-> **Kimari Local AI v0.1.2-alpha**
+> **Kimari Local AI v0.1.3-alpha**
 
 ### ✅ Works Today
-- CLI: `doctor`, `start`, `stop`, `status`, `chat`, `bench`, `fit`, `models`, `profiles`, `logs`, `pull`
+- CLI: `doctor`, `info`, `start`, `stop`, `status`, `chat`, `bench`, `fit`, `models`, `profiles`, `logs`, `pull`
+- Config management: `config path`, `config show`, `config validate`, `config migrate`
+- Modular Python package (`kimari/`) — installable via `pip install -e .`
 - llama.cpp runtime with CUDA acceleration
 - OpenAI-compatible API (`http://127.0.0.1:11435/v1`)
-- Model download via `kimari pull`
+- Model download via `kimari pull` with resume and SHA256 verification
 - Profile overrides: `--model`, `--host`, `--port`, `--ctx`
+- JSON output for all commands (`--json`) — IDE and agent friendly
 - Open WebUI integration (Docker)
 - Continue.dev IDE integration
-- KimariFit scoring system
-- Benchmark framework
+- KimariFit scoring system with `--vram` override
+- Benchmark framework with TTFT measurement
+- Security warnings for `0.0.0.0` binding
 
 ### 🔨 Planned
 - **Kimari-4B** — Target model under development. Weights not yet available.
-- **PWA** — Lightweight web app (v0.2)
-- **Tauri Desktop** — Native desktop app (v1.0)
+- **Local REST API** — FastAPI-based API for programmatic access (v0.2)
+- **Web Dashboard** — Minimal status/controls UI (v0.3)
 - **VRAM reporting** — Real-time memory usage in `kimari status`
-- **Eval command** — `kimari eval` for evaluation suite
 
 ### ❌ Not Included Yet
 - Multi-model serving
 - RAG support
 - Tool/function calling
-- Authentication/authorization
+- Authentication/authorization for API
 - Fine-tuning pipeline
-
-## Why Kimari?
-
-| Feature | Description |
-|---------|-------------|
-| 🔒 **Privacy First** | Your data never leaves your machine. Zero cloud dependency. Zero telemetry. |
-| 🎮 **Consumer GPU Optimized** | Designed for real hardware, not datacenter GPUs. GTX 1060 and up. |
-| ⚡ **Fast Inference** | Powered by llama.cpp with CUDA acceleration. Flash attention support. |
-| 📊 **KimariFit Score** | Proprietary metric: useful intelligence per GiB of VRAM. Know before you run. |
-| 🖥️ **Open Source** | MIT licensed. Inspect, modify, contribute. No lock-in. |
-| 🌐 **OpenAI-Compatible API** | Drop-in replacement for OpenAI API. Works with existing tooling. |
-| 🧩 **IDE Integration** | First-class Continue.dev support for VS Code and JetBrains. |
-| 🌐 **Bilingual** | English and technical Spanish support. |
+- macOS / CPU-only support
 
 ## Quick Start
 
@@ -93,15 +74,6 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - Git
 - 8 GB+ system RAM
 
-### CUDA Compatibility
-
-| CUDA Version | Status | Notes |
-|-------------|--------|-------|
-| 12.4 | ✅ Recommended | Latest stable, best performance |
-| 12.1 | ✅ Tested | Works well |
-| 11.8 | ✅ Tested | Minimum recommended version |
-| 11.0–11.7 | ⚠️ Best-effort | May work but not actively tested |
-
 ### Installation
 
 ```bash
@@ -109,23 +81,32 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 git clone https://github.com/smouj/kimari-local-ai.git
 cd kimari-local-ai
 
-# 2. Install Python dependencies
-pip install -r cli/requirements.txt
+# 2. Install (option A: pip install)
+pip install -e .
 
 # 3. Run system diagnostics
-python cli/kimari_cli.py doctor
+kimari doctor
 
 # 4. Download a test model
-python cli/kimari_cli.py pull test
+kimari pull test
 
-# 5. Start the server with the test profile
-python cli/kimari_cli.py start --profile test
+# 5. Start the server
+kimari start --profile test
 
 # 6. Chat with the model
-python cli/kimari_cli.py chat "Hello, Kimari!"
+kimari chat "Hello, Kimari!"
 ```
 
-> **Note:** The `test` profile is the only profile usable out of the box. The `gtx1060` and `gtx1080` profiles require the Kimari-4B GGUF model (not yet published) — or you can edit the profile in `config/kimari.profiles.json` to point to your own GGUF file.
+### Alternative: Manual install (no pip)
+
+```bash
+pip install -r cli/requirements.txt
+python -m kimari.cli.main doctor
+python -m kimari.cli.main pull test
+python -m kimari.cli.main start --profile test
+```
+
+> **Note:** The `test` profile is the only profile usable out of the box. The `gtx1060` and `gtx1080` profiles require the Kimari-4B GGUF model (not yet published) — or you can use `--model` to point to your own GGUF file.
 
 ### Linux (Ubuntu 22.04+)
 
@@ -137,58 +118,85 @@ sudo apt install -y build-essential cmake nvidia-cuda-toolkit git
 # Build llama.cpp with CUDA support
 bash scripts/linux/build-llamacpp-cuda.sh
 
-# Install Python dependencies
-pip install -r cli/requirements.txt
+# Install Kimari
+pip install -e .
 
 # Run diagnostics
-python cli/kimari_cli.py doctor
+kimari doctor
 ```
 
-### Windows
+### Development Setup
 
-```powershell
-# Install CUDA Toolkit from NVIDIA
-# Install Python 3.10+
-pip install -r cli\requirements.txt
-.\scripts\windows\start-kimari-1080.ps1
+```bash
+# Install with dev dependencies
+pip install -e ".[dev]"
+
+# Or use the setup script
+bash scripts/linux/install-dev.sh
+
+# Verify environment
+python scripts/linux/check-env.py
 ```
 
 ## GPU Profiles
 
 Pre-configured settings optimized for specific GPU models. No manual tuning required.
 
-| Profile | GPU | VRAM | Quantization | Context | Batch | UBatch | KV Cache |
-|---------|-----|------|-------------|---------|-------|--------|----------|
-| `gtx1060` | GTX 1060 | 6 GB | Q4_K_M | 8,192 | 256 | 128 | f16 |
-| `gtx1080` | GTX 1080 | 8 GB | Q5_K_M | 16,384 | 512 | 256 | f16 |
-| `turbo` | 6 GB+ | 6 GB | IQ4_XS | 16,384 | 256 | 128 | q8_0 |
-| `test` | Any 6 GB+ | 6 GB | Q4_K_M | 4,096 | 128 | 64 | f16 |
-| `docker` | 6 GB+ (Open WebUI) | 6 GB | Q4_K_M | 4,096 | 128 | 64 | f16 |
+| Profile | GPU | VRAM | Quantization | Context | Host |
+|---------|-----|------|-------------|---------|------|
+| `gtx1060` | GTX 1060 | 6 GB | Q4_K_M | 8,192 | 127.0.0.1 |
+| `gtx1080` | GTX 1080 | 8 GB | Q5_K_M | 16,384 | 127.0.0.1 |
+| `turbo` | 6 GB+ | 6 GB | IQ4_XS | 8,192 | 127.0.0.1 |
+| `test` | Any 6 GB+ | 6 GB | Q4_K_M | 4,096 | 127.0.0.1 |
+| `docker` | Open WebUI | 6 GB | Q4_K_M | 4,096 | 0.0.0.0 |
 
 ## CLI Commands
 
 ```bash
-kimari doctor                                        # System diagnostics
+# Diagnostics and info
+kimari doctor                                        # System diagnostics (CUDA, GPU, llama-server)
+kimari doctor --json                                 # JSON output for automation/IDEs
+kimari info                                          # Installation info (version, paths, profiles)
+kimari info --json                                   # JSON info output
+
+# Server management
 kimari start --profile gtx1080                       # Start server
+kimari start --profile test --dry-run                # Preview command without running
+kimari start --profile test --host 0.0.0.0 --port 8080  # Override host and port
+kimari start --profile gtx1080 --daemon              # Start in background
 kimari stop                                          # Stop server
 kimari status                                        # Check server status
-kimari chat "Your message here"                      # Send a single message
-kimari chat                                          # Interactive chat mode
-kimari bench --profile gtx1080                       # Run benchmarks (tokens/s, TTFT)
-kimari fit --model models/file.gguf --ctx 8192       # KimariFit score
-kimari pull test                                      # Download test model
-kimari pull recommended                               # Download recommended model
-kimari pull --list                                    # List available models
-kimari pull test --dry-run                            # Preview download
-kimari models                                         # List available GGUF models
-kimari profiles                                       # List GPU profiles
-kimari start --profile test --dry-run                # Preview command without running
-kimari start --profile gtx1080 --daemon              # Start in background
+kimari status --json                                 # JSON status output
 kimari logs                                          # Show server logs
 kimari logs --follow                                 # Tail logs
-kimari doctor --json                                 # JSON output for automation
-kimari status --json                                 # JSON status output
-kimari bench --profile test --json                   # JSON benchmark output
+
+# Models
+kimari pull test                                      # Download test model
+kimari pull recommended                               # Download recommended model
+kimari pull --all                                     # Download all models
+kimari pull --list                                    # List available models
+kimari pull test --dry-run                            # Preview download
+kimari models                                         # List downloaded models
+kimari models --json                                  # JSON output
+kimari models --downloaded                            # Only downloaded models
+
+# Profiles and configuration
+kimari profiles                                       # List GPU profiles
+kimari profiles --json                                # JSON output
+kimari config path                                    # Print config file path
+kimari config show                                    # Show full configuration
+kimari config show --json                             # JSON config output
+kimari config validate                                # Validate against schema
+kimari config migrate                                 # Migrate to current version
+kimari config migrate --dry-run                       # Preview migration
+
+# Chat and benchmarks
+kimari chat "Your message here"                       # Send a single message
+kimari chat                                          # Interactive chat mode
+kimari bench --profile gtx1080                        # Run benchmarks (tokens/s, TTFT)
+kimari bench --profile test --json                    # JSON benchmark output
+kimari fit --model models/file.gguf --ctx 8192        # KimariFit score
+kimari fit --model models/file.gguf --vram 8.0        # Override VRAM manually
 ```
 
 ## KimariFit Score
@@ -199,17 +207,6 @@ The KimariFit formula measures useful intelligence density per GiB of VRAM. It a
 M_total ≈ S_GGUF + C/9709 + overhead
 ```
 
-Where:
-- `S_GGUF` = Model file size in GiB
-- `C` = Context window size in tokens
-- `overhead` = 0.8–1.3 GiB (runtime overhead)
-
-The KimariFit Score (0–100) evaluates:
-- **VRAM utilization efficiency** — Target: 85–92% of available VRAM
-- **Quantization quality retention** — Higher quantization = better score
-- **Stability** — OOM probability estimation
-- **Inference speed potential** — Based on model-to-VRAM ratio
-
 | Score | Rating | Meaning |
 |-------|--------|---------|
 | 90–100 | 🟢 Optimal | Model fits perfectly. Best performance expected. |
@@ -218,7 +215,8 @@ The KimariFit Score (0–100) evaluates:
 | < 50 | 🔴 Poor | Will be slow or OOM. Not recommended. |
 
 ```bash
-python cli/kimari_cli.py fit --model models/your-model.gguf --ctx 8192
+kimari fit --model models/your-model.gguf --ctx 8192
+kimari fit --model models/your-model.gguf --vram 8.0  # Manual VRAM override
 ```
 
 See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the full formula.
@@ -234,58 +232,45 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 │  llama-server (OpenAI-compatible API)       │
 │  http://127.0.0.1:11435/v1                  │
 ├─────────────────────────────────────────────┤
-│  CLI · Open WebUI · PWA · Continue (IDE)    │
+│  CLI · Open WebUI · Continue (IDE)          │
 └─────────────────────────────────────────────┘
 ```
 
 - **CLI** — Python 3.10+ command-line interface for all operations
 - **Open WebUI** — Full-featured web chat interface (Docker)
 - **Continue** — AI coding assistant for VS Code and JetBrains
-- **PWA** — Planned lightweight web app (v0.2)
-- **Desktop** — Planned Tauri native app (v1.0)
+- **Local API** — Planned FastAPI REST API (v0.2)
+- **Web Dashboard** — Planned minimal UI (v0.3)
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
+| [Getting Started](GETTING_STARTED.md) | 10-minute quick start guide |
+| [Project Structure](docs/PROJECT_STRUCTURE.md) | Codebase organization and modules |
 | [Product Vision](docs/00-01_product_vision.md) | Project goals, philosophy, and differentiation |
 | [KimariFit Formula](docs/00-02_kimarifit_formula.md) | Hardware scoring system explained |
 | [Architecture](docs/00-03_architecture.md) | System design and data flow |
-| [Local Runtime](docs/00-04_local_runtime.md) | llama.cpp setup, CUDA, and tuning |
-| [CLI Spec](docs/00-05_cli_spec.md) | CLI commands, options, and output formats |
-| [Web & Desktop](docs/00-06_web_pwa_desktop.md) | PWA and Tauri desktop plans |
-| [IDE Integration](docs/00-07_ide_integration.md) | Continue.dev setup and configuration |
-| [Dataset & Tuning](docs/00-08_dataset_tuning.md) | Fine-tuning roadmap and data pipeline |
-| [Security & Governance](docs/00-09_security_governance.md) | Privacy, security model, responsible AI |
-| [Service Status](docs/00-10_service_status.md) | Roadmap, milestones, version history |
-| [Compatibility](docs/00-11_tech_stack_compatibility.md) | Supported platforms and GPU matrix |
-| [Runtime Validation](docs/11_NEXT_RUNTIME_VALIDATION.md) | Step-by-step runtime validation guide |
+| [Comparison](docs/COMPARISON.md) | Kimari vs. Ollama, LM Studio, and others |
+| [Web UI Plan](docs/WEB_UI_PLAN.md) | Future web dashboard roadmap |
+| [Roadmap](ROADMAP.md) | Version milestones and plans |
+| [Changelog](CHANGELOG.md) | Version history |
+| [Security](SECURITY.md) | Security policy and best practices |
+| [Privacy](PRIVACY.md) | Privacy policy (no telemetry) |
 
 ## Open WebUI Integration
 
-Kimari integrates with [Open WebUI](https://github.com/open-webui/open-webui) for a full-featured web chat interface.
-
-### Quick Setup
-
 ```bash
 # 1. Start Kimari with the docker profile (listens on 0.0.0.0)
-python cli/kimari_cli.py start --profile docker --daemon
+kimari start --profile docker --daemon
 
 # 2. Launch Open WebUI
 make webui-up
 
-# 3. Open in browser
-# http://localhost:3000
+# 3. Open in browser → http://localhost:3000
 ```
 
-### Alternative: Override host for existing profiles
-
-```bash
-python cli/kimari_cli.py start --profile test --host 0.0.0.0 --daemon
-make webui-up
-```
-
-> ⚠️ **Security Warning:** Binding to `0.0.0.0` makes the API accessible from other machines on your network. Only use this on trusted local networks. Never expose Kimari on public networks without proper firewall rules and authentication. For local-only use, stick with the default `127.0.0.1`.
+> ⚠️ **Security Warning:** Binding to `0.0.0.0` makes the API accessible from other machines on your network. Only use this on trusted local networks. See [SECURITY.md](SECURITY.md) for details.
 
 ## Contributing
 

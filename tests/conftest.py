@@ -8,12 +8,9 @@ from pathlib import Path
 
 import pytest
 
-# Add project root and cli/ to sys.path so we can import kimari_cli
+# Add project root to sys.path so we can import the kimari package
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(PROJECT_ROOT / "cli"))
-
-import kimari_cli  # noqa: E402
 
 
 @pytest.fixture
@@ -31,24 +28,32 @@ def sample_config() -> dict:
 
 
 @pytest.fixture
+def sample_models_registry() -> dict:
+    """Loads the actual kimari.models.json registry."""
+    registry_path = PROJECT_ROOT / "config" / "kimari.models.json"
+    with open(registry_path, "r") as f:
+        return json.load(f)
+
+
+@pytest.fixture
 def tmp_state_dir(tmp_path: Path) -> Path:
-    """Creates a temp directory for state files and patches kimari_cli constants."""
+    """Creates a temp directory for state files and patches constants."""
+    from kimari.core import state as state_module
+
     state_dir = tmp_path / ".kimari"
     state_dir.mkdir()
     state_file = state_dir / "state.json"
 
-    # Patch module-level constants used by state functions
-    original_state_dir = kimari_cli.STATE_DIR
-    original_state_file = kimari_cli.STATE_FILE
+    original_state_dir = state_module.STATE_DIR
+    original_state_file = state_module.STATE_FILE
 
-    kimari_cli.STATE_DIR = state_dir
-    kimari_cli.STATE_FILE = state_file
+    state_module.STATE_DIR = state_dir
+    state_module.STATE_FILE = state_file
 
     yield state_dir
 
-    # Restore originals
-    kimari_cli.STATE_DIR = original_state_dir
-    kimari_cli.STATE_FILE = original_state_file
+    state_module.STATE_DIR = original_state_dir
+    state_module.STATE_FILE = original_state_file
 
 
 @pytest.fixture

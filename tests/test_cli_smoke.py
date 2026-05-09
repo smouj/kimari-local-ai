@@ -31,6 +31,15 @@ def test_cli_profiles():
     assert "gtx1060" in result.stdout or "GTX 1060" in result.stdout
 
 
+def test_cli_profiles_json():
+    """'profiles --json' outputs valid JSON."""
+    result = _run_cli("profiles", "--json")
+    assert result.returncode == 0
+    import json
+    data = json.loads(result.stdout)
+    assert "profiles" in data
+
+
 def test_cli_pull_list():
     """'pull --list' runs without error."""
     result = _run_cli("pull", "--list")
@@ -65,9 +74,65 @@ def test_cli_start_dry_run_with_overrides():
 def test_cli_doctor():
     """'doctor' runs (may have warnings, that's ok)."""
     result = _run_cli("doctor")
-    # Doctor may exit with 1 if there are failures (like no GPU),
-    # but it should not crash with an unhandled exception
     assert result.returncode in (0, 1)
-    # Should contain diagnostic output
     output = result.stdout + result.stderr
     assert "OS" in output or "System Diagnostics" in output
+
+
+def test_cli_doctor_json():
+    """'doctor --json' outputs valid JSON."""
+    result = _run_cli("doctor", "--json")
+    assert result.returncode in (0, 1)
+    import json
+    data = json.loads(result.stdout)
+    assert "checks" in data
+    assert "summary" in data
+
+
+def test_cli_info():
+    """'info' command runs and shows version."""
+    result = _run_cli("info")
+    assert result.returncode == 0
+    assert "0.1.3-alpha" in result.stdout
+
+
+def test_cli_info_json():
+    """'info --json' outputs valid JSON."""
+    result = _run_cli("info", "--json")
+    assert result.returncode == 0
+    import json
+    data = json.loads(result.stdout)
+    assert data["kimari_version"] == "0.1.3-alpha"
+
+
+def test_cli_config_path():
+    """'config path' outputs config file path."""
+    result = _run_cli("config", "path")
+    assert result.returncode == 0
+    assert "kimari.profiles.json" in result.stdout
+
+
+def test_cli_config_validate():
+    """'config validate' runs successfully."""
+    result = _run_cli("config", "validate")
+    assert result.returncode == 0
+    assert "valid" in result.stdout.lower()
+
+
+def test_cli_config_show():
+    """'config show' runs and shows config."""
+    result = _run_cli("config", "show")
+    assert result.returncode == 0
+    assert "Kimari Configuration" in result.stdout or "gtx1060" in result.stdout
+
+
+def test_cli_models():
+    """'models' command runs."""
+    result = _run_cli("models")
+    assert result.returncode == 0
+
+
+def test_cli_models_json():
+    """'models --json' runs."""
+    result = _run_cli("models", "--json")
+    assert result.returncode == 0
