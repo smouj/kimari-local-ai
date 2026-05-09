@@ -9,7 +9,7 @@
 - **Context Length:** Up to 16,384 tokens (profile-dependent)
 - **Quantization:** GGUF (Q4_K_M, Q5_K_M, IQ4_XS)
 - **License:** See [MODEL_LICENSES.md](MODEL_LICENSES.md)
-- **Developer:** Kimari AI
+- **Developer:** Smouj ([@smouj013](https://x.com/smouj013))
 
 ## Training Information
 

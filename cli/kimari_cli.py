@@ -42,6 +42,7 @@ KIMARI_ASCII = r"""
 ╚██████╗██║  ██║██║  ██║╚██████╔╝██║ ╚████║██║  ██║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝
    Local AI for Consumer GPUs — v0.1.0
+   Created by Smouj (https://x.com/smouj013)
 """
 
 

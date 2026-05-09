@@ -10,7 +10,8 @@
 
 <p align="center">
   <a href="LICENSE">MIT License</a> ·
-  <a href="https://github.com/kimari-ai/kimari-local-ai">GitHub</a> ·
+  <a href="https://github.com/smouj/kimari-local-ai">GitHub</a> ·
+  <a href="https://x.com/smouj013"><img src="https://img.shields.io/badge/X-@smouj013-black.svg" alt="X"></a> ·
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-green.svg" alt="Python 3.10+"></a>
   <a href="https://developer.nvidia.com/cuda-downloads"><img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+"></a>
   <a href="https://github.com/ggerganov/llama.cpp"><img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp"></a>
@@ -53,7 +54,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/kimari-ai/kimari-local-ai.git
+git clone https://github.com/smouj/kimari-local-ai.git
 cd kimari-local-ai
 
 # 2. Install Python dependencies
@@ -214,5 +215,5 @@ Model weights are not included in this repository. See [MODEL_LICENSES.md](MODEL
 ---
 
 <p align="center">
-  Made with ❤️ by the Kimari Team · <a href="https://github.com/kimari-ai/kimari-local-ai">GitHub</a>
+  Created by <a href="https://x.com/smouj013">Smouj</a> · <a href="https://github.com/smouj/kimari-local-ai">GitHub</a>
 </p>

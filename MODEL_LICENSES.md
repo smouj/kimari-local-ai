@@ -13,7 +13,7 @@ Kimari itself is released under the **MIT License**. However, language model wei
 All code in this repository (CLI, scripts, configurations, documentation) is licensed under the MIT License. You are free to use, modify, and distribute the software.
 
 ```
-Copyright (c) 2025 Kimari AI
+Copyright (c) 2025 Smouj
 ```
 
 ### 2. Kimari Fine-Tuning Modifications — MIT License
@@ -50,7 +50,7 @@ As a user of Kimari, you are responsible for:
 
 ## Disclaimer
 
-Kimari AI does not host, distribute, or take responsibility for model weights. We provide the software infrastructure to run GGUF-quantized models locally. The end user is solely responsible for ensuring compliance with all applicable model licenses.
+The Kimari project (created by Smouj) does not host, distribute, or take responsibility for model weights. We provide the software infrastructure to run GGUF-quantized models locally. The end user is solely responsible for ensuring compliance with all applicable model licenses.
 
 ## Questions?
 

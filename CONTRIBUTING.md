@@ -1,6 +1,6 @@
 # Contributing to Kimari
 
-Thank you for your interest in contributing to Kimari! This guide explains how to get involved.
+Thank you for your interest in contributing to Kimari! Created by [Smouj](https://x.com/smouj013), this project thrives on community contributions.
 
 ## Table of Contents
 
@@ -37,7 +37,7 @@ Be respectful, constructive, and inclusive. We welcome contributors of all backg
 
 ```bash
 # Clone your fork
-git clone https://github.com/your-username/kimari-local-ai.git
+git clone https://github.com/smouj/kimari-local-ai.git
 cd kimari-local-ai
 
 # Create a virtual environment
@@ -148,3 +148,5 @@ Use the GitHub issue tracker with appropriate labels.
 - **PRs** — Use Pull Requests for code changes
 
 Thank you for contributing to Kimari! 🎉
+
+Reach the creator: [Smouj](https://x.com/smouj013)
