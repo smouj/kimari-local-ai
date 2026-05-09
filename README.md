@@ -11,11 +11,22 @@
 <p align="center">
   <a href="LICENSE">MIT License</a> ·
   <a href="https://github.com/smouj/kimari-local-ai">GitHub</a> ·
+  <a href="https://smouj.github.io/kimari-local-ai/"><img src="https://img.shields.io/badge/website-kimari-00d4aa.svg" alt="Kimari Website"></a> ·
   <a href="https://x.com/smouj013"><img src="https://img.shields.io/badge/X-@smouj013-black.svg" alt="X"></a> ·
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-green.svg" alt="Python 3.10+"></a>
   <a href="https://developer.nvidia.com/cuda-downloads"><img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+"></a>
   <a href="https://github.com/ggerganov/llama.cpp"><img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp"></a>
 </p>
+
+---
+
+<p align="center">
+  <a href="https://smouj.github.io/kimari-local-ai/">
+    <img src="docs/assets/site/screenshot-hero.png" alt="Kimari Website" width="800">
+  </a>
+</p>
+
+<p align="center"><em>Visit <a href="https://smouj.github.io/kimari-local-ai/">smouj.github.io/kimari-local-ai</a> for the full experience</em></p>
 
 ---
 
