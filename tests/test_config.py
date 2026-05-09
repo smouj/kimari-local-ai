@@ -2,14 +2,14 @@
 Tests for Kimari config loading and validation.
 """
 
+import json
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
-sys.path.insert(0, str(PROJECT_ROOT / "cli"))
 
-from kimari_cli import load_config
+from kimari.config.loader import load_config, validate_config, get_config_path
 
 
 def test_load_config_exists(sample_config):
@@ -55,9 +55,43 @@ def test_profile_model_paths_relative(sample_config):
 
 
 def test_port_ranges_valid(sample_config):
-    """All ports are in valid range 1-65535."""
+    """All ports are in valid range 1024-65535."""
     for profile_name, profile in sample_config["profiles"].items():
         port = profile["port"]
-        assert 1 <= port <= 65535, (
+        assert 1024 <= port <= 65535, (
             f"Profile '{profile_name}' has invalid port: {port}"
         )
+
+
+def test_config_has_config_version(sample_config):
+    """Config has config_version field (v2+)."""
+    assert "config_version" in sample_config
+    assert isinstance(sample_config["config_version"], int)
+    assert sample_config["config_version"] >= 2
+
+
+def test_validate_config_passes(sample_config):
+    """validate_config returns no errors for the current config."""
+    is_valid, errors = validate_config(sample_config)
+    assert is_valid, f"Config validation failed: {errors}"
+
+
+def test_get_config_path():
+    """get_config_path returns an absolute path that exists."""
+    path = get_config_path()
+    assert path.is_absolute()
+    assert path.exists()
+
+
+def test_validate_config_catches_missing_default():
+    """validate_config catches missing default_profile."""
+    bad_config = {
+        "version": "1.0.0",
+        "config_version": 2,
+        "default_profile": "nonexistent",
+        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
+        "profiles": {"test": {"name": "Test", "model": "models/test.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "127.0.0.1", "port": 11435, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+    }
+    is_valid, errors = validate_config(bad_config)
+    assert not is_valid
+    assert any("default_profile" in e for e in errors)

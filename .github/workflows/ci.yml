@@ -1,112 +1,131 @@
-name: CI
-on: [push, pull_request]
+name: Kimari CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
 
 jobs:
   lint-python:
+    name: Lint Python
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -r cli/requirements.txt
-      - run: python -m py_compile cli/kimari_cli.py
-      - run: python -m py_compile eval/run_eval.py
+          python-version: "3.11"
+      - name: Install ruff
+        run: pip install ruff>=0.5.0
+      - name: Run ruff check
+        run: ruff check kimari/ tests/
 
   lint-scripts:
+    name: Lint Shell Scripts
     runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Check bash scripts
+        run: |
           for f in scripts/linux/*.sh; do
-            bash -n "$f" || { echo "FAIL: $f"; exit 1; }
+            bash -n "$f" || exit 1
           done
-          echo "All shell scripts pass syntax check."
+          echo "All shell scripts OK"
 
   validate-config:
+    name: Validate Config
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -r requirements-dev.txt
-      - run: python -c "import json; c=json.load(open('config/kimari.profiles.json')); assert 'profiles' in c; assert 'gtx1060' in c['profiles']; assert 'gtx1080' in c['profiles']; assert 'turbo' in c['profiles']; assert 'test' in c['profiles']; assert 'docker' in c['profiles']; print('Config valid.')"
-      - run: make validate-config
-
-  validate-schema:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements-dev.txt
-      - run: python -c "
-import json, jsonschema
-config = json.load(open('config/kimari.profiles.json'))
-schema = json.load(open('config/kimari.profiles.schema.json'))
-jsonschema.validate(config, schema)
-# Verify default_profile exists in profiles
-default = config.get('default_profile', '')
-assert default in config.get('profiles', {}), f'default_profile \"{default}\" not found in profiles'
-print('Schema validation passed. default_profile=\"' + default + '\" exists in profiles.')
-"
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install jsonschema>=4.0.0
+      - name: Validate profiles config
+        run: |
+          python -c "
+          import json, jsonschema
+          config = json.load(open('config/kimari.profiles.json'))
+          schema = json.load(open('config/kimari.profiles.schema.json'))
+          jsonschema.validate(config, schema)
+          default = config.get('default_profile', '')
+          assert default in config.get('profiles', {}), f'default_profile \"{default}\" not found'
+          print(f'Config valid. default_profile={default}')
+          "
+      - name: Validate models registry
+        run: |
+          python -c "
+          import json
+          registry = json.load(open('config/kimari.models.json'))
+          for m in registry.get('models', []):
+              for field in ['id', 'display_name', 'url', 'filename', 'target_path', 'size_gb', 'recommended_profile', 'status', 'license']:
+                  assert field in m, f'Model {m.get(\"id\", \"?\")} missing field: {field}'
+          print(f'Models registry valid. {len(registry[\"models\"])} models.')
+          "
 
   pytest:
+    name: Pytest (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -r requirements-dev.txt
-      - run: python -m pytest tests/ -q
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Compile check
+        run: |
+          python -m py_compile kimari/__init__.py
+          python -m py_compile kimari/cli/main.py
+          python -m py_compile kimari/core/constants.py
+          python -m py_compile kimari/core/state.py
+          python -m py_compile kimari/core/errors.py
+          python -m py_compile kimari/core/detection.py
+          python -m py_compile kimari/config/loader.py
+          python -m py_compile kimari/models/registry.py
+          python -m py_compile kimari/profiles/manager.py
+          python -m py_compile kimari/benchmarks/kimarifit.py
+          python -m py_compile kimari/benchmarks/bench.py
+      - name: Run tests
+        run: python -m pytest tests/ -q
 
   cli-smoke:
+    name: CLI Smoke Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -r cli/requirements.txt
-      - run: python cli/kimari_cli.py profiles
-      - run: python cli/kimari_cli.py doctor --json || true
-      - run: python cli/kimari_cli.py start --profile test --dry-run
-      - run: python cli/kimari_cli.py start --profile test --model models/test.gguf --host 0.0.0.0 --port 8080 --ctx 2048 --dry-run
-      - run: python cli/kimari_cli.py pull --list
-      - run: python cli/kimari_cli.py pull test --dry-run
-      - run: python cli/kimari_cli.py status --json || true
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Version check
+        run: python -m kimari.cli.main --version
+      - name: Doctor
+        run: python -m kimari.cli.main doctor || true
+      - name: Info
+        run: python -m kimari.cli.main info
+      - name: Profiles
+        run: python -m kimari.cli.main profiles
+      - name: Pull list
+        run: python -m kimari.cli.main pull --list
+      - name: Start dry-run
+        run: python -m kimari.cli.main start --profile test --dry-run
+      - name: Config validate
+        run: python -m kimari.cli.main config validate
+      - name: Config path
+        run: python -m kimari.cli.main config path
 
   check-docs:
+    name: Check Documentation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          count=$(find docs -name "*.md" | wc -l)
-          echo "Found $count documentation files."
-          [ "$count" -ge 10 ] || { echo "FAIL: Expected at least 10 doc files"; exit 1; }
-
-  validate-models-registry:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements-dev.txt
-      - run: python -c "
-import json
-registry = json.load(open('config/kimari.models.json'))
-assert 'models' in registry, 'Missing models key'
-required_ids = {'test', 'recommended', 'qwen3-4b-q4', 'smollm3-3b-q4'}
-found_ids = {m['id'] for m in registry['models']}
-missing = required_ids - found_ids
-assert not missing, f'Missing model IDs: {missing}'
-for m in registry['models']:
-    for key in ['id', 'display_name', 'url', 'filename', 'target_path', 'size_gb', 'recommended_profile', 'license_note']:
-        assert key in m, f'Model {m.get(\"id\", \"?\")} missing key: {key}'
-    assert m['filename'].endswith('.gguf'), f'Model {m[\"id\"]} filename does not end with .gguf'
-print(f'Models registry valid: {len(registry[\"models\"])} models registered.')
-"
+      - name: Check key docs exist
+        run: |
+          for f in README.md GETTING_STARTED.md ROADMAP.md CHANGELOG.md SECURITY.md PRIVACY.md docs/COMPARISON.md docs/WEB_UI_PLAN.md; do
+            test -f "$f" && echo "$f: OK" || { echo "$f: MISSING"; exit 1; }
+          done

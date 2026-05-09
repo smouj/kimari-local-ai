@@ -1,108 +1,117 @@
 # Getting Started with Kimari Local AI
 
-> **10-minute guide to running your first local AI model**
+> Get from zero to running inference in under 10 minutes.
 
 ## Prerequisites
 
-- **NVIDIA GPU** (GTX 1060 6GB or better)
-- **CUDA Toolkit** 11.8+ ([Download](https://developer.nvidia.com/cuda-downloads))
-- **Python** 3.10+
-- **Git**
-- **8 GB+** system RAM
+| Requirement | Minimum | Recommended |
+|-------------|---------|-------------|
+| NVIDIA GPU | GTX 1060 6GB | GTX 1080 8GB+ |
+| CUDA Toolkit | 11.8 | 12.4 |
+| Python | 3.10 | 3.12 |
+| System RAM | 8 GB | 16 GB |
+| Disk space | 5 GB | 10 GB |
 
-## Step 1: Clone and Install
+## Step 1: Install
 
 ```bash
+# Clone the repository
 git clone https://github.com/smouj/kimari-local-ai.git
 cd kimari-local-ai
+
+# Option A: Install as package (recommended)
+pip install -e .
+
+# Option B: Install dependencies only
 pip install -r cli/requirements.txt
 ```
 
-## Step 2: Run Diagnostics
+## Step 2: Check Your System
 
 ```bash
-python cli/kimari_cli.py doctor
+kimari doctor
 ```
 
-This checks your GPU, CUDA, and system setup. Warnings are OK for testing — only FAIL items need fixing.
+This checks your GPU, CUDA, Python version, and configuration. Some warnings are expected if you don't have a GPU in your current environment.
 
 ## Step 3: Download a Model
 
 ```bash
-# Download the tiny test model (~0.7 GB)
-python cli/kimari_cli.py pull test
+# Download the test model (TinyLlama 1.1B, ~700 MB)
+kimari pull test
 
-# Or download a more capable model (~2.7 GB)
-python cli/kimari_cli.py pull recommended
-```
+# List all available models
+kimari pull --list
 
-See all available models:
-```bash
-python cli/kimari_cli.py pull --list
+# Download the recommended model (Qwen3-4B, ~2.7 GB)
+kimari pull recommended
 ```
 
 ## Step 4: Start the Server
 
 ```bash
-# With the test profile
-python cli/kimari_cli.py start --profile test --daemon
+# Start with the test profile
+kimari start --profile test
 
-# Or specify a different model
-python cli/kimari_cli.py start --profile test --model models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf --daemon
+# Or preview the command without running it
+kimari start --profile test --dry-run
+
+# Start in background (daemon mode)
+kimari start --profile test --daemon
 ```
 
-## Step 5: Chat!
+## Step 5: Chat
 
 ```bash
 # Single message
-python cli/kimari_cli.py chat "Explain Docker in one paragraph"
+kimari chat "Explain Docker containers briefly"
 
 # Interactive mode
-python cli/kimari_cli.py chat
+kimari chat
 ```
 
 ## Step 6: Open WebUI (Optional)
 
 ```bash
-# Start with Docker profile so Open WebUI can reach the API
-python cli/kimari_cli.py stop
-python cli/kimari_cli.py start --profile docker --daemon
+# Start with Docker profile (listens on 0.0.0.0)
+kimari start --profile docker --daemon
 
 # Launch Open WebUI
 make webui-up
 
-# Open http://localhost:3000
+# Open http://localhost:3000 in your browser
 ```
+
+> ⚠️ **Security:** The `docker` profile binds to `0.0.0.0`, which makes the API accessible from other machines on your network. Only use this on trusted local networks.
 
 ## Troubleshooting
 
-### "Model not found"
-Run `kimari pull test` or place any GGUF file in `models/`.
-
-### "llama-server not found"
-Build it: `bash scripts/linux/build-llamacpp-cuda.sh`
-Or set: `export LLAMA_SERVER=/path/to/llama-server`
-
-### "CUDA out of memory"
-Use a smaller model or reduce context:
-```bash
-python cli/kimari_cli.py start --profile test --ctx 2048 --daemon
-```
-
-## What Works Today
-
-| Feature | Status |
-|---------|--------|
-| CLI (doctor, start, stop, status, chat, bench, fit, pull) | ✅ Works |
-| llama.cpp runtime with CUDA | ✅ Works |
-| Model download (kimari pull) | ✅ Works |
-| Open WebUI integration | ✅ Works via Docker |
-| Continue IDE integration | ✅ Config ready |
-| Kimari-4B model | 🔨 Planned (not released yet) |
+| Problem | Solution |
+|---------|----------|
+| `llama-server not found` | Build it: `bash scripts/linux/build-llamacpp-cuda.sh` or set `LLAMA_SERVER=/path/to/binary` |
+| `Model not found` | Run `kimari pull test` or use `--model models/your-model.gguf` |
+| `Port 11435 in use` | Run `kimari stop` or use `--port 8080` |
+| No GPU detected | Install NVIDIA drivers and CUDA Toolkit. Use `kimari fit --vram 6.0` for manual VRAM |
+| `ModuleNotFoundError: requests` | Run `pip install -r cli/requirements.txt` |
 
 ## Next Steps
 
-- Read the [full README](README.md)
-- Check [GPU profiles](config/kimari.profiles.json)
-- Run benchmarks: `python cli/kimari_cli.py bench --profile test --json`
-- Calculate KimariFit: `python cli/kimari_cli.py fit --model models/your-model.gguf --ctx 8192`
+- Read the [README](README.md) for full command reference
+- Check [docs/COMPARISON.md](docs/COMPARISON.md) to compare Kimari with alternatives
+- See [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) to understand the codebase
+- Read [SECURITY.md](SECURITY.md) for security best practices
+
+## Quick Reference
+
+```bash
+kimari doctor              # Check system
+kimari info                # Show installation info
+kimari pull test           # Download test model
+kimari start --profile test  # Start server
+kimari chat                # Chat with model
+kimari status              # Check server status
+kimari stop                # Stop server
+kimari config validate     # Validate configuration
+kimari models              # List models
+kimari profiles            # List GPU profiles
+```
