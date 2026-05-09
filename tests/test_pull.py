@@ -1,7 +1,6 @@
-"""
-Tests for model registry and pull functionality.
-"""
+"""Tests for model registry and pull functionality."""
 
+import inspect
 import sys
 from pathlib import Path
 
@@ -10,7 +9,12 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from kimari.models.registry import load_models_registry
+from kimari.models.registry import (  # noqa: E402
+    load_models_registry,
+    pull_all_models,
+    pull_model,
+    verify_model_hash,
+)
 
 
 def test_load_models_registry():
@@ -51,32 +55,26 @@ def test_registry_models_have_family(sample_models_registry):
 def test_registry_urls_are_https(sample_models_registry):
     """All model download URLs use HTTPS."""
     for model in sample_models_registry["models"]:
-        assert model["url"].startswith("https://"), (
-            f"Model '{model['id']}' uses non-HTTPS URL: {model['url']}"
-        )
+        assert model["url"].startswith("https://"), f"Model '{model['id']}' uses non-HTTPS URL: {model['url']}"
 
 
 def test_pull_unknown_model_exits():
     """pull_model raises SystemExit for unknown model ID."""
-    from kimari.models.registry import pull_model
     with pytest.raises(SystemExit):
         pull_model("nonexistent_model_12345")
 
 
 def test_verify_model_hash_unknown_model():
     """verify_model_hash raises SystemExit for unknown model ID."""
-    from kimari.models.registry import verify_model_hash
     with pytest.raises(SystemExit):
         verify_model_hash("nonexistent_model_12345")
 
 
 def test_pull_all_models_runs():
     """pull_all_models runs without error (no models to actually download in test)."""
-    from kimari.models.registry import pull_all_models
     # This will attempt to download; we just verify the function is callable
     # In a real test environment, we'd mock requests
     # For now, just verify the function exists and has the right signature
-    import inspect
     sig = inspect.signature(pull_all_models)
     assert "dry_run" in sig.parameters
     assert "force" in sig.parameters

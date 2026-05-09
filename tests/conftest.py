@@ -23,7 +23,7 @@ def project_root() -> Path:
 def sample_config() -> dict:
     """Loads the actual kimari.profiles.json config."""
     config_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
-    with open(config_path, "r") as f:
+    with open(config_path) as f:
         return json.load(f)
 
 
@@ -31,7 +31,7 @@ def sample_config() -> dict:
 def sample_models_registry() -> dict:
     """Loads the actual kimari.models.json registry."""
     registry_path = PROJECT_ROOT / "config" / "kimari.models.json"
-    with open(registry_path, "r") as f:
+    with open(registry_path) as f:
         return json.load(f)
 
 

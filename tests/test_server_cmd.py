@@ -1,6 +1,4 @@
-"""
-Tests for build_server_cmd and server command construction.
-"""
+"""Tests for build_server_cmd and server command construction."""
 
 import sys
 from pathlib import Path
@@ -8,7 +6,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from kimari.cli.main import build_server_cmd
+from kimari.cli.main import build_server_cmd  # noqa: E402
 
 
 def test_build_server_cmd_basic(sample_profile):
@@ -42,32 +40,28 @@ def test_build_server_cmd_host_port(sample_profile):
 
 def test_build_server_cmd_model_override(sample_profile):
     """build_server_cmd respects model override."""
-    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile,
-                           model_override="models/custom.gguf")
+    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile, model_override="models/custom.gguf")
     model_idx = cmd.index("-m")
     assert "custom.gguf" in cmd[model_idx + 1]
 
 
 def test_build_server_cmd_host_override(sample_profile):
     """build_server_cmd respects host override."""
-    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile,
-                           host_override="0.0.0.0")
+    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile, host_override="0.0.0.0")
     host_idx = cmd.index("--host")
     assert cmd[host_idx + 1] == "0.0.0.0"
 
 
 def test_build_server_cmd_port_override(sample_profile):
     """build_server_cmd respects port override."""
-    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile,
-                           port_override=9999)
+    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile, port_override=9999)
     port_idx = cmd.index("--port")
     assert cmd[port_idx + 1] == "9999"
 
 
 def test_build_server_cmd_ctx_override(sample_profile):
     """build_server_cmd respects ctx override."""
-    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile,
-                           ctx_override=2048)
+    cmd = build_server_cmd("/usr/bin/llama-server", sample_profile, ctx_override=2048)
     ctx_idx = cmd.index("-c")
     assert cmd[ctx_idx + 1] == "2048"
 

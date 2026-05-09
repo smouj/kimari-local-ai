@@ -7,11 +7,8 @@ and validating model integrity via SHA256 hashes.
 
 import hashlib
 import json
-import os
-import sys
 import time
 from pathlib import Path
-from typing import Optional
 
 try:
     import requests
@@ -19,7 +16,7 @@ except ImportError:
     requests = None  # type: ignore
 
 from kimari.core.constants import MODELS_DIR, MODELS_REGISTRY_PATH, PROJECT_ROOT
-from kimari.utils.colors import Color, ok, warn, info
+from kimari.utils.colors import Color, info, ok, warn
 
 
 def load_models_registry() -> dict:
@@ -28,12 +25,15 @@ def load_models_registry() -> dict:
         print(f"[ERROR] Models registry not found: {MODELS_REGISTRY_PATH}")
         print("Run this command from the kimari-local-ai root directory.")
         raise SystemExit(1)
-    with open(MODELS_REGISTRY_PATH, "r") as f:
+    with open(MODELS_REGISTRY_PATH) as f:
         return json.load(f)
 
 
-def list_registry_models(json_output: bool = False, downloaded_only: bool = False,
-                          status_filter: Optional[str] = None) -> list:
+def list_registry_models(
+    json_output: bool = False,
+    downloaded_only: bool = False,
+    status_filter: str | None = None,
+) -> list:
     """List all models in the registry with download status.
 
     Args:
@@ -76,8 +76,9 @@ def list_registry_models(json_output: bool = False, downloaded_only: bool = Fals
     for m in result:
         target = PROJECT_ROOT / m["target_path"]
         is_downloaded = target.exists()
-        status_str = (f"{Color.GREEN}✓ downloaded{Color.RESET}"
-                      if is_downloaded else f"{Color.DIM}not downloaded{Color.RESET}")
+        status_str = (
+            f"{Color.GREEN}✓ downloaded{Color.RESET}" if is_downloaded else f"{Color.DIM}not downloaded{Color.RESET}"
+        )
         status_badge = ""
         if m.get("status"):
             status_badge = f" [{m['status']}]"
@@ -111,7 +112,7 @@ def _compute_sha256(filepath: Path, progress: bool = False) -> str:
     return sha256.hexdigest()
 
 
-def verify_model_hash(model_id: str) -> Optional[bool]:
+def verify_model_hash(model_id: str) -> bool | None:
     """Verify a downloaded model's SHA256 hash against the registry.
 
     Returns True if match, False if mismatch, None if no hash in registry.
@@ -235,7 +236,7 @@ def pull_model(model_id: str, dry_run: bool = False, force: bool = False):
     if partial_path.exists():
         resume_from = partial_path.stat().st_size
         if resume_from > 0:
-            info(f"Resuming from {resume_from / (1024*1024):.1f} MB")
+            info(f"Resuming from {resume_from / (1024 * 1024):.1f} MB")
 
     try:
         headers = {}
@@ -272,12 +273,19 @@ def pull_model(model_id: str, dry_run: bool = False, force: bool = False):
                         elapsed = time.time() - start_time
                         speed = downloaded_mb / elapsed if elapsed > 0 else 0
                         eta_s = (total_mb - downloaded_mb) / speed if speed > 0 else 0
-                        print(f"\r  Progress: {pct:5.1f}% ({downloaded_mb:.1f}/{total_mb:.1f} MB) "
-                              f"{speed:.1f} MB/s ETA: {eta_s:.0f}s",
-                              end="", flush=True)
+                        print(
+                            f"\r  Progress: {pct:5.1f}% ({downloaded_mb:.1f}/{total_mb:.1f} MB) "
+                            f"{speed:.1f} MB/s ETA: {eta_s:.0f}s",
+                            end="",
+                            flush=True,
+                        )
                     else:
                         downloaded_mb = downloaded / (1024 * 1024)
-                        print(f"\r  Downloaded: {downloaded_mb:.1f} MB", end="", flush=True)
+                        print(
+                            f"\r  Downloaded: {downloaded_mb:.1f} MB",
+                            end="",
+                            flush=True,
+                        )
 
         elapsed = time.time() - start_time
         downloaded_mb = downloaded / (1024 * 1024)
@@ -305,30 +313,30 @@ def pull_model(model_id: str, dry_run: bool = False, force: bool = False):
                 print(f"  {Color.RED}[FAIL]{Color.RESET} SHA256 mismatch!")
                 print(f"  Expected: {model_entry['sha256']}")
                 print(f"  Actual:   {actual_hash}")
-                print(f"  The file may be corrupted. Try downloading again with --force.")
+                print("  The file may be corrupted. Try downloading again with --force.")
 
     except requests.exceptions.HTTPError as e:
         print(f"\n[ERROR] Download failed (HTTP {e.response.status_code}): {e}")
         # Keep partial for resume
         if partial_path.exists() and partial_path.stat().st_size == 0:
             partial_path.unlink()
-        raise SystemExit(1)
+        raise SystemExit(1) from None
     except requests.exceptions.ConnectionError:
-        print(f"\n[ERROR] Connection failed. Check your internet connection.")
+        print("\n[ERROR] Connection failed. Check your internet connection.")
         # Keep partial for resume
-        raise SystemExit(1)
+        raise SystemExit(1) from None
     except KeyboardInterrupt:
         print(f"\n\n  {Color.YELLOW}[INTERRUPTED]{Color.RESET} Download cancelled.")
         # Keep partial for resume
         if partial_path.exists():
             print(f"  Partial download kept: {partial_path}")
-            print(f"  Re-run to resume download.")
-        raise SystemExit(1)
+            print("  Re-run to resume download.")
+        raise SystemExit(1) from None
     except Exception as e:
         print(f"\n[ERROR] Download failed: {e}")
         if partial_path.exists() and partial_path.stat().st_size == 0:
             partial_path.unlink()
-        raise SystemExit(1)
+        raise SystemExit(1) from None
 
 
 def pull_all_models(dry_run: bool = False, force: bool = False):
@@ -351,7 +359,7 @@ def pull_all_models(dry_run: bool = False, force: bool = False):
 
     if not dry_run:
         try:
-            response = input(f"\n  Download all? [y/N] ").strip().lower()
+            response = input("\n  Download all? [y/N] ").strip().lower()
             if response not in ("y", "yes"):
                 print("  Cancelled.")
                 return

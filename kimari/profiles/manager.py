@@ -3,9 +3,7 @@ GPU profile listing and management for Kimari.
 """
 
 import json
-from typing import Optional
 
-from kimari.config.loader import load_config
 from kimari.utils.colors import Color
 
 

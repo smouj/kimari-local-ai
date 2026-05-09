@@ -1,8 +1,9 @@
-"""
-Smoke tests for the Kimari CLI interface.
+"""Smoke tests for the Kimari CLI interface.
+
 Uses subprocess.run with capture_output=True to test the actual CLI.
 """
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -13,7 +14,7 @@ CLI_PATH = PROJECT_ROOT / "cli" / "kimari_cli.py"
 
 def _run_cli(*args: str) -> subprocess.CompletedProcess:
     """Run the kimari CLI with the given arguments and return the result."""
-    cmd = [sys.executable, str(CLI_PATH)] + list(args)
+    cmd = [sys.executable, str(CLI_PATH), *list(args)]
     return subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
 
@@ -35,7 +36,6 @@ def test_cli_profiles_json():
     """'profiles --json' outputs valid JSON."""
     result = _run_cli("profiles", "--json")
     assert result.returncode == 0
-    import json
     data = json.loads(result.stdout)
     assert "profiles" in data
 
@@ -57,12 +57,18 @@ def test_cli_start_dry_run_test():
 def test_cli_start_dry_run_with_overrides():
     """'start --profile test --model models/x.gguf --host 0.0.0.0 --port 9999 --ctx 2048 --dry-run' runs."""
     result = _run_cli(
-        "start", "--profile", "test",
-        "--model", "models/x.gguf",
-        "--host", "0.0.0.0",
-        "--port", "9999",
-        "--ctx", "2048",
-        "--dry-run"
+        "start",
+        "--profile",
+        "test",
+        "--model",
+        "models/x.gguf",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "9999",
+        "--ctx",
+        "2048",
+        "--dry-run",
     )
     assert result.returncode == 0
     assert "DRY RUN" in result.stdout
@@ -83,7 +89,6 @@ def test_cli_doctor_json():
     """'doctor --json' outputs valid JSON."""
     result = _run_cli("doctor", "--json")
     assert result.returncode in (0, 1)
-    import json
     data = json.loads(result.stdout)
     assert "checks" in data
     assert "summary" in data
@@ -93,16 +98,15 @@ def test_cli_info():
     """'info' command runs and shows version."""
     result = _run_cli("info")
     assert result.returncode == 0
-    assert "0.1.6-alpha" in result.stdout
+    assert "0.1.7-alpha" in result.stdout
 
 
 def test_cli_info_json():
     """'info --json' outputs valid JSON."""
     result = _run_cli("info", "--json")
     assert result.returncode == 0
-    import json
     data = json.loads(result.stdout)
-    assert data["kimari_version"] == "0.1.6-alpha"
+    assert data["kimari_version"] == "0.1.7-alpha"
 
 
 def test_cli_config_path():

@@ -1,6 +1,6 @@
 # Kimari Local AI — Project Structure
 
-> Last updated: v0.1.6-alpha
+> Last updated: v0.1.7-alpha
 
 This document describes the organization of the Kimari Local AI codebase.
 

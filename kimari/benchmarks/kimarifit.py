@@ -5,11 +5,8 @@ Estimates whether a given model + context will fit in a GPU's VRAM
 and provides a score based on utilization and quantization quality.
 """
 
-import platform
 from pathlib import Path
-from typing import Optional
 
-from kimari import __version__ as KIMARI_VERSION
 from kimari.core.constants import PROJECT_ROOT
 from kimari.core.detection import detect_gpu
 from kimari.utils.colors import Color
@@ -39,8 +36,7 @@ def quality_factor(model_name: str) -> int:
         return 70  # Unknown
 
 
-def calculate_kimarifit(model_path: str, ctx_size: int, config: dict,
-                         vram_override: Optional[float] = None):
+def calculate_kimarifit(model_path: str, ctx_size: int, config: dict, vram_override: float | None = None):
     """Calculate the KimariFit score for a given model and context.
 
     Args:
@@ -59,7 +55,7 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict,
 
     # Get model size in GiB
     model_size_bytes = model_file.stat().st_size
-    model_size_gib = model_size_bytes / (1024 ** 3)
+    model_size_gib = model_size_bytes / (1024**3)
 
     # Detect GPU or use override
     if vram_override is not None:
@@ -114,7 +110,7 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict,
     elif vram_override:
         print(f"  VRAM (manual):   {vram_override} GiB")
     print(f"  Safe VRAM:       {safe_vram:.2f} GiB ({total_vram:.1f} GiB × 0.87)")
-    print(f"  Utilization:     {total_estimated/safe_vram*100:.1f}%")
+    print(f"  Utilization:     {total_estimated / safe_vram * 100:.1f}%")
     print(f"\n  {Color.BOLD}KimariFit Score: {final_score:.0f}/100{Color.RESET}")
 
     if final_score >= 80:

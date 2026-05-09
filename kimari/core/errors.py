@@ -6,10 +6,8 @@ and provides actionable solutions.
 """
 
 from pathlib import Path
-from typing import Optional
 
 from kimari.core.constants import LOG_FILE
-
 
 ERROR_PATTERNS = [
     {
@@ -55,7 +53,7 @@ ERROR_PATTERNS = [
 ]
 
 
-def parse_log_errors(log_path: Path = LOG_FILE) -> Optional[dict]:
+def parse_log_errors(log_path: Path = LOG_FILE) -> dict | None:
     """Read kimari-server.log and detect known error patterns.
 
     Returns the first matched error dict with 'error_type', 'pattern', and 'solution',
@@ -64,7 +62,7 @@ def parse_log_errors(log_path: Path = LOG_FILE) -> Optional[dict]:
     if not log_path.exists():
         return None
     try:
-        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+        with open(log_path, encoding="utf-8", errors="replace") as f:
             content = f.read()
     except OSError:
         return None
@@ -85,7 +83,7 @@ def read_log_tail(log_path: Path = LOG_FILE, lines: int = 10) -> list:
     if not log_path.exists():
         return []
     try:
-        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+        with open(log_path, encoding="utf-8", errors="replace") as f:
             all_lines = f.readlines()
         return all_lines[-lines:]
     except OSError:

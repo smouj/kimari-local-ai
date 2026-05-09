@@ -10,19 +10,17 @@ import platform
 import subprocess
 import time
 from pathlib import Path
-from typing import Optional
 
 try:
     import requests
 except ImportError:
     requests = None  # type: ignore
 
-from kimari import __version__ as KIMARI_VERSION
+from kimari import __version__ as KIMARI_VERSION  # noqa: N812
 from kimari.config.loader import get_profile
 from kimari.core.constants import PROJECT_ROOT
-from kimari.core.detection import detect_gpu, detect_cuda_version
+from kimari.core.detection import detect_cuda_version, detect_gpu
 from kimari.utils.colors import Color
-
 
 # Standard benchmark prompts (English + Spanish technical)
 BENCHMARK_PROMPTS = [
@@ -37,12 +35,14 @@ BENCHMARK_PROMPTS = [
 ]
 
 
-def _detect_llama_cpp_version() -> Optional[str]:
+def _detect_llama_cpp_version() -> str | None:
     """Try to detect llama.cpp version from llama-server --version."""
     try:
         result = subprocess.run(
             ["llama-server", "--version"],
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         output = (result.stdout or "") + (result.stderr or "")
         # Extract version-like string from output
@@ -55,9 +55,13 @@ def _detect_llama_cpp_version() -> Optional[str]:
         return None
 
 
-def run_benchmark(profile_name: str, config: dict, json_output: bool = False,
-                   output: Optional[str] = None,
-                   vram_override: Optional[float] = None):
+def run_benchmark(
+    profile_name: str,
+    config: dict,
+    json_output: bool = False,
+    output: str | None = None,
+    vram_override: float | None = None,
+):
     """Run a basic benchmark on the Kimari server."""
     if requests is None:
         print("[ERROR] 'requests' is required. Install with: pip install -r cli/requirements.txt")
@@ -72,14 +76,14 @@ def run_benchmark(profile_name: str, config: dict, json_output: bool = False,
         requests.get(f"http://{host}:{port}/health", timeout=3)
     except requests.ConnectionError:
         print("[ERROR] Server not running. Start first: kimari start")
-        raise SystemExit(1)
+        raise SystemExit(1) from None
 
     results = []
     for i, prompt in enumerate(BENCHMARK_PROMPTS):
         prompt_display = prompt[:50] + ("..." if len(prompt) > 50 else "")
 
         if not json_output:
-            print(f"  [{i+1}/{len(BENCHMARK_PROMPTS)}] ", end="", flush=True)
+            print(f"  [{i + 1}/{len(BENCHMARK_PROMPTS)}] ", end="", flush=True)
             print(f"{Color.DIM}{prompt_display}{Color.RESET} ", end="", flush=True)
 
         start = time.time()
@@ -127,23 +131,29 @@ def run_benchmark(profile_name: str, config: dict, json_output: bool = False,
             completion_tokens = max(chunks, len(full_content) // 4)
             tokens_per_sec = completion_tokens / elapsed if elapsed > 0 else 0
 
-            results.append({
-                "prompt": prompt_display,
-                "tokens": completion_tokens,
-                "time_s": round(elapsed, 2),
-                "tokens_per_sec": round(tokens_per_sec, 1),
-                "time_to_first_token_ms": round(first_token_time * 1000, 1) if first_token_time else None,
-                "status": "ok",
-            })
+            results.append(
+                {
+                    "prompt": prompt_display,
+                    "tokens": completion_tokens,
+                    "time_s": round(elapsed, 2),
+                    "tokens_per_sec": round(tokens_per_sec, 1),
+                    "time_to_first_token_ms": round(first_token_time * 1000, 1) if first_token_time else None,
+                    "status": "ok",
+                }
+            )
             if not json_output:
-                ttft = f" TTFT: {first_token_time*1000:.0f}ms" if first_token_time else ""
-                print(f"{Color.GREEN}✓{Color.RESET} {completion_tokens}tok in {elapsed:.1f}s ({tokens_per_sec:.1f} t/s){ttft}")
+                ttft = f" TTFT: {first_token_time * 1000:.0f}ms" if first_token_time else ""
+                print(
+                    f"{Color.GREEN}✓{Color.RESET} {completion_tokens}tok in {elapsed:.1f}s ({tokens_per_sec:.1f} t/s){ttft}"
+                )
 
         except Exception as e:
-            results.append({
-                "prompt": prompt_display,
-                "status": f"error: {str(e)[:50]}",
-            })
+            results.append(
+                {
+                    "prompt": prompt_display,
+                    "status": f"error: {str(e)[:50]}",
+                }
+            )
             if not json_output:
                 print(f"{Color.RED}✗{Color.RESET} {e}")
 
@@ -170,17 +180,20 @@ def run_benchmark(profile_name: str, config: dict, json_output: bool = False,
         "ubatch": profile.get("ubatch"),
         "prompt_tokens": None,
         "generated_tokens": sum(r["tokens"] for r in ok_results) if ok_results else None,
-        "tokens_per_second": round(
-            sum(r["tokens_per_sec"] for r in ok_results) / len(ok_results), 2
-        ) if ok_results else None,
+        "tokens_per_second": round(sum(r["tokens_per_sec"] for r in ok_results) / len(ok_results), 2)
+        if ok_results
+        else None,
         "time_to_first_token_ms": round(
-            sum(r["time_to_first_token_ms"] for r in ok_results
-                if r.get("time_to_first_token_ms") is not None) /
-            len([r for r in ok_results if r.get("time_to_first_token_ms") is not None]), 1
-        ) if any(r.get("time_to_first_token_ms") is not None for r in ok_results) else None,
+            sum(r["time_to_first_token_ms"] for r in ok_results if r.get("time_to_first_token_ms") is not None)
+            / len([r for r in ok_results if r.get("time_to_first_token_ms") is not None]),
+            1,
+        )
+        if any(r.get("time_to_first_token_ms") is not None for r in ok_results)
+        else None,
         "peak_vram_mb": None,  # Known limitation — cannot measure from CLI
         "llama_cpp_version": _detect_llama_cpp_version(),
-        "notes": "Automated benchmark via 'kimari bench'" + (" (VRAM manually overridden)" if vram_override is not None else ""),
+        "notes": "Automated benchmark via 'kimari bench'"
+        + (" (VRAM manually overridden)" if vram_override is not None else ""),
     }
 
     # Build detailed bench data

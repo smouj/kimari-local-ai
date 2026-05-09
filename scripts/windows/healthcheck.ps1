@@ -14,7 +14,7 @@ if (-not (Test-Path $CONFIG_FILE)) {
 
 $config = Get-Content $CONFIG_FILE | ConvertFrom-Json
 $profileName = $config.default_profile
-if (-not $profileName) { $profileName = "gtx1060" }
+if (-not $profileName) { $profileName = "test" }
 $PORT = $config.profiles.$profileName.port
 
 $HEALTH_URL = "http://127.0.0.1:${PORT}/health"
@@ -32,6 +32,6 @@ try {
 } catch {
     $statusCode = $_.Exception.Response.StatusCode.value__
     Write-Host "[FAIL] Kimari server is not responding (HTTP ${statusCode})" -ForegroundColor Red
-    Write-Host "[INFO] Start the server: .\scripts\windows\start-kimari-1060.ps1" -ForegroundColor Yellow
+    Write-Host "[INFO] Start the server: kimari start" -ForegroundColor Yellow
     exit 1
 }

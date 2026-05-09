@@ -9,21 +9,25 @@ import shutil
 import socket
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from kimari.core.constants import PROJECT_ROOT
 
 
-def detect_gpu() -> Optional[dict]:
+def detect_gpu() -> dict | None:
     """Detect NVIDIA GPU using nvidia-smi.
 
     Returns dict with 'name', 'vram_mb', 'driver' or None if not found.
     """
     try:
         result = subprocess.run(
-            ["nvidia-smi", "--query-gpu=name,memory.total,driver_version",
-             "--format=csv,noheader,nounits"],
-            capture_output=True, text=True, timeout=10
+            [
+                "nvidia-smi",
+                "--query-gpu=name,memory.total,driver_version",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         if result.returncode == 0:
             lines = result.stdout.strip().split("\n")
@@ -40,7 +44,7 @@ def detect_gpu() -> Optional[dict]:
     return None
 
 
-def detect_cuda_version() -> Optional[str]:
+def detect_cuda_version() -> str | None:
     """Detect CUDA version via nvcc --version.
 
     Returns version string like '12.4' or None.
@@ -49,10 +53,7 @@ def detect_cuda_version() -> Optional[str]:
     if not nvcc:
         return None
     try:
-        result = subprocess.run(
-            [nvcc, "--version"],
-            capture_output=True, text=True, timeout=10
-        )
+        result = subprocess.run([nvcc, "--version"], capture_output=True, text=True, timeout=10)
         if result.returncode == 0:
             # Parse output like: "release 12.4, V12.4.131"
             for line in result.stdout.split("\n"):
@@ -71,7 +72,7 @@ def detect_cuda() -> bool:
     return shutil.which("nvcc") is not None or shutil.which("nvidia-smi") is not None
 
 
-def detect_llama_server() -> Optional[str]:
+def detect_llama_server() -> str | None:
     """Find llama-server binary searching 7 locations in priority order."""
     # 1. LLAMA_SERVER environment variable
     env_llama = os.environ.get("LLAMA_SERVER")
@@ -126,7 +127,7 @@ def is_port_free(host: str, port: int) -> bool:
         return False
 
 
-def recommend_profile(config: dict, gpu: Optional[dict]) -> str:
+def recommend_profile(config: dict, gpu: dict | None) -> str:
     """Recommend a GPU profile based on detected hardware."""
     if not gpu:
         return config.get("default_profile", "gtx1060")
@@ -136,7 +137,7 @@ def recommend_profile(config: dict, gpu: Optional[dict]) -> str:
 
     # Try to match by GPU name first
     gpu_name_lower = gpu["name"].lower()
-    for key, profile in profiles.items():
+    for key, _profile in profiles.items():
         if key in gpu_name_lower:
             return key
 

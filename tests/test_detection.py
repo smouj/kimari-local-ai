@@ -1,15 +1,19 @@
-"""
-Tests for system detection functions.
-"""
+"""Tests for system detection functions."""
 
 import sys
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from kimari.core.detection import detect_cuda, detect_gpu, detect_llama_server, is_port_free, recommend_profile
+from kimari.core.detection import (  # noqa: E402
+    detect_cuda,
+    detect_gpu,
+    detect_llama_server,
+    is_port_free,
+    recommend_profile,
+)
 
 
 def test_detect_cuda_without_tools():
@@ -44,10 +48,12 @@ def test_detect_gpu_with_valid_output():
 
 def test_detect_llama_server_not_found():
     """detect_llama_server returns None when no binary is found."""
-    with patch.dict("os.environ", {}, clear=True):
-        with patch("shutil.which", return_value=None):
-            with patch.object(Path, "exists", return_value=False):
-                assert detect_llama_server() is None
+    with (
+        patch.dict("os.environ", {}, clear=True),
+        patch("shutil.which", return_value=None),
+        patch.object(Path, "exists", return_value=False),
+    ):
+        assert detect_llama_server() is None
 
 
 def test_is_port_free_with_unused_port():
