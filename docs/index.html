@@ -367,7 +367,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.2-alpha — Now with kimari pull, --model/--host/--port/--ctx overrides
+      v0.1.4-alpha — Modular package, config migration, enhanced security
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run powerful language models locally on consumer-grade NVIDIA GPUs. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -389,7 +389,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="stats-grid reveal">
     <div class="stat-card">
       <div class="stat-icon">🎮</div>
-      <div class="stat-value">4</div>
+      <div class="stat-value">5</div>
       <div class="stat-label">GPU Profiles</div>
     </div>
     <div class="stat-card">
@@ -436,7 +436,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <div class="feature-card">
       <span class="feature-icon">📊</span>
       <div class="feature-title">KimariFit Score</div>
-      <div class="feature-desc">Proprietary metric: useful intelligence per GiB of VRAM. Know before you run.</div>
+      <div class="feature-desc">Unique metric: useful intelligence per GiB of VRAM. Know before you run.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">🌐</span>
@@ -458,6 +458,16 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-title">Bilingual</div>
       <div class="feature-desc">English and technical Spanish support built in.</div>
     </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚙️</span>
+      <div class="feature-title">Config Management</div>
+      <div class="feature-desc">kimari config path/show/validate/migrate with JSON output. Full control over your configuration.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📦</span>
+      <div class="feature-title">Model Registry</div>
+      <div class="feature-desc">kimari pull with resume support and SHA256 verification. Download and verify models safely.</div>
+    </div>
   </div>
 </section>
 
@@ -471,6 +481,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="terminal-wrapper reveal">
     <div class="terminal-tabs">
       <div class="terminal-tab active" onclick="switchTab(this, 'tab-doctor')">doctor</div>
+      <div class="terminal-tab" onclick="switchTab(this, 'tab-pull')">pull</div>
+      <div class="terminal-tab" onclick="switchTab(this, 'tab-info')">info --json</div>
       <div class="terminal-tab" onclick="switchTab(this, 'tab-start')">start --dry-run</div>
       <div class="terminal-tab" onclick="switchTab(this, 'tab-status')">status --json</div>
       <div class="terminal-tab" onclick="switchTab(this, 'tab-profiles')">profiles</div>
@@ -486,7 +498,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██║     ██╔══██║██╔══██╗██║   ██║██║╚██╗██║██╔══██║
 ╚██████╗██║  ██║██║  ██║╚██████╔╝██║ ╚████║██║  ██║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.2-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.4-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -502,6 +514,38 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 
   <span class="terminal-ok">Result: 9 OK, 1 WARN, 0 FAIL</span>
   <span class="terminal-output">Warnings present. Kimari may work with limitations.</span>
+      </div>
+
+      <div class="terminal-panel" id="tab-pull">
+        <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari pull test</span>
+<span class="terminal-output">
+📦 Pulling model: <span class="terminal-highlight">test</span>
+   URL:    https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+   Dest:   models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+   Size:   ~800 MB
+
+  Downloading... ████████████████████████ 100%
+  <span class="terminal-ok">[OK]</span>   SHA256 verified: a3f8b2c1d4e5f6...
+  <span class="terminal-ok">[OK]</span>   Model saved to models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+
+  <span class="terminal-ok">Result: Model pulled and verified successfully.</span>
+</span>
+      </div>
+
+      <div class="terminal-panel" id="tab-info">
+        <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
+<span class="terminal-output">{
+  "version": "<span class="terminal-highlight">0.1.4-alpha</span>",
+  "python": "3.11.6",
+  "install_method": "pip install -e .",
+  "package": "kimari-local-ai",
+  "config_path": "config/kimari.profiles.json",
+  "state_dir": ".kimari",
+  "profiles": ["gtx1060", "gtx1080", "turbo", "test", "docker"],
+  "llama_server": "deps/llama.cpp/build/bin/llama-server",
+  "cuda_available": true,
+  "models_dir": "models/"
+}</span>
       </div>
 
       <div class="terminal-panel" id="tab-start">
@@ -586,6 +630,14 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     Ctx:      4096
     Batch:     128
     VRAM:   6.0 GB
+
+  <span class="terminal-highlight">docker</span>
+    Name:   Docker Container
+    Model:  models/Kimari-4B-Q4_K_M.gguf
+    Quant:  Q4_K_M
+    Ctx:      8192
+    Batch:     256
+    VRAM:   6.0 GB
 </span>
       </div>
 
@@ -599,12 +651,19 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari start --profile test</span>                 <span class="terminal-output"># Start server</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari stop</span>                                  <span class="terminal-output"># Stop server</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari status</span>                                <span class="terminal-output"># Check status</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari pull test</span>                             <span class="terminal-output"># Download model</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info</span>                                  <span class="terminal-output"># Show system info</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>                           <span class="terminal-output"># JSON system info</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari chat "Hello, Kimari!"</span>                 <span class="terminal-output"># Single message</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari chat</span>                                  <span class="terminal-output"># Interactive REPL</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari bench --profile test</span>                  <span class="terminal-output"># Benchmark</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari fit --model file.gguf --ctx 8192</span>      <span class="terminal-output"># KimariFit score</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari models</span>                                <span class="terminal-output"># List GGUF models</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari profiles</span>                              <span class="terminal-output"># List profiles</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari config path</span>                           <span class="terminal-output"># Show config path</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari config show</span>                           <span class="terminal-output"># Display config</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari config validate</span>                       <span class="terminal-output"># Validate config</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari config migrate</span>                        <span class="terminal-output"># Migrate config</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari start --profile test --dry-run</span>        <span class="terminal-output"># Preview command</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari start --profile test --daemon</span>         <span class="terminal-output"># Background mode</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari logs</span>                                  <span class="terminal-output"># Show logs</span>
@@ -683,6 +742,21 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <div class="vram-bar"><div class="vram-bar-fill" style="width:55%"></div></div>
       </div>
     </div>
+    <div class="profile-card">
+      <div class="profile-name">docker</div>
+      <div class="profile-specs">
+        <div class="profile-spec"><span class="profile-spec-label">GPU</span><br><span class="profile-spec-value">Any (container)</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">VRAM</span><br><span class="profile-spec-value">6 GB</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">Quant</span><br><span class="profile-spec-value">Q4_K_M</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">Context</span><br><span class="profile-spec-value">8,192</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">Batch</span><br><span class="profile-spec-value">256 / 128</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">KV Cache</span><br><span class="profile-spec-value">f16</span></div>
+      </div>
+      <div class="vram-bar-wrap">
+        <div class="vram-bar-label"><span>VRAM Usage (est.)</span><span>~75%</span></div>
+        <div class="vram-bar"><div class="vram-bar-fill" style="width:75%"></div></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -734,43 +808,36 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-content">
-        <div class="step-title">Install dependencies</div>
-        <div class="step-code"><span class="prompt">$ </span>pip install -r requirements-dev.txt</div>
+        <div class="step-title">Install the package</div>
+        <div class="step-code"><span class="prompt">$ </span>pip install -e .</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-content">
         <div class="step-title">Run system diagnostics</div>
-        <div class="step-code"><span class="prompt">$ </span>python cli/kimari_cli.py doctor</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari doctor</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-content">
-        <div class="step-title">Download a test GGUF model</div>
-        <div class="step-code"><span class="prompt">$ </span>wget -O models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \<br>&nbsp;&nbsp;"https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/\<br>&nbsp;&nbsp;resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"</div>
+        <div class="step-title">Download a test model</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari pull test</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-content">
-        <div class="step-title">Preview the server start</div>
-        <div class="step-code"><span class="prompt">$ </span>python cli/kimari_cli.py start --profile test --dry-run</div>
+        <div class="step-title">Start the server</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari start --profile test</div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">6</div>
       <div class="step-content">
-        <div class="step-title">Start the server</div>
-        <div class="step-code"><span class="prompt">$ </span>python cli/kimari_cli.py start --profile test</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">7</div>
-      <div class="step-content">
         <div class="step-title">Chat with your model</div>
-        <div class="step-code"><span class="prompt">$ </span>python cli/kimari_cli.py chat "Hello, Kimari!"</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari chat "Hello, Kimari!"</div>
       </div>
     </div>
   </div>
@@ -872,6 +939,14 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="doc-card-title">Runtime Validation</div>
       <div class="doc-card-desc">Step-by-step runtime validation guide.</div>
     </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/SECURITY.md" target="_blank" class="doc-card">
+      <div class="doc-card-title">Security Policy</div>
+      <div class="doc-card-desc">Vulnerability reporting and security model.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/PRIVACY.md" target="_blank" class="doc-card">
+      <div class="doc-card-title">Privacy Policy</div>
+      <div class="doc-card-desc">Data handling, telemetry, and privacy commitments.</div>
+    </a>
   </div>
 </section>
 
@@ -880,7 +955,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.2-alpha — Framework/runtime/CLI is functional. Kimari-4B model is planned.</p>
+    <p class="section-desc">Kimari Local AI v0.1.4-alpha — Framework/runtime/CLI is functional. Modular package, config migration, enhanced security.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -896,6 +971,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Kimari-4B model</td><td>🔨 Planned — weights not yet available</td></tr>
         <tr><td>Real GPU benchmarks</td><td>📋 Pending — need measured data</td></tr>
         <tr><td><code>kimari pull</code> (model download)</td><td>✅ Implemented in v0.1.2-alpha</td></tr>
+        <tr><td><code>kimari info</code> / <code>kimari config</code></td><td>✅ Implemented in v0.1.4-alpha</td></tr>
+        <tr><td>Modular package (<code>pip install -e .</code>)</td><td>✅ Implemented in v0.1.4-alpha</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>
       </tbody>

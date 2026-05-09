@@ -23,7 +23,7 @@
 | Criterion | Kimari | Ollama | LM Studio |
 |-----------|--------|--------|-----------|
 | Primary objective | Maximize useful AI on old consumer GPUs | Simplest way to run LLMs locally | Discover, configure, and chat with models via GUI |
-| Ease of installation | Medium — clone repo, pip install, build llama.cpp | Easy — one-line installer | Easy — download .dmg/.exe/AppImage |
+| Ease of installation | Medium — clone repo, `pip install -e .`, build llama.cpp | Easy — one-line installer | Easy — download .dmg/.exe/AppImage |
 | OpenAI-compatible API | Yes (via llama-server) | Yes (built-in) | Yes (built-in) |
 | Offline / local-first | Yes | Yes | Mostly (model discovery needs internet) |
 | Privacy | Full local, zero telemetry | Full local, minimal telemetry opt-in | Local inference; app phones home for model hub |
@@ -227,4 +227,4 @@ The local AI ecosystem is not zero-sum. Kimari uses llama.cpp under the hood, in
 
 ---
 
-*Last updated: 2025-03-05 · Kimari v0.1.4-alpha*
+*Last updated: 2025-05-09 · Kimari v0.1.4-alpha*
