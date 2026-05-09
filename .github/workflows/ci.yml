@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install ruff
-        run: pip install ruff>=0.5.0
+        run: pip install "ruff>=0.5.0"
       - name: Run ruff check
         run: ruff check kimari/ tests/
       - name: Run ruff format check
@@ -43,7 +43,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install dependencies
-        run: pip install jsonschema>=4.0.0
+        run: pip install "jsonschema>=4.0.0"
       - name: Validate profiles config
         run: |
           python -c "
@@ -66,6 +66,20 @@ jobs:
               assert m['url'].startswith('https://'), f'Model {m.get(\"id\", \"?\")} URL must use HTTPS: {m[\"url\"]}'
           print(f'Models registry valid. {len(registry[\"models\"])} models, all URLs use HTTPS.')
           "
+
+  validate-makefile:
+    name: Validate Makefile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Makefile targets
+        run: |
+          make -n dry-run
+          make -n bench
+          make -n bench-1060
+          make -n bench-1080
+          make -n ci-local
+          echo "Makefile OK"
 
   pytest:
     name: Pytest (Python ${{ matrix.python-version }})
@@ -106,7 +120,7 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
-      - name: Version check
+      - name: Version check (python -m)
         run: python -m kimari.cli.main --version
       - name: Doctor
         run: python -m kimari.cli.main doctor || true
@@ -124,6 +138,25 @@ jobs:
         run: python -m kimari.cli.main config validate
       - name: Config path
         run: python -m kimari.cli.main config path
+
+  installed-cli-smoke:
+    name: Installed CLI Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install kimari package
+        run: pip install -e .
+      - name: Installed CLI — version
+        run: kimari --version
+      - name: Installed CLI — info
+        run: kimari info
+      - name: Installed CLI — start dry-run (default profile)
+        run: kimari start --dry-run
+      - name: Installed CLI — config validate
+        run: kimari config validate
 
   build-package:
     name: Build Package
@@ -149,6 +182,21 @@ jobs:
               names = z.namelist()
               assert any('py.typed' in n for n in names), f'py.typed not found in {wheels[0]}'
           print(f'py.typed found in {wheels[0]}')
+          "
+      - name: Verify no unwanted files in package
+        run: |
+          python -c "
+          import zipfile, glob
+          wheels = glob.glob('dist/*.whl')
+          assert wheels, 'No wheel found in dist/'
+          with zipfile.ZipFile(wheels[0]) as z:
+              names = z.namelist()
+              forbidden = [n for n in names if any(
+                  n.startswith(p) or p in n
+                  for p in ['.kimari/', 'kimari-server.log', '.kimari-server.pid']
+              )]
+              assert not forbidden, f'Unwanted files in wheel: {forbidden}'
+          print('Package contents OK — no unwanted files')
           "
 
   check-docs:

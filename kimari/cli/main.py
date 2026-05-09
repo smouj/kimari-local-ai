@@ -9,13 +9,10 @@ import argparse
 import json
 import os
 import signal
-import socket
 import subprocess
 import sys
 import time
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Optional
 
 try:
     import requests
@@ -23,38 +20,62 @@ except ImportError:
     print("[ERROR] 'requests' is required. Install with: pip install -r cli/requirements.txt")
     sys.exit(1)
 
-from kimari import __version__ as KIMARI_VERSION
-from kimari.core.constants import (
-    CONFIG_PATH, LOG_FILE, PID_FILE, PROJECT_ROOT, STATE_DIR, STATE_FILE,
-    KIMARI_ASCII,
-)
-from kimari.core.state import clear_state, ensure_state_dir, is_pid_alive, read_state, write_state
-from kimari.core.errors import parse_log_errors, read_log_tail
-from kimari.core.detection import (
-    detect_cuda, detect_cuda_version, detect_gpu, detect_llama_server,
-    is_port_free, recommend_profile,
-)
+from kimari import __version__ as KIMARI_VERSION  # noqa: N812
+from kimari.benchmarks.bench import run_benchmark
+from kimari.benchmarks.kimarifit import calculate_kimarifit
 from kimari.config.loader import (
-    load_config, get_profile, validate_config, migrate_config,
-    get_config_path, show_config,
+    get_config_path,
+    get_profile,
+    load_config,
+    migrate_config,
+    show_config,
+    validate_config,
+)
+from kimari.core.constants import (
+    CONFIG_PATH,
+    KIMARI_ASCII,
+    LOG_FILE,
+    PID_FILE,
+    PROJECT_ROOT,
+    STATE_DIR,
+    STATE_FILE,
+)
+from kimari.core.detection import (
+    detect_cuda,
+    detect_cuda_version,
+    detect_gpu,
+    detect_llama_server,
+    is_port_free,
+    recommend_profile,
+)
+from kimari.core.errors import parse_log_errors, read_log_tail
+from kimari.core.state import (
+    clear_state,
+    ensure_state_dir,
+    is_pid_alive,
+    read_state,
+    write_state,
 )
 from kimari.models.registry import (
-    load_models_registry, list_registry_models, pull_model, pull_all_models,
-    scan_models_dir_for_gguf, verify_model_hash,
+    list_registry_models,
+    pull_all_models,
+    pull_model,
+    scan_models_dir_for_gguf,
 )
 from kimari.profiles.manager import list_profiles
-from kimari.benchmarks.kimarifit import calculate_kimarifit
-from kimari.benchmarks.bench import run_benchmark
-from kimari.utils.colors import Color, ok, warn, fail, info
-
+from kimari.utils.colors import Color, fail, info, ok, warn
 
 # ─── Server Management ───────────────────────────────────────────────────────
 
-def build_server_cmd(llama_server: str, profile: dict,
-                     model_override: Optional[str] = None,
-                     host_override: Optional[str] = None,
-                     port_override: Optional[int] = None,
-                     ctx_override: Optional[int] = None) -> list:
+
+def build_server_cmd(
+    llama_server: str,
+    profile: dict,
+    model_override: str | None = None,
+    host_override: str | None = None,
+    port_override: int | None = None,
+    ctx_override: int | None = None,
+) -> list:
     """Build the llama-server command list for a given profile.
 
     Optional overrides replace the profile values when provided.
@@ -66,15 +87,24 @@ def build_server_cmd(llama_server: str, profile: dict,
 
     cmd = [
         llama_server,
-        "-m", str(model_path),
-        "--host", host,
-        "--port", str(port),
-        "-ngl", profile.get("gpu_layers", "all"),
-        "-c", str(ctx),
-        "-b", str(profile.get("batch", 256)),
-        "-ub", str(profile.get("ubatch", 128)),
-        "--cache-type-k", profile.get("cache_type_k", "f16"),
-        "--cache-type-v", profile.get("cache_type_v", "f16"),
+        "-m",
+        str(model_path),
+        "--host",
+        host,
+        "--port",
+        str(port),
+        "-ngl",
+        profile.get("gpu_layers", "all"),
+        "-c",
+        str(ctx),
+        "-b",
+        str(profile.get("batch", 256)),
+        "-ub",
+        str(profile.get("ubatch", 128)),
+        "--cache-type-k",
+        profile.get("cache_type_k", "f16"),
+        "--cache-type-v",
+        profile.get("cache_type_v", "f16"),
     ]
 
     if profile.get("threads"):
@@ -83,12 +113,16 @@ def build_server_cmd(llama_server: str, profile: dict,
     return cmd
 
 
-def start_server(profile_name: str, config: dict, dry_run: bool = False,
-                 daemon: bool = False,
-                 model_override: Optional[str] = None,
-                 host_override: Optional[str] = None,
-                 port_override: Optional[int] = None,
-                 ctx_override: Optional[int] = None):
+def start_server(
+    profile_name: str,
+    config: dict,
+    dry_run: bool = False,
+    daemon: bool = False,
+    model_override: str | None = None,
+    host_override: str | None = None,
+    port_override: int | None = None,
+    ctx_override: int | None = None,
+):
     """Start llama-server with the specified profile."""
     profile = get_profile(config, profile_name)
 
@@ -108,23 +142,37 @@ def start_server(profile_name: str, config: dict, dry_run: bool = False,
 
     # Build command
     if llama_server:
-        cmd = build_server_cmd(llama_server, profile,
-                               model_override=model_override,
-                               host_override=host_override,
-                               port_override=port_override,
-                               ctx_override=ctx_override)
+        cmd = build_server_cmd(
+            llama_server,
+            profile,
+            model_override=model_override,
+            host_override=host_override,
+            port_override=port_override,
+            ctx_override=ctx_override,
+        )
     else:
         model_path = PROJECT_ROOT / effective_model
-        cmd = ["llama-server",
-               "-m", str(model_path),
-               "--host", effective_host,
-               "--port", str(effective_port),
-               "-ngl", profile.get("gpu_layers", "all"),
-               "-c", str(effective_ctx),
-               "-b", str(profile.get("batch", 256)),
-               "-ub", str(profile.get("ubatch", 128)),
-               "--cache-type-k", profile.get("cache_type_k", "f16"),
-               "--cache-type-v", profile.get("cache_type_v", "f16")]
+        cmd = [
+            "llama-server",
+            "-m",
+            str(model_path),
+            "--host",
+            effective_host,
+            "--port",
+            str(effective_port),
+            "-ngl",
+            profile.get("gpu_layers", "all"),
+            "-c",
+            str(effective_ctx),
+            "-b",
+            str(profile.get("batch", 256)),
+            "-ub",
+            str(profile.get("ubatch", 128)),
+            "--cache-type-k",
+            profile.get("cache_type_k", "f16"),
+            "--cache-type-v",
+            profile.get("cache_type_v", "f16"),
+        ]
         if profile.get("threads"):
             cmd.extend(["-t", str(profile["threads"])])
 
@@ -137,7 +185,7 @@ def start_server(profile_name: str, config: dict, dry_run: bool = False,
     if llama_server:
         print(f"   Binary:  {llama_server}")
     else:
-        print(f"   Binary:  llama-server (not found — build or set LLAMA_SERVER)")
+        print("   Binary:  llama-server (not found — build or set LLAMA_SERVER)")
     if model_override:
         print(f"   {Color.YELLOW}[OVERRIDE]{Color.RESET} --model {model_override}")
     if host_override:
@@ -166,126 +214,176 @@ def start_server(profile_name: str, config: dict, dry_run: bool = False,
         print(f"[ERROR] Model not found: {model_path}")
         gguf_files = scan_models_dir_for_gguf()
         if len(gguf_files) == 1:
-            print(f"  Found {Color.GREEN}{gguf_files[0]}{Color.RESET} — "
-                  f"use {Color.CYAN}--model {gguf_files[0]}{Color.RESET}")
+            print(
+                f"  Found {Color.GREEN}{gguf_files[0]}{Color.RESET} — "
+                f"use {Color.CYAN}--model {gguf_files[0]}{Color.RESET}"
+            )
         elif len(gguf_files) > 1:
-            print(f"  Available models in models/:")
+            print("  Available models in models/:")
             for f in gguf_files:
-                print(f"    • {Color.GREEN}{f}{Color.RESET} — "
-                      f"use {Color.CYAN}--model {f}{Color.RESET}")
+                print(f"    • {Color.GREEN}{f}{Color.RESET} — use {Color.CYAN}--model {f}{Color.RESET}")
         else:
-            print(f"  Run {Color.CYAN}'kimari pull test'{Color.RESET} to download a test model, "
-                  f"or place any GGUF in models/")
-        write_state("ERROR", error="MODEL_NOT_FOUND", profile=profile_name,
-                    model=effective_model)
+            print(
+                f"  Run {Color.CYAN}'kimari pull test'{Color.RESET} to download a test model, "
+                f"or place any GGUF in models/"
+            )
+        write_state(
+            "ERROR",
+            error="MODEL_NOT_FOUND",
+            profile=profile_name,
+            model=effective_model,
+        )
         raise SystemExit(1)
 
     if not llama_server:
         print("[ERROR] llama-server not found.")
         print("  Searched in order:")
-        print(f"    1. $LLAMA_SERVER environment variable")
-        print(f"    2. $KIMARI_LLAMA_SERVER environment variable")
-        print(f"    3. llama-server in PATH")
-        print(f"    4. llama_server in PATH")
+        print("    1. $LLAMA_SERVER environment variable")
+        print("    2. $KIMARI_LLAMA_SERVER environment variable")
+        print("    3. llama-server in PATH")
+        print("    4. llama_server in PATH")
         print(f"    5. {PROJECT_ROOT / 'llama-server'}")
         print(f"    6. {PROJECT_ROOT / 'bin' / 'llama-server'}")
         print(f"    7. {PROJECT_ROOT / 'deps' / 'llama.cpp' / 'build' / 'bin' / 'llama-server'}")
         print()
         print("  Build it first: bash scripts/linux/build-llamacpp-cuda.sh")
         print("  Or set LLAMA_SERVER=/path/to/llama-server")
-        write_state("ERROR", error="LLAMA_SERVER_NOT_FOUND", profile=profile_name,
-                    model=effective_model)
+        write_state(
+            "ERROR",
+            error="LLAMA_SERVER_NOT_FOUND",
+            profile=profile_name,
+            model=effective_model,
+        )
         raise SystemExit(1)
 
     if not is_port_free(effective_host, effective_port):
         print(f"[ERROR] Port {effective_port} is already in use.")
         print("Stop the existing server first: kimari stop")
-        write_state("ERROR", error="PORT_BUSY", profile=profile_name,
-                    model=effective_model, host=effective_host, port=effective_port)
+        write_state(
+            "ERROR",
+            error="PORT_BUSY",
+            profile=profile_name,
+            model=effective_model,
+            host=effective_host,
+            port=effective_port,
+        )
         raise SystemExit(1)
 
-    write_state("STARTING", pid=None, profile=profile_name,
-                model=effective_model, host=effective_host, port=effective_port)
+    write_state(
+        "STARTING",
+        pid=None,
+        profile=profile_name,
+        model=effective_model,
+        host=effective_host,
+        port=effective_port,
+    )
 
     try:
-        log_fh = open(LOG_FILE, "w")
-        process = subprocess.Popen(
-            cmd,
-            stdout=log_fh,
-            stderr=subprocess.STDOUT,
-            preexec_fn=os.setsid if sys.platform != "win32" else None,
-        )
+        with open(LOG_FILE, "w") as log_fh:
+            process = subprocess.Popen(
+                cmd,
+                stdout=log_fh,
+                stderr=subprocess.STDOUT,
+                preexec_fn=os.setsid if sys.platform != "win32" else None,
+            )
 
-        with open(PID_FILE, "w") as f:
-            f.write(str(process.pid))
+            with open(PID_FILE, "w") as f:
+                f.write(str(process.pid))
 
-        print(f"   Waiting for server to start...", end=" ", flush=True)
-        max_wait = 30
-        for i in range(max_wait):
-            time.sleep(1)
-            try:
-                resp = requests.get(f"http://{effective_host}:{effective_port}/health", timeout=2)
-                if resp.status_code == 200:
-                    print(f"{Color.GREEN}✓ Ready{Color.RESET}")
-                    print(f"\n{Color.DIM}   API: http://{effective_host}:{effective_port}/v1{Color.RESET}")
-                    print(f"{Color.DIM}   Log: {LOG_FILE}{Color.RESET}")
-                    print(f"{Color.DIM}   State: {STATE_FILE}{Color.RESET}")
-                    print()
-                    write_state("READY", pid=process.pid, profile=profile_name,
-                                model=effective_model, host=effective_host, port=effective_port)
+            print("   Waiting for server to start...", end=" ", flush=True)
+            max_wait = 30
+            for i in range(max_wait):
+                time.sleep(1)
+                try:
+                    resp = requests.get(f"http://{effective_host}:{effective_port}/health", timeout=2)
+                    if resp.status_code == 200:
+                        print(f"{Color.GREEN}✓ Ready{Color.RESET}")
+                        print(f"\n{Color.DIM}   API: http://{effective_host}:{effective_port}/v1{Color.RESET}")
+                        print(f"{Color.DIM}   Log: {LOG_FILE}{Color.RESET}")
+                        print(f"{Color.DIM}   State: {STATE_FILE}{Color.RESET}")
+                        print()
+                        write_state(
+                            "READY",
+                            pid=process.pid,
+                            profile=profile_name,
+                            model=effective_model,
+                            host=effective_host,
+                            port=effective_port,
+                        )
 
-                    if daemon:
-                        info(f"Server running in background (PID: {process.pid})")
-                        info(f"Logs: kimari logs")
-                        info(f"Stop: kimari stop")
+                        if daemon:
+                            info(f"Server running in background (PID: {process.pid})")
+                            info("Logs: kimari logs")
+                            info("Stop: kimari stop")
+                            return
+
+                        info("Press Ctrl+C to stop, or run: kimari stop")
+                        try:
+                            process.wait()
+                        except KeyboardInterrupt:
+                            stop_server()
                         return
-
-                    info("Press Ctrl+C to stop, or run: kimari stop")
+                except requests.ConnectionError:
+                    pass
+                if i == max_wait - 1:
+                    print(f"{Color.YELLOW}⚠ Timeout{Color.RESET}")
+                    print(f"   Server may still be starting. Check logs: {LOG_FILE}")
+                    print(f"   PID: {process.pid}")
+                    write_state(
+                        "ERROR",
+                        pid=process.pid,
+                        profile=profile_name,
+                        model=effective_model,
+                        host=effective_host,
+                        port=effective_port,
+                        error="START_TIMEOUT",
+                    )
                     try:
                         process.wait()
                     except KeyboardInterrupt:
                         stop_server()
                     return
-            except requests.ConnectionError:
-                pass
-            if i == max_wait - 1:
-                print(f"{Color.YELLOW}⚠ Timeout{Color.RESET}")
-                print(f"   Server may still be starting. Check logs: {LOG_FILE}")
-                print(f"   PID: {process.pid}")
-                write_state("ERROR", pid=process.pid, profile=profile_name,
-                            model=effective_model, host=effective_host, port=effective_port,
-                            error="START_TIMEOUT")
-                try:
-                    process.wait()
-                except KeyboardInterrupt:
-                    stop_server()
-                return
-            if process.poll() is not None:
-                log_fh.close()
-                error_info = parse_log_errors()
-                last_lines = read_log_tail(LOG_FILE, 10)
-                print(f"{Color.RED}✗ Failed{Color.RESET}")
-                if error_info:
-                    print(f"\n   {Color.RED}Error detected:{Color.RESET} {error_info['pattern']}")
-                    print(f"   {Color.YELLOW}Solution:{Color.RESET} {error_info['solution']}")
-                    write_state("ERROR", pid=process.pid, profile=profile_name,
-                                model=effective_model, host=effective_host, port=effective_port,
-                                error=error_info["error_type"])
-                else:
-                    print(f"\n   Last log lines:")
-                    for line in last_lines:
-                        print(f"   {Color.DIM}{line.rstrip()}{Color.RESET}")
-                    write_state("ERROR", pid=process.pid, profile=profile_name,
-                                model=effective_model, host=effective_host, port=effective_port,
-                                error="UNKNOWN")
-                raise SystemExit(1)
-            print(".", end="", flush=True)
+                if process.poll() is not None:
+                    error_info = parse_log_errors()
+                    last_lines = read_log_tail(LOG_FILE, 10)
+                    print(f"{Color.RED}✗ Failed{Color.RESET}")
+                    if error_info:
+                        print(f"\n   {Color.RED}Error detected:{Color.RESET} {error_info['pattern']}")
+                        print(f"   {Color.YELLOW}Solution:{Color.RESET} {error_info['solution']}")
+                        write_state(
+                            "ERROR",
+                            pid=process.pid,
+                            profile=profile_name,
+                            model=effective_model,
+                            host=effective_host,
+                            port=effective_port,
+                            error=error_info["error_type"],
+                        )
+                    else:
+                        print("\n   Last log lines:")
+                        for line in last_lines:
+                            print(f"   {Color.DIM}{line.rstrip()}{Color.RESET}")
+                        write_state(
+                            "ERROR",
+                            pid=process.pid,
+                            profile=profile_name,
+                            model=effective_model,
+                            host=effective_host,
+                            port=effective_port,
+                            error="UNKNOWN",
+                        )
+                    raise SystemExit(1)
+                print(".", end="", flush=True)
 
     except FileNotFoundError:
         print(f"[ERROR] Could not execute: {llama_server}")
-        write_state("ERROR", error="LLAMA_SERVER_NOT_FOUND", profile=profile_name,
-                    model=effective_model)
-        raise SystemExit(1)
+        write_state(
+            "ERROR",
+            error="LLAMA_SERVER_NOT_FOUND",
+            profile=profile_name,
+            model=effective_model,
+        )
+        raise SystemExit(1) from None
 
 
 def stop_server():
@@ -295,7 +393,7 @@ def stop_server():
         clear_state()
         return
 
-    with open(PID_FILE, "r") as f:
+    with open(PID_FILE) as f:
         pid = int(f.read().strip())
 
     try:
@@ -314,6 +412,7 @@ def stop_server():
 
 
 # ─── Status ──────────────────────────────────────────────────────────────────
+
 
 def check_status(config: dict, json_output: bool = False):
     """Check the Kimari server status from multiple sources."""
@@ -361,9 +460,9 @@ def check_status(config: dict, json_output: bool = False):
     try:
         resp = requests.get(f"http://{host}:{port}/health", timeout=3)
         if resp.status_code == 200:
-            status_data["health"] = resp.json() if resp.headers.get(
-                "content-type", ""
-            ).startswith("application/json") else {"status": "ok"}
+            status_data["health"] = (
+                resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {"status": "ok"}
+            )
             if status_data.get("status") not in ("ERROR",):
                 status_data["status"] = "READY"
         else:
@@ -454,6 +553,7 @@ def check_status(config: dict, json_output: bool = False):
 
 # ─── Logs ────────────────────────────────────────────────────────────────────
 
+
 def show_logs(lines: int = 50, follow: bool = False):
     """Show kimari-server.log contents."""
     if not LOG_FILE.exists():
@@ -468,7 +568,7 @@ def show_logs(lines: int = 50, follow: bool = False):
     if follow:
         print(f"\n{Color.DIM}--- Following log (Ctrl+C to stop) ---{Color.RESET}")
         try:
-            with open(LOG_FILE, "r", encoding="utf-8", errors="replace") as f:
+            with open(LOG_FILE, encoding="utf-8", errors="replace") as f:
                 f.seek(0, 2)
                 while True:
                     line = f.readline()
@@ -483,7 +583,8 @@ def show_logs(lines: int = 50, follow: bool = False):
 
 # ─── Chat ────────────────────────────────────────────────────────────────────
 
-def chat(message: str, config: dict, profile_name: Optional[str] = None):
+
+def chat(message: str, config: dict, profile_name: str | None = None):
     """Send a chat message to the Kimari API."""
     if not profile_name:
         profile_name = config.get("default_profile", "test")
@@ -510,9 +611,11 @@ def chat(message: str, config: dict, profile_name: Optional[str] = None):
             print(f"\n{Color.BOLD}{Color.CYAN}Kimari:{Color.RESET}")
             print(f"{content}\n")
             if usage:
-                print(f"{Color.DIM}  Tokens: {usage.get('prompt_tokens', '?')} prompt + "
-                      f"{usage.get('completion_tokens', '?')} completion = "
-                      f"{usage.get('total_tokens', '?')} total{Color.RESET}")
+                print(
+                    f"{Color.DIM}  Tokens: {usage.get('prompt_tokens', '?')} prompt + "
+                    f"{usage.get('completion_tokens', '?')} completion = "
+                    f"{usage.get('total_tokens', '?')} total{Color.RESET}"
+                )
         else:
             print(f"[ERROR] API returned {resp.status_code}: {resp.text}")
     except requests.ConnectionError:
@@ -522,7 +625,7 @@ def chat(message: str, config: dict, profile_name: Optional[str] = None):
         print(f"[ERROR] {e}")
 
 
-def interactive_chat(config: dict, profile_name: Optional[str] = None):
+def interactive_chat(config: dict, profile_name: str | None = None):
     """Run an interactive chat session."""
     if not profile_name:
         profile_name = config.get("default_profile", "test")
@@ -592,6 +695,7 @@ def interactive_chat(config: dict, profile_name: Optional[str] = None):
 
 # ─── Doctor ──────────────────────────────────────────────────────────────────
 
+
 def run_doctor(config: dict, json_output: bool = False):
     """Run system diagnostics."""
     diagnostics = {
@@ -607,10 +711,9 @@ def run_doctor(config: dict, json_output: bool = False):
 
     # OS
     import platform as _platform
+
     os_name = f"{_platform.system()} {_platform.release()}"
-    if _platform.system() == "Linux":
-        os_name += f" ({_platform.machine()})"
-    elif _platform.system() == "Windows":
+    if _platform.system() in ("Linux", "Windows"):
         os_name += f" ({_platform.machine()})"
     diagnostics["checks"].append({"name": "OS", "status": "ok", "value": os_name})
     if not json_output:
@@ -677,7 +780,13 @@ def run_doctor(config: dict, json_output: bool = False):
         if not json_output:
             ok(f"Model: {model_str}")
     else:
-        diagnostics["checks"].append({"name": "Model", "status": "warn", "value": f"{model_path.name} not found in models/"})
+        diagnostics["checks"].append(
+            {
+                "name": "Model",
+                "status": "warn",
+                "value": f"{model_path.name} not found in models/",
+            }
+        )
         if not json_output:
             warn(f"Model: {model_path.name} not found in models/")
 
@@ -695,13 +804,15 @@ def run_doctor(config: dict, json_output: bool = False):
 
     # Security: host binding warning
     if host == "0.0.0.0":
-        diagnostics["checks"].append({
-            "name": "Security",
-            "status": "warn",
-            "value": f"Host 0.0.0.0 exposes API to all interfaces (profile: {default_profile})"
-        })
+        diagnostics["checks"].append(
+            {
+                "name": "Security",
+                "status": "warn",
+                "value": f"Host 0.0.0.0 exposes API to all interfaces (profile: {default_profile})",
+            }
+        )
         if not json_output:
-            warn(f"Security: Host 0.0.0.0 exposes API to all interfaces")
+            warn("Security: Host 0.0.0.0 exposes API to all interfaces")
 
     # Config
     diagnostics["checks"].append({"name": "Config", "status": "ok", "value": str(CONFIG_PATH)})
@@ -710,11 +821,7 @@ def run_doctor(config: dict, json_output: bool = False):
 
     # Config version
     config_version = config.get("config_version", 1)
-    diagnostics["checks"].append({
-        "name": "Config version",
-        "status": "ok",
-        "value": str(config_version)
-    })
+    diagnostics["checks"].append({"name": "Config version", "status": "ok", "value": str(config_version)})
     if not json_output:
         ok(f"Config version: {config_version}")
 
@@ -726,20 +833,21 @@ def run_doctor(config: dict, json_output: bool = False):
         if not json_output:
             ok(f"Recommended profile: {recommended}")
     else:
-        diagnostics["checks"].append({"name": "Recommended profile", "status": "ok", "value": f"{recommended} (current: {default_profile})"})
+        diagnostics["checks"].append(
+            {
+                "name": "Recommended profile",
+                "status": "ok",
+                "value": f"{recommended} (current: {default_profile})",
+            }
+        )
         if not json_output:
             info(f"Recommended profile: {recommended} (current: {default_profile})")
 
     # Python
     py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-    if sys.version_info >= (3, 10):
-        diagnostics["checks"].append({"name": "Python", "status": "ok", "value": py_version})
-        if not json_output:
-            ok(f"Python: {py_version}")
-    else:
-        diagnostics["checks"].append({"name": "Python", "status": "warn", "value": f"{py_version} (3.10+ recommended)"})
-        if not json_output:
-            warn(f"Python: {py_version} (3.10+ recommended)")
+    diagnostics["checks"].append({"name": "Python", "status": "ok", "value": py_version})
+    if not json_output:
+        ok(f"Python: {py_version}")
 
     # State dir
     diagnostics["checks"].append({"name": "State dir", "status": "ok", "value": str(STATE_DIR)})
@@ -777,6 +885,7 @@ def run_doctor(config: dict, json_output: bool = False):
 
 
 # ─── Info ────────────────────────────────────────────────────────────────────
+
 
 def show_info(config: dict, json_output: bool = False):
     """Show Kimari installation information (version, paths, profiles, endpoint)."""
@@ -826,8 +935,13 @@ def show_info(config: dict, json_output: bool = False):
 
 # ─── Models ──────────────────────────────────────────────────────────────────
 
-def list_models(json_output: bool = False, downloaded_only: bool = False,
-                status_filter: Optional[str] = None, verify: bool = False):
+
+def list_models(
+    json_output: bool = False,
+    downloaded_only: bool = False,
+    status_filter: str | None = None,
+    verify: bool = False,
+):
     """List available models (downloaded + registry)."""
     if not (PROJECT_ROOT / "models").exists():
         print("[ERROR] models/ directory not found.")
@@ -839,12 +953,14 @@ def list_models(json_output: bool = False, downloaded_only: bool = False,
         result = []
         for f in sorted(gguf_files):
             size_mb = f.stat().st_size / (1024 * 1024)
-            result.append({
-                "name": f.name,
-                "path": str(f.relative_to(PROJECT_ROOT)),
-                "size_mb": round(size_mb, 1),
-                "size_gb": round(size_mb / 1024, 2),
-            })
+            result.append(
+                {
+                    "name": f.name,
+                    "path": str(f.relative_to(PROJECT_ROOT)),
+                    "size_mb": round(size_mb, 1),
+                    "size_gb": round(size_mb / 1024, 2),
+                }
+            )
         print(json.dumps(result, indent=2))
         return
 
@@ -857,15 +973,11 @@ def list_models(json_output: bool = False, downloaded_only: bool = False,
     for f in sorted(gguf_files):
         size_mb = f.stat().st_size / (1024 * 1024)
         size_gb = size_mb / 1024
-        if size_gb >= 1:
-            size_str = f"{size_gb:.2f} GiB"
-        else:
-            size_str = f"{size_mb:.1f} MB"
+        size_str = f"{size_gb:.2f} GiB" if size_gb >= 1 else f"{size_mb:.1f} MB"
         print(f"  📦 {Color.GREEN}{f.name}{Color.RESET}  ({size_str})")
 
     # Also show registry models not yet downloaded
-    registry_models = list_registry_models(json_output=True, downloaded_only=False,
-                                            status_filter=status_filter)
+    registry_models = list_registry_models(json_output=True, downloaded_only=False, status_filter=status_filter)
     not_downloaded = [m for m in registry_models if not m.get("downloaded")]
     if not_downloaded:
         print(f"\n  {Color.DIM}Not yet downloaded (use 'kimari pull <name>'):{Color.RESET}")
@@ -875,6 +987,7 @@ def list_models(json_output: bool = False, downloaded_only: bool = False,
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -887,45 +1000,59 @@ def main():
 
     # doctor
     doctor_parser = subparsers.add_parser("doctor", help="Run system diagnostics")
-    doctor_parser.add_argument("--json", action="store_true", dest="json_output",
-                               help="Output diagnostics as JSON")
+    doctor_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Output diagnostics as JSON",
+    )
 
     # info
     info_parser = subparsers.add_parser("info", help="Show Kimari installation info")
-    info_parser.add_argument("--json", action="store_true", dest="json_output",
-                             help="Output info as JSON")
+    info_parser.add_argument("--json", action="store_true", dest="json_output", help="Output info as JSON")
 
     # start
     start_parser = subparsers.add_parser("start", help="Start Kimari server")
-    start_parser.add_argument("--profile", "-p", default=None,
-                              help="GPU profile (default: from config, currently 'test'). Options: gtx1060, gtx1080, turbo, test, docker)")
-    start_parser.add_argument("--dry-run", action="store_true",
-                              help="Print command without executing")
-    start_parser.add_argument("--daemon", action="store_true",
-                              help="Start server in background (exit after READY)")
-    start_parser.add_argument("--model", "-m", default=None, dest="model",
-                              help="Override profile model path")
-    start_parser.add_argument("--host", default=None, dest="host",
-                              help="Override profile host (e.g. 0.0.0.0)")
-    start_parser.add_argument("--port", type=int, default=None, dest="port",
-                              help="Override profile port")
-    start_parser.add_argument("--ctx", type=int, default=None, dest="ctx",
-                              help="Override profile context size (tokens)")
+    start_parser.add_argument(
+        "--profile",
+        "-p",
+        default=None,
+        help="GPU profile (default: from config, currently 'test'). Options: gtx1060, gtx1080, turbo, test, docker)",
+    )
+    start_parser.add_argument("--dry-run", action="store_true", help="Print command without executing")
+    start_parser.add_argument(
+        "--daemon",
+        action="store_true",
+        help="Start server in background (exit after READY)",
+    )
+    start_parser.add_argument("--model", "-m", default=None, dest="model", help="Override profile model path")
+    start_parser.add_argument("--host", default=None, dest="host", help="Override profile host (e.g. 0.0.0.0)")
+    start_parser.add_argument("--port", type=int, default=None, dest="port", help="Override profile port")
+    start_parser.add_argument(
+        "--ctx",
+        type=int,
+        default=None,
+        dest="ctx",
+        help="Override profile context size (tokens)",
+    )
 
     # stop
     subparsers.add_parser("stop", help="Stop Kimari server")
 
     # status
     status_parser = subparsers.add_parser("status", help="Check Kimari server status")
-    status_parser.add_argument("--json", action="store_true", dest="json_output",
-                               help="Output status as JSON")
+    status_parser.add_argument("--json", action="store_true", dest="json_output", help="Output status as JSON")
 
     # logs
     logs_parser = subparsers.add_parser("logs", help="Show server logs")
-    logs_parser.add_argument("--lines", "-n", type=int, default=50,
-                             help="Number of log lines to show (default: 50)")
-    logs_parser.add_argument("--follow", "-f", action="store_true",
-                             help="Follow log output in real time")
+    logs_parser.add_argument(
+        "--lines",
+        "-n",
+        type=int,
+        default=50,
+        help="Number of log lines to show (default: 50)",
+    )
+    logs_parser.add_argument("--follow", "-f", action="store_true", help="Follow log output in real time")
 
     # chat
     chat_parser = subparsers.add_parser("chat", help="Send a chat message")
@@ -933,65 +1060,97 @@ def main():
 
     # bench
     bench_parser = subparsers.add_parser("bench", help="Run benchmarks")
-    bench_parser.add_argument("--profile", "-p", default=None,
-                              help="GPU profile to benchmark")
-    bench_parser.add_argument("--json", action="store_true", dest="json_output",
-                              help="Output benchmark results as JSON only")
-    bench_parser.add_argument("--output", "-o", default=None, dest="output",
-                              help="Save standardized benchmark results to a JSON file")
-    bench_parser.add_argument("--vram", type=float, default=None,
-                              help="Override VRAM in GiB (for systems without GPU)")
+    bench_parser.add_argument("--profile", "-p", default=None, help="GPU profile to benchmark")
+    bench_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Output benchmark results as JSON only",
+    )
+    bench_parser.add_argument(
+        "--output",
+        "-o",
+        default=None,
+        dest="output",
+        help="Save standardized benchmark results to a JSON file",
+    )
+    bench_parser.add_argument(
+        "--vram",
+        type=float,
+        default=None,
+        help="Override VRAM in GiB (for systems without GPU)",
+    )
 
     # fit
     fit_parser = subparsers.add_parser("fit", help="Calculate KimariFit score")
     fit_parser.add_argument("--model", "-m", required=True, help="Path to GGUF model")
     fit_parser.add_argument("--ctx", "-c", type=int, default=8192, help="Context size")
-    fit_parser.add_argument("--vram", type=float, default=None,
-                            help="Override VRAM in GiB (for systems without GPU)")
+    fit_parser.add_argument(
+        "--vram",
+        type=float,
+        default=None,
+        help="Override VRAM in GiB (for systems without GPU)",
+    )
 
     # models
     models_parser = subparsers.add_parser("models", help="List available GGUF models")
-    models_parser.add_argument("--json", action="store_true", dest="json_output",
-                                help="Output as JSON")
-    models_parser.add_argument("--downloaded", action="store_true",
-                                help="Only show downloaded models")
-    models_parser.add_argument("--status", default=None, dest="status_filter",
-                                help="Filter by status (recommended, test, experimental)")
-    models_parser.add_argument("--verify", action="store_true",
-                                help="Verify SHA256 hashes of downloaded models")
+    models_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
+    models_parser.add_argument("--downloaded", action="store_true", help="Only show downloaded models")
+    models_parser.add_argument(
+        "--status",
+        default=None,
+        dest="status_filter",
+        help="Filter by status (recommended, test, experimental)",
+    )
+    models_parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="Verify SHA256 hashes of downloaded models",
+    )
 
     # profiles
     profiles_parser = subparsers.add_parser("profiles", help="List configured GPU profiles")
-    profiles_parser.add_argument("--json", action="store_true", dest="json_output",
-                                  help="Output as JSON")
+    profiles_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
 
     # pull
     pull_parser = subparsers.add_parser("pull", help="Download a model from the registry")
-    pull_parser.add_argument("name", nargs="?", default=None,
-                             help="Model ID to download (e.g. test, recommended)")
-    pull_parser.add_argument("--list", action="store_true", dest="list_models",
-                             help="List available models in the registry")
-    pull_parser.add_argument("--all", action="store_true", dest="pull_all",
-                             help="Download all models from the registry")
-    pull_parser.add_argument("--dry-run", action="store_true",
-                             help="Show what would be downloaded without downloading")
-    pull_parser.add_argument("--force", action="store_true",
-                             help="Redownload even if file already exists")
+    pull_parser.add_argument(
+        "name",
+        nargs="?",
+        default=None,
+        help="Model ID to download (e.g. test, recommended)",
+    )
+    pull_parser.add_argument(
+        "--list",
+        action="store_true",
+        dest="list_models",
+        help="List available models in the registry",
+    )
+    pull_parser.add_argument(
+        "--all",
+        action="store_true",
+        dest="pull_all",
+        help="Download all models from the registry",
+    )
+    pull_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be downloaded without downloading",
+    )
+    pull_parser.add_argument("--force", action="store_true", help="Redownload even if file already exists")
 
     # config (subcommands)
     config_parser = subparsers.add_parser("config", help="Configuration management")
     config_sub = config_parser.add_subparsers(dest="config_command", help="Config subcommands")
 
-    config_path_parser = config_sub.add_parser("path", help="Print config file path")
+    config_sub.add_parser("path", help="Print config file path")
     config_show_parser = config_sub.add_parser("show", help="Show full configuration")
-    config_show_parser.add_argument("--json", action="store_true", dest="json_output",
-                                    help="Output as JSON")
+    config_show_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
 
-    config_validate_parser = config_sub.add_parser("validate", help="Validate configuration against schema")
+    config_sub.add_parser("validate", help="Validate configuration against schema")
 
     config_migrate_parser = config_sub.add_parser("migrate", help="Migrate configuration to current version")
-    config_migrate_parser.add_argument("--dry-run", action="store_true",
-                                       help="Show changes without applying them")
+    config_migrate_parser.add_argument("--dry-run", action="store_true", help="Show changes without applying them")
 
     args = parser.parse_args()
 
@@ -1013,13 +1172,16 @@ def main():
         show_info(config, json_output=getattr(args, "json_output", False))
     elif args.command == "start":
         profile = args.profile or config.get("default_profile", "test")
-        start_server(profile, config,
-                     dry_run=args.dry_run,
-                     daemon=args.daemon,
-                     model_override=args.model,
-                     host_override=args.host,
-                     port_override=args.port,
-                     ctx_override=args.ctx)
+        start_server(
+            profile,
+            config,
+            dry_run=args.dry_run,
+            daemon=args.daemon,
+            model_override=args.model,
+            host_override=args.host,
+            port_override=args.port,
+            ctx_override=args.ctx,
+        )
     elif args.command == "stop":
         stop_server()
     elif args.command == "status":
@@ -1033,18 +1195,22 @@ def main():
             interactive_chat(config)
     elif args.command == "bench":
         profile = args.profile or config.get("default_profile", "test")
-        run_benchmark(profile, config,
-                      json_output=getattr(args, "json_output", False),
-                      output=getattr(args, "output", None),
-                      vram_override=getattr(args, "vram", None))
+        run_benchmark(
+            profile,
+            config,
+            json_output=getattr(args, "json_output", False),
+            output=getattr(args, "output", None),
+            vram_override=getattr(args, "vram", None),
+        )
     elif args.command == "fit":
-        calculate_kimarifit(args.model, args.ctx, config,
-                            vram_override=getattr(args, "vram", None))
+        calculate_kimarifit(args.model, args.ctx, config, vram_override=getattr(args, "vram", None))
     elif args.command == "models":
-        list_models(json_output=getattr(args, "json_output", False),
-                    downloaded_only=getattr(args, "downloaded", False),
-                    status_filter=getattr(args, "status_filter", None),
-                    verify=getattr(args, "verify", False))
+        list_models(
+            json_output=getattr(args, "json_output", False),
+            downloaded_only=getattr(args, "downloaded", False),
+            status_filter=getattr(args, "status_filter", None),
+            verify=getattr(args, "verify", False),
+        )
     elif args.command == "profiles":
         list_profiles(config, json_output=getattr(args, "json_output", False))
     elif args.command == "pull":
@@ -1085,7 +1251,7 @@ def main():
                     print(f"\n  {Color.GREEN}Migration complete.{Color.RESET}")
                 print(f"  From version: {info['from_version']}")
                 print(f"  To version:   {info['to_version']}")
-                print(f"  Changes:")
+                print("  Changes:")
                 for change in info["changes"]:
                     print(f"    • {change}")
                 if info.get("backup_path"):

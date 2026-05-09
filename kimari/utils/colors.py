@@ -7,6 +7,7 @@ import sys
 
 class Color:
     """ANSI color codes for terminal output."""
+
     RESET = "\033[0m"
     BOLD = "\033[1m"
     RED = "\033[91m"

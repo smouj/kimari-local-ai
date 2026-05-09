@@ -7,9 +7,10 @@ as the directory containing the config/ folder.
 
 from pathlib import Path
 
-from kimari import __version__ as KIMARI_VERSION
+from kimari import __version__ as KIMARI_VERSION  # noqa: N812
 
 # ─── Project Root Detection ─────────────────────────────────────────────────
+
 
 def _detect_project_root() -> Path:
     """Detect the project root by searching upward for config/kimari.profiles.json."""

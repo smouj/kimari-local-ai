@@ -51,7 +51,7 @@
 - ✅ SHA256 verification note added (hashes not yet pinned in registry)
 - ✅ README and GETTING_STARTED updated for new default flow
 
-## v0.1.6-alpha (Current)
+## v0.1.6-alpha (Released)
 
 - ✅ `kimari start` works without `--profile` (uses default from config)
 - ✅ All `default_profile` fallbacks changed from `"gtx1060"` to `"test"`
@@ -63,14 +63,19 @@
 - ✅ CI: dry-run without `--profile`, `py.typed` in wheel verification
 - ✅ New tests: default_profile, py.typed existence, profile size coherence, start without profile
 
-## v0.1.7-alpha (Planned)
+## v0.1.7-alpha (Current)
 
-- Windows/WSL installation improvements
-- `kimari eval` command for evaluation suite
-- Package published on PyPI (or TestPyPI)
-- More models in registry
-- Advanced security: optional API authentication token implementation
-- Real SHA256 hashes pinned in model registry
+- ✅ Ruff lint/format cleanup — all 115+ warnings fixed, `ruff check` and `ruff format --check` pass
+- ✅ Makefile fixed with proper tabs (was 8 spaces)
+- ✅ CI shell quoting fix (pip install with `>=` now quoted)
+- ✅ New CI job: `validate-makefile` (make -n dry-run, bench)
+- ✅ New CI job: `installed-cli-smoke` (tests `kimari` entry point after pip install)
+- ✅ New CI step: package contents validation (no unwanted files in wheel)
+- ✅ Windows scripts updated: prefer `kimari start`, default profile `test`
+- ✅ Python type annotations: `Optional[X]` → `X | None` throughout
+- ✅ `ci-local` now runs ruff check + ruff format --check
+
+## v0.1.8-alpha (Planned)
 
 ## v0.2.0-alpha
 

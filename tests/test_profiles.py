@@ -1,6 +1,4 @@
-"""
-Tests for GPU profile listing and management.
-"""
+"""Tests for GPU profile listing and management."""
 
 import sys
 from pathlib import Path
@@ -10,7 +8,7 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from kimari.config.loader import load_config, get_profile
+from kimari.config.loader import get_profile  # noqa: E402
 
 
 def test_get_profile_gtx1060(sample_config):

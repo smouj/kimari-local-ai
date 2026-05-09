@@ -1,15 +1,12 @@
-"""
-Tests for Kimari config loading and validation.
-"""
+"""Tests for Kimari config loading and validation."""
 
-import json
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from kimari.config.loader import load_config, validate_config, get_config_path
+from kimari.config.loader import get_config_path, validate_config  # noqa: E402
 
 
 def test_load_config_exists(sample_config):
@@ -58,9 +55,7 @@ def test_port_ranges_valid(sample_config):
     """All ports are in valid range 1024-65535."""
     for profile_name, profile in sample_config["profiles"].items():
         port = profile["port"]
-        assert 1024 <= port <= 65535, (
-            f"Profile '{profile_name}' has invalid port: {port}"
-        )
+        assert 1024 <= port <= 65535, f"Profile '{profile_name}' has invalid port: {port}"
 
 
 def test_config_has_config_version(sample_config):
@@ -89,8 +84,24 @@ def test_validate_config_catches_missing_default():
         "version": "1.0.0",
         "config_version": 2,
         "default_profile": "nonexistent",
-        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
-        "profiles": {"test": {"name": "Test", "model": "models/test.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "127.0.0.1", "port": 11435, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+        "server": {
+            "health_endpoint": "/health",
+            "chat_endpoint": "/v1/chat/completions",
+            "models_endpoint": "/v1/models",
+        },
+        "profiles": {
+            "test": {
+                "name": "Test",
+                "model": "models/test.gguf",
+                "ctx": 4096,
+                "batch": 128,
+                "ubatch": 64,
+                "host": "127.0.0.1",
+                "port": 11435,
+                "gpu_layers": "all",
+                "quantization": "Q4_K_M",
+            }
+        },
     }
     is_valid, errors = validate_config(bad_config)
     assert not is_valid
@@ -100,6 +111,7 @@ def test_validate_config_catches_missing_default():
 def test_migrate_config_current_no_changes():
     """migrate_config returns no changes when config is already current."""
     from kimari.config.loader import migrate_config
+
     changed, info = migrate_config(dry_run=True)
     assert changed is False
     assert "already up to date" in info.get("message", "").lower() or info.get("changes") == []
@@ -111,8 +123,24 @@ def test_validate_config_catches_0000_host():
         "version": "1.0.0",
         "config_version": 2,
         "default_profile": "test",
-        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
-        "profiles": {"test": {"name": "Test", "model": "models/test.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "0.0.0.0", "port": 11435, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+        "server": {
+            "health_endpoint": "/health",
+            "chat_endpoint": "/v1/chat/completions",
+            "models_endpoint": "/v1/models",
+        },
+        "profiles": {
+            "test": {
+                "name": "Test",
+                "model": "models/test.gguf",
+                "ctx": 4096,
+                "batch": 128,
+                "ubatch": 64,
+                "host": "0.0.0.0",
+                "port": 11435,
+                "gpu_layers": "all",
+                "quantization": "Q4_K_M",
+            }
+        },
     }
     is_valid, errors = validate_config(bad_config)
     assert not is_valid
@@ -125,8 +153,24 @@ def test_validate_config_catches_absolute_path():
         "version": "1.0.0",
         "config_version": 2,
         "default_profile": "test",
-        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
-        "profiles": {"test": {"name": "Test", "model": "/absolute/path/model.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "127.0.0.1", "port": 11435, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+        "server": {
+            "health_endpoint": "/health",
+            "chat_endpoint": "/v1/chat/completions",
+            "models_endpoint": "/v1/models",
+        },
+        "profiles": {
+            "test": {
+                "name": "Test",
+                "model": "/absolute/path/model.gguf",
+                "ctx": 4096,
+                "batch": 128,
+                "ubatch": 64,
+                "host": "127.0.0.1",
+                "port": 11435,
+                "gpu_layers": "all",
+                "quantization": "Q4_K_M",
+            }
+        },
     }
     is_valid, errors = validate_config(bad_config)
     assert not is_valid
@@ -139,8 +183,24 @@ def test_validate_config_catches_invalid_port():
         "version": "1.0.0",
         "config_version": 2,
         "default_profile": "test",
-        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
-        "profiles": {"test": {"name": "Test", "model": "models/test.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "127.0.0.1", "port": 80, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+        "server": {
+            "health_endpoint": "/health",
+            "chat_endpoint": "/v1/chat/completions",
+            "models_endpoint": "/v1/models",
+        },
+        "profiles": {
+            "test": {
+                "name": "Test",
+                "model": "models/test.gguf",
+                "ctx": 4096,
+                "batch": 128,
+                "ubatch": 64,
+                "host": "127.0.0.1",
+                "port": 80,
+                "gpu_layers": "all",
+                "quantization": "Q4_K_M",
+            }
+        },
     }
     is_valid, errors = validate_config(bad_config)
     assert not is_valid

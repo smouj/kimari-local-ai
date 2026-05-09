@@ -6,20 +6,12 @@ REM ============================================================================
 setlocal EnableDelayedExpansion
 
 set KIMARI_ROOT=%~dp0..\..
-set CONFIG_FILE=%KIMARI_ROOT%\config\kimari.profiles.json
-set PROFILE=gtx1060
 
 echo === Kimari — Launching Web UI ===
 
-REM Check config
-if not exist "%CONFIG_FILE%" (
-    echo [ERROR] Config not found: %CONFIG_FILE%
-    exit /b 1
-)
-
-REM Start server in background
+REM Start server in background using default profile (test)
 echo [INFO] Starting Kimari server in background ...
-start "Kimari Server" /MIN powershell -ExecutionPolicy Bypass -File "%KIMARI_ROOT%\scripts\windows\start-kimari-1060.ps1"
+start "Kimari Server" /MIN kimari start --daemon
 
 REM Wait for server
 echo [INFO] Waiting for server to start ...
@@ -48,6 +40,6 @@ echo.
 echo === Kimari is running ===
 echo   API:  http://127.0.0.1:11435
 echo.
-echo   Close the "Kimari Server" window to stop.
+echo   Stop with: kimari stop
 
 endlocal

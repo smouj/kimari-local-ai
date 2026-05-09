@@ -9,12 +9,13 @@ import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Tuple
 
 from kimari.core.constants import (
-    CONFIG_PATH, CONFIG_SCHEMA_PATH, CURRENT_CONFIG_VERSION, PROJECT_ROOT
+    CONFIG_PATH,
+    CONFIG_SCHEMA_PATH,
+    CURRENT_CONFIG_VERSION,
 )
-from kimari.utils.colors import Color, warn
+from kimari.utils.colors import Color
 
 
 def load_config() -> dict:
@@ -23,7 +24,7 @@ def load_config() -> dict:
         print(f"[ERROR] Config not found: {CONFIG_PATH}")
         print("Run this command from the kimari-local-ai root directory.")
         raise SystemExit(1)
-    with open(CONFIG_PATH, "r") as f:
+    with open(CONFIG_PATH) as f:
         return json.load(f)
 
 
@@ -37,7 +38,7 @@ def get_profile(config: dict, profile_name: str) -> dict:
     return profiles[profile_name]
 
 
-def validate_config(config: dict, schema: Optional[dict] = None) -> Tuple[bool, list]:
+def validate_config(config: dict, schema: dict | None = None) -> tuple[bool, list]:
     """Validate configuration against JSON Schema.
 
     Returns (is_valid, list_of_errors).
@@ -47,11 +48,12 @@ def validate_config(config: dict, schema: Optional[dict] = None) -> Tuple[bool, 
     if schema is None:
         if not CONFIG_SCHEMA_PATH.exists():
             return True, ["Schema file not found"]
-        with open(CONFIG_SCHEMA_PATH, "r") as f:
+        with open(CONFIG_SCHEMA_PATH) as f:
             schema = json.load(f)
 
     try:
         import jsonschema
+
         jsonschema.validate(config, schema)
     except jsonschema.ValidationError as e:
         errors.append(f"Schema validation: {e.message}")
@@ -81,14 +83,13 @@ def validate_config(config: dict, schema: Optional[dict] = None) -> Tuple[bool, 
         model = profile.get("model", "")
         if model.startswith("/"):
             errors.append(
-                f"Profile '{name}' uses absolute path '{model}'. "
-                f"Use relative paths (e.g. 'models/model.gguf') instead."
+                f"Profile '{name}' uses absolute path '{model}'. Use relative paths (e.g. 'models/model.gguf') instead."
             )
 
     return len(errors) == 0, errors
 
 
-def migrate_config(dry_run: bool = False) -> Tuple[bool, dict]:
+def migrate_config(dry_run: bool = False) -> tuple[bool, dict]:
     """Migrate configuration to the current version.
 
     If dry_run is True, returns the changes that would be made without modifying the file.

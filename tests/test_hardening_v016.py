@@ -1,11 +1,14 @@
 """
-Tests for v0.1.6-alpha hardening:
+Tests for v0.1.6/v0.1.7-alpha hardening:
 - Default profile is 'test' while Kimari-4B is not published
 - kimari/py.typed exists (PEP 561 marker)
 - Test profile model size coherence with registry
 - CLI start without --profile uses default from config
+- Package excludes unwanted files
+- Installed CLI entry point works
 """
 
+import subprocess
 import sys
 from pathlib import Path
 
@@ -35,7 +38,6 @@ def test_test_profile_model_size_coherent(sample_config, sample_models_registry)
     test_profile = sample_config["profiles"]["test"]
     profile_size = test_profile.get("estimated_model_size_gb")
 
-    # Find the 'test' model in the registry
     test_model = None
     for m in sample_models_registry["models"]:
         if m["id"] == "test":
@@ -55,31 +57,37 @@ def test_test_profile_points_to_tinyllama(sample_config):
     """Test profile must point to TinyLlama (the only published model)."""
     test_profile = sample_config["profiles"]["test"]
     model_path = test_profile["model"]
-    assert "tinyllama" in model_path.lower(), (
-        f"Test profile model path should reference TinyLlama, got: {model_path}"
-    )
+    assert "tinyllama" in model_path.lower(), f"Test profile model path should reference TinyLlama, got: {model_path}"
 
 
 def test_start_dry_run_without_profile():
     """'kimari start --dry-run' (no --profile) should use default profile and succeed."""
-    import subprocess
     cmd = [sys.executable, "-m", "kimari.cli.main", "start", "--dry-run"]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
     assert result.returncode == 0, (
-        f"'kimari start --dry-run' failed (exit {result.returncode}). "
-        f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        f"'kimari start --dry-run' failed (exit {result.returncode}). stdout: {result.stdout}\nstderr: {result.stderr}"
     )
-    assert "DRY RUN" in result.stdout, (
-        f"Expected 'DRY RUN' in output, got: {result.stdout}"
-    )
+    assert "DRY RUN" in result.stdout, f"Expected 'DRY RUN' in output, got: {result.stdout}"
 
 
 def test_bench_defaults_to_test_profile():
     """'kimari bench' without --profile should use 'test' default."""
-    from kimari.config.loader import load_config
+    from kimari.config.loader import load_config  # noqa: E402
+
     config = load_config()
     default = config.get("default_profile", "test")
-    # The bench command uses config default, which should be 'test'
-    assert default == "test", (
-        f"Bench defaults to config default_profile, which should be 'test', got: {default}"
+    assert default == "test", f"Bench defaults to config default_profile, which should be 'test', got: {default}"
+
+
+def test_installed_kimari_entry_point():
+    """Verify the 'kimari' entry point is defined in pyproject.toml."""
+    import tomllib
+
+    pyproject_path = PROJECT_ROOT / "pyproject.toml"
+    with open(pyproject_path, "rb") as f:
+        data = tomllib.load(f)
+    scripts = data.get("project", {}).get("scripts", {})
+    assert "kimari" in scripts, "Entry point 'kimari' not found in pyproject.toml [project.scripts]"
+    assert scripts["kimari"] == "kimari.cli.main:main", (
+        f"Entry point 'kimari' should be 'kimari.cli.main:main', got: {scripts['kimari']}"
     )

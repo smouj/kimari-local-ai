@@ -1,15 +1,12 @@
-"""
-Tests for error parsing from logs.
-"""
+"""Tests for error parsing from logs."""
 
 import sys
-import tempfile
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from kimari.core.errors import parse_log_errors, read_log_tail
+from kimari.core.errors import parse_log_errors, read_log_tail  # noqa: E402
 
 
 def test_parse_oom_error(tmp_path):

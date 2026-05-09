@@ -1,22 +1,17 @@
-"""
-Tests for state management (write_state, read_state, clear_state).
-"""
+"""Tests for state management (write_state, read_state, clear_state)."""
 
-import json
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from kimari.core.state import write_state, read_state, clear_state
+from kimari.core.state import clear_state, read_state, write_state  # noqa: E402
 
 
 def test_write_read_state_roundtrip(tmp_state_dir):
     """write_state then read_state returns the same data."""
-    from kimari.core import state as state_module
-    write_state("READY", pid=12345, profile="gtx1060", model="models/test.gguf",
-                host="127.0.0.1", port=11435)
+    write_state("READY", pid=12345, profile="gtx1060", model="models/test.gguf", host="127.0.0.1", port=11435)
     state = read_state()
     assert state is not None
     assert state["status"] == "READY"

@@ -5,6 +5,30 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7-alpha] — 2026-05-09
+
+### Changed
+- **Ruff lint cleanup** — Fixed all 115+ ruff warnings across `kimari/` and `tests/`. Both `ruff check` and `ruff format --check` now pass with zero errors
+- **Makefile** — Rewrote with proper tabs (was 8 spaces, which broke `make`). Added `format-check` step to `ci-local`. Now `make -n` passes for all targets
+- **CI quoting fix** — Added quotes around `pip install "ruff>=0.5.0"` and `"jsonschema>=4.0.0"` in `.github/workflows/ci.yml` to prevent shell redirection
+- **Windows scripts** — Updated `start-kimari-1060.ps1`, `start-kimari-1080.ps1`, `launch-kimari.bat`, and `healthcheck.ps1` to prefer `kimari start` command with `python -m` fallback. Changed `healthcheck.ps1` default profile from `"gtx1060"` to `"test"`
+- **Version bumped** to `0.1.7-alpha`
+
+### Added
+- **New CI job: `validate-makefile`** — Runs `make -n` on key targets to catch tab/syntax issues
+- **New CI job: `installed-cli-smoke`** — Tests `kimari --version`, `kimari info`, `kimari start --dry-run`, `kimari config validate` via the installed entry point (after `pip install -e .`)
+- **New CI step: package contents validation** — Verifies wheel doesn't contain `models/`, `.kimari/`, `kimari-server.log`, or other runtime artifacts
+- **New test: `test_installed_kimari_entry_point`** — Verifies `kimari` entry point is correctly defined in `pyproject.toml`
+- **`ci-local` Makefile target** — Now runs 5 steps: validate-config, py_compile, ruff check, ruff format --check, pytest
+
+### Fixed
+- **Makefile tabs** — All recipe lines now use real tabs instead of 8 spaces. `make` commands now work correctly
+- **Python type annotations** — Migrated from `Optional[X]` to `X | None` throughout (Python 3.10+ requirement)
+- **Unused imports** — Removed `socket`, `pathlib.Path`, `load_models_registry`, `verify_model_hash`, `platform`, `os`, `sys`, `json`, `tempfile`, `load_config` from files where they were unused
+- **F-strings without placeholders** — Removed extraneous `f` prefix from 8+ strings
+- **Context managers** — `open(LOG_FILE, "w")` now uses `with` statement; removed unnecessary `"r"` mode from `open()` calls
+- **Exception chaining** — Added `from None` to `raise SystemExit(1)` in except clauses for cleaner tracebacks
+
 ## [0.1.6-alpha] — 2026-05-09
 
 ### Added
