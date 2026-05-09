@@ -83,7 +83,7 @@ Verifying the SHA-256 hash of a downloaded model file ensures it matches the exp
 
 3. **Compare the hashes.** The output must match the published checksum exactly. If it does not match, **do not use the file** — delete it and re-download.
 
-4. **Automated verification (optional).** If a checksum is listed in `config/kimari.models.json` under the `sha256` field, `kimari pull` will verify it automatically after download. Note that not all models have pre-populated hashes; for those that do not, manual verification is recommended.
+4. **Automated verification (optional).** If a checksum is listed in `config/kimari.models.json` under the `sha256` field, `kimari pull` will verify it automatically after download. **Note:** Model hashes in the registry are not yet pinned (they are currently `null`). SHA256 verification is supported but not yet enforced. This will be updated in a future release once real hashes are computed and validated.
 
 ### Quick sanity checks
 

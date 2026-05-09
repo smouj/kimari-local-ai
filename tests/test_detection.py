@@ -56,8 +56,8 @@ def test_is_port_free_with_unused_port():
 
 
 def test_recommend_profile_no_gpu(sample_config):
-    """recommend_profile returns default when no GPU detected."""
-    assert recommend_profile(sample_config, None) == "gtx1060"
+    """recommend_profile returns default profile when no GPU detected."""
+    assert recommend_profile(sample_config, None) == "test"
 
 
 def test_recommend_profile_8gb_vram(sample_config):

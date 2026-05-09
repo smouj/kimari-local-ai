@@ -367,7 +367,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.4-alpha — Modular package, config migration, enhanced security
+      v0.1.5-alpha — Seamless first-run, test profile default, improved docs
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run powerful language models locally on consumer-grade NVIDIA GPUs. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -492,13 +492,13 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel active" id="tab-doctor">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari doctor</span>
 <span class="terminal-output">
- ██████╗██╗  ██╗██████╗  ██████╗ ███╗   ██╗ █████╗
-██╔════╝██║  ██║██╔══██╗██╔═══██╗████╗  ██║██╔══██╗
-██║     ███████║██████╔╝██║   ██║██╔██╗ ██║███████║
-██║     ██╔══██║██╔══██╗██║   ██║██║╚██╗██║██╔══██║
-╚██████╗██║  ██║██║  ██║╚██████╔╝██║ ╚████║██║  ██║
- ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.4-alpha</span>
+██╗  ██╗██╗███╗   ███╗ █████╗ ██████╗ ██╗
+██║ ██╔╝██║████╗ ████║██╔══██╗██╔══██╗██║
+█████╔╝ ██║██╔████╔██║███████║██████╔╝██║
+██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
+██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
+╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.5-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -535,7 +535,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.4-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.5-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -583,7 +583,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   "host": "127.0.0.1",
   "port": 11435,
   "uptime_s": 342,
-  "started_at": "2025-01-15T10:23:45Z",
+  "started_at": "2026-01-15T10:23:45Z",
   "health": { "status": "ok" },
   "models": ["tinyllama-1.1b-chat-v1.0.Q4_K_M"],
   "last_log_lines": [
@@ -599,7 +599,15 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <span class="terminal-output">
   GPU Profiles
 
-  <span class="terminal-highlight">gtx1060</span> <span class="terminal-ok">(default)</span>
+  <span class="terminal-highlight">test</span> <span class="terminal-ok">(default)</span>
+    Name:   Test Model
+    Model:  models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+    Quant:  Q4_K_M
+    Ctx:      4096
+    Batch:     128
+    VRAM:   6.0 GB
+
+  <span class="terminal-highlight">gtx1060</span>
     Name:   GTX 1060 (6 GB)
     Model:  models/Kimari-4B-Q4_K_M.gguf
     Quant:  Q4_K_M
@@ -623,14 +631,6 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     Batch:     512
     VRAM:   6.0 GB
 
-  <span class="terminal-highlight">test</span>
-    Name:   Test Model
-    Model:  models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
-    Quant:  Q4_K_M
-    Ctx:      4096
-    Batch:     128
-    VRAM:   6.0 GB
-
   <span class="terminal-highlight">docker</span>
     Name:   Docker Container
     Model:  models/Kimari-4B-Q4_K_M.gguf
@@ -648,7 +648,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;">All CLI Commands</h3>
     <div class="terminal" style="font-size: .78rem; line-height: 1.8;">
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari doctor</span>                              <span class="terminal-output"># System diagnostics</span>
-<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari start --profile test</span>                 <span class="terminal-output"># Start server</span>
+<span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari start</span>                              <span class="terminal-output"># Start server (default: test)</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari stop</span>                                  <span class="terminal-output"># Stop server</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari status</span>                                <span class="terminal-output"># Check status</span>
 <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari pull test</span>                             <span class="terminal-output"># Download model</span>
@@ -682,8 +682,23 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <p class="section-desc">No manual tuning required. Select your GPU profile and Kimari handles the rest.</p>
   </div>
   <div class="profiles-grid reveal">
+    <div class="profile-card featured">
+      <div class="profile-name">test <span class="tag">default</span></div>
+      <div class="profile-specs">
+        <div class="profile-spec"><span class="profile-spec-label">GPU</span><br><span class="profile-spec-value">Any 6 GB+</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">VRAM</span><br><span class="profile-spec-value">6 GB</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">Quant</span><br><span class="profile-spec-value">Q4_K_M</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">Context</span><br><span class="profile-spec-value">4,096</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">Batch</span><br><span class="profile-spec-value">128 / 64</span></div>
+        <div class="profile-spec"><span class="profile-spec-label">KV Cache</span><br><span class="profile-spec-value">f16</span></div>
+      </div>
+      <div class="vram-bar-wrap">
+        <div class="vram-bar-label"><span>VRAM Usage (est.)</span><span>~55%</span></div>
+        <div class="vram-bar"><div class="vram-bar-fill" style="width:55%"></div></div>
+      </div>
+    </div>
     <div class="profile-card">
-      <div class="profile-name">gtx1060 <span class="tag">default</span></div>
+      <div class="profile-name">gtx1060</div>
       <div class="profile-specs">
         <div class="profile-spec"><span class="profile-spec-label">GPU</span><br><span class="profile-spec-value">GTX 1060</span></div>
         <div class="profile-spec"><span class="profile-spec-label">VRAM</span><br><span class="profile-spec-value">6 GB</span></div>
@@ -725,21 +740,6 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="vram-bar-wrap">
         <div class="vram-bar-label"><span>VRAM Usage (est.)</span><span>~82%</span></div>
         <div class="vram-bar"><div class="vram-bar-fill" style="width:82%"></div></div>
-      </div>
-    </div>
-    <div class="profile-card featured">
-      <div class="profile-name">test</div>
-      <div class="profile-specs">
-        <div class="profile-spec"><span class="profile-spec-label">GPU</span><br><span class="profile-spec-value">Any 6 GB+</span></div>
-        <div class="profile-spec"><span class="profile-spec-label">VRAM</span><br><span class="profile-spec-value">6 GB</span></div>
-        <div class="profile-spec"><span class="profile-spec-label">Quant</span><br><span class="profile-spec-value">Q4_K_M</span></div>
-        <div class="profile-spec"><span class="profile-spec-label">Context</span><br><span class="profile-spec-value">4,096</span></div>
-        <div class="profile-spec"><span class="profile-spec-label">Batch</span><br><span class="profile-spec-value">128 / 64</span></div>
-        <div class="profile-spec"><span class="profile-spec-label">KV Cache</span><br><span class="profile-spec-value">f16</span></div>
-      </div>
-      <div class="vram-bar-wrap">
-        <div class="vram-bar-label"><span>VRAM Usage (est.)</span><span>~55%</span></div>
-        <div class="vram-bar"><div class="vram-bar-fill" style="width:55%"></div></div>
       </div>
     </div>
     <div class="profile-card">
@@ -830,7 +830,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="step-num">5</div>
       <div class="step-content">
         <div class="step-title">Start the server</div>
-        <div class="step-code"><span class="prompt">$ </span>kimari start --profile test</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari start</div>
       </div>
     </div>
     <div class="step">
@@ -955,7 +955,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.4-alpha — Framework/runtime/CLI is functional. Modular package, config migration, enhanced security.</p>
+    <p class="section-desc">Kimari Local AI v0.1.5-alpha — Framework/runtime/CLI is functional. Seamless first-run experience, test profile default, improved documentation.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">

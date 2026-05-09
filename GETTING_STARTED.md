@@ -47,18 +47,25 @@ kimari pull --list
 kimari pull recommended
 ```
 
+> **SHA256 verification:** `kimari pull` supports hash verification, but model hashes in the registry are not yet pinned. Verification will be enforced once hashes are added in a future release.
+
 ## Step 4: Start the Server
 
 ```bash
-# Start with the test profile
+# Start with the default profile (test)
+kimari start
+
+# Or specify a profile explicitly
 kimari start --profile test
 
-# Or preview the command without running it
-kimari start --profile test --dry-run
+# Preview the command without running it
+kimari start --dry-run
 
 # Start in background (daemon mode)
-kimari start --profile test --daemon
+kimari start --daemon
 ```
+
+> **Note:** The default profile is `test` during alpha (uses TinyLlama 1.1B). You don't need to specify `--profile test` — `kimari start` works out of the box after `kimari pull test`. The `gtx1060` and `gtx1080` profiles will become the defaults once Kimari-4B is released.
 
 ## Step 5: Chat
 
@@ -93,6 +100,7 @@ make webui-up
 | `Port 11435 in use` | Run `kimari stop` or use `--port 8080` |
 | No GPU detected | Install NVIDIA drivers and CUDA Toolkit. Use `kimari fit --vram 6.0` for manual VRAM |
 | `ModuleNotFoundError: requests` | Run `pip install -e .` to install all dependencies |
+| Wrong profile used | Default is `test` during alpha. Use `--profile gtx1060` for Kimari-4B when available |
 
 ## Next Steps
 
@@ -107,7 +115,7 @@ make webui-up
 kimari doctor              # Check system
 kimari info                # Show installation info
 kimari pull test           # Download test model
-kimari start --profile test  # Start server
+kimari start               # Start server (default: test profile)
 kimari chat                # Chat with model
 kimari status              # Check server status
 kimari stop                # Stop server

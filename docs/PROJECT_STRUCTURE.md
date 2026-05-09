@@ -1,6 +1,6 @@
 # Kimari Local AI — Project Structure
 
-> Last updated: v0.1.4-alpha
+> Last updated: v0.1.5-alpha
 
 This document describes the organization of the Kimari Local AI codebase.
 
@@ -10,6 +10,7 @@ This document describes the organization of the Kimari Local AI codebase.
 kimari-local-ai/
 ├── kimari/                    # Main Python package (pip installable)
 │   ├── __init__.py           # Package version and metadata
+│   ├── py.typed              # PEP 561 type marker
 │   ├── cli/                  # CLI interface
 │   │   ├── __init__.py
 │   │   └── main.py           # argparse CLI, all command handlers
@@ -58,10 +59,12 @@ kimari-local-ai/
 │   └── test_state.py         # State management
 │
 ├── scripts/                   # Build and installation scripts
+│   ├── common/               # Cross-platform scripts
+│   │   └── check-env.py      # Environment verification (Python, CUDA, llama-server)
 │   ├── linux/                # Linux/WSL scripts
 │   │   ├── build-llamacpp-cuda.sh
 │   │   ├── build-llamacpp-rocm.sh
-│   │   ├── check-env.py
+│   │   ├── start-kimari.sh
 │   │   ├── smoke-test.sh
 │   │   └── ...
 │   └── windows/              # Windows scripts

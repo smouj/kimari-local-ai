@@ -104,7 +104,7 @@ llama.cpp is the engine under Kimari's hood. It provides maximum control and max
 - `kimari fit` tells you if a model+context combo will OOM before you launch the server.
 - `kimari bench` automates performance measurement with standard prompts.
 - `kimari pull` downloads models from a curated registry.
-- Experimental AMD ROCm build script (`scripts/linux/build-llamacpp-rocm.sh`) for non-NVIDIA GPUs.
+- Experimental AMD ROCm build script (`scripts/linux/build-llamacpp-rocm.sh`) for non-NVIDIA GPUs. **Note:** ROCm support is experimental and not yet tested at parity with CUDA.
 
 **Honest assessment:** If you are comfortable with llama.cpp and know which flags to set, you don't need Kimari. Kimari's value is in encoding that expertise so you don't have to rediscover it. Power users may prefer the raw control of llama.cpp directly.
 
@@ -192,7 +192,7 @@ Open WebUI is a full-featured chat interface — think "local ChatGPT" — that 
 - **You need multi-model serving.** Kimari runs one model at a time.
 - **You need fine-tuning or training.** Kimari does not include training tools yet.
 - **You need RAG, tool-calling, or agents.** These are not yet supported.
-- **You're on macOS or CPU-only.** Kimari is NVIDIA + CUDA focused, with experimental ROCm support via `scripts/linux/build-llamacpp-rocm.sh`. If you're on Apple Silicon, Ollama or llama.cpp are better options.
+- **You're on macOS or CPU-only.** Kimari is NVIDIA + CUDA focused, with **experimental** ROCm support via `scripts/linux/build-llamacpp-rocm.sh`. If you're on Apple Silicon, Ollama or llama.cpp are better options.
 
 ---
 
@@ -227,4 +227,4 @@ The local AI ecosystem is not zero-sum. Kimari uses llama.cpp under the hood, in
 
 ---
 
-*Last updated: 2025-05-09 · Kimari v0.1.4-alpha*
+*Last updated: 2026-05-09 · Kimari v0.1.5-alpha*
