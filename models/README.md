@@ -40,12 +40,15 @@ models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
 # Create models directory
 mkdir -p models
 
-# Download Llama 3.2 1B (small, good for testing)
+# Download test model using kimari pull (recommended)
+kimari pull test
+
+# Or manually download Llama 3.2 1B
 wget -O models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \
   "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"
 
 # Start with test profile
-python3 cli/kimari_cli.py start --profile test
+kimari start --profile test
 ```
 
 > **Any compatible GGUF file works.** Just rename it to `tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf`,

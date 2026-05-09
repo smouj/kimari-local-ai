@@ -136,11 +136,11 @@ Install the Kimari CLI dependencies and run the health check.
 # Navigate to the Kimari project
 cd /path/to/kimari-local-ai
 
-# Install Python dependencies
-pip install -r cli/requirements.txt
+# Install as package
+pip install -e .
 
 # Run system diagnostics
-python3 cli/kimari_cli.py doctor
+kimari doctor
 ```
 
 **Expected output:**
@@ -161,36 +161,23 @@ python3 cli/kimari_cli.py doctor
 
 ---
 
-## Step 4: Place a Test GGUF Model
+## Step 4: Download a Test GGUF Model
 
-Download a small test model from HuggingFace and place it where the `test` profile expects it.
+Download a test model using Kimari's built-in pull command.
 
 ```bash
-# Create models directory
-mkdir -p models
-
-# Download a small test model (e.g., Llama 3.2 1B, Q4_K_M)
-wget -O models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \
-  "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"
+# Download the test model (TinyLlama 1.1B, ~700 MB)
+kimari pull test
 ```
 
 **Expected output:**
 ```
-Saving to: 'models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf'
-models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf  100%[===================>]  800MB  12.3MB/s  in 65s
+Downloading TinyLlama 1.1B Chat v1.0 Q4_K_M...
+models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf  100%[===================>]  700MB  12.3MB/s  in 58s
+SHA256 verification: ✓ OK
 ```
 
-**Verify the file:**
-```bash
-ls -lh models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
-```
-
-**Expected output:**
-```
--rw-r--r-- 1 user user 800M Jun 15 10:00 models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
-```
-
-> **Note:** The `test` profile expects the file at `models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf`. You can use any compatible GGUF model — just rename it to match, or create a custom profile. See `models/README.md` for details.
+> **Note:** You can also manually download any compatible GGUF model. The `test` profile expects the file at `models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf`. See `models/README.md` for details.
 
 ---
 
@@ -200,13 +187,13 @@ Before starting the server, verify the command would work by listing profiles an
 
 ```bash
 # List available profiles
-python3 cli/kimari_cli.py profiles
+kimari profiles
 
 # Verify the test profile is listed
-python3 cli/kimari_cli.py models
+kimari models
 
 # Preview the server start command without actually running it
-python3 cli/kimari_cli.py start --profile test --dry-run
+kimari start --profile test --dry-run
 ```
 
 **Expected output:**
@@ -231,7 +218,7 @@ python3 cli/kimari_cli.py start --profile test --dry-run
 Launch the llama.cpp server through Kimari using the `test` profile.
 
 ```bash
-python3 cli/kimari_cli.py start --profile test
+kimari start --profile test
 ```
 
 **Expected output:**
@@ -300,7 +287,7 @@ Use Kimari's chat command to verify the model responds.
 
 ```bash
 # Single message
-python3 cli/kimari_cli.py chat "What is 2 + 2?"
+kimari chat "What is 2 + 2?"
 ```
 
 **Expected response:**
@@ -311,7 +298,7 @@ Kimari:
 
 **Or use interactive chat:**
 ```bash
-python3 cli/kimari_cli.py chat
+kimari chat
 ```
 
 ```
@@ -373,7 +360,7 @@ curl -s http://127.0.0.1:11435/v1/chat/completions \
 Measure token throughput to validate GPU performance.
 
 ```bash
-python3 cli/kimari_cli.py bench --profile test
+kimari bench --profile test
 ```
 
 **Expected output:**
@@ -404,7 +391,7 @@ Summary:
 ## Step 11: Stop the Server
 
 ```bash
-python3 cli/kimari_cli.py stop
+kimari stop
 ```
 
 **Expected output:**
@@ -466,7 +453,7 @@ cmake --build build -j$(nproc)
 **Fix:**
 ```bash
 # Stop via Kimari CLI
-python3 cli/kimari_cli.py stop
+kimari stop
 
 # Or find and kill manually
 lsof -i :11435
@@ -491,9 +478,9 @@ kill -9 <PID>
 **Cause:** No GGUF file at the path specified by the profile.
 
 **Fix:**
-- Verify the model exists: `python3 cli/kimari_cli.py models`
+- Verify the model exists: `kimari models`
 - Download and rename a model: see `models/README.md`
-- Or use a different profile: `python3 cli/kimari_cli.py profiles`
+- Or use a different profile: `kimari profiles`
 
 ---
 
@@ -587,12 +574,12 @@ This script automates healthcheck, chat test, and benchmark in a single run.
 |------|---------|---------------|
 | 1. Prerequisites | `nvidia-smi && nvcc --version && python3 --version` | All commands succeed |
 | 2. Build llama.cpp | `cmake -B build -DGGML_CUDA=ON && cmake --build build` | Binary exists |
-| 3. Doctor | `python3 cli/kimari_cli.py doctor` | All checks ✅ |
-| 4. Place model | Download + rename to `models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf` | File exists |
-| 5. Preview | `python3 cli/kimari_cli.py profiles && python3 cli/kimari_cli.py models && python3 cli/kimari_cli.py start --profile test --dry-run` | Profile, model listed, dry-run output shown |
-| 6. Start server | `python3 cli/kimari_cli.py start --profile test` | "Ready" message |
+| 3. Doctor | `kimari doctor` | All checks ✅ |
+| 4. Place model | `kimari pull test` | File exists in models/ |
+| 5. Preview | `kimari profiles && kimari models && kimari start --profile test --dry-run` | Profile, model listed, dry-run output shown |
+| 6. Start server | `kimari start --profile test` | "Ready" message |
 | 7. Healthcheck | `curl http://127.0.0.1:11435/health` | `{"status":"ok"}` |
-| 8. CLI chat | `python3 cli/kimari_cli.py chat "test"` | Model responds |
+| 8. CLI chat | `kimari chat "test"` | Model responds |
 | 9. API chat | `curl .../v1/chat/completions` | Valid JSON response |
-| 10. Benchmark | `python3 cli/kimari_cli.py bench --profile test` | Token rates displayed |
-| 11. Stop | `python3 cli/kimari_cli.py stop` | Server stopped |
+| 10. Benchmark | `kimari bench --profile test` | Token rates displayed |
+| 11. Stop | `kimari stop` | Server stopped |
