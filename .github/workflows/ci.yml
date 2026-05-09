@@ -30,7 +30,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - run: pip install -r requirements-dev.txt
       - run: python -c "import json; c=json.load(open('config/kimari.profiles.json')); assert 'profiles' in c; assert 'gtx1060' in c['profiles']; assert 'gtx1080' in c['profiles']; assert 'turbo' in c['profiles']; assert 'test' in c['profiles']; print('Config valid.')"
+      - run: make validate-config
 
   validate-schema:
     runs-on: ubuntu-latest
@@ -39,13 +41,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install jsonschema
+      - run: pip install -r requirements-dev.txt
       - run: python -c "
 import json, jsonschema
 config = json.load(open('config/kimari.profiles.json'))
 schema = json.load(open('config/kimari.profiles.schema.json'))
 jsonschema.validate(config, schema)
-print('Schema validation passed.')
+# Verify default_profile exists in profiles
+default = config.get('default_profile', '')
+assert default in config.get('profiles', {}), f'default_profile \"{default}\" not found in profiles'
+print('Schema validation passed. default_profile=\"' + default + '\" exists in profiles.')
 "
 
   cli-smoke:
@@ -59,6 +64,7 @@ print('Schema validation passed.')
       - run: python cli/kimari_cli.py profiles
       - run: python cli/kimari_cli.py doctor --json || true
       - run: python cli/kimari_cli.py start --profile test --dry-run
+      - run: python cli/kimari_cli.py status --json || true
 
   check-docs:
     runs-on: ubuntu-latest

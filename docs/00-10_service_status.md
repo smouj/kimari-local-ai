@@ -22,7 +22,7 @@ own GGUF files. The Kimari-4B target model is planned but not yet released.
 | `kimari doctor` | ✅ Working | System health checks (GPU, CUDA, Python, llama.cpp) |
 | `kimari start --profile <name>` | ✅ Working | Starts llama.cpp server with profile-based config |
 | `kimari stop` | ✅ Working | Graceful server shutdown |
-| `kimari status` | ✅ Working | Shows server state, PID, uptime, memory usage |
+| `kimari status` | ✅ Working | Shows server state, PID, uptime, health |
 | `kimari chat` | ✅ Working | Interactive REPL chat and single-message mode |
 | `kimari bench --profile <name>` | ✅ Working | Token throughput benchmark (prompt eval + generation) |
 | `kimari fit --model <path> --ctx <n>` | ✅ Working | KimariFit score for any GGUF model |
@@ -47,7 +47,8 @@ own GGUF files. The Kimari-4B target model is planned but not yet released.
 | `kimari pull` (model download) | Medium | Manual download only; integrated fetch planned for v0.1.2 |
 | PWA (own web app) | Medium | Planned for v0.2 |
 | Tauri desktop app | Medium | Design spec written; implementation not started |
-| `kimari logs` / `--json` flags | Low | Planned CLI enhancements |
+| `kimari logs` / `--json` flags | — | ✅ Implemented in v0.1.1-alpha |
+| Memory/VRAM usage reporting | Low | Planned — requires nvidia-smi/psutil integration |
 | Multi-GPU support | Low | Single-GPU only for now |
 | Streaming API in CLI | Low | llama.cpp supports it; CLI doesn't expose it yet |
 

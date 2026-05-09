@@ -204,6 +204,9 @@ python3 cli/kimari_cli.py profiles
 
 # Verify the test profile is listed
 python3 cli/kimari_cli.py models
+
+# Preview the server start command without actually running it
+python3 cli/kimari_cli.py start --profile test --dry-run
 ```
 
 **Expected output:**
@@ -586,7 +589,7 @@ This script automates healthcheck, chat test, and benchmark in a single run.
 | 2. Build llama.cpp | `cmake -B build -DGGML_CUDA=ON && cmake --build build` | Binary exists |
 | 3. Doctor | `python3 cli/kimari_cli.py doctor` | All checks ✅ |
 | 4. Place model | Download + rename to `models/Kimari-base-test-Q4_K_M.gguf` | File exists |
-| 5. Preview | `python3 cli/kimari_cli.py profiles && python3 cli/kimari_cli.py models` | Profile and model listed |
+| 5. Preview | `python3 cli/kimari_cli.py profiles && python3 cli/kimari_cli.py models && python3 cli/kimari_cli.py start --profile test --dry-run` | Profile, model listed, dry-run output shown |
 | 6. Start server | `python3 cli/kimari_cli.py start --profile test` | "Ready" message |
 | 7. Healthcheck | `curl http://127.0.0.1:11435/health` | `{"status":"ok"}` |
 | 8. CLI chat | `python3 cli/kimari_cli.py chat "test"` | Model responds |

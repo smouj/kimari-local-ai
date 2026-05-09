@@ -37,14 +37,16 @@ LOG_FILE = PROJECT_ROOT / "kimari-server.log"
 STATE_DIR = PROJECT_ROOT / ".kimari"
 STATE_FILE = STATE_DIR / "state.json"
 
-KIMARI_ASCII = r"""
+KIMARI_VERSION = "0.1.1-alpha"
+
+KIMARI_ASCII = f"""
  ██████╗██╗  ██╗██████╗  ██████╗ ███╗   ██╗ █████╗
 ██╔════╝██║  ██║██╔══██╗██╔═══██╗████╗  ██║██╔══██╗
 ██║     ███████║██████╔╝██║   ██║██╔██╗ ██║███████║
 ██║     ██╔══██║██╔══██╗██║   ██║██║╚██╗██║██╔══██║
 ╚██████╗██║  ██║██║  ██║╚██████╔╝██║ ╚████║██║  ██║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝
-   Local AI for Consumer GPUs — v0.1.0
+   Local AI for Consumer GPUs — v{KIMARI_VERSION}
    Created by Smouj (https://x.com/smouj013)
 """
 
@@ -1294,7 +1296,7 @@ def main():
         prog="kimari",
         description="Kimari CLI — Local AI for Consumer GPUs",
     )
-    parser.add_argument("-v", "--version", action="version", version="Kimari CLI v0.1.0")
+    parser.add_argument("-v", "--version", action="version", version=f"Kimari CLI v{KIMARI_VERSION}")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 

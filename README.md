@@ -82,12 +82,14 @@ python cli/kimari_cli.py doctor
 # 4. Download a GGUF model and place in models/
 #    See docs/00-04_local_runtime.md for recommended models
 
-# 5. Start the server with your GPU profile
-python cli/kimari_cli.py start --profile gtx1080
+# 5. Start the server with the test profile
+python cli/kimari_cli.py start --profile test
 
 # 6. Chat with the model
 python cli/kimari_cli.py chat "Hello, Kimari!"
 ```
+
+> **Note:** The `test` profile is the only profile usable out of the box. The `gtx1060` and `gtx1080` profiles require the Kimari-4B GGUF model (not yet published) — or you can edit the profile in `config/kimari.profiles.json` to point to your own GGUF file.
 
 ### Linux (Ubuntu 22.04+)
 

@@ -1,4 +1,4 @@
-.PHONY: help doctor start-1060 start-1080 start-turbo start-test status stop chat smoke bench clean install dry-run-test logs logs-follow doctor-json status-json validate-config webui-up webui-down webui-logs
+.PHONY: help doctor start-1060 start-1080 start-turbo start-test status stop chat smoke bench clean install install-dev dry-run-test logs logs-follow doctor-json status-json validate-config validate-schema webui-up webui-down webui-logs
 
 .DEFAULT_GOAL := help
 
@@ -11,6 +11,9 @@ help: ## Show this help
 
 install: ## Install Python dependencies
 	pip install -r cli/requirements.txt
+
+install-dev: ## Install Python dependencies (including dev tools)
+	pip install -r requirements-dev.txt
 
 doctor: ## Run system diagnostics
 	cd cli && python kimari_cli.py doctor
@@ -59,6 +62,9 @@ status-json: ## Show status as JSON
 	cd cli && python kimari_cli.py status --json
 
 validate-config: ## Validate profiles config against schema
+	python -c "import json, jsonschema; config=json.load(open('config/kimari.profiles.json')); schema=json.load(open('config/kimari.profiles.schema.json')); jsonschema.validate(config, schema); default=config.get('default_profile',''); assert default in config.get('profiles',{}), f'default_profile \"{default}\" not found in profiles'; print('Config schema valid. default_profile=\"' + default + '\" exists in profiles.')"
+
+validate-schema: ## Validate profiles JSON only (no schema check)
 	python -c "import json; json.load(open('config/kimari.profiles.json')); print('Config JSON valid.')"
 
 webui-up: ## Start Open WebUI via Docker
