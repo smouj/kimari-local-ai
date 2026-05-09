@@ -63,7 +63,7 @@
 - ✅ CI: dry-run without `--profile`, `py.typed` in wheel verification
 - ✅ New tests: default_profile, py.typed existence, profile size coherence, start without profile
 
-## v0.1.7-alpha (Current)
+## v0.1.7-alpha (Released)
 
 - ✅ Ruff lint/format cleanup — all 115+ warnings fixed, `ruff check` and `ruff format --check` pass
 - ✅ Makefile fixed with proper tabs (was 8 spaces)
@@ -75,7 +75,22 @@
 - ✅ Python type annotations: `Optional[X]` → `X | None` throughout
 - ✅ `ci-local` now runs ruff check + ruff format --check
 
-## v0.1.8-alpha (Planned)
+## v0.1.8-alpha (Current)
+
+- ✅ GitHub topics — 20 discovery topics added (ai, llm, local-ai, gguf, cuda, openai-compatible-api, etc.)
+- ✅ pyproject.toml keywords — 12 targeted discovery keywords
+- ✅ RELEASE_CHECKLIST.md — pre-release validation checklist with TestPyPI workflow
+- ✅ scripts/release/check-release.py — automated release validation script
+- ✅ CI release-check job — runs check-release.py in CI
+- ✅ TestPyPI publishing documentation (manual workflow)
+
+## v0.1.9-alpha (Planned)
+
+- TestPyPI real validation (actual upload and install test)
+- Real SHA256 hashes if computable reliably
+- WSL2 installation guide
+- More robust Windows launcher
+- Optional `kimari setup` interactive command
 
 ## v0.2.0-alpha
 

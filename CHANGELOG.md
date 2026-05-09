@@ -5,6 +5,19 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8-alpha] — 2026-05-10
+
+### Added
+- **GitHub topics** — Added 20 discovery topics to the repository (ai, openai, llm, local-ai, local-llm, on-device-ai, offline-ai, self-hosted-ai, llama-cpp, gguf, quantization, llm-inference, cuda, nvidia-gpu, gtx1060, gtx1080, consumer-gpu, openai-compatible-api, open-webui, openclaw)
+- **pyproject.toml keywords** — Updated from 6 generic keywords to 12 targeted discovery keywords: ai, llm, local-ai, local-llm, llama-cpp, gguf, cuda, nvidia, openai-compatible-api, open-webui, consumer-gpu, quantization
+- **RELEASE_CHECKLIST.md** — Pre-release validation checklist covering version consistency, testing, CLI validation, build/package verification, content review, and publishing steps (including TestPyPI workflow)
+- **scripts/release/check-release.py** — Automated release validation script that checks: version consistency (pyproject.toml vs __init__.py), README badge, CHANGELOG entry, ROADMAP entry, default_profile=="test", py.typed existence, no GGUF files tracked, no unsafe paths in models registry, no runtime artifacts in project root
+- **CI release-check job** — New CI job that runs `python scripts/release/check-release.py` to catch release hygiene issues before merge
+- **TestPyPI publishing documentation** — Added step-by-step TestPyPI workflow to RELEASE_CHECKLIST.md (manual only, no automated PyPI publishing from CI)
+
+### Changed
+- **Version bumped** to `0.1.8-alpha`
+
 ## [0.1.7-alpha] — 2026-05-09
 
 ### Changed

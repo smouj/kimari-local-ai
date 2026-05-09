@@ -209,3 +209,14 @@ jobs:
           for f in README.md GETTING_STARTED.md ROADMAP.md CHANGELOG.md SECURITY.md PRIVACY.md docs/COMPARISON.md docs/WEB_UI_PLAN.md; do
             test -f "$f" && echo "$f: OK" || { echo "$f: MISSING"; exit 1; }
           done
+
+  release-check:
+    name: Release Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run release validation script
+        run: python scripts/release/check-release.py
