@@ -1,0 +1,42 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r cli/requirements.txt
+      - run: python -m py_compile cli/kimari_cli.py
+      - run: python -m py_compile eval/run_eval.py
+
+  lint-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          for f in scripts/linux/*.sh; do
+            bash -n "$f" || { echo "FAIL: $f"; exit 1; }
+          done
+          echo "All shell scripts pass syntax check."
+
+  validate-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -c "import json; c=json.load(open('config/kimari.profiles.json')); assert 'profiles' in c; assert 'gtx1060' in c['profiles']; assert 'gtx1080' in c['profiles']; assert 'turbo' in c['profiles']; print('Config valid.')"
+
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          count=$(find docs -name "*.md" | wc -l)
+          echo "Found $count documentation files."
+          [ "$count" -ge 10 ] || { echo "FAIL: Expected at least 10 doc files"; exit 1; }

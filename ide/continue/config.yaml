@@ -1,0 +1,15 @@
+models:
+  - name: Kimari Local
+    provider: openai
+    model: kimari
+    apiBase: http://127.0.0.1:11435/v1
+    apiKey: local
+    contextLength: 8192
+    completionOptions:
+      temperature: 0.7
+      topP: 0.9
+      maxTokens: 2048
+    systemMessage: |
+      You are Kimari, a helpful technical AI assistant specialized in programming,
+      server administration, automation, and AI. Respond in the language the user uses.
+      Be precise, technical, and practical. When you're not sure, say so.

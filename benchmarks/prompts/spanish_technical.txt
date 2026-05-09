@@ -1,0 +1,9 @@
+Explica qué son los contenedores de Docker y cuál es la diferencia principal entre un contenedor y una máquina virtual en términos de arquitectura, rendimiento y casos de uso recomendados.
+
+¿Qué es una API REST y cuáles son los principales métodos HTTP que utiliza (GET, POST, PUT, DELETE, PATCH)? Explica cada uno con su propósito semántico, códigos de estado esperados y ejemplos de cuándo usarlos.
+
+Explica en detalle qué son los Pods y los Services en Kubernetes. ¿Cómo se relacionan entre sí, cómo maneja Kubernetes la red entre pods, y cuáles son los diferentes tipos de services disponibles (ClusterIP, NodePort, LoadBalancer)?
+
+¿Cómo funciona un reverse proxy con nginx? Explica el flujo de una petición HTTP desde el cliente hasta el servidor backend, incluyendo configuración básica de proxy_pass, balanceo de carga, y manejo de headers.
+
+¿Cuál es la diferencia entre un proceso y un hilo (thread) a nivel de sistema operativo? Explica cómo comparten recursos, las implicaciones en memoria y contexto de ejecución, y cuándo conviene usar programación multihilo versus multiproceso.

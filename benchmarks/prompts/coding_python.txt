@@ -1,0 +1,9 @@
+Write a Python function `merge_sorted_lists(list1, list2)` that merges two already-sorted lists into a single sorted list in O(n+m) time complexity. Do not use `sorted()` or `list.sort()`. Handle edge cases like empty lists and lists of different lengths. Include type hints and a few test cases.
+
+Implement an async function `async_read_file(path: str) -> str` that reads a file asynchronously using aiofiles. It must include proper error handling for FileNotFoundError, PermissionError, and generic IOError. Log warnings for each specific error type and re-raise with a descriptive message. Show usage with asyncio.run().
+
+Create a Python dataclass `User` with fields: username (str, 3-20 chars), email (str, must contain @), age (int, 0-150), and created_at (datetime, defaults to now). Add `__post_init__` validation that raises ValueError with clear messages for invalid data. Include a `to_dict()` serialization method.
+
+Write a Python decorator `cache_result` that caches function results based on arguments using a dictionary. It should support functions with any number of positional and keyword arguments. The cache should be stored on the function object as `func._cache`. Include a `cache_clear` method. Handle unhashable arguments gracefully by skipping cache.
+
+Implement a function `find_duplicate_files(directory: Path) -> dict[str, list[Path]]` that scans a directory recursively, computes SHA-256 hashes of all files, and returns a dictionary mapping each hash to a list of file paths that share that hash. Only include entries with 2 or more files. Use concurrent.futures.ThreadPoolExecutor for parallel hashing with max_workers=4.

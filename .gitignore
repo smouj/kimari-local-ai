@@ -1,0 +1,65 @@
+# Model weights (never commit these)
+models/*.gguf
+models/*.safetensors
+models/*.bin
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Node.js
+node_modules/
+.next/
+out/
+.turbo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Benchmark results
+benchmarks/results/*.json
+benchmarks/results/*.csv
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+coverage.xml
+
+# Temporary
+tmp/
+temp/

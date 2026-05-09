@@ -1,0 +1,26 @@
+# Kimari Service — systemd Unit
+
+[Unit]
+Description=Kimari Local AI Server
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/opt/kimari-local-ai
+ExecStart=/usr/bin/python3 /opt/kimari-local-ai/cli/kimari_cli.py start --profile gtx1080
+ExecStop=/usr/bin/python3 /opt/kimari-local-ai/cli/kimari_cli.py stop
+Restart=on-failure
+RestartSec=5
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/kimari-local-ai/models /opt/kimari-local-ai/benchmarks/results /opt/kimari-local-ai/kimari-server.log
+
+# Resource limits
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
