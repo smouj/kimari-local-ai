@@ -1,0 +1,65 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for Kimari Local AI
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please describe your idea clearly.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: What problem does this feature solve? Or what use case does it enable?
+      placeholder: "I'm always frustrated when I have to manually edit the profile JSON to change the context size..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature or behavior you'd like to see.
+      placeholder: "Add a `kimari config` command that opens an interactive wizard to set profile options..."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other solutions or workarounds have you tried or considered?
+      placeholder: "I currently edit the JSON file manually, but it's error-prone..."
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of Kimari does this relate to?
+      options:
+        - CLI
+        - API (OpenAI-compatible)
+        - GPU Profiles
+        - Model Management (kimari pull)
+        - Web UI (Open WebUI / PWA)
+        - IDE Integration (Continue)
+        - KimariFit Scoring
+        - Benchmarks
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (your opinion)
+      description: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would be really useful
+        - Blocking my workflow
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any mockups, references to other projects, or extra information.

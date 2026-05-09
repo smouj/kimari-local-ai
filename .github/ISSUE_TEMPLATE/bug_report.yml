@@ -1,0 +1,92 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in Kimari Local AI
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this bug! Please fill out the sections below.
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is.
+      placeholder: "When I run `kimari start --profile test`, the server crashes with..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Run `python cli/kimari_cli.py start --profile test`
+        2. Wait for server to start
+        3. Run `python cli/kimari_cli.py chat "Hello"`
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: "The server should start and respond to chat messages."
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include error messages, stack traces, or logs.
+      placeholder: "Error: llama-server process exited with code 1"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Paste any relevant log output. You can run `kimari logs` to get server logs.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Kimari Version
+      description: What version of Kimari are you running?
+      placeholder: "0.1.2-alpha"
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU Model
+      description: What NVIDIA GPU are you using?
+      placeholder: "NVIDIA GTX 1060 6GB"
+    validations:
+      required: true
+  - type: input
+    id: cuda
+    attributes:
+      label: CUDA Version
+      description: What version of CUDA is installed?
+      placeholder: "11.8"
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What OS are you running on?
+      placeholder: "Ubuntu 22.04"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python Version
+      description: What version of Python are you using?
+      placeholder: "3.11.5"
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem (model used, profile, custom config, etc.).

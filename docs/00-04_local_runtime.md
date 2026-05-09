@@ -27,7 +27,7 @@ This document covers setting up the llama.cpp runtime that powers Kimari. It inc
 | Software | Version | Purpose |
 |----------|---------|---------|
 | NVIDIA Driver | 525+ | GPU support |
-| CUDA Toolkit | 11.0+ | Building llama.cpp (optional for pre-built) |
+| CUDA Toolkit | 11.8+ (11.0 best-effort) | Building llama.cpp (optional for pre-built) |
 | Python | 3.10+ | Kimari CLI |
 | CMake | 3.18+ | Building from source |
 | Git | 2.x | Cloning repos |

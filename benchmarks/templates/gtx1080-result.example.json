@@ -1,0 +1,22 @@
+{
+  "date": "2025-01-15T10:30:00",
+  "kimari_version": "0.1.2-alpha",
+  "os": "Ubuntu 22.04",
+  "gpu_name": "NVIDIA GeForce GTX 1080 8GB",
+  "driver_version": "550.54.14",
+  "cuda_version": "12.4",
+  "llama_cpp_ref": "b4683",
+  "model_name": "Qwen3-4B-Q5_K_M",
+  "model_size_gb": 3.8,
+  "quantization": "Q5_K_M",
+  "ctx": 16384,
+  "batch": 512,
+  "ubatch": 256,
+  "prompt_tokens": 128,
+  "generated_tokens": 256,
+  "prompt_eval_tokens_per_second": null,
+  "generation_tokens_per_second": null,
+  "time_to_first_token_ms": null,
+  "peak_vram_mb": null,
+  "notes": "Example template. Fill in with actual measured values."
+}
