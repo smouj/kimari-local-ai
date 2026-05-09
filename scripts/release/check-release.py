@@ -46,8 +46,7 @@ def get_pyproject_version() -> str:
     pyproject = PROJECT_ROOT / "pyproject.toml"
     for line in pyproject.read_text().splitlines():
         line = line.strip()
-        if line.startswith("version"):
-            # version = "0.1.8-alpha"
+        if line.startswith("version") and "python" not in line.lower():
             return line.split("=", 1)[1].strip().strip('"').strip("'")
     return ""
 
@@ -67,7 +66,7 @@ def main() -> None:
     print("=" * 50)
 
     # ── Version consistency ──────────────────────────────────────
-    print("\n[1/7] Version consistency")
+    print("\n[1/10] Version consistency")
     pyproject_ver = get_pyproject_version()
     init_ver = get_init_version()
     check("pyproject.toml version is set", bool(pyproject_ver), "version field is empty")
@@ -79,7 +78,7 @@ def main() -> None:
     )
 
     # ── README version badge ─────────────────────────────────────
-    print("\n[2/7] README version badge")
+    print("\n[2/10] README version badge")
     readme = PROJECT_ROOT / "README.md"
     readme_text = readme.read_text()
     check("README.md exists", readme.exists())
@@ -89,12 +88,16 @@ def main() -> None:
         badge_ver in readme_text or init_ver in readme_text,
         f"version {init_ver!r} not found in README.md",
     )
+    check(
+        "README links to Release Checklist",
+        "RELEASE_CHECKLIST.md" in readme_text,
+        "RELEASE_CHECKLIST.md link not found in README.md",
+    )
 
     # ── CHANGELOG entry ──────────────────────────────────────────
-    print("\n[3/7] CHANGELOG entry")
+    print("\n[3/10] CHANGELOG entry")
     changelog = PROJECT_ROOT / "CHANGELOG.md"
     changelog_text = changelog.read_text()
-    # Look for heading like ## [0.1.8-alpha]
     changelog_header = f"[{init_ver}]"
     check(
         "CHANGELOG.md has entry for current version",
@@ -103,7 +106,7 @@ def main() -> None:
     )
 
     # ── ROADMAP entry ────────────────────────────────────────────
-    print("\n[4/7] ROADMAP entry")
+    print("\n[4/10] ROADMAP entry")
     roadmap = PROJECT_ROOT / "ROADMAP.md"
     roadmap_text = roadmap.read_text()
     check(
@@ -111,9 +114,14 @@ def main() -> None:
         init_ver in roadmap_text,
         f"version {init_ver!r} not found in ROADMAP.md",
     )
+    check(
+        "ROADMAP marks current version",
+        "Current" in roadmap_text and init_ver in roadmap_text,
+        "current version not marked as 'Current' in ROADMAP.md",
+    )
 
     # ── Config defaults ──────────────────────────────────────────
-    print("\n[5/7] Config defaults")
+    print("\n[5/10] Config defaults")
     profiles_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
     if profiles_path.exists():
         profiles = json.loads(profiles_path.read_text())
@@ -126,15 +134,59 @@ def main() -> None:
     else:
         check("config/kimari.profiles.json exists", False, "file not found")
 
-    # ── py.typed ─────────────────────────────────────────────────
-    print("\n[6/7] Package markers")
+    # ── Package markers ─────────────────────────────────────────
+    print("\n[6/10] Package markers")
     py_typed = PROJECT_ROOT / "kimari" / "py.typed"
     check("kimari/py.typed exists", py_typed.exists(), "PEP 561 marker missing")
 
+    # ── GitHub Pages / SEO ──────────────────────────────────────
+    print("\n[7/10] GitHub Pages / SEO")
+    index_html = PROJECT_ROOT / "docs" / "index.html"
+    if index_html.exists():
+        index_text = index_html.read_text()
+        check(
+            "docs/index.html contains current version",
+            init_ver in index_text,
+            f"version {init_ver!r} not found in docs/index.html",
+        )
+        check(
+            "docs/index.html has canonical URL",
+            "canonical" in index_text,
+            "canonical link not found in docs/index.html",
+        )
+        check(
+            "docs/index.html has og:title",
+            "og:title" in index_text,
+            "Open Graph title not found in docs/index.html",
+        )
+        check(
+            "docs/index.html has og:image",
+            "og:image" in index_text,
+            "Open Graph image not found in docs/index.html",
+        )
+    else:
+        check("docs/index.html exists", False, "file not found")
+
+    # ── Documentation files ─────────────────────────────────────
+    print("\n[8/10] Documentation files")
+    check(
+        "docs/INSTALL_WSL2.md exists",
+        (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists(),
+        "WSL2 installation guide missing",
+    )
+    check(
+        "docs/PUBLISHING.md exists",
+        (PROJECT_ROOT / "docs" / "PUBLISHING.md").exists(),
+        "Publishing guide missing",
+    )
+    check(
+        "RELEASE_CHECKLIST.md exists",
+        (PROJECT_ROOT / "RELEASE_CHECKLIST.md").exists(),
+        "Release checklist missing",
+    )
+
     # ── No tracked GGUF / runtime artifacts ──────────────────────
-    print("\n[7/7] No unwanted tracked files")
-    forbidden_patterns = [".kimari/", "kimari-server.log", ".kimari-server.pid"]
-    # Check for GGUF files tracked in git
+    print("\n[9/10] No unwanted tracked files")
     try:
         result = subprocess.run(
             ["git", "ls-files", "*.gguf"],
@@ -174,6 +226,29 @@ def main() -> None:
     kimari_dir = PROJECT_ROOT / ".kimari"
     if kimari_dir.exists():
         warn(".kimari/ directory exists in project root", "should be in .gitignore")
+
+    # ── No false claims ─────────────────────────────────────────
+    print("\n[10/10] Content integrity")
+    readme_lower = readme_text.lower()
+    changelog_lower = changelog_text.lower()
+    index_lower = (PROJECT_ROOT / "docs" / "index.html").read_text().lower() if index_html.exists() else ""
+
+    # Check that Kimari-4B is not claimed as released
+    # These patterns should NOT appear (they claim the model exists/is available)
+    k4b_false_patterns = [
+        "kimari-4b is available now",
+        "kimari-4b can be downloaded",
+        "download kimari-4b",
+        "kimari-4b weights available",
+        "kimari-4b has been released",
+    ]
+    all_text = f"{readme_lower} {changelog_lower} {index_lower}"
+    false_claims = [p for p in k4b_false_patterns if p in all_text]
+    check(
+        "No 'Kimari-4B released' false claim",
+        len(false_claims) == 0,
+        f"found false claims: {false_claims}",
+    )
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)

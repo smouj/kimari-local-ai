@@ -75,7 +75,7 @@
 - ✅ Python type annotations: `Optional[X]` → `X | None` throughout
 - ✅ `ci-local` now runs ruff check + ruff format --check
 
-## v0.1.8-alpha (Current)
+## v0.1.8-alpha (Released)
 
 - ✅ GitHub topics — 20 discovery topics added (ai, llm, local-ai, gguf, cuda, openai-compatible-api, etc.)
 - ✅ pyproject.toml keywords — 12 targeted discovery keywords
@@ -84,13 +84,23 @@
 - ✅ CI release-check job — runs check-release.py in CI
 - ✅ TestPyPI publishing documentation (manual workflow)
 
-## v0.1.9-alpha (Planned)
+## v0.1.9-alpha (Current)
 
-- TestPyPI real validation (actual upload and install test)
-- Real SHA256 hashes if computable reliably
-- WSL2 installation guide
-- More robust Windows launcher
+- ✅ GitHub Pages revamp — hero, alpha honesty strip, Quick Start before Features, Hardware Targets, Trust section, topics chips, improved footer
+- ✅ SEO/social metadata — canonical URL, Open Graph, Twitter Cards, JSON-LD SoftwareApplication
+- ✅ Accessibility — aria labels, role attributes, semantic button, alt text
+- ✅ docs/INSTALL_WSL2.md — complete WSL2 installation guide with troubleshooting
+- ✅ docs/PUBLISHING.md — manual TestPyPI/PyPI publishing guide
+- ✅ RELEASE_CHECKLIST.md — added SEO, WSL2, publishing, GitHub Pages checks
+- ✅ check-release.py — 10 validation categories including SEO, docs, false claim detection
+
+## v0.1.10-alpha (Planned)
+
+- TestPyPI actual install verification (real upload + install test)
 - Optional `kimari setup` interactive command
+- Real SHA256 hashes if computable reliably
+- More robust Windows launcher/installer
+- GitHub release automation preparation
 
 ## v0.2.0-alpha
 
