@@ -1,3 +1,8 @@
+# Kimari runtime
+.kimari/
+.kimari-server.pid
+kimari-server.log
+
 # Model weights (never commit these)
 models/*.gguf
 models/*.safetensors
@@ -59,6 +64,10 @@ coverage/
 htmlcov/
 .coverage
 coverage.xml
+
+# Kimari state
+.kimari/
+.kimari-server.pid
 
 # Temporary
 tmp/

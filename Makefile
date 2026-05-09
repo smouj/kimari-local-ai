@@ -1,4 +1,4 @@
-.PHONY: help doctor start-1060 start-1080 start-turbo status stop chat smoke bench clean install
+.PHONY: help doctor start-1060 start-1080 start-turbo start-test status stop chat smoke bench clean install dry-run-test logs logs-follow doctor-json status-json validate-config webui-up webui-down webui-logs
 
 .DEFAULT_GOAL := help
 
@@ -24,6 +24,9 @@ start-1080: ## Start Kimari with GTX 1080 profile
 start-turbo: ## Start Kimari with Turbo profile
 	cd cli && python kimari_cli.py start --profile turbo
 
+start-test: ## Start Kimari with test profile
+	cd cli && python kimari_cli.py start --profile test
+
 stop: ## Stop running Kimari server
 	cd cli && python kimari_cli.py stop
 
@@ -39,6 +42,33 @@ smoke: ## Run smoke tests
 
 bench: ## Run benchmarks with default profile
 	cd cli && python kimari_cli.py bench --profile gtx1080
+
+dry-run-test: ## Preview server start without running (test profile)
+	cd cli && python kimari_cli.py start --profile test --dry-run
+
+logs: ## Show last 50 lines of server log
+	cd cli && python kimari_cli.py logs
+
+logs-follow: ## Tail server logs
+	cd cli && python kimari_cli.py logs --follow
+
+doctor-json: ## Run diagnostics as JSON
+	cd cli && python kimari_cli.py doctor --json
+
+status-json: ## Show status as JSON
+	cd cli && python kimari_cli.py status --json
+
+validate-config: ## Validate profiles config against schema
+	python -c "import json; json.load(open('config/kimari.profiles.json')); print('Config JSON valid.')"
+
+webui-up: ## Start Open WebUI via Docker
+	docker compose -f docker/docker-compose.open-webui.yml up -d
+
+webui-down: ## Stop Open WebUI
+	docker compose -f docker/docker-compose.open-webui.yml down
+
+webui-logs: ## Show Open WebUI logs
+	docker compose -f docker/docker-compose.open-webui.yml logs -f
 
 clean: ## Clean build artifacts
 	@echo "Cleaning..."

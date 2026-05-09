@@ -23,9 +23,25 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. No cloud. No subscriptions. Your data stays on your machine.
 
-Kimari-4B is optimized for the hardware most people actually have — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)** — delivering maximum useful intelligence per GiB of VRAM through intelligent quantization and the KimariFit scoring system.
+Kimari-4B is the **target model** currently under development. Until the final fine-tuned weights are released, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)** — delivering maximum useful intelligence per GiB of VRAM through intelligent quantization and the KimariFit scoring system.
 
 Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari provides an OpenAI-compatible API, a full-featured CLI, and integrations for Open WebUI and Continue (VS Code / JetBrains).
+
+## Project Status
+
+> **Kimari Local AI v0.1.1-alpha** — Framework/runtime/CLI is functional. Kimari-4B model is planned.
+
+| Component | Status |
+|-----------|--------|
+| CLI (`kimari`) | ✅ Functional alpha |
+| llama.cpp runtime | ✅ Works with any GGUF model |
+| Open WebUI integration | ✅ Functional via Docker |
+| Continue IDE integration | ✅ Configuration ready |
+| Kimari-4B model | 🔨 Planned — weights not yet available |
+| Real GPU benchmarks | 📋 Pending — need measured data |
+| PWA (own web app) | 📋 Planned for v0.2 |
+| Tauri Desktop | 📋 Planned for v1.0 |
+| `kimari pull` (model download) | 📋 Planned for v0.1.2 |
 
 ## Why Kimari?
 
@@ -108,6 +124,7 @@ Pre-configured settings optimized for specific GPU models. No manual tuning requ
 | `gtx1060` | GTX 1060 | 6 GB | Q4_K_M | 8,192 | 256 | 128 | f16 |
 | `gtx1080` | GTX 1080 | 8 GB | Q5_K_M | 16,384 | 512 | 256 | f16 |
 | `turbo` | 6 GB+ | 6 GB | IQ4_XS | 16,384 | 256 | 128 | q8_0 |
+| `test` | Any 6 GB+ | 6 GB | Q4_K_M | 4,096 | 128 | 64 | f16 |
 
 ## CLI Commands
 
@@ -122,6 +139,13 @@ kimari bench --profile gtx1080                       # Run benchmarks (tokens/s,
 kimari fit --model models/file.gguf --ctx 8192       # KimariFit score
 kimari models                                         # List available GGUF models
 kimari profiles                                       # List GPU profiles
+kimari start --profile test --dry-run                # Preview command without running
+kimari start --profile gtx1080 --daemon              # Start in background
+kimari logs                                          # Show server logs
+kimari logs --follow                                 # Tail logs
+kimari doctor --json                                 # JSON output for automation
+kimari status --json                                 # JSON status output
+kimari bench --profile test --json                   # JSON benchmark output
 ```
 
 ## KimariFit Score
@@ -160,7 +184,7 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 
 ```
 ┌─────────────────────────────────────────────┐
-│  GGUF Quantized Model (Kimari-4B)           │
+│  GGUF Quantized Model (any compatible GGUF) │
 ├─────────────────────────────────────────────┤
 │  llama.cpp Runtime + CUDA Acceleration      │
 ├─────────────────────────────────────────────┤

@@ -1,5 +1,10 @@
 # Model Card: Kimari-4B
 
+> **Status: Planned / Not Released**
+> Weights are not available in this repository. Kimari-4B is the target model under development.
+> Until release, Kimari can run compatible GGUF base models for testing.
+> See `models/README.md` for recommended test models.
+
 ## Model Details
 
 - **Model Name:** Kimari-4B
@@ -15,7 +20,7 @@
 
 ### Base Model
 
-Kimari-4B is built on a base language model (details to be confirmed). The base model provides general language understanding and generation capabilities.
+Kimari-4B is built on a base language model (not yet selected — candidates include LLaMA-based, Qwen, SmolLM3, and other 3–4B parameter architectures). The base model provides general language understanding and generation capabilities. A final selection will be made before fine-tuning begins.
 
 ### Fine-Tuning (Planned)
 

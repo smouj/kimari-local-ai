@@ -30,7 +30,35 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -c "import json; c=json.load(open('config/kimari.profiles.json')); assert 'profiles' in c; assert 'gtx1060' in c['profiles']; assert 'gtx1080' in c['profiles']; assert 'turbo' in c['profiles']; print('Config valid.')"
+      - run: python -c "import json; c=json.load(open('config/kimari.profiles.json')); assert 'profiles' in c; assert 'gtx1060' in c['profiles']; assert 'gtx1080' in c['profiles']; assert 'turbo' in c['profiles']; assert 'test' in c['profiles']; print('Config valid.')"
+
+  validate-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install jsonschema
+      - run: python -c "
+import json, jsonschema
+config = json.load(open('config/kimari.profiles.json'))
+schema = json.load(open('config/kimari.profiles.schema.json'))
+jsonschema.validate(config, schema)
+print('Schema validation passed.')
+"
+
+  cli-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r cli/requirements.txt
+      - run: python cli/kimari_cli.py profiles
+      - run: python cli/kimari_cli.py doctor --json || true
+      - run: python cli/kimari_cli.py start --profile test --dry-run
 
   check-docs:
     runs-on: ubuntu-latest

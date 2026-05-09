@@ -16,6 +16,7 @@ import socket
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -33,6 +34,8 @@ CONFIG_PATH = PROJECT_ROOT / "config" / "kimari.profiles.json"
 MODELS_DIR = PROJECT_ROOT / "models"
 PID_FILE = PROJECT_ROOT / ".kimari-server.pid"
 LOG_FILE = PROJECT_ROOT / "kimari-server.log"
+STATE_DIR = PROJECT_ROOT / ".kimari"
+STATE_FILE = STATE_DIR / "state.json"
 
 KIMARI_ASCII = r"""
  ██████╗██╗  ██╗██████╗  ██████╗ ███╗   ██╗ █████╗
@@ -75,6 +78,134 @@ def fail(msg: str):
 
 def info(msg: str):
     print(f"  {Color.CYAN}[INFO]{Color.RESET} {msg}")
+
+
+# ─── State Management ────────────────────────────────────────────────────────
+
+def ensure_state_dir():
+    """Create .kimari/ directory if it doesn't exist."""
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def write_state(status: str, pid: Optional[int] = None, profile: Optional[str] = None,
+                model: Optional[str] = None, host: Optional[str] = None,
+                port: Optional[int] = None, error: Optional[str] = None):
+    """Write state to .kimari/state.json."""
+    ensure_state_dir()
+    state = {
+        "status": status,
+        "pid": pid,
+        "profile": profile,
+        "model": model,
+        "host": host,
+        "port": port,
+        "started_at": None,
+        "error": error,
+        "log_file": "kimari-server.log",
+    }
+    if status == "READY" and pid is not None:
+        state["started_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f, indent=2)
+
+
+def read_state() -> Optional[dict]:
+    """Read state from .kimari/state.json."""
+    if not STATE_FILE.exists():
+        return None
+    try:
+        with open(STATE_FILE, "r") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def clear_state():
+    """Remove state file."""
+    if STATE_FILE.exists():
+        STATE_FILE.unlink(missing_ok=True)
+
+
+def is_pid_alive(pid: int) -> bool:
+    """Check if a PID is still alive."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, ProcessLookupError):
+        return False
+
+
+# ─── Error Parsing from Logs ─────────────────────────────────────────────────
+
+ERROR_PATTERNS = [
+    {
+        "pattern": "CUDA out of memory",
+        "error_type": "OOM",
+        "solution": "Use a lower quantization profile or reduce context size",
+    },
+    {
+        "pattern": "no kernel image is available",
+        "error_type": "CUDA_ERROR",
+        "solution": "Rebuild llama.cpp with -DCMAKE_CUDA_ARCHITECTURES=native",
+    },
+    {
+        "pattern": "failed to load model",
+        "error_type": "MODEL_NOT_FOUND",
+        "solution": "Verify the GGUF file is valid and not corrupted",
+    },
+    {
+        "pattern": "unknown argument",
+        "error_type": "CUDA_ERROR",
+        "solution": "Check llama.cpp version compatibility",
+    },
+    {
+        "pattern": "address already in use",
+        "error_type": "PORT_BUSY",
+        "solution": "Stop the existing server with 'kimari stop' or change port",
+    },
+    {
+        "pattern": "model architecture not supported",
+        "error_type": "MODEL_NOT_FOUND",
+        "solution": "Use a model compatible with this llama.cpp version",
+    },
+]
+
+
+def parse_log_errors(log_path: Path = LOG_FILE) -> Optional[dict]:
+    """Read kimari-server.log and detect known error patterns.
+
+    Returns the first matched error dict with 'error_type', 'pattern', and 'solution',
+    or None if no errors found.
+    """
+    if not log_path.exists():
+        return None
+    try:
+        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read()
+    except OSError:
+        return None
+
+    content_lower = content.lower()
+    for entry in ERROR_PATTERNS:
+        if entry["pattern"].lower() in content_lower:
+            return {
+                "error_type": entry["error_type"],
+                "pattern": entry["pattern"],
+                "solution": entry["solution"],
+            }
+    return None
+
+
+def read_log_tail(log_path: Path = LOG_FILE, lines: int = 10) -> list:
+    """Read the last N lines of a log file."""
+    if not log_path.exists():
+        return []
+    try:
+        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+            all_lines = f.readlines()
+        return all_lines[-lines:]
+    except OSError:
+        return []
 
 
 # ─── Config ───────────────────────────────────────────────────────────────────
@@ -130,12 +261,46 @@ def detect_cuda() -> bool:
 
 
 def detect_llama_server() -> Optional[str]:
-    """Find llama-server binary in PATH."""
-    names = ["llama-server", "llama_server", "./llama-server"]
-    for name in names:
-        path = shutil.which(name)
-        if path:
-            return path
+    """Find llama-server binary searching 7 locations in priority order."""
+    # 1. LLAMA_SERVER environment variable
+    env_llama = os.environ.get("LLAMA_SERVER")
+    if env_llama:
+        path = Path(env_llama)
+        if path.exists():
+            return str(path.resolve())
+
+    # 2. KIMARI_LLAMA_SERVER environment variable
+    env_kimari = os.environ.get("KIMARI_LLAMA_SERVER")
+    if env_kimari:
+        path = Path(env_kimari)
+        if path.exists():
+            return str(path.resolve())
+
+    # 3. shutil.which("llama-server") (PATH)
+    which_llama = shutil.which("llama-server")
+    if which_llama:
+        return which_llama
+
+    # 4. shutil.which("llama_server") (PATH, underscore variant)
+    which_llama_us = shutil.which("llama_server")
+    if which_llama_us:
+        return which_llama_us
+
+    # 5. ./llama-server (relative to PROJECT_ROOT)
+    rel_llama = PROJECT_ROOT / "llama-server"
+    if rel_llama.exists():
+        return str(rel_llama.resolve())
+
+    # 6. ./bin/llama-server (relative to PROJECT_ROOT)
+    bin_llama = PROJECT_ROOT / "bin" / "llama-server"
+    if bin_llama.exists():
+        return str(bin_llama.resolve())
+
+    # 7. deps/llama.cpp/build/bin/llama-server (relative to PROJECT_ROOT)
+    deps_llama = PROJECT_ROOT / "deps" / "llama.cpp" / "build" / "bin" / "llama-server"
+    if deps_llama.exists():
+        return str(deps_llama.resolve())
+
     return None
 
 
@@ -154,16 +319,16 @@ def recommend_profile(config: dict, gpu: Optional[dict]) -> str:
     """Recommend a GPU profile based on detected hardware."""
     if not gpu:
         return config.get("default_profile", "gtx1060")
-    
+
     vram_gb = gpu["vram_mb"] / 1024
     profiles = config.get("profiles", {})
-    
+
     # Try to match by GPU name first
     gpu_name_lower = gpu["name"].lower()
     for key, profile in profiles.items():
         if key in gpu_name_lower:
             return key
-    
+
     # Fall back to VRAM-based recommendation
     if vram_gb >= 8:
         return "gtx1080"
@@ -175,34 +340,12 @@ def recommend_profile(config: dict, gpu: Optional[dict]) -> str:
 
 # ─── Server Management ───────────────────────────────────────────────────────
 
-def start_server(profile_name: str, config: dict, verbose: bool = False):
-    """Start llama-server with the specified profile."""
-    profile = get_profile(config, profile_name)
-    
-    # Check model exists
+def build_server_cmd(llama_server: str, profile: dict) -> list:
+    """Build the llama-server command list for a given profile."""
     model_path = PROJECT_ROOT / profile["model"]
-    if not model_path.exists():
-        print(f"[ERROR] Model not found: {model_path}")
-        print("Place a GGUF model in the models/ directory.")
-        print(f"Expected: {profile['model']}")
-        sys.exit(1)
-    
-    # Check llama-server
-    llama_server = detect_llama_server()
-    if not llama_server:
-        print("[ERROR] llama-server not found in PATH.")
-        print("Build it first: bash scripts/linux/build-llamacpp-cuda.sh")
-        sys.exit(1)
-    
-    # Check port
     host = profile.get("host", "127.0.0.1")
     port = profile.get("port", 11435)
-    if not is_port_free(host, port):
-        print(f"[ERROR] Port {port} is already in use.")
-        print("Stop the existing server first: kimari stop")
-        sys.exit(1)
-    
-    # Build command
+
     cmd = [
         llama_server,
         "-m", str(model_path),
@@ -215,18 +358,108 @@ def start_server(profile_name: str, config: dict, verbose: bool = False):
         "--cache-type-k", profile.get("cache_type_k", "f16"),
         "--cache-type-v", profile.get("cache_type_v", "f16"),
     ]
-    
+
     if profile.get("threads"):
         cmd.extend(["-t", str(profile["threads"])])
-    
+
+    return cmd
+
+
+def start_server(profile_name: str, config: dict, dry_run: bool = False,
+                 daemon: bool = False):
+    """Start llama-server with the specified profile."""
+    profile = get_profile(config, profile_name)
+
+    host = profile.get("host", "127.0.0.1")
+    port = profile.get("port", 11435)
+
+    # Try to find llama-server (may not exist in dry-run / CI environments)
+    llama_server = detect_llama_server()
+
+    # Build command (works even if binary doesn't exist, for --dry-run)
+    if llama_server:
+        cmd = build_server_cmd(llama_server, profile)
+    else:
+        # For dry-run without binary, show a placeholder
+        cmd = ["llama-server",
+               "-m", str(PROJECT_ROOT / profile["model"]),
+               "--host", host,
+               "--port", str(port),
+               "-ngl", profile.get("gpu_layers", "all"),
+               "-c", str(profile.get("ctx", 8192)),
+               "-b", str(profile.get("batch", 256)),
+               "-ub", str(profile.get("ubatch", 128)),
+               "--cache-type-k", profile.get("cache_type_k", "f16"),
+               "--cache-type-v", profile.get("cache_type_v", "f16")]
+        if profile.get("threads"):
+            cmd.extend(["-t", str(profile["threads"])])
+
     print(f"\n{Color.BOLD}{Color.CYAN}🚀 Starting Kimari{Color.RESET}")
     print(f"   Profile: {Color.GREEN}{profile_name}{Color.RESET} ({profile['name']})")
     print(f"   Model:   {profile['model']}")
     print(f"   Host:    {host}:{port}")
     print(f"   Context: {profile.get('ctx', 8192)} tokens")
     print(f"   Quant:   {profile['quantization']}")
+    if llama_server:
+        print(f"   Binary:  {llama_server}")
+    else:
+        print(f"   Binary:  llama-server (not found — build or set LLAMA_SERVER)")
     print()
-    
+
+    # --dry-run: print command and exit (skip model/port checks)
+    if dry_run:
+        model_path = PROJECT_ROOT / profile["model"]
+        if not model_path.exists():
+            print(f"  {Color.YELLOW}[WARN]{Color.RESET} Model not found: {model_path}")
+            print(f"  {Color.YELLOW}[WARN]{Color.RESET} Place a GGUF model before actually starting.\n")
+        print(f"{Color.YELLOW}[DRY RUN]{Color.RESET} Would execute:\n")
+        print(f"  {' '.join(cmd)}\n")
+        print(f"  stdout → {LOG_FILE}")
+        print(f"  state  → {STATE_FILE}")
+        return
+
+    # --- Real startup checks below ---
+
+    # Check model exists
+    model_path = PROJECT_ROOT / profile["model"]
+    if not model_path.exists():
+        print(f"[ERROR] Model not found: {model_path}")
+        print("Place a GGUF model in the models/ directory.")
+        print(f"Expected: {profile['model']}")
+        write_state("ERROR", error="MODEL_NOT_FOUND", profile=profile_name,
+                    model=profile["model"])
+        sys.exit(1)
+
+    # Check llama-server
+    if not llama_server:
+        print("[ERROR] llama-server not found.")
+        print("  Searched in order:")
+        print(f"    1. $LLAMA_SERVER environment variable")
+        print(f"    2. $KIMARI_LLAMA_SERVER environment variable")
+        print(f"    3. llama-server in PATH")
+        print(f"    4. llama_server in PATH")
+        print(f"    5. {PROJECT_ROOT / 'llama-server'}")
+        print(f"    6. {PROJECT_ROOT / 'bin' / 'llama-server'}")
+        print(f"    7. {PROJECT_ROOT / 'deps' / 'llama.cpp' / 'build' / 'bin' / 'llama-server'}")
+        print()
+        print("  Build it first: bash scripts/linux/build-llamacpp-cuda.sh")
+        print("  Or set LLAMA_SERVER=/path/to/llama-server")
+        write_state("ERROR", error="LLAMA_SERVER_NOT_FOUND", profile=profile_name,
+                    model=profile["model"])
+        sys.exit(1)
+
+    # Check port
+    if not is_port_free(host, port):
+        print(f"[ERROR] Port {port} is already in use.")
+        print("Stop the existing server first: kimari stop")
+        write_state("ERROR", error="PORT_BUSY", profile=profile_name,
+                    model=profile["model"], host=host, port=port)
+        sys.exit(1)
+
+    # Write STARTING state
+    write_state("STARTING", pid=None, profile=profile_name,
+                model=profile["model"], host=host, port=port)
+
     # Start server
     try:
         log_fh = open(LOG_FILE, "w")
@@ -236,11 +469,11 @@ def start_server(profile_name: str, config: dict, verbose: bool = False):
             stderr=subprocess.STDOUT,
             preexec_fn=os.setsid if sys.platform != "win32" else None,
         )
-        
+
         # Save PID
         with open(PID_FILE, "w") as f:
             f.write(str(process.pid))
-        
+
         # Wait and check if it started
         print(f"   Waiting for server to start...", end=" ", flush=True)
         max_wait = 30
@@ -252,7 +485,18 @@ def start_server(profile_name: str, config: dict, verbose: bool = False):
                     print(f"{Color.GREEN}✓ Ready{Color.RESET}")
                     print(f"\n{Color.DIM}   API: http://{host}:{port}/v1{Color.RESET}")
                     print(f"{Color.DIM}   Log: {LOG_FILE}{Color.RESET}")
+                    print(f"{Color.DIM}   State: {STATE_FILE}{Color.RESET}")
                     print()
+                    # Write READY state
+                    write_state("READY", pid=process.pid, profile=profile_name,
+                                model=profile["model"], host=host, port=port)
+
+                    if daemon:
+                        info(f"Server running in background (PID: {process.pid})")
+                        info(f"Logs: kimari logs")
+                        info(f"Stop: kimari stop")
+                        return
+
                     info("Press Ctrl+C to stop, or run: kimari stop")
                     # Keep running until interrupted
                     try:
@@ -266,6 +510,9 @@ def start_server(profile_name: str, config: dict, verbose: bool = False):
                 print(f"{Color.YELLOW}⚠ Timeout{Color.RESET}")
                 print(f"   Server may still be starting. Check logs: {LOG_FILE}")
                 print(f"   PID: {process.pid}")
+                write_state("ERROR", pid=process.pid, profile=profile_name,
+                            model=profile["model"], host=host, port=port,
+                            error="START_TIMEOUT")
                 try:
                     process.wait()
                 except KeyboardInterrupt:
@@ -274,17 +521,30 @@ def start_server(profile_name: str, config: dict, verbose: bool = False):
             if process.poll() is not None:
                 # Process exited
                 log_fh.close()
-                with open(LOG_FILE, "r") as f:
-                    last_lines = f.readlines()[-10:]
+                # Parse logs for errors
+                error_info = parse_log_errors()
+                last_lines = read_log_tail(LOG_FILE, 10)
                 print(f"{Color.RED}✗ Failed{Color.RESET}")
-                print(f"\n   Last log lines:")
-                for line in last_lines:
-                    print(f"   {Color.DIM}{line.rstrip()}{Color.RESET}")
+                if error_info:
+                    print(f"\n   {Color.RED}Error detected:{Color.RESET} {error_info['pattern']}")
+                    print(f"   {Color.YELLOW}Solution:{Color.RESET} {error_info['solution']}")
+                    write_state("ERROR", pid=process.pid, profile=profile_name,
+                                model=profile["model"], host=host, port=port,
+                                error=error_info["error_type"])
+                else:
+                    print(f"\n   Last log lines:")
+                    for line in last_lines:
+                        print(f"   {Color.DIM}{line.rstrip()}{Color.RESET}")
+                    write_state("ERROR", pid=process.pid, profile=profile_name,
+                                model=profile["model"], host=host, port=port,
+                                error="UNKNOWN")
                 sys.exit(1)
             print(".", end="", flush=True)
-    
+
     except FileNotFoundError:
         print(f"[ERROR] Could not execute: {llama_server}")
+        write_state("ERROR", error="LLAMA_SERVER_NOT_FOUND", profile=profile_name,
+                    model=profile["model"])
         sys.exit(1)
 
 
@@ -292,11 +552,12 @@ def stop_server():
     """Stop the running llama-server."""
     if not PID_FILE.exists():
         print("[WARN] No server PID file found. Server may not be running.")
+        clear_state()
         return
-    
+
     with open(PID_FILE, "r") as f:
         pid = int(f.read().strip())
-    
+
     try:
         if sys.platform != "win32":
             os.killpg(os.getpgid(pid), signal.SIGTERM)
@@ -309,34 +570,193 @@ def stop_server():
         print(f"[ERROR] No permission to stop process {pid}")
     finally:
         PID_FILE.unlink(missing_ok=True)
+        clear_state()
 
 
-def check_status(config: dict):
-    """Check the Kimari server status."""
-    profile_name = config.get("default_profile", "gtx1060")
+def check_status(config: dict, json_output: bool = False):
+    """Check the Kimari server status from multiple sources."""
+    status_data = {
+        "status": "STOPPED",
+        "pid": None,
+        "profile": None,
+        "model": None,
+        "host": None,
+        "port": None,
+        "uptime_s": None,
+        "started_at": None,
+        "health": None,
+        "models": [],
+        "last_log_lines": [],
+        "log_errors": None,
+    }
+
+    # 1. Read .kimari/state.json
+    state = read_state()
+    if state:
+        status_data["profile"] = state.get("profile")
+        status_data["model"] = state.get("model")
+        status_data["host"] = state.get("host")
+        status_data["port"] = state.get("port")
+        status_data["started_at"] = state.get("started_at")
+        status_data["status"] = state.get("status", "STOPPED")
+        pid = state.get("pid")
+        if pid:
+            status_data["pid"] = pid
+
+    # Determine host/port for health check
+    profile_name = status_data.get("profile") or config.get("default_profile", "gtx1060")
     profile = config.get("profiles", {}).get(profile_name, {})
-    host = profile.get("host", "127.0.0.1")
-    port = profile.get("port", 11435)
-    
+    host = status_data.get("host") or profile.get("host", "127.0.0.1")
+    port = status_data.get("port") or profile.get("port", 11435)
+    status_data["host"] = host
+    status_data["port"] = port
+    if not status_data.get("profile"):
+        status_data["profile"] = profile_name
+
+    # 2. Check if PID is still alive
+    pid = status_data.get("pid")
+    if pid and not is_pid_alive(pid):
+        status_data["status"] = "ERROR"
+        status_data["error"] = "PROCESS_DIED"
+
+    # 3. Hit /health endpoint
     try:
         resp = requests.get(f"http://{host}:{port}/health", timeout=3)
         if resp.status_code == 200:
-            data = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
-            print(f"\n{Color.GREEN}● Kimari Server: READY{Color.RESET}")
-            print(f"  Endpoint: http://{host}:{port}")
-            print(f"  Profile:  {profile_name}")
-            print(f"  Model:    {profile.get('model', 'unknown')}")
-            if data:
-                print(f"  Status:   {json.dumps(data, indent=2)}")
+            status_data["health"] = resp.json() if resp.headers.get(
+                "content-type", ""
+            ).startswith("application/json") else {"status": "ok"}
+            if status_data.get("status") not in ("ERROR",):
+                status_data["status"] = "READY"
         else:
-            print(f"\n{Color.YELLOW}● Kimari Server: ERROR{Color.RESET}")
-            print(f"  HTTP {resp.status_code}")
+            status_data["health"] = {"error": f"HTTP {resp.status_code}"}
+            if status_data.get("status") == "READY":
+                status_data["status"] = "ERROR"
     except requests.ConnectionError:
-        print(f"\n{Color.RED}● Kimari Server: STOPPED{Color.RESET}")
-        print(f"  No response from http://{host}:{port}")
+        status_data["health"] = {"error": "connection refused"}
+        if status_data.get("status") == "READY":
+            status_data["status"] = "STOPPED"
     except Exception as e:
-        print(f"\n{Color.RED}● Kimari Server: ERROR{Color.RESET}")
-        print(f"  {e}")
+        status_data["health"] = {"error": str(e)}
+
+    # 4. Hit /v1/models endpoint
+    try:
+        resp = requests.get(f"http://{host}:{port}/v1/models", timeout=3)
+        if resp.status_code == 200:
+            data = resp.json()
+            status_data["models"] = [m.get("id", "unknown") for m in data.get("data", [])]
+    except Exception:
+        pass
+
+    # 5. Read last 10 lines of log
+    last_lines = read_log_tail(LOG_FILE, 10)
+    status_data["last_log_lines"] = [line.rstrip() for line in last_lines]
+
+    # 6. Parse log errors
+    error_info = parse_log_errors()
+    if error_info:
+        status_data["log_errors"] = error_info
+        if status_data.get("status") == "ERROR" and not status_data.get("error"):
+            status_data["error"] = error_info["error_type"]
+
+    # Calculate uptime
+    if status_data.get("started_at") and status_data.get("status") == "READY":
+        try:
+            started = datetime.fromisoformat(status_data["started_at"].replace("Z", "+00:00"))
+            uptime = (datetime.now(timezone.utc) - started).total_seconds()
+            status_data["uptime_s"] = int(uptime)
+        except (ValueError, TypeError):
+            pass
+
+    # Output
+    if json_output:
+        print(json.dumps(status_data, indent=2))
+        return
+
+    # Human-readable output
+    status = status_data["status"]
+    if status == "READY":
+        color = Color.GREEN
+        symbol = "●"
+    elif status == "STOPPED":
+        color = Color.RED
+        symbol = "●"
+    elif status == "STARTING":
+        color = Color.YELLOW
+        symbol = "●"
+    elif status == "BUSY":
+        color = Color.YELLOW
+        symbol = "●"
+    else:
+        color = Color.RED
+        symbol = "●"
+
+    print(f"\n{color}{symbol} Kimari Server: {status}{Color.RESET}")
+
+    if status_data.get("pid"):
+        print(f"  PID:         {status_data['pid']}")
+
+    print(f"  Endpoint:    http://{host}:{port}")
+    if status_data.get("profile"):
+        print(f"  Profile:     {status_data['profile']}")
+    if status_data.get("model"):
+        print(f"  Model:       {status_data['model']}")
+    if status_data.get("uptime_s") is not None:
+        uptime = status_data["uptime_s"]
+        hours, remainder = divmod(uptime, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        if hours > 0:
+            print(f"  Uptime:      {hours}h {minutes}m {seconds}s")
+        elif minutes > 0:
+            print(f"  Uptime:      {minutes}m {seconds}s")
+        else:
+            print(f"  Uptime:      {seconds}s")
+    if status_data.get("started_at"):
+        print(f"  Started:     {status_data['started_at']}")
+    if status_data.get("models"):
+        print(f"  Loaded models: {', '.join(status_data['models'])}")
+    if status_data.get("health"):
+        health = status_data["health"]
+        if "error" in health:
+            print(f"  Health:      {Color.RED}{health['error']}{Color.RESET}")
+        else:
+            print(f"  Health:      {Color.GREEN}OK{Color.RESET}")
+    if status_data.get("log_errors"):
+        err = status_data["log_errors"]
+        print(f"\n  {Color.RED}Log error detected:{Color.RESET} {err['pattern']}")
+        print(f"  {Color.YELLOW}Solution:{Color.RESET} {err['solution']}")
+    if status_data.get("error"):
+        print(f"  Error:       {Color.RED}{status_data['error']}{Color.RESET}")
+
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+
+def show_logs(lines: int = 50, follow: bool = False):
+    """Show kimari-server.log contents."""
+    if not LOG_FILE.exists():
+        print("[WARN] No log file found at:", LOG_FILE)
+        print("Start the server first: kimari start --profile <profile>")
+        return
+
+    tail_lines = read_log_tail(LOG_FILE, lines)
+    for line in tail_lines:
+        print(line.rstrip())
+
+    if follow:
+        print(f"\n{Color.DIM}--- Following log (Ctrl+C to stop) ---{Color.RESET}")
+        try:
+            with open(LOG_FILE, "r", encoding="utf-8", errors="replace") as f:
+                # Seek to end
+                f.seek(0, 2)
+                while True:
+                    line = f.readline()
+                    if line:
+                        print(line.rstrip(), end="\n")
+                        sys.stdout.flush()
+                    else:
+                        time.sleep(0.5)
+        except KeyboardInterrupt:
+            print(f"\n{Color.DIM}Stopped following.{Color.RESET}")
 
 
 # ─── Chat ─────────────────────────────────────────────────────────────────────
@@ -348,9 +768,9 @@ def chat(message: str, config: dict, profile_name: Optional[str] = None):
     profile = config.get("profiles", {}).get(profile_name, {})
     host = profile.get("host", "127.0.0.1")
     port = profile.get("port", 11435)
-    
+
     url = f"http://{host}:{port}/v1/chat/completions"
-    
+
     payload = {
         "model": "kimari",
         "messages": [{"role": "user", "content": message}],
@@ -358,7 +778,7 @@ def chat(message: str, config: dict, profile_name: Optional[str] = None):
         "max_tokens": 2048,
         "stream": False,
     }
-    
+
     try:
         resp = requests.post(url, json=payload, timeout=120)
         if resp.status_code == 200:
@@ -387,15 +807,15 @@ def interactive_chat(config: dict, profile_name: Optional[str] = None):
     profile = config.get("profiles", {}).get(profile_name, {})
     host = profile.get("host", "127.0.0.1")
     port = profile.get("port", 11435)
-    
+
     url = f"http://{host}:{port}/v1/chat/completions"
-    
+
     print(f"\n{Color.BOLD}Kimari Interactive Chat{Color.RESET}")
     print(f"Profile: {profile_name} | {host}:{port}")
     print(f"Type {Color.DIM}/quit{Color.RESET} or {Color.DIM}Ctrl+C{Color.RESET} to exit\n")
-    
+
     conversation = []
-    
+
     # Load system prompt
     system_prompt = (
         "You are Kimari, a helpful technical AI assistant specialized in programming, "
@@ -403,14 +823,14 @@ def interactive_chat(config: dict, profile_name: Optional[str] = None):
         "Be precise, technical, and practical. When you're not sure, say so."
     )
     conversation.append({"role": "system", "content": system_prompt})
-    
+
     while True:
         try:
             user_input = input(f"{Color.GREEN}You>{Color.RESET} ").strip()
         except (EOFError, KeyboardInterrupt):
             print(f"\n{Color.DIM}Bye!{Color.RESET}")
             break
-        
+
         if not user_input:
             continue
         if user_input.lower() in ["/quit", "/exit", "/q"]:
@@ -420,9 +840,9 @@ def interactive_chat(config: dict, profile_name: Optional[str] = None):
             conversation = [{"role": "system", "content": system_prompt}]
             print(f"{Color.DIM}Conversation cleared.{Color.RESET}")
             continue
-        
+
         conversation.append({"role": "user", "content": user_input})
-        
+
         payload = {
             "model": "kimari",
             "messages": conversation,
@@ -430,7 +850,7 @@ def interactive_chat(config: dict, profile_name: Optional[str] = None):
             "max_tokens": 2048,
             "stream": False,
         }
-        
+
         try:
             resp = requests.post(url, json=payload, timeout=120)
             if resp.status_code == 200:
@@ -451,19 +871,19 @@ def interactive_chat(config: dict, profile_name: Optional[str] = None):
 
 # ─── Benchmark ────────────────────────────────────────────────────────────────
 
-def run_benchmark(profile_name: str, config: dict):
+def run_benchmark(profile_name: str, config: dict, json_output: bool = False):
     """Run a basic benchmark on the Kimari server."""
     profile = get_profile(config, profile_name)
     host = profile.get("host", "127.0.0.1")
     port = profile.get("port", 11435)
-    
+
     # Check server
     try:
         requests.get(f"http://{host}:{port}/health", timeout=3)
     except requests.ConnectionError:
         print("[ERROR] Server not running. Start first: kimari start")
         sys.exit(1)
-    
+
     # Benchmark prompts
     prompts = [
         "Explain Docker containers in one paragraph.",
@@ -472,17 +892,15 @@ def run_benchmark(profile_name: str, config: dict):
         "Responde en español: ¿Qué es una API REST?",
         "Write a TypeScript interface for a User with optional fields.",
     ]
-    
-    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Benchmark{Color.RESET}")
-    print(f"Profile: {profile_name} ({profile['name']})")
-    print(f"Running {len(prompts)} prompts...\n")
-    
+
     results = []
     for i, prompt in enumerate(prompts):
-        print(f"  [{i+1}/{len(prompts)}] ", end="", flush=True)
         prompt_display = prompt[:50] + ("..." if len(prompt) > 50 else "")
-        print(f"{Color.DIM}{prompt_display}{Color.RESET} ", end="", flush=True)
-        
+
+        if not json_output:
+            print(f"  [{i+1}/{len(prompts)}] ", end="", flush=True)
+            print(f"{Color.DIM}{prompt_display}{Color.RESET} ", end="", flush=True)
+
         start = time.time()
         try:
             resp = requests.post(
@@ -497,7 +915,7 @@ def run_benchmark(profile_name: str, config: dict):
                 timeout=60,
             )
             elapsed = time.time() - start
-            
+
             if resp.status_code == 200:
                 data = resp.json()
                 usage = data.get("usage", {})
@@ -510,50 +928,66 @@ def run_benchmark(profile_name: str, config: dict):
                     "tokens_per_sec": round(tokens_per_sec, 1),
                     "status": "ok",
                 })
-                print(f"{Color.GREEN}✓{Color.RESET} {completion_tokens}tok in {elapsed:.1f}s ({tokens_per_sec:.1f} t/s)")
+                if not json_output:
+                    print(f"{Color.GREEN}✓{Color.RESET} {completion_tokens}tok in {elapsed:.1f}s ({tokens_per_sec:.1f} t/s)")
             else:
                 results.append({
                     "prompt": prompt_display,
                     "status": f"http_{resp.status_code}",
                 })
-                print(f"{Color.RED}✗{Color.RESET} HTTP {resp.status_code}")
+                if not json_output:
+                    print(f"{Color.RED}✗{Color.RESET} HTTP {resp.status_code}")
         except Exception as e:
             results.append({
                 "prompt": prompt_display,
                 "status": f"error: {str(e)[:50]}",
             })
-            print(f"{Color.RED}✗{Color.RESET} {e}")
-    
+            if not json_output:
+                print(f"{Color.RED}✗{Color.RESET} {e}")
+
     # Summary
     ok_results = [r for r in results if r.get("status") == "ok"]
+
+    # Build benchmark output data
+    bench_data = {
+        "profile": profile_name,
+        "profile_name": profile["name"],
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "results": results,
+    }
+
     if ok_results:
         avg_tps = sum(r["tokens_per_sec"] for r in ok_results) / len(ok_results)
         avg_time = sum(r["time_s"] for r in ok_results) / len(ok_results)
         total_tokens = sum(r["tokens"] for r in ok_results)
-        
-        print(f"\n{Color.BOLD}Summary:{Color.RESET}")
-        print(f"  Avg speed:      {Color.GREEN}{avg_tps:.1f} tokens/s{Color.RESET}")
-        print(f"  Avg latency:    {avg_time:.2f}s")
-        print(f"  Total tokens:   {total_tokens}")
-        print(f"  Success rate:   {len(ok_results)}/{len(results)}")
-        
-        # Save results
-        results_dir = PROJECT_ROOT / "benchmarks" / "results"
-        results_dir.mkdir(parents=True, exist_ok=True)
-        result_file = results_dir / f"{profile_name}-bench.json"
-        with open(result_file, "w") as f:
-            json.dump({
-                "profile": profile_name,
-                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                "summary": {
-                    "avg_tokens_per_sec": round(avg_tps, 2),
-                    "avg_latency_s": round(avg_time, 2),
-                    "total_tokens": total_tokens,
-                    "success_rate": f"{len(ok_results)}/{len(results)}",
-                },
-                "results": results,
-            }, f, indent=2)
-        print(f"\n  Results saved: {result_file}")
+        bench_data["summary"] = {
+            "avg_tokens_per_sec": round(avg_tps, 2),
+            "avg_latency_s": round(avg_time, 2),
+            "total_tokens": total_tokens,
+            "success_rate": f"{len(ok_results)}/{len(results)}",
+        }
+
+        if not json_output:
+            print(f"\n{Color.BOLD}Summary:{Color.RESET}")
+            print(f"  Avg speed:      {Color.GREEN}{avg_tps:.1f} tokens/s{Color.RESET}")
+            print(f"  Avg latency:    {avg_time:.2f}s")
+            print(f"  Total tokens:   {total_tokens}")
+            print(f"  Success rate:   {len(ok_results)}/{len(results)}")
+
+            # Save results
+            results_dir = PROJECT_ROOT / "benchmarks" / "results"
+            results_dir.mkdir(parents=True, exist_ok=True)
+            result_file = results_dir / f"{profile_name}-bench.json"
+            with open(result_file, "w") as f:
+                json.dump(bench_data, f, indent=2)
+            print(f"\n  Results saved: {result_file}")
+
+    if json_output:
+        print(json.dumps(bench_data, indent=2))
+        return
+
+    if not json_output and not ok_results:
+        print(f"\n  {Color.RED}All benchmarks failed.{Color.RESET}")
 
 
 # ─── KimariFit ────────────────────────────────────────────────────────────────
@@ -563,15 +997,15 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict):
     model_file = Path(model_path)
     if not model_file.is_absolute():
         model_file = PROJECT_ROOT / model_path
-    
+
     if not model_file.exists():
         print(f"[ERROR] Model not found: {model_file}")
         sys.exit(1)
-    
+
     # Get model size in GiB
     model_size_bytes = model_file.stat().st_size
     model_size_gib = model_size_bytes / (1024 ** 3)
-    
+
     # Detect GPU
     gpu = detect_gpu()
     if not gpu:
@@ -579,14 +1013,14 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict):
         total_vram = 6.0
     else:
         total_vram = gpu["vram_mb"] / 1024
-    
+
     safe_vram = total_vram * 0.87
-    
+
     # VRAM estimation formula: Mtotal ≈ S_GGUF + C/9709 + overhead
     kv_vram = ctx_size / 9709
     overhead = 1.0  # Conservative estimate
     total_estimated = model_size_gib + kv_vram + overhead
-    
+
     # Calculate fit score
     if total_estimated <= safe_vram:
         # Score based on how much headroom remains
@@ -602,7 +1036,7 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict):
         # Over budget
         over_pct = (total_estimated - safe_vram) / safe_vram * 100
         score = max(0, 40 - over_pct)
-    
+
     # Quality factor based on quantization name
     model_name_lower = model_file.name.lower()
     if "q8" in model_name_lower:
@@ -621,9 +1055,9 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict):
         quality = 50
     else:
         quality = 70  # Unknown
-    
+
     final_score = (score * 0.7) + (quality * 0.3)
-    
+
     print(f"\n{Color.BOLD}{Color.CYAN}KimariFit Analysis{Color.RESET}\n")
     print(f"  Model:          {model_file.name}")
     print(f"  Model size:     {model_size_gib:.2f} GiB")
@@ -636,7 +1070,7 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict):
     print(f"  Safe VRAM:      {safe_vram:.2f} GiB ({total_vram:.1f} GiB × 0.87)")
     print(f"  Utilization:    {total_estimated/safe_vram*100:.1f}%")
     print(f"\n  {Color.BOLD}KimariFit Score: {final_score:.0f}/100{Color.RESET}")
-    
+
     if final_score >= 80:
         print(f"  {Color.GREEN}✓ Excellent fit{Color.RESET}")
     elif final_score >= 60:
@@ -649,105 +1083,153 @@ def calculate_kimarifit(model_path: str, ctx_size: int, config: dict):
 
 # ─── Doctor ───────────────────────────────────────────────────────────────────
 
-def run_doctor(config: dict):
+def run_doctor(config: dict, json_output: bool = False):
     """Run system diagnostics."""
-    print(f"\n{KIMARI_ASCII}")
-    print(f"  {Color.BOLD}System Diagnostics{Color.RESET}\n")
-    
-    ok_count = 0
-    warn_count = 0
-    fail_count = 0
-    
+    diagnostics = {
+        "checks": [],
+        "summary": {"ok": 0, "warn": 0, "fail": 0},
+        "recommended_profile": None,
+    }
+
+    if not json_output:
+        print(f"\n{KIMARI_ASCII}")
+        print(f"  {Color.BOLD}System Diagnostics{Color.RESET}\n")
+
     # OS
     os_name = f"{platform.system()} {platform.release()}"
     if platform.system() == "Linux":
         os_name += f" ({platform.machine()})"
     elif platform.system() == "Windows":
         os_name += f" ({platform.machine()})"
-    ok(f"OS: {os_name}")
-    ok_count += 1
-    
+    diagnostics["checks"].append({"name": "OS", "status": "ok", "value": os_name})
+    if not json_output:
+        ok(f"OS: {os_name}")
+
     # GPU
     gpu = detect_gpu()
     if gpu:
-        ok(f"GPU: {gpu['name']} ({gpu['vram_mb']} MB)")
-        ok_count += 1
+        gpu_str = f"{gpu['name']} ({gpu['vram_mb']} MB)"
+        diagnostics["checks"].append({"name": "GPU", "status": "ok", "value": gpu_str})
+        if not json_output:
+            ok(f"GPU: {gpu_str}")
     else:
-        warn("GPU: No NVIDIA GPU detected")
-        warn_count += 1
-    
+        diagnostics["checks"].append({"name": "GPU", "status": "warn", "value": "No NVIDIA GPU detected"})
+        if not json_output:
+            warn("GPU: No NVIDIA GPU detected")
+
     # Driver
     if gpu:
-        ok(f"Driver: {gpu['driver']}")
-        ok_count += 1
+        diagnostics["checks"].append({"name": "Driver", "status": "ok", "value": gpu["driver"]})
+        if not json_output:
+            ok(f"Driver: {gpu['driver']}")
     else:
-        warn("Driver: Cannot check (no GPU)")
-        warn_count += 1
-    
+        diagnostics["checks"].append({"name": "Driver", "status": "warn", "value": "Cannot check (no GPU)"})
+        if not json_output:
+            warn("Driver: Cannot check (no GPU)")
+
     # CUDA
-    if detect_cuda():
-        ok("CUDA: Available")
-        ok_count += 1
+    has_cuda = detect_cuda()
+    if has_cuda:
+        diagnostics["checks"].append({"name": "CUDA", "status": "ok", "value": "Available"})
+        if not json_output:
+            ok("CUDA: Available")
     else:
-        warn("CUDA: Not detected")
-        warn_count += 1
-    
+        diagnostics["checks"].append({"name": "CUDA", "status": "warn", "value": "Not detected"})
+        if not json_output:
+            warn("CUDA: Not detected")
+
     # llama-server
     llama_server = detect_llama_server()
     if llama_server:
-        ok(f"llama-server: {llama_server}")
-        ok_count += 1
+        diagnostics["checks"].append({"name": "llama-server", "status": "ok", "value": llama_server})
+        if not json_output:
+            ok(f"llama-server: {llama_server}")
     else:
-        fail("llama-server: Not found in PATH")
-        fail_count += 1
-    
+        diagnostics["checks"].append({"name": "llama-server", "status": "fail", "value": "Not found in PATH"})
+        if not json_output:
+            fail("llama-server: Not found in PATH")
+
     # Model
     default_profile = config.get("default_profile", "gtx1060")
     profile = config.get("profiles", {}).get(default_profile, {})
     model_path = PROJECT_ROOT / profile.get("model", "models/Kimari-4B-Q4_K_M.gguf")
     if model_path.exists():
         size_mb = model_path.stat().st_size / (1024 * 1024)
-        ok(f"Model: {model_path.name} ({size_mb:.1f} MB)")
-        ok_count += 1
+        model_str = f"{model_path.name} ({size_mb:.1f} MB)"
+        diagnostics["checks"].append({"name": "Model", "status": "ok", "value": model_str})
+        if not json_output:
+            ok(f"Model: {model_str}")
     else:
-        warn(f"Model: {model_path.name} not found in models/")
-        warn_count += 1
-    
+        diagnostics["checks"].append({"name": "Model", "status": "warn", "value": f"{model_path.name} not found in models/"})
+        if not json_output:
+            warn(f"Model: {model_path.name} not found in models/")
+
     # Port
     host = profile.get("host", "127.0.0.1")
     port = profile.get("port", 11435)
     if is_port_free(host, port):
-        ok(f"Port: {port} available")
-        ok_count += 1
+        diagnostics["checks"].append({"name": "Port", "status": "ok", "value": f"{port} available"})
+        if not json_output:
+            ok(f"Port: {port} available")
     else:
-        warn(f"Port: {port} in use")
-        warn_count += 1
-    
+        diagnostics["checks"].append({"name": "Port", "status": "warn", "value": f"{port} in use"})
+        if not json_output:
+            warn(f"Port: {port} in use")
+
     # Config
-    ok(f"Config: {CONFIG_PATH}")
-    ok_count += 1
-    
+    diagnostics["checks"].append({"name": "Config", "status": "ok", "value": str(CONFIG_PATH)})
+    if not json_output:
+        ok(f"Config: {CONFIG_PATH}")
+
     # Recommended profile
     recommended = recommend_profile(config, gpu)
+    diagnostics["recommended_profile"] = recommended
     if recommended == default_profile:
-        ok(f"Recommended profile: {recommended}")
-        ok_count += 1
+        diagnostics["checks"].append({"name": "Recommended profile", "status": "ok", "value": recommended})
+        if not json_output:
+            ok(f"Recommended profile: {recommended}")
     else:
-        info(f"Recommended profile: {recommended} (current: {default_profile})")
-        ok_count += 1
-    
+        diagnostics["checks"].append({"name": "Recommended profile", "status": "ok", "value": f"{recommended} (current: {default_profile})"})
+        if not json_output:
+            info(f"Recommended profile: {recommended} (current: {default_profile})")
+
     # Python
     py_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     if sys.version_info >= (3, 10):
-        ok(f"Python: {py_version}")
-        ok_count += 1
+        diagnostics["checks"].append({"name": "Python", "status": "ok", "value": py_version})
+        if not json_output:
+            ok(f"Python: {py_version}")
     else:
-        warn(f"Python: {py_version} (3.10+ recommended)")
-        warn_count += 1
-    
-    # Summary
+        diagnostics["checks"].append({"name": "Python", "status": "warn", "value": f"{py_version} (3.10+ recommended)"})
+        if not json_output:
+            warn(f"Python: {py_version} (3.10+ recommended)")
+
+    # State dir
+    diagnostics["checks"].append({"name": "State dir", "status": "ok", "value": str(STATE_DIR)})
+    if not json_output:
+        ok(f"State dir: {STATE_DIR}")
+
+    # Compute summary
+    for check in diagnostics["checks"]:
+        status = check.get("status", "ok")
+        if status == "ok":
+            diagnostics["summary"]["ok"] += 1
+        elif status == "warn":
+            diagnostics["summary"]["warn"] += 1
+        elif status == "fail":
+            diagnostics["summary"]["fail"] += 1
+
+    # Output
+    if json_output:
+        print(json.dumps(diagnostics, indent=2))
+        return
+
+    ok_count = diagnostics["summary"]["ok"]
+    warn_count = diagnostics["summary"]["warn"]
+    fail_count = diagnostics["summary"]["fail"]
+
     print(f"\n  {Color.BOLD}Result: {ok_count} OK, {warn_count} WARN, {fail_count} FAIL{Color.RESET}")
-    
+
     if fail_count > 0:
         print(f"\n  {Color.YELLOW}Fix the errors above before starting Kimari.{Color.RESET}")
         sys.exit(1)
@@ -765,14 +1247,14 @@ def list_models():
     if not MODELS_DIR.exists():
         print("[ERROR] models/ directory not found.")
         return
-    
+
     gguf_files = list(MODELS_DIR.glob("*.gguf"))
-    
+
     if not gguf_files:
         print("\n  No GGUF models found in models/")
         print("  Download a model and place it there.")
         return
-    
+
     print(f"\n  {Color.BOLD}Available Models{Color.RESET}\n")
     for f in sorted(gguf_files):
         size_mb = f.stat().st_size / (1024 * 1024)
@@ -790,7 +1272,7 @@ def list_profiles(config: dict):
     """List configured GPU profiles."""
     profiles = config.get("profiles", {})
     default = config.get("default_profile", "gtx1060")
-    
+
     print(f"\n  {Color.BOLD}GPU Profiles{Color.RESET}\n")
     for key, profile in profiles.items():
         is_default = key == default
@@ -813,22 +1295,37 @@ def main():
         description="Kimari CLI — Local AI for Consumer GPUs",
     )
     parser.add_argument("-v", "--version", action="version", version="Kimari CLI v0.1.0")
-    
+
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # doctor
-    subparsers.add_parser("doctor", help="Run system diagnostics")
+    doctor_parser = subparsers.add_parser("doctor", help="Run system diagnostics")
+    doctor_parser.add_argument("--json", action="store_true", dest="json_output",
+                               help="Output diagnostics as JSON")
 
     # start
     start_parser = subparsers.add_parser("start", help="Start Kimari server")
     start_parser.add_argument("--profile", "-p", required=True,
-                               help="GPU profile (gtx1060, gtx1080, turbo)")
+                              help="GPU profile (gtx1060, gtx1080, turbo)")
+    start_parser.add_argument("--dry-run", action="store_true",
+                              help="Print command without executing")
+    start_parser.add_argument("--daemon", action="store_true",
+                              help="Start server in background (exit after READY)")
 
     # stop
     subparsers.add_parser("stop", help="Stop Kimari server")
 
     # status
-    subparsers.add_parser("status", help="Check Kimari server status")
+    status_parser = subparsers.add_parser("status", help="Check Kimari server status")
+    status_parser.add_argument("--json", action="store_true", dest="json_output",
+                               help="Output status as JSON")
+
+    # logs
+    logs_parser = subparsers.add_parser("logs", help="Show server logs")
+    logs_parser.add_argument("--lines", "-n", type=int, default=50,
+                             help="Number of log lines to show (default: 50)")
+    logs_parser.add_argument("--follow", "-f", action="store_true",
+                             help="Follow log output in real time")
 
     # chat
     chat_parser = subparsers.add_parser("chat", help="Send a chat message")
@@ -837,7 +1334,9 @@ def main():
     # bench
     bench_parser = subparsers.add_parser("bench", help="Run benchmarks")
     bench_parser.add_argument("--profile", "-p", default=None,
-                               help="GPU profile to benchmark")
+                              help="GPU profile to benchmark")
+    bench_parser.add_argument("--json", action="store_true", dest="json_output",
+                              help="Output benchmark results as JSON only")
 
     # fit
     fit_parser = subparsers.add_parser("fit", help="Calculate KimariFit score")
@@ -852,6 +1351,9 @@ def main():
 
     args = parser.parse_args()
 
+    # Ensure state directory exists
+    ensure_state_dir()
+
     # Load config (needed for most commands)
     config = {}
     if CONFIG_PATH.exists():
@@ -862,13 +1364,17 @@ def main():
         return
 
     if args.command == "doctor":
-        run_doctor(config)
+        run_doctor(config, json_output=getattr(args, "json_output", False))
     elif args.command == "start":
-        start_server(args.profile, config)
+        start_server(args.profile, config,
+                     dry_run=args.dry_run,
+                     daemon=args.daemon)
     elif args.command == "stop":
         stop_server()
     elif args.command == "status":
-        check_status(config)
+        check_status(config, json_output=getattr(args, "json_output", False))
+    elif args.command == "logs":
+        show_logs(lines=args.lines, follow=args.follow)
     elif args.command == "chat":
         if args.message:
             chat(args.message, config)
@@ -876,7 +1382,7 @@ def main():
             interactive_chat(config)
     elif args.command == "bench":
         profile = args.profile or config.get("default_profile", "gtx1080")
-        run_benchmark(profile, config)
+        run_benchmark(profile, config, json_output=getattr(args, "json_output", False))
     elif args.command == "fit":
         calculate_kimarifit(args.model, args.ctx, config)
     elif args.command == "models":

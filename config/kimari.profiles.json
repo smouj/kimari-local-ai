@@ -60,6 +60,24 @@
       "quantization": "IQ4_XS",
       "estimated_model_size_gb": 2.8,
       "notes": "Turbo profile. Fast inference with large context on limited hardware."
+    },
+    "test": {
+      "name": "Test Model",
+      "model": "models/Kimari-base-test-Q4_K_M.gguf",
+      "ctx": 4096,
+      "batch": 128,
+      "ubatch": 64,
+      "cache_type_k": "f16",
+      "cache_type_v": "f16",
+      "host": "127.0.0.1",
+      "port": 11435,
+      "gpu_layers": "all",
+      "threads": 4,
+      "vram_total_gb": 6.0,
+      "vram_safe_gb": 5.2,
+      "quantization": "Q4_K_M",
+      "estimated_model_size_gb": 2.5,
+      "notes": "Small provisional GGUF for runtime validation. Place any compatible GGUF model at the path above."
     }
   }
 }
