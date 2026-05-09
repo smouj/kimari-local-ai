@@ -47,6 +47,13 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] SHA256 verification is **not** marked as enforced if hashes are still `null`
 - [ ] `default_profile` is `"test"` in `config/kimari.profiles.json`
 - [ ] No GGUF files are tracked in git
+- [ ] GitHub Pages (`docs/index.html`) checked locally or via file review
+- [ ] `docs/index.html` SEO metadata is present (canonical, og:title, og:image)
+- [ ] `docs/INSTALL_WSL2.md` is up to date
+- [ ] `docs/PUBLISHING.md` is up to date
+- [ ] README links to Release Checklist
+- [ ] ROADMAP marks current version as "Current"
+- [ ] No "Kimari-4B released" false claim anywhere
 
 ## Publishing (Manual)
 
@@ -86,6 +93,8 @@ twine upload dist/*
 
 ## Post-Release
 
-- [ ] GitHub topics still accurate
+- [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)
 - [ ] `docs/index.html` live site reflects new version
 - [ ] ROADMAP.md next version entry created
+- [ ] TestPyPI validation result recorded (if attempted)
+- [ ] GitHub release tag pushed

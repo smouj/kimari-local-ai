@@ -5,6 +5,23 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9-alpha] — 2026-05-11
+
+### Added
+- **GitHub Pages revamp** — Complete overhaul of `docs/index.html`: improved hero with explicit GPU mention, alpha honesty strip ("Kimari is the framework. Kimari-4B is not released yet."), reordered sections (Quick Start before Features), new Hardware Targets section, Trust section ("What We Don't Claim"), topics chips, improved footer with doc links, additional docs in grid (WSL2, Publishing, Release Checklist, Roadmap)
+- **SEO and social metadata** — Added canonical URL, meta keywords, Open Graph tags (og:title, og:description, og:type, og:url, og:image), Twitter Card tags (twitter:card, twitter:title, twitter:description, twitter:image), and JSON-LD SoftwareApplication structured data to `docs/index.html`
+- **Accessibility improvements** — Hamburger button changed to `<button>` with `aria-label`, `aria-expanded`, `aria-controls`; navigation has `aria-label`; terminal tabs have `role="tablist"`/`role="tab"`/`role="tabpanel"` with `aria-selected`; all external links use `rel="noopener noreferrer"`; images have descriptive `alt` text
+- **docs/INSTALL_WSL2.md** — Complete WSL2 installation guide covering: Windows 10/11 requirements, Ubuntu setup, NVIDIA driver notes, CUDA on WSL, clone/install/build/pull/start flow, Open WebUI optional setup, and troubleshooting (nvidia-smi missing, nvcc missing, llama-server missing, port busy, model not found, CUDA OOM)
+- **docs/PUBLISHING.md** — Manual publishing guide for TestPyPI and PyPI: pre-publish checklist, clean/build/check/upload workflow, TestPyPI install verification in clean venv, production PyPI steps, GitHub release/tag creation, API token configuration, .pypirc setup, and common issues
+- **RELEASE_CHECKLIST.md improved** — Added checks for: GitHub Pages review, SEO metadata, WSL2 guide, publishing guide, README links to Release Checklist, ROADMAP current version marking, no false claims, GitHub topics accuracy, TestPyPI result recording
+- **scripts/release/check-release.py improved** — Now 10 validation categories (was 7): added README links to Release Checklist check, ROADMAP "Current" marking check, docs/index.html version presence, canonical URL, og:title, og:image checks, docs/INSTALL_WSL2.md existence, docs/PUBLISHING.md existence, RELEASE_CHECKLIST.md existence, and "Kimari-4B released" false claim detection
+- **New tests** — `tests/test_release_v019.py` with 12 tests: index.html version, canonical URL, Open Graph metadata, Twitter Card, JSON-LD, WSL2 guide existence, WSL2 troubleshooting, publishing guide existence, TestPyPI mention, release check script, README Kimari-4B honesty
+
+### Changed
+- **Version bumped** to `0.1.9-alpha`
+- **Section order in GitHub Pages** — Quick Start now appears before Features for better conversion
+- **docs/index.html version strings** — All terminal output examples updated to v0.1.9-alpha
+
 ## [0.1.8-alpha] — 2026-05-10
 
 ### Added

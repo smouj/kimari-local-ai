@@ -71,3 +71,40 @@ Stage Summary:
   ✅ Documentation fully updated (README, GETTING_STARTED, CHANGELOG, ROADMAP, SECURITY, PRIVACY, COMPARISON, PROJECT_STRUCTURE, GitHub Pages)
   ✅ Tests updated and passing
   ✅ Pushed to GitHub
+
+---
+Task ID: v0.1.8-alpha
+Agent: Main Agent
+Task: v0.1.8-alpha — Discovery, publishing, and release hygiene
+
+Work Log:
+- Explored current repo state: v0.1.7-alpha, 90 tests passing, ruff clean
+- Task 1: Added 20 GitHub topics via API (ai, openai, llm, local-ai, local-llm, on-device-ai, offline-ai, self-hosted-ai, llama-cpp, gguf, quantization, llm-inference, cuda, nvidia-gpu, gtx1060, gtx1080, consumer-gpu, openai-compatible-api, open-webui, openclaw)
+- Task 2: Updated pyproject.toml keywords from 6 generic to 12 targeted discovery keywords; bumped version to 0.1.8-alpha in pyproject.toml and kimari/__init__.py
+- Task 3: Created RELEASE_CHECKLIST.md with version/metadata, changelog/roadmap, testing, CLI validation, build/package, release validation script, content review, publishing (TestPyPI + PyPI), and post-release sections
+- Task 4: Created scripts/release/check-release.py — automated release validation checking version consistency, README badge, CHANGELOG entry, ROADMAP entry, default_profile, py.typed, no GGUF tracked, no unsafe model paths, no runtime artifacts
+- Task 5: Added release-check CI job to .github/workflows/ci.yml
+- Task 6: Added TestPyPI publishing documentation to RELEASE_CHECKLIST.md (manual workflow with build, twine check, testpypi upload, verify install steps)
+- Task 7: Updated README.md to v0.1.8-alpha (badge, alpha notice, project status); added Release Checklist link to docs table
+- Task 8: Added CHANGELOG.md v0.1.8-alpha entry with all changes documented
+- Task 9: Updated ROADMAP.md — v0.1.7-alpha as Released, v0.1.8-alpha as Current, added v0.1.9-alpha Planned with specific items
+- Updated docs/index.html version references (4 locations)
+- Updated docs/PROJECT_STRUCTURE.md (version, new files: scripts/release/, RELEASE_CHECKLIST.md, test_release_v018.py)
+- Updated docs/COMPARISON.md date and version
+- Updated tests/test_cli_smoke.py version assertions
+- Created tests/test_release_v018.py with 8 tests (release check script, checklist existence, TestPyPI mention, keywords count, GitHub topics format, check-release structure, CI job, version consistency)
+- Fixed ruff lint (removed unused json import from test file)
+- All 98 tests passing, ruff check/format clean, check-release.py all OK, build/twine passed, make ci-local passed
+
+Stage Summary:
+- Version: v0.1.8-alpha
+- 13 files changed, 452 insertions, 16 deletions
+- 20 GitHub topics applied
+- 12 pyproject.toml keywords
+- RELEASE_CHECKLIST.md with TestPyPI workflow
+- scripts/release/check-release.py (7 validation categories)
+- CI release-check job
+- 8 new tests (98 total, up from 90)
+- All validations pass
+- Committed and pushed to GitHub
+- Git tag v0.1.8-alpha created and pushed

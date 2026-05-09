@@ -1,6 +1,6 @@
 # Kimari Local AI — Project Structure
 
-> Last updated: v0.1.8-alpha
+> Last updated: v0.1.9-alpha
 
 This document describes the organization of the Kimari Local AI codebase.
 
@@ -58,6 +58,7 @@ kimari-local-ai/
 │   ├── test_server_cmd.py    # Server command construction
 │   ├── test_hardening_v016.py # v0.1.6/v0.1.7 hardening tests
 │   ├── test_release_v018.py  # v0.1.8 release validation tests
+│   ├── test_release_v019.py  # v0.1.9 GitHub Pages / SEO / docs tests
 │   └── test_state.py         # State management
 │
 ├── scripts/                   # Build and installation scripts
@@ -79,6 +80,8 @@ kimari-local-ai/
 │   ├── 00-02_kimarifit_formula.md
 │   ├── COMPARISON.md         # Comparison with alternatives
 │   ├── WEB_UI_PLAN.md        # Web UI roadmap
+│   ├── INSTALL_WSL2.md       # WSL2 installation guide
+│   ├── PUBLISHING.md          # Manual TestPyPI/PyPI publishing guide
 │   └── assets/               # Images and logos
 │
 ├── docker/                    # Docker Compose files

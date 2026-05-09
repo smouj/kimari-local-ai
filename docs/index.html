@@ -5,11 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kimari — Local AI for Consumer GPUs</title>
 <meta name="description" content="Run powerful language models locally on consumer-grade NVIDIA GPUs. No cloud. No subscriptions. Your data stays on your machine.">
+<meta name="keywords" content="ai, llm, local-ai, local-llm, llama-cpp, gguf, cuda, nvidia, openai-compatible-api, consumer-gpu">
 <meta name="theme-color" content="#0a0e1a">
+<link rel="canonical" href="https://smouj.github.io/kimari-local-ai/">
+<meta property="og:title" content="Kimari — Local AI for Consumer GPUs">
+<meta property="og:description" content="Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://smouj.github.io/kimari-local-ai/">
+<meta property="og:image" content="assets/kimari-logo-full.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kimari — Local AI for Consumer GPUs">
+<meta name="twitter:description" content="Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.">
+<meta name="twitter:image" content="assets/kimari-logo-full.png">
 <link rel="icon" href="assets/kimari-logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Kimari Local AI",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Linux",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "An open-source framework for running local LLMs on consumer NVIDIA GPUs. Built on llama.cpp with CUDA acceleration, zero telemetry, and OpenAI-compatible API. Designed for GTX 1060, GTX 1080, and other consumer-grade hardware."
+}
+</script>
 <style>
 :root {
   --kimari-midnight: #0a0e1a;
@@ -71,7 +97,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .nav-links a:hover { color: var(--kimari-teal); }
 .nav-gh { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 8px; background: var(--kimari-surface); border: 1px solid var(--kimari-border); font-size: .8rem; font-weight: 600; color: var(--kimari-text); transition: all .2s; }
 .nav-gh:hover { border-color: var(--kimari-teal); color: var(--kimari-teal); background: var(--kimari-surface-light); }
-.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
 .hamburger span { display: block; width: 22px; height: 2px; background: var(--kimari-text); border-radius: 2px; transition: all .3s; }
 .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: rgba(10,14,26,.96); backdrop-filter: blur(20px); border-bottom: 1px solid var(--kimari-border); padding: 20px 24px; z-index: 999; }
 .mobile-menu.open { display: flex; flex-direction: column; gap: 16px; }
@@ -127,9 +153,26 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   border: 1px solid var(--kimari-border); cursor: pointer; transition: all .25s;
 }
 .btn-secondary:hover { border-color: var(--kimari-teal); color: var(--kimari-teal); transform: translateY(-2px); }
+.btn-tertiary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
+  background: rgba(139,92,246,.12); color: var(--kimari-purple-light);
+  border: 1px solid rgba(139,92,246,.3); cursor: pointer; transition: all .25s;
+}
+.btn-tertiary:hover { border-color: var(--kimari-purple); color: var(--kimari-purple-light); background: rgba(139,92,246,.2); transform: translateY(-2px); }
 .hero-scroll { margin-top: 60px; animation: float 3s ease-in-out infinite; }
 .hero-scroll i { font-size: 1.4rem; color: var(--kimari-text-muted); }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+
+/* ─── Honesty Strip ─── */
+.honesty-strip {
+  padding: 20px 24px; text-align: center;
+  border-top: 1px solid rgba(0,212,170,.15);
+  border-bottom: 1px solid rgba(0,212,170,.15);
+  background: rgba(0,212,170,.03);
+  font-size: .95rem; color: var(--kimari-text-muted);
+}
+.honesty-strip strong { color: var(--kimari-teal); }
 
 /* ─── Section Shared ─── */
 .section { padding: 100px 24px; max-width: 1280px; margin: 0 auto; }
@@ -289,6 +332,43 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .status-table tr td:first-child { border-radius: 10px 0 0 10px; }
 .status-table tr td:last-child { border-radius: 0 10px 10px 0; }
 
+/* ─── Trust Section ─── */
+.trust-list {
+  list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px;
+  max-width: 560px;
+}
+.trust-list li {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  background: rgba(248,113,113,.04);
+  border: 1px solid rgba(248,113,113,.15);
+  border-radius: 12px;
+  font-weight: 600; font-size: .95rem;
+  color: var(--kimari-text);
+  transition: border-color .3s;
+}
+.trust-list li:hover { border-color: rgba(248,113,113,.35); }
+.trust-list li i { color: #f87171; font-size: 1rem; flex-shrink: 0; }
+
+/* ─── Topics Chips ─── */
+.topics-chips {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  padding: 32px 24px;
+}
+.topic-chip {
+  display: inline-block;
+  padding: 5px 14px;
+  border: 1px solid rgba(0,212,170,.25);
+  border-radius: 50px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--kimari-teal);
+  background: rgba(0,212,170,.05);
+  letter-spacing: .02em;
+  transition: all .2s;
+}
+.topic-chip:hover { background: rgba(0,212,170,.12); border-color: rgba(0,212,170,.45); }
+
 /* ─── Footer ─── */
 .footer {
   border-top: 1px solid var(--kimari-border); padding: 48px 24px; margin-top: 60px;
@@ -297,7 +377,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .footer-brand { display: flex; align-items: center; gap: 10px; }
 .footer-brand img { width: 28px; height: 28px; border-radius: 5px; }
 .footer-brand span { font-weight: 700; font-size: .95rem; }
-.footer-links { display: flex; gap: 24px; align-items: center; }
+.footer-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
 .footer-links a { font-size: .85rem; color: var(--kimari-text-muted); }
 .footer-links a:hover { color: var(--kimari-teal); }
 .footer-copy { width: 100%; text-align: center; font-size: .78rem; color: var(--kimari-text-muted); margin-top: 12px; }
@@ -318,6 +398,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   .terminal { font-size: .72rem; padding: 14px 16px; }
   .hero-ctas { flex-direction: column; align-items: center; }
   .hero-ctas a, .hero-ctas button { width: 100%; max-width: 300px; justify-content: center; }
+  .trust-list { max-width: 100%; }
+  .topics-chips { justify-content: flex-start; }
 }
 </style>
 </head>
@@ -326,58 +408,66 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <div class="dot-grid"></div>
 
 <!-- ═══════ NAVIGATION ═══════ -->
-<nav class="nav">
+<nav class="nav" aria-label="Main navigation">
   <div class="nav-inner">
-    <a href="#" class="nav-brand">
-      <img src="assets/kimari-logo.png" alt="Kimari" width="34" height="34">
+    <a href="#" class="nav-brand" aria-label="Kimari home">
+      <img src="assets/kimari-logo.png" alt="Kimari logo" width="34" height="34">
       <span>Kimari</span>
     </a>
     <div class="nav-links">
       <a href="#overview">Overview</a>
+      <a href="#quickstart">Quick Start</a>
       <a href="#features">Features</a>
+      <a href="#hardware">Hardware</a>
       <a href="#cli">CLI</a>
       <a href="#profiles">Profiles</a>
       <a href="#architecture">Architecture</a>
-      <a href="#quickstart">Quick Start</a>
       <a href="#docs">Docs</a>
-      <a href="https://github.com/smouj/kimari-local-ai" target="_blank" class="nav-gh">
+      <a href="https://github.com/smouj/kimari-local-ai" target="_blank" rel="noopener noreferrer" class="nav-gh" aria-label="View Kimari on GitHub">
         <i class="fa-brands fa-github"></i> GitHub
       </a>
     </div>
-    <div class="hamburger" onclick="toggleMobile()">
+    <button class="hamburger" onclick="toggleMobile()" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">
       <span></span><span></span><span></span>
-    </div>
+    </button>
   </div>
 </nav>
-<div class="mobile-menu" id="mobileMenu">
+<div class="mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile navigation">
   <a href="#overview" onclick="closeMobile()">Overview</a>
+  <a href="#quickstart" onclick="closeMobile()">Quick Start</a>
   <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#hardware" onclick="closeMobile()">Hardware</a>
   <a href="#cli" onclick="closeMobile()">CLI</a>
   <a href="#profiles" onclick="closeMobile()">Profiles</a>
   <a href="#architecture" onclick="closeMobile()">Architecture</a>
-  <a href="#quickstart" onclick="closeMobile()">Quick Start</a>
   <a href="#docs" onclick="closeMobile()">Docs</a>
-  <a href="https://github.com/smouj/kimari-local-ai" target="_blank" onclick="closeMobile()">GitHub</a>
+  <a href="https://github.com/smouj/kimari-local-ai" target="_blank" rel="noopener noreferrer" onclick="closeMobile()">GitHub</a>
 </div>
 
 <!-- ═══════ HERO ═══════ -->
 <section class="hero" id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
+  <div class="hero-bg" role="presentation"></div>
+  <div class="hero-overlay" role="presentation"></div>
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.8-alpha — GitHub topics, release checklist, release validation, TestPyPI preparation
+      v0.1.9-alpha — GitHub Pages revamp, WSL2 guide, publishing docs, SEO metadata
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
-    <p>Run powerful language models locally on consumer-grade NVIDIA GPUs. No cloud. No subscriptions. Your data stays on your machine.</p>
+    <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
     <div class="hero-ctas">
       <a href="#quickstart" class="btn-primary"><i class="fa-solid fa-rocket"></i> Get Started</a>
-      <a href="https://github.com/smouj/kimari-local-ai" target="_blank" class="btn-secondary"><i class="fa-brands fa-github"></i> View on GitHub</a>
+      <a href="https://github.com/smouj/kimari-local-ai" target="_blank" rel="noopener noreferrer" class="btn-secondary"><i class="fa-brands fa-github"></i> View on GitHub</a>
+      <a href="#docs" class="btn-tertiary"><i class="fa-solid fa-book"></i> Read Docs</a>
     </div>
     <div class="hero-scroll"><i class="fa-solid fa-chevron-down"></i></div>
   </div>
 </section>
+
+<!-- ═══════ ALPHA HONESTY STRIP ═══════ -->
+<div class="honesty-strip">
+  <strong>Kimari</strong> is the framework. <strong>Kimari-4B</strong> is not released yet.
+</div>
 
 <!-- ═══════ OVERVIEW ═══════ -->
 <section class="section" id="overview">
@@ -406,6 +496,59 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="stat-icon">📄</div>
       <div class="stat-value">MIT</div>
       <div class="stat-label">Open Source</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ QUICK START ═══════ -->
+<section class="section" id="quickstart">
+  <div class="reveal">
+    <span class="section-label"><i class="fa-solid fa-rocket"></i> Quick Start</span>
+    <h2 class="section-title">Up and Running in Minutes</h2>
+    <p class="section-desc">Get Kimari running on your machine with just a few commands.</p>
+  </div>
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Clone the repository</div>
+        <div class="step-code"><span class="prompt">$ </span>git clone https://github.com/smouj/kimari-local-ai.git<br><span class="prompt">$ </span>cd kimari-local-ai</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Install the package</div>
+        <div class="step-code"><span class="prompt">$ </span>pip install -e .</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Run system diagnostics</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari doctor</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">Download a test model</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari pull test</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <div class="step-title">Start the server</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari start</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <div class="step-title">Chat with your model</div>
+        <div class="step-code"><span class="prompt">$ </span>kimari chat "Hello, Kimari!"</div>
+      </div>
     </div>
   </div>
 </section>
@@ -471,6 +614,47 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
 </section>
 
+<!-- ═══════ HARDWARE TARGETS ═══════ -->
+<section class="section" id="hardware">
+  <div class="reveal">
+    <span class="section-label"><i class="fa-solid fa-microchip"></i> Hardware</span>
+    <h2 class="section-title">Built for Your GPU</h2>
+    <p class="section-desc">First-class support for consumer NVIDIA hardware.</p>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <span class="feature-icon">🎮</span>
+      <div class="feature-title">GTX 1060 6GB</div>
+      <div class="feature-desc">Q4_K_M quantization, 8K context. Runs well within 6 GB VRAM budget.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎮</span>
+      <div class="feature-title">GTX 1080 8GB</div>
+      <div class="feature-desc">Q5_K_M quantization, 16K context. Extra VRAM for longer conversations.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-title">CUDA 11.8+</div>
+      <div class="feature-desc">Full GPU acceleration via llama.cpp. Supports older NVIDIA drivers.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📦</span>
+      <div class="feature-title">GGUF Models</div>
+      <div class="feature-desc">Any compatible GGUF quantized model. Qwen3, SmolLM3, Llama 3.2, and more.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💬</span>
+      <div class="feature-title">Open WebUI</div>
+      <div class="feature-desc">Full chat interface via Docker. ChatGPT-like experience, 100% local.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔒</span>
+      <div class="feature-title">100% Local</div>
+      <div class="feature-desc">Zero telemetry, zero cloud dependency. Your data never leaves your machine.</div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════ CLI SHOWCASE ═══════ -->
 <section class="section" id="cli">
   <div class="reveal">
@@ -479,17 +663,17 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <p class="section-desc">Everything you need to manage your local AI runtime from the terminal.</p>
   </div>
   <div class="terminal-wrapper reveal">
-    <div class="terminal-tabs">
-      <div class="terminal-tab active" onclick="switchTab(this, 'tab-doctor')">doctor</div>
-      <div class="terminal-tab" onclick="switchTab(this, 'tab-pull')">pull</div>
-      <div class="terminal-tab" onclick="switchTab(this, 'tab-info')">info --json</div>
-      <div class="terminal-tab" onclick="switchTab(this, 'tab-start')">start --dry-run</div>
-      <div class="terminal-tab" onclick="switchTab(this, 'tab-status')">status --json</div>
-      <div class="terminal-tab" onclick="switchTab(this, 'tab-profiles')">profiles</div>
+    <div class="terminal-tabs" role="tablist" aria-label="CLI command examples">
+      <div class="terminal-tab active" onclick="switchTab(this, 'tab-doctor')" role="tab" aria-selected="true" tabindex="0">doctor</div>
+      <div class="terminal-tab" onclick="switchTab(this, 'tab-pull')" role="tab" aria-selected="false" tabindex="0">pull</div>
+      <div class="terminal-tab" onclick="switchTab(this, 'tab-info')" role="tab" aria-selected="false" tabindex="0">info --json</div>
+      <div class="terminal-tab" onclick="switchTab(this, 'tab-start')" role="tab" aria-selected="false" tabindex="0">start --dry-run</div>
+      <div class="terminal-tab" onclick="switchTab(this, 'tab-status')" role="tab" aria-selected="false" tabindex="0">status --json</div>
+      <div class="terminal-tab" onclick="switchTab(this, 'tab-profiles')" role="tab" aria-selected="false" tabindex="0">profiles</div>
     </div>
     <div class="terminal">
 
-      <div class="terminal-panel active" id="tab-doctor">
+      <div class="terminal-panel active" id="tab-doctor" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari doctor</span>
 <span class="terminal-output">
 ██╗  ██╗██╗███╗   ███╗ █████╗ ██████╗ ██╗
@@ -498,7 +682,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.8-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.9-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -516,7 +700,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <span class="terminal-output">Warnings present. Kimari may work with limitations.</span>
       </div>
 
-      <div class="terminal-panel" id="tab-pull">
+      <div class="terminal-panel" id="tab-pull" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari pull test</span>
 <span class="terminal-output">
 📦 Pulling model: <span class="terminal-highlight">test</span>
@@ -532,10 +716,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 </span>
       </div>
 
-      <div class="terminal-panel" id="tab-info">
+      <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.8-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.9-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -548,7 +732,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 }</span>
       </div>
 
-      <div class="terminal-panel" id="tab-start">
+      <div class="terminal-panel" id="tab-start" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari start --dry-run</span>
 <span class="terminal-output">
 🚀 Starting Kimari
@@ -573,7 +757,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   state  → .kimari/state.json
       </div>
 
-      <div class="terminal-panel" id="tab-status">
+      <div class="terminal-panel" id="tab-status" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari status --json</span>
 <span class="terminal-output">{
   "status": "<span class="terminal-ok">READY</span>",
@@ -594,7 +778,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 }</span>
       </div>
 
-      <div class="terminal-panel" id="tab-profiles">
+      <div class="terminal-panel" id="tab-profiles" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari profiles</span>
 <span class="terminal-output">
   GPU Profiles
@@ -790,59 +974,6 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
 </section>
 
-<!-- ═══════ QUICK START ═══════ -->
-<section class="section" id="quickstart">
-  <div class="reveal">
-    <span class="section-label"><i class="fa-solid fa-rocket"></i> Quick Start</span>
-    <h2 class="section-title">Up and Running in Minutes</h2>
-    <p class="section-desc">Get Kimari running on your machine with just a few commands.</p>
-  </div>
-  <div class="steps reveal">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <div class="step-title">Clone the repository</div>
-        <div class="step-code"><span class="prompt">$ </span>git clone https://github.com/smouj/kimari-local-ai.git<br><span class="prompt">$ </span>cd kimari-local-ai</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <div class="step-title">Install the package</div>
-        <div class="step-code"><span class="prompt">$ </span>pip install -e .</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <div class="step-title">Run system diagnostics</div>
-        <div class="step-code"><span class="prompt">$ </span>kimari doctor</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <div class="step-title">Download a test model</div>
-        <div class="step-code"><span class="prompt">$ </span>kimari pull test</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">5</div>
-      <div class="step-content">
-        <div class="step-title">Start the server</div>
-        <div class="step-code"><span class="prompt">$ </span>kimari start</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">6</div>
-      <div class="step-content">
-        <div class="step-title">Chat with your model</div>
-        <div class="step-code"><span class="prompt">$ </span>kimari chat "Hello, Kimari!"</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ═══════ KIMARIFIT ═══════ -->
 <section class="section" id="kimarifit">
   <div class="reveal">
@@ -883,6 +1014,25 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
 </section>
 
+<!-- ═══════ TOPICS CHIPS ═══════ -->
+<section class="section" id="topics" style="padding-top: 40px; padding-bottom: 20px;">
+  <div class="reveal" style="text-align: center;">
+    <span class="section-label" style="justify-content: center;"><i class="fa-solid fa-tags"></i> Topics</span>
+  </div>
+  <div class="topics-chips reveal">
+    <span class="topic-chip">ai</span>
+    <span class="topic-chip">llm</span>
+    <span class="topic-chip">local-ai</span>
+    <span class="topic-chip">gguf</span>
+    <span class="topic-chip">llama-cpp</span>
+    <span class="topic-chip">cuda</span>
+    <span class="topic-chip">open-webui</span>
+    <span class="topic-chip">openclaw</span>
+    <span class="topic-chip">consumer-gpu</span>
+    <span class="topic-chip">quantization</span>
+  </div>
+</section>
+
 <!-- ═══════ DOCUMENTATION ═══════ -->
 <section class="section" id="docs">
   <div class="reveal">
@@ -891,59 +1041,75 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <p class="section-desc">Comprehensive guides covering every aspect of Kimari.</p>
   </div>
   <div class="docs-grid reveal">
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-01_product_vision.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-01_product_vision.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Product Vision</div>
       <div class="doc-card-desc">Project goals, philosophy, and differentiation.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-02_kimarifit_formula.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-02_kimarifit_formula.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">KimariFit Formula</div>
       <div class="doc-card-desc">Hardware scoring system explained.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-03_architecture.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-03_architecture.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Architecture</div>
       <div class="doc-card-desc">System design and data flow.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-04_local_runtime.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-04_local_runtime.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Local Runtime</div>
       <div class="doc-card-desc">llama.cpp setup, CUDA, and tuning.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-05_cli_spec.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-05_cli_spec.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">CLI Spec</div>
       <div class="doc-card-desc">Commands, options, and output formats.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-06_web_pwa_desktop.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-06_web_pwa_desktop.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Web &amp; Desktop</div>
       <div class="doc-card-desc">PWA and Tauri desktop plans.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-07_ide_integration.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-07_ide_integration.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">IDE Integration</div>
       <div class="doc-card-desc">Continue.dev setup and configuration.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-08_dataset_tuning.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-08_dataset_tuning.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Dataset &amp; Tuning</div>
       <div class="doc-card-desc">Fine-tuning roadmap and data pipeline.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-09_security_governance.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-09_security_governance.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Security &amp; Governance</div>
       <div class="doc-card-desc">Privacy, security model, responsible AI.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-10_service_status.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-10_service_status.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Service Status</div>
       <div class="doc-card-desc">Roadmap, milestones, version history.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-11_tech_stack_compatibility.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-11_tech_stack_compatibility.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Compatibility</div>
       <div class="doc-card-desc">Supported platforms and GPU matrix.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/11_NEXT_RUNTIME_VALIDATION.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/11_NEXT_RUNTIME_VALIDATION.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Runtime Validation</div>
       <div class="doc-card-desc">Step-by-step runtime validation guide.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/SECURITY.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/INSTALL_WSL2.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">WSL2 Installation Guide</div>
+      <div class="doc-card-desc">Install Kimari on Windows via WSL2 with CUDA.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/PUBLISHING.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Publishing Guide</div>
+      <div class="doc-card-desc">How to publish releases to PyPI and TestPyPI.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/RELEASE_CHECKLIST.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Release Checklist</div>
+      <div class="doc-card-desc">Step-by-step release process and verification.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/ROADMAP.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Roadmap</div>
+      <div class="doc-card-desc">Future plans, milestones, and development timeline.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Security Policy</div>
       <div class="doc-card-desc">Vulnerability reporting and security model.</div>
     </a>
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/PRIVACY.md" target="_blank" class="doc-card">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/PRIVACY.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Privacy Policy</div>
       <div class="doc-card-desc">Data handling, telemetry, and privacy commitments.</div>
     </a>
@@ -955,7 +1121,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.8-alpha — Framework/runtime/CLI is functional. Discovery-ready with GitHub topics and keywords. Release checklist and automated validation. TestPyPI publishing workflow documented.</p>
+    <p class="section-desc">Kimari Local AI v0.1.9-alpha — Framework/runtime/CLI is functional. GitHub Pages revamp, WSL2 guide, publishing docs, SEO metadata, and release validation.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -973,6 +1139,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td><code>kimari pull</code> (model download)</td><td>✅ Implemented in v0.1.2-alpha</td></tr>
         <tr><td><code>kimari info</code> / <code>kimari config</code></td><td>✅ Implemented in v0.1.4-alpha</td></tr>
         <tr><td>Modular package (<code>pip install -e .</code>)</td><td>✅ Implemented in v0.1.4-alpha</td></tr>
+        <tr><td>Release validation (<code>check-release.py</code>)</td><td>✅ Implemented in v0.1.8-alpha</td></tr>
+        <tr><td>WSL2 Installation Guide</td><td>✅ Implemented in v0.1.9-alpha</td></tr>
+        <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>
       </tbody>
@@ -980,20 +1149,43 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
 </section>
 
+<!-- ═══════ TRUST ═══════ -->
+<section class="section" id="trust">
+  <div class="reveal">
+    <span class="section-label"><i class="fa-solid fa-shield-halved"></i> Trust</span>
+    <h2 class="section-title">What We Don't Claim</h2>
+    <p class="section-desc">Honesty matters. Here is what Kimari does not do.</p>
+  </div>
+  <div class="reveal">
+    <ul class="trust-list">
+      <li><i class="fa-solid fa-circle-xmark"></i> No telemetry</li>
+      <li><i class="fa-solid fa-circle-xmark"></i> No cloud dependency</li>
+      <li><i class="fa-solid fa-circle-xmark"></i> No bundled model weights</li>
+      <li><i class="fa-solid fa-circle-xmark"></i> No Kimari-4B release yet</li>
+      <li><i class="fa-solid fa-circle-xmark"></i> No production guarantee during alpha</li>
+    </ul>
+  </div>
+</section>
+
 <!-- ═══════ FOOTER ═══════ -->
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <img src="assets/kimari-logo.png" alt="Kimari" width="28" height="28">
+      <img src="assets/kimari-logo.png" alt="Kimari logo" width="28" height="28">
       <span>Kimari</span>
     </div>
     <div class="footer-links">
-      <a href="https://github.com/smouj/kimari-local-ai" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
-      <a href="https://x.com/smouj013" target="_blank"><i class="fa-brands fa-x-twitter"></i> @smouj013</a>
-      <a href="https://github.com/smouj/kimari-local-ai/blob/main/LICENSE" target="_blank"><i class="fa-solid fa-scale-balanced"></i> MIT License</a>
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">Security</a>
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/PRIVACY.md" target="_blank" rel="noopener noreferrer">Privacy</a>
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a>
+      <a href="#quickstart">Getting Started</a>
+      <a href="https://github.com/smouj/kimari-local-ai" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a>
+      <a href="https://x.com/smouj013" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i> @smouj013</a>
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-scale-balanced"></i> MIT License</a>
     </div>
     <div class="footer-copy">
-      Created by <a href="https://x.com/smouj013" target="_blank">Smouj</a> · Built with ❤️ for consumer GPUs
+      Created by <a href="https://x.com/smouj013" target="_blank" rel="noopener noreferrer">Smouj</a> · Built with ❤️ for consumer GPUs
     </div>
   </div>
 </footer>
@@ -1001,33 +1193,38 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <script>
 // ─── Mobile Menu ───
 function toggleMobile() {
-  document.getElementById('mobileMenu').classList.toggle('open');
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.querySelector('.hamburger');
+  var isOpen = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen);
 }
 function closeMobile() {
   document.getElementById('mobileMenu').classList.remove('open');
+  document.querySelector('.hamburger').setAttribute('aria-expanded', 'false');
 }
 
 // ─── Terminal Tabs ───
 function switchTab(tab, panelId) {
-  document.querySelectorAll('.terminal-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.terminal-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.terminal-tab').forEach(function(t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+  document.querySelectorAll('.terminal-panel').forEach(function(p) { p.classList.remove('active'); });
   tab.classList.add('active');
+  tab.setAttribute('aria-selected', 'true');
   document.getElementById(panelId).classList.add('active');
 }
 
 // ─── Scroll Reveal ───
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
     if (entry.isIntersecting) {
       entry.target.classList.add('visible');
     }
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
 
 // ─── Nav background on scroll ───
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('.nav');
+window.addEventListener('scroll', function() {
+  var nav = document.querySelector('.nav');
   if (window.scrollY > 50) {
     nav.style.background = 'rgba(10,14,26,.95)';
   } else {
@@ -1036,7 +1233,7 @@ window.addEventListener('scroll', () => {
 });
 
 // ─── Close mobile menu on resize ───
-window.addEventListener('resize', () => {
+window.addEventListener('resize', function() {
   if (window.innerWidth > 900) closeMobile();
 });
 </script>
