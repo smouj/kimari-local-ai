@@ -19,11 +19,11 @@
 git clone https://github.com/smouj/kimari-local-ai.git
 cd kimari-local-ai
 
-# Option A: Install as package (recommended)
+# Install as editable package (provides the `kimari` command)
 pip install -e .
 
-# Option B: Install dependencies only
-pip install -r cli/requirements.txt
+# Or include dev dependencies (pytest, ruff, jsonschema)
+pip install -e ".[dev]"
 ```
 
 ## Step 2: Check Your System
@@ -92,7 +92,7 @@ make webui-up
 | `Model not found` | Run `kimari pull test` or use `--model models/your-model.gguf` |
 | `Port 11435 in use` | Run `kimari stop` or use `--port 8080` |
 | No GPU detected | Install NVIDIA drivers and CUDA Toolkit. Use `kimari fit --vram 6.0` for manual VRAM |
-| `ModuleNotFoundError: requests` | Run `pip install -r cli/requirements.txt` |
+| `ModuleNotFoundError: requests` | Run `pip install -e .` to install all dependencies |
 
 ## Next Steps
 

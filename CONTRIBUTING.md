@@ -45,8 +45,14 @@ python -m venv .venv
 source .venv/bin/activate  # Linux/macOS
 # or .venv\Scripts\activate  # Windows
 
-# Install dependencies
-pip install -r cli/requirements.txt
+# Install as editable package (recommended)
+pip install -e .
+
+# Or install with dev dependencies (pytest, ruff, jsonschema)
+pip install -e ".[dev]"
+
+# Verify the CLI is available
+kimari --help
 
 # Run diagnostics
 make doctor
@@ -55,12 +61,19 @@ make doctor
 ### Running Tests
 
 ```bash
-# Smoke tests
-make smoke
+# Run the full test suite
+pytest
 
-# Run specific tests
-bash scripts/linux/healthcheck.sh
-bash scripts/linux/chat-test.sh
+# Or use Makefile targets
+make test     # pytest with verbose output
+make smoke    # smoke tests
+make lint     # ruff lint + format check
+
+# Run a specific test file
+pytest tests/test_config.py
+
+# Run a specific test by name
+pytest tests/test_kimarifit.py::test_quality_factor -v
 ```
 
 ## Making Changes
@@ -92,7 +105,7 @@ bash scripts/linux/chat-test.sh
 ### PR Checklist
 
 - [ ] Code compiles without errors
-- [ ] `make smoke` passes
+- [ ] `make smoke` passes (or `pytest` passes)
 - [ ] Documentation updated (if applicable)
 - [ ] No new dependencies without discussion
 - [ ] Commit messages are clear and descriptive
