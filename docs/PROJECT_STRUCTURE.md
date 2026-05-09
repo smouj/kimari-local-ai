@@ -1,6 +1,6 @@
 # Kimari Local AI — Project Structure
 
-> Last updated: v0.1.7-alpha
+> Last updated: v0.1.8-alpha
 
 This document describes the organization of the Kimari Local AI codebase.
 
@@ -56,6 +56,8 @@ kimari-local-ai/
 │   ├── test_profiles.py      # GPU profile management
 │   ├── test_pull.py          # Model registry and pull
 │   ├── test_server_cmd.py    # Server command construction
+│   ├── test_hardening_v016.py # v0.1.6/v0.1.7 hardening tests
+│   ├── test_release_v018.py  # v0.1.8 release validation tests
 │   └── test_state.py         # State management
 │
 ├── scripts/                   # Build and installation scripts
@@ -68,6 +70,9 @@ kimari-local-ai/
 │   │   ├── smoke-test.sh
 │   │   └── ...
 │   └── windows/              # Windows scripts
+│
+├── scripts/release/            # Release validation
+│   └── check-release.py      # Automated release hygiene checks
 │
 ├── docs/                      # Documentation
 │   ├── 00-01_product_vision.md
@@ -89,6 +94,7 @@ kimari-local-ai/
 ├── Makefile                   # Development tasks and CI
 ├── SECURITY.md                # Security policy
 ├── PRIVACY.md                 # Privacy policy
+├── RELEASE_CHECKLIST.md       # Pre-release validation checklist
 ├── README.md                  # Main documentation
 ├── GETTING_STARTED.md         # Quick start guide
 ├── ROADMAP.md                 # Version roadmap

@@ -1,0 +1,91 @@
+# Release Checklist
+
+Use this checklist before publishing any Kimari Local AI release.
+
+## Version & Metadata
+
+- [ ] Version bumped in `pyproject.toml`
+- [ ] Version bumped in `kimari/__init__.py` (`__version__`)
+- [ ] README.md version badge updated
+- [ ] `docs/index.html` version references updated
+
+## Changelog & Roadmap
+
+- [ ] `CHANGELOG.md` entry added for the new version (Keep a Changelog format)
+- [ ] `ROADMAP.md` updated — previous version marked "Released", new version marked "Current"
+
+## Testing
+
+- [ ] `python -m pytest tests/ -q` — all tests pass
+- [ ] `ruff check kimari/ tests/` — zero lint errors
+- [ ] `ruff format --check kimari/ tests/` — zero format errors
+- [ ] `make ci-local` — full local CI passes
+
+## CLI Validation
+
+- [ ] `python -m kimari.cli.main --version` — prints correct version
+- [ ] `python -m kimari.cli.main start --dry-run` — works without `--profile`
+- [ ] `pip install -e .` — installs without errors
+- [ ] `kimari --version` — installed entry point works
+- [ ] `kimari start --dry-run` — installed entry point works
+
+## Build & Package
+
+- [ ] `python -m build` — builds without errors
+- [ ] `twine check dist/*` — no warnings or errors
+- [ ] Wheel contains `kimari/py.typed`
+- [ ] Wheel does **not** contain `models/*.gguf`, `.kimari/`, `kimari-server.log`, or `.kimari-server.pid`
+
+## Release Validation Script
+
+- [ ] `python scripts/release/check-release.py` — all checks pass
+
+## Content Review
+
+- [ ] Kimari-4B is **not** advertised as published/released
+- [ ] ROCm is marked as **experimental** (not stable)
+- [ ] SHA256 verification is **not** marked as enforced if hashes are still `null`
+- [ ] `default_profile` is `"test"` in `config/kimari.profiles.json`
+- [ ] No GGUF files are tracked in git
+
+## Publishing (Manual)
+
+### TestPyPI (Pre-release Validation)
+
+Before publishing to the real PyPI, validate the package on TestPyPI:
+
+```bash
+# 1. Build the package
+python -m build
+
+# 2. Check with twine
+twine check dist/*
+
+# 3. Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# 4. Verify the package installs correctly from TestPyPI
+pip install -i https://test.pypi.org/simple/ kimari-local-ai
+```
+
+> **Note:** This is manual for now. Do not configure automated PyPI publishing from CI until TestPyPI has been validated at least once.
+
+### PyPI (Production)
+
+Do **not** upload to the real PyPI until TestPyPI validation passes and the version is confirmed working:
+
+```bash
+# Only after successful TestPyPI validation
+twine upload dist/*
+```
+
+### GitHub Release
+
+- [ ] GitHub Release created with notes from CHANGELOG
+- [ ] Git tag created: `git tag v0.1.X-alpha && git push origin v0.1.X-alpha`
+
+## Post-Release
+
+- [ ] GitHub topics still accurate
+- [ ] `docs/index.html` live site reflects new version
+- [ ] ROADMAP.md next version entry created

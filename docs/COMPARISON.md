@@ -227,4 +227,4 @@ The local AI ecosystem is not zero-sum. Kimari uses llama.cpp under the hood, in
 
 ---
 
-*Last updated: 2026-05-09 · Kimari v0.1.7-alpha*
+*Last updated: 2026-05-10 · Kimari v0.1.8-alpha*

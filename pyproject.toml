@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kimari-local-ai"
-version = "0.1.7-alpha"
+version = "0.1.8-alpha"
 description = "Open-source framework for running local LLMs on consumer NVIDIA GPUs"
 readme = "README.md"
 license = {text = "MIT"}
@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 authors = [
     {name = "Smouj", email = "smouj013@users.noreply.github.com"},
 ]
-keywords = ["llm", "local-ai", "llama-cpp", "nvidia", "gpu", "cli"]
+keywords = ["ai", "llm", "local-ai", "local-llm", "llama-cpp", "gguf", "cuda", "nvidia", "openai-compatible-api", "open-webui", "consumer-gpu", "quantization"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
