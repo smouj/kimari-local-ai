@@ -19,7 +19,7 @@ fi
 PY_VERSION=$($PYTHON -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 echo "[INFO] Python version: $PY_VERSION"
 
-if [ "$(echo "$PY_VERSION < 3.10" | bc -l)" -eq 1 ]; then
+if ! $PYTHON -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)"; then
     echo "[ERROR] Python 3.10+ required. Found: $PY_VERSION"
     exit 1
 fi
@@ -45,6 +45,6 @@ echo ""
 echo "Quick start:"
 echo "  kimari doctor          # Check system"
 echo "  kimari pull test       # Download test model"
-echo "  kimari start --profile test --dry-run  # Preview start"
+echo "  kimari start --dry-run # Preview start"
 echo "  make test              # Run tests"
 echo "  make ci-local          # Run full CI locally"

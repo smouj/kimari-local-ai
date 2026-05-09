@@ -116,8 +116,10 @@ jobs:
         run: python -m kimari.cli.main profiles
       - name: Pull list
         run: python -m kimari.cli.main pull --list
-      - name: Start dry-run
+      - name: Start dry-run (explicit profile)
         run: python -m kimari.cli.main start --profile test --dry-run
+      - name: Start dry-run (default profile)
+        run: python -m kimari.cli.main start --dry-run
       - name: Config validate
         run: python -m kimari.cli.main config validate
       - name: Config path
@@ -137,6 +139,17 @@ jobs:
         run: python -m build
       - name: Check package with twine
         run: twine check dist/*
+      - name: Verify py.typed in package
+        run: |
+          python -c "
+          import zipfile, glob
+          wheels = glob.glob('dist/*.whl')
+          assert wheels, 'No wheel found in dist/'
+          with zipfile.ZipFile(wheels[0]) as z:
+              names = z.namelist()
+              assert any('py.typed' in n for n in names), f'py.typed not found in {wheels[0]}'
+          print(f'py.typed found in {wheels[0]}')
+          "
 
   check-docs:
     name: Check Documentation

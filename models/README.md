@@ -47,8 +47,8 @@ kimari pull test
 wget -O models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \
   "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"
 
-# Start with test profile
-kimari start --profile test
+# Start with default profile (test)
+kimari start
 ```
 
 > **Any compatible GGUF file works.** Just rename it to `tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf`,

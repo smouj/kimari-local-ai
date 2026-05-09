@@ -344,7 +344,7 @@ def check_status(config: dict, json_output: bool = False):
         if pid:
             status_data["pid"] = pid
 
-    profile_name = status_data.get("profile") or config.get("default_profile", "gtx1060")
+    profile_name = status_data.get("profile") or config.get("default_profile", "test")
     profile = config.get("profiles", {}).get(profile_name, {})
     host = status_data.get("host") or profile.get("host", "127.0.0.1")
     port = status_data.get("port") or profile.get("port", 11435)
@@ -458,7 +458,7 @@ def show_logs(lines: int = 50, follow: bool = False):
     """Show kimari-server.log contents."""
     if not LOG_FILE.exists():
         print("[WARN] No log file found at:", LOG_FILE)
-        print("Start the server first: kimari start --profile <profile>")
+        print("Start it first: kimari start")
         return
 
     tail_lines = read_log_tail(LOG_FILE, lines)
@@ -486,7 +486,7 @@ def show_logs(lines: int = 50, follow: bool = False):
 def chat(message: str, config: dict, profile_name: Optional[str] = None):
     """Send a chat message to the Kimari API."""
     if not profile_name:
-        profile_name = config.get("default_profile", "gtx1060")
+        profile_name = config.get("default_profile", "test")
     profile = config.get("profiles", {}).get(profile_name, {})
     host = profile.get("host", "127.0.0.1")
     port = profile.get("port", 11435)
@@ -517,7 +517,7 @@ def chat(message: str, config: dict, profile_name: Optional[str] = None):
             print(f"[ERROR] API returned {resp.status_code}: {resp.text}")
     except requests.ConnectionError:
         print("[ERROR] Cannot connect to Kimari server.")
-        print("Start it first: kimari start --profile <profile>")
+        print("Start it first: kimari start")
     except Exception as e:
         print(f"[ERROR] {e}")
 
@@ -525,7 +525,7 @@ def chat(message: str, config: dict, profile_name: Optional[str] = None):
 def interactive_chat(config: dict, profile_name: Optional[str] = None):
     """Run an interactive chat session."""
     if not profile_name:
-        profile_name = config.get("default_profile", "gtx1060")
+        profile_name = config.get("default_profile", "test")
     profile = config.get("profiles", {}).get(profile_name, {})
     host = profile.get("host", "127.0.0.1")
     port = profile.get("port", 11435)
@@ -667,7 +667,7 @@ def run_doctor(config: dict, json_output: bool = False):
             fail("llama-server: Not found in PATH")
 
     # Model
-    default_profile = config.get("default_profile", "gtx1060")
+    default_profile = config.get("default_profile", "test")
     profile = config.get("profiles", {}).get(default_profile, {})
     model_path = PROJECT_ROOT / profile.get("model", "models/Kimari-4B-Q4_K_M.gguf")
     if model_path.exists():
@@ -773,7 +773,7 @@ def run_doctor(config: dict, json_output: bool = False):
         print(f"\n  {Color.YELLOW}Warnings present. Kimari may work with limitations.{Color.RESET}")
     else:
         print(f"\n  {Color.GREEN}All checks passed! Ready to start.{Color.RESET}")
-        print(f"  Run: {Color.CYAN}kimari start --profile {recommended}{Color.RESET}")
+        print(f"  Run: {Color.CYAN}kimari start{Color.RESET}")
 
 
 # ─── Info ────────────────────────────────────────────────────────────────────
@@ -782,7 +782,7 @@ def show_info(config: dict, json_output: bool = False):
     """Show Kimari installation information (version, paths, profiles, endpoint)."""
     state = read_state()
     llama_server = detect_llama_server()
-    default_profile = config.get("default_profile", "gtx1060")
+    default_profile = config.get("default_profile", "test")
     profile = config.get("profiles", {}).get(default_profile, {})
     gpu = detect_gpu()
 
@@ -897,8 +897,8 @@ def main():
 
     # start
     start_parser = subparsers.add_parser("start", help="Start Kimari server")
-    start_parser.add_argument("--profile", "-p", required=True,
-                              help="GPU profile (gtx1060, gtx1080, turbo, test, docker)")
+    start_parser.add_argument("--profile", "-p", default=None,
+                              help="GPU profile (default: from config, currently 'test'). Options: gtx1060, gtx1080, turbo, test, docker)")
     start_parser.add_argument("--dry-run", action="store_true",
                               help="Print command without executing")
     start_parser.add_argument("--daemon", action="store_true",
@@ -1012,7 +1012,8 @@ def main():
     elif args.command == "info":
         show_info(config, json_output=getattr(args, "json_output", False))
     elif args.command == "start":
-        start_server(args.profile, config,
+        profile = args.profile or config.get("default_profile", "test")
+        start_server(profile, config,
                      dry_run=args.dry_run,
                      daemon=args.daemon,
                      model_override=args.model,
@@ -1031,7 +1032,7 @@ def main():
         else:
             interactive_chat(config)
     elif args.command == "bench":
-        profile = args.profile or config.get("default_profile", "gtx1080")
+        profile = args.profile or config.get("default_profile", "test")
         run_benchmark(profile, config,
                       json_output=getattr(args, "json_output", False),
                       output=getattr(args, "output", None),

@@ -39,7 +39,7 @@
 - ✅ Fixed all documentation references to match actual model paths
 - ✅ Updated docs/PROJECT_STRUCTURE.md with new files
 
-## v0.1.5-alpha (Current)
+## v0.1.5-alpha (Released)
 
 - ✅ Default profile changed to `test` for seamless first-run experience
 - ✅ `kimari/py.typed` created (PEP 561 marker)
@@ -51,7 +51,19 @@
 - ✅ SHA256 verification note added (hashes not yet pinned in registry)
 - ✅ README and GETTING_STARTED updated for new default flow
 
-## v0.1.6-alpha (Planned)
+## v0.1.6-alpha (Current)
+
+- ✅ `kimari start` works without `--profile` (uses default from config)
+- ✅ All `default_profile` fallbacks changed from `"gtx1060"` to `"test"`
+- ✅ Fixed `test` profile `estimated_model_size_gb` (2.5 → 0.7, coherent with registry)
+- ✅ `make bench` now uses `--profile test`; added `bench-1080` and `bench-1060`
+- ✅ Removed `bc` dependency from `install-dev.sh` (uses Python version check)
+- ✅ CLI error messages simplified ("Start it first: kimari start" instead of "--profile")
+- ✅ ROCm detection in `check-env.py` (experimental, not equivalent to CUDA)
+- ✅ CI: dry-run without `--profile`, `py.typed` in wheel verification
+- ✅ New tests: default_profile, py.typed existence, profile size coherence, start without profile
+
+## v0.1.7-alpha (Planned)
 
 - Windows/WSL installation improvements
 - `kimari eval` command for evaluation suite
