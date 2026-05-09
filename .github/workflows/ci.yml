@@ -19,10 +19,13 @@ jobs:
         run: pip install ruff>=0.5.0
       - name: Run ruff check
         run: ruff check kimari/ tests/
+      - name: Run ruff format check
+        run: ruff format --check kimari/ tests/
 
   lint-scripts:
     name: Lint Shell Scripts
     runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
       - name: Check bash scripts
         run: |
@@ -60,7 +63,8 @@ jobs:
           for m in registry.get('models', []):
               for field in ['id', 'display_name', 'url', 'filename', 'target_path', 'size_gb', 'recommended_profile', 'status', 'license']:
                   assert field in m, f'Model {m.get(\"id\", \"?\")} missing field: {field}'
-          print(f'Models registry valid. {len(registry[\"models\"])} models.')
+              assert m['url'].startswith('https://'), f'Model {m.get(\"id\", \"?\")} URL must use HTTPS: {m[\"url\"]}'
+          print(f'Models registry valid. {len(registry[\"models\"])} models, all URLs use HTTPS.')
           "
 
   pytest:
@@ -118,6 +122,21 @@ jobs:
         run: python -m kimari.cli.main config validate
       - name: Config path
         run: python -m kimari.cli.main config path
+
+  build-package:
+    name: Build Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build tools
+        run: pip install build twine
+      - name: Build package
+        run: python -m build
+      - name: Check package with twine
+        run: twine check dist/*
 
   check-docs:
     name: Check Documentation

@@ -1,4 +1,4 @@
-.PHONY: help doctor info start-1060 start-1080 start-turbo start-test start-docker status stop chat smoke bench clean install install-dev dry-run-test logs logs-follow doctor-json status-json validate-config validate-schema webui-up webui-down webui-logs test lint ci-local pull-list pull-test models profiles config-validate config-show config-path migrate format-check
+.PHONY: help doctor info start-1060 start-1080 start-turbo start-test start-docker status stop chat smoke bench clean install install-dev dry-run-test logs logs-follow doctor-json status-json validate-config validate-schema webui-up webui-down webui-logs test lint ci-local pull-list pull-test models profiles config-validate config-show config-path migrate format-check build-rocm
 
 .DEFAULT_GOAL := help
 
@@ -20,6 +20,9 @@ install-editable: ## Install kimari package in editable mode
 
 install-editable-dev: ## Install kimari package in editable mode with dev deps
 	pip install -e ".[dev]"
+
+build-rocm: ## Build llama-server with AMD ROCm support
+	bash scripts/linux/build-llamacpp-rocm.sh
 
 doctor: ## Run system diagnostics
 	python -m kimari.cli.main doctor

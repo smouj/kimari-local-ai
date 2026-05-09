@@ -38,24 +38,6 @@
       "sha256": null
     },
     {
-      "id": "qwen3-4b-q4",
-      "display_name": "Qwen3-4B Q4_K_M",
-      "family": "Qwen3",
-      "repo": "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
-      "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/qwen3-4b-q4_k_m.gguf",
-      "filename": "qwen3-4b-q4_k_m.gguf",
-      "target_path": "models/qwen3-4b-q4_k_m.gguf",
-      "size_gb": 2.7,
-      "quantization": "Q4_K_M",
-      "expected_vram_gb": 4.5,
-      "recommended_profile": "gtx1060",
-      "license_note": "Apache-2.0",
-      "license": "Apache-2.0",
-      "source": "Qwen/Qwen3-4B-GGUF",
-      "status": "recommended",
-      "sha256": null
-    },
-    {
       "id": "smollm3-3b-q4",
       "display_name": "SmolLM3-3B Q4_K_M",
       "family": "SmolLM3",

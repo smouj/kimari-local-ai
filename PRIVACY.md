@@ -57,17 +57,18 @@ All data Kimari generates stays on your local machine:
 
 | Data | Location | Purpose |
 |------|----------|---------|
-| Server PID file | `server/kimari.pid` | Process management |
-| Server log | `server/kimari.log` | Debugging (local only) |
+| Server PID file | `.kimari-server.pid` | Process management |
+| Server log | `kimari-server.log` | Debugging (local only) |
+| Server state | `.kimari/state.json` | Server state tracking |
 | Configuration | `config/kimari.profiles.json`, `config/kimari.models.json` | Profile and model settings |
 | Downloaded models | `models/*.gguf` | Inference (user-managed) |
 
 ### Log files
 
-Log files (`server/kimari.log`) are written to disk locally and **never transmitted**. They may contain server status messages and error output. They do **not** contain the content of your prompts or model responses. You can delete them at any time:
+Log files (`kimari-server.log`) are written to disk locally and **never transmitted**. They may contain server status messages and error output. They do **not** contain the content of your prompts or model responses. You can delete them at any time:
 
 ```bash
-rm -f server/kimari.log server/kimari.pid
+rm -f kimari-server.log .kimari-server.pid
 ```
 
 ---
@@ -111,8 +112,9 @@ To remove all Kimari-generated data from your machine:
 # Stop the server
 kimari stop
 
-# Remove logs and PID files
-rm -f server/kimari.log server/kimari.pid
+# Remove logs, PID files, and state
+rm -f kimari-server.log .kimari-server.pid
+rm -rf .kimari
 
 # Remove downloaded models (optional — these are large files)
 rm -rf models/*.gguf

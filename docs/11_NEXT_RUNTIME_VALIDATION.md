@@ -170,27 +170,27 @@ Download a small test model from HuggingFace and place it where the `test` profi
 mkdir -p models
 
 # Download a small test model (e.g., Llama 3.2 1B, Q4_K_M)
-wget -O models/Kimari-base-test-Q4_K_M.gguf \
+wget -O models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \
   "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"
 ```
 
 **Expected output:**
 ```
-Saving to: 'models/Kimari-base-test-Q4_K_M.gguf'
-models/Kimari-base-test-Q4_K_M.gguf  100%[===================>]  800MB  12.3MB/s  in 65s
+Saving to: 'models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf'
+models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf  100%[===================>]  800MB  12.3MB/s  in 65s
 ```
 
 **Verify the file:**
 ```bash
-ls -lh models/Kimari-base-test-Q4_K_M.gguf
+ls -lh models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
 ```
 
 **Expected output:**
 ```
--rw-r--r-- 1 user user 800M Jun 15 10:00 models/Kimari-base-test-Q4_K_M.gguf
+-rw-r--r-- 1 user user 800M Jun 15 10:00 models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
 ```
 
-> **Note:** The `test` profile expects the file at `models/Kimari-base-test-Q4_K_M.gguf`. You can use any compatible GGUF model — just rename it to match, or create a custom profile. See `models/README.md` for details.
+> **Note:** The `test` profile expects the file at `models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf`. You can use any compatible GGUF model — just rename it to match, or create a custom profile. See `models/README.md` for details.
 
 ---
 
@@ -220,7 +220,7 @@ python3 cli/kimari_cli.py start --profile test --dry-run
 
   test
     Name:   Test Model
-    Model:  models/Kimari-base-test-Q4_K_M.gguf
+    Model:  models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
     ...
 ```
 
@@ -238,7 +238,7 @@ python3 cli/kimari_cli.py start --profile test
 ```
 🚀 Starting Kimari
    Profile: test (Test Model)
-   Model:   models/Kimari-base-test-Q4_K_M.gguf
+   Model:   models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
    Host:    127.0.0.1:11435
    Context: 4096 tokens
    Quant:   Q4_K_M
@@ -283,7 +283,7 @@ curl -s http://127.0.0.1:11435/v1/models
 {
   "data": [
     {
-      "id": "Kimari-base-test-Q4_K_M",
+      "id": "tinyllama-1.1b-chat-v1.0.Q4_K_M",
       "object": "model",
       "owned_by": "local",
       "context_length": 4096
@@ -588,7 +588,7 @@ This script automates healthcheck, chat test, and benchmark in a single run.
 | 1. Prerequisites | `nvidia-smi && nvcc --version && python3 --version` | All commands succeed |
 | 2. Build llama.cpp | `cmake -B build -DGGML_CUDA=ON && cmake --build build` | Binary exists |
 | 3. Doctor | `python3 cli/kimari_cli.py doctor` | All checks ✅ |
-| 4. Place model | Download + rename to `models/Kimari-base-test-Q4_K_M.gguf` | File exists |
+| 4. Place model | Download + rename to `models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf` | File exists |
 | 5. Preview | `python3 cli/kimari_cli.py profiles && python3 cli/kimari_cli.py models && python3 cli/kimari_cli.py start --profile test --dry-run` | Profile, model listed, dry-run output shown |
 | 6. Start server | `python3 cli/kimari_cli.py start --profile test` | "Ready" message |
 | 7. Healthcheck | `curl http://127.0.0.1:11435/health` | `{"status":"ok"}` |

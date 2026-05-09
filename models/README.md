@@ -21,7 +21,7 @@ for testing. The `test` profile in `config/kimari.profiles.json` expects a model
 at:
 
 ```
-models/Kimari-base-test-Q4_K_M.gguf
+models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
 ```
 
 **Recommended test models (any will work):**
@@ -41,14 +41,14 @@ models/Kimari-base-test-Q4_K_M.gguf
 mkdir -p models
 
 # Download Llama 3.2 1B (small, good for testing)
-wget -O models/Kimari-base-test-Q4_K_M.gguf \
+wget -O models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \
   "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"
 
 # Start with test profile
 python3 cli/kimari_cli.py start --profile test
 ```
 
-> **Any compatible GGUF file works.** Just rename it to `Kimari-base-test-Q4_K_M.gguf`,
+> **Any compatible GGUF file works.** Just rename it to `tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf`,
 > or create a custom profile in `config/kimari.profiles.json` pointing to your file.
 
 ## Profile Naming Convention
@@ -60,7 +60,7 @@ The profiles in `config/kimari.profiles.json` reference specific model filenames
 | `gtx1060` | `models/Kimari-4B-Q4_K_M.gguf` |
 | `gtx1080` | `models/Kimari-4B-Q5_K_M.gguf` |
 | `turbo` | `models/Kimari-4B-IQ4_XS.gguf` |
-| `test` | `models/Kimari-base-test-Q4_K_M.gguf` |
+| `test` | `models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf` |
 
 Until the official Kimari-4B weights are released, only the `test` profile
 is usable out of the box. For other profiles, rename any compatible GGUF to match,

@@ -509,18 +509,18 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <span class="terminal-output">
 🚀 Starting Kimari
    Profile: <span class="terminal-highlight">test</span> (Test Model)
-   Model:   models/Kimari-base-test-Q4_K_M.gguf
+   Model:   models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
    Host:    127.0.0.1:11435
    Context: 4096 tokens
    Quant:   Q4_K_M
    Binary:  /home/user/kimari-local-ai/deps/llama.cpp/build/bin/llama-server
 </span>
-  <span class="terminal-warn">[WARN]</span> Model not found: models/Kimari-base-test-Q4_K_M.gguf
+  <span class="terminal-warn">[WARN]</span> Model not found: models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
   <span class="terminal-warn">[WARN]</span> Place a GGUF model before actually starting.
 
 <span class="terminal-highlight">[DRY RUN]</span> Would execute:
 
-  llama-server -m models/Kimari-base-test-Q4_K_M.gguf \
+  llama-server -m models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \
     --host 127.0.0.1 --port 11435 -ngl all \
     -c 4096 -b 128 -ub 64 \
     --cache-type-k f16 --cache-type-v f16 -t 4
@@ -535,13 +535,13 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   "status": "<span class="terminal-ok">READY</span>",
   "pid": 28451,
   "profile": "test",
-  "model": "models/Kimari-base-test-Q4_K_M.gguf",
+  "model": "models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
   "host": "127.0.0.1",
   "port": 11435,
   "uptime_s": 342,
   "started_at": "2025-01-15T10:23:45Z",
   "health": { "status": "ok" },
-  "models": ["Kimari-base-test-Q4_K_M"],
+  "models": ["tinyllama-1.1b-chat-v1.0.Q4_K_M"],
   "last_log_lines": [
     "llama_server: model loaded successfully",
     "llama_server: listening on 127.0.0.1:11435"
@@ -581,7 +581,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 
   <span class="terminal-highlight">test</span>
     Name:   Test Model
-    Model:  models/Kimari-base-test-Q4_K_M.gguf
+    Model:  models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
     Quant:  Q4_K_M
     Ctx:      4096
     Batch:     128
@@ -749,7 +749,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="step-num">4</div>
       <div class="step-content">
         <div class="step-title">Download a test GGUF model</div>
-        <div class="step-code"><span class="prompt">$ </span>wget -O models/Kimari-base-test-Q4_K_M.gguf \<br>&nbsp;&nbsp;"https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/\<br>&nbsp;&nbsp;resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"</div>
+        <div class="step-code"><span class="prompt">$ </span>wget -O models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf \<br>&nbsp;&nbsp;"https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/\<br>&nbsp;&nbsp;resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf"</div>
       </div>
     </div>
     <div class="step">
