@@ -2,8 +2,8 @@
 """
 check-env.py — Verify the development environment for Kimari Local AI.
 
-Checks Python version, CUDA availability, llama-server binary,
-required Python packages, and configuration files.
+Checks Python version, CUDA availability, ROCm availability (experimental),
+llama-server binary, required Python packages, and configuration files.
 """
 
 import json
@@ -45,6 +45,23 @@ def check_cuda():
     else:
         print("  [WARN] CUDA: not found (optional — needed for GPU inference)")
         return False
+
+
+def check_rocm():
+    """Check ROCm availability (experimental)."""
+    hipcc = shutil.which("hipcc")
+    if hipcc:
+        try:
+            result = subprocess.run([hipcc, "--version"], capture_output=True, text=True, timeout=10)
+            version_line = [l for l in result.stdout.split("\n") if l.strip()]
+            version = version_line[-1].strip() if version_line else "unknown"
+            print(f"  [OK]   ROCm: {version} (experimental)")
+        except Exception:
+            print("  [OK]   ROCm: available (experimental, version unknown)")
+        return True
+    else:
+        print("  [INFO] ROCm: not found (experimental — optional for AMD GPUs)")
+        return True  # Not a failure, just informational
 
 
 def check_llama_server():
@@ -99,6 +116,7 @@ def main():
     results = [
         check_python(),
         check_cuda(),
+        check_rocm(),
         check_llama_server(),
         check_packages(),
         check_config(),

@@ -25,3 +25,49 @@ Stage Summary:
 - docs/11_NEXT_RUNTIME_VALIDATION.md: Replaced all stale command references
 - benchmarks/README.md, models/README.md: Updated command references
 - All changes pushed to GitHub main branch
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: v0.1.5-alpha hardening — First-run experience, documentation overhaul, all review fixes
+
+Work Log:
+- Examined all key files in the Kimari Local AI repository (README, CHANGELOG, ROADMAP, GETTING_STARTED, SECURITY, PRIVACY, CONTRIBUTING, COMPARISON, PROJECT_STRUCTURE, pyproject.toml, __init__.py, constants.py, start-kimari.sh, check-env.py, index.html, kimari.profiles.json, kimari.models.json)
+- Changed default_profile from "gtx1060" to "test" in config/kimari.profiles.json
+- Created kimari/py.typed (empty PEP 561 marker file)
+- Rewrote scripts/linux/start-kimari.sh to prefer `kimari` command, fallback to `python3 -m kimari.cli.main`, default to test profile
+- Replaced ambiguous ASCII art in kimari/core/constants.py with clear "KIMARI" block-letter banner
+- Moved scripts/linux/check-env.py to scripts/common/check-env.py for cross-platform use
+- Updated scripts/linux/install-dev.sh and scripts/windows/install-dev.ps1 to use scripts/common/check-env.py
+- Fixed all dates from 2025 to 2026 in CHANGELOG.md entries
+- Fixed PRIVACY.md "Last updated: 2025" → "2026"
+- Fixed docs/COMPARISON.md last updated date and marked ROCm as experimental
+- Added SHA256 verification note to SECURITY.md (hashes not yet pinned)
+- Bumped version from 0.1.4-alpha to 0.1.5-alpha in kimari/__init__.py and pyproject.toml
+- Added comprehensive v0.1.5-alpha section to CHANGELOG.md
+- Updated ROADMAP.md: v0.1.4-alpha as Released, v0.1.5-alpha as Current, v0.1.6-alpha as Planned
+- Completely rewrote README.md with streamlined quick start, test as default, GPU profile status table, SHA256 note, ROCm experimental
+- Completely rewrote GETTING_STARTED.md with clearer default flow and SHA256 note
+- Updated docs/PROJECT_STRUCTURE.md with py.typed and scripts/common/ references
+- Updated docs/index.html (GitHub Pages): hero badge v0.1.5-alpha, new ASCII banner, version strings, test as default profile, date fix
+- Fixed tests: test_cli_smoke.py version assertions, test_detection.py default profile assertion
+- Ran all 83 tests — passing
+- Ran py_compile on all modules — passing
+- Validated config against JSON Schema — passing
+- Committed and pushed to GitHub
+
+Stage Summary:
+- Version bumped to v0.1.5-alpha
+- 21 files changed, 306 insertions, 101 deletions
+- All critical review items from the audit have been addressed:
+  ✅ P0: default_profile changed to "test"
+  ✅ P0: kimari/py.typed created
+  ✅ P1: start-kimari.sh updated
+  ✅ P1: ASCII banner fixed
+  ✅ P1: Dates corrected from 2025 to 2026
+  ✅ P1: SHA256 note added (hashes not pinned)
+  ✅ P2: check-env.py moved to scripts/common/
+  ✅ P2: ROCm marked as experimental
+  ✅ Documentation fully updated (README, GETTING_STARTED, CHANGELOG, ROADMAP, SECURITY, PRIVACY, COMPARISON, PROJECT_STRUCTURE, GitHub Pages)
+  ✅ Tests updated and passing
+  ✅ Pushed to GitHub

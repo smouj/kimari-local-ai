@@ -77,7 +77,7 @@
       "vram_total_gb": 6.0,
       "vram_safe_gb": 5.2,
       "quantization": "Q4_K_M",
-      "estimated_model_size_gb": 2.5,
+      "estimated_model_size_gb": 0.7,
       "notes": "Small provisional GGUF for runtime validation. Place any compatible GGUF model at the path above."
     },
     "docker": {

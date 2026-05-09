@@ -5,6 +5,36 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6-alpha] — 2026-05-09
+
+### Added
+- **`kimari start` without `--profile`** — The `--profile` flag is now optional for `kimari start`. When omitted, the default profile from config is used (currently `test`). This enables the ideal first-run flow: `kimari pull test` → `kimari start`
+- **ROCm detection in `check-env.py`** — Both `scripts/common/check-env.py` and `scripts/linux/check-env.py` now detect `hipcc` and report "ROCm: available (experimental)". ROCm is never presented as equivalent to CUDA
+- **New Makefile targets:** `bench-1080`, `bench-1060`, `dry-run`
+- **New CI smoke test:** `kimari start --dry-run` (without `--profile`) verifies the default profile works
+- **New CI packaging test:** Verifies `kimari/py.typed` is included in the built wheel
+- **New test file:** `tests/test_hardening_v016.py` with tests for:
+  - `default_profile == "test"` assertion
+  - `kimari/py.typed` existence
+  - Test profile model size coherence with registry
+  - `kimari start --dry-run` without `--profile`
+  - Bench defaults to `test` profile
+
+### Changed
+- **`make bench`** — Now uses `--profile test` instead of `--profile gtx1080`. Added `bench-1080` and `bench-1060` targets for specific profiles
+- **`scripts/linux/install-dev.sh`** — Removed `bc` dependency for Python version check. Now uses `sys.version_info >= (3, 10)` directly via Python
+- **CLI error messages** — Changed "Start it first: kimari start --profile \<profile\>" to "Start it first: kimari start" in chat and logs commands
+- **`doctor` recommendation** — Changed from `kimari start --profile <profile>` to `kimari start`
+- **All `config.get("default_profile", "gtx1060")` fallbacks** — Changed to `config.get("default_profile", "test")` throughout CLI code
+- **`config/kimari.profiles.json`** — Fixed `estimated_model_size_gb` for `test` profile from `2.5` to `0.7` (coherent with `kimari.models.json` registry)
+- **`scripts/linux/install-dev.sh`** — Updated quick-start hints to use `kimari start --dry-run` instead of `kimari start --profile test --dry-run`
+- **Version bumped** to `0.1.6-alpha`
+
+### Fixed
+- **Profile size inconsistency** — `test` profile `estimated_model_size_gb` was 2.5 but TinyLlama Q4_K_M is 0.7 GB per registry. Now coherent at 0.7
+- **Makefile bench default** — Was using `gtx1080` profile but alpha experience centers on `test`. Now `make bench` uses `test`
+- **`bc` dependency** — `install-dev.sh` required `bc` which is not always installed on minimal systems. Replaced with pure Python check
+
 ## [0.1.5-alpha] — 2026-05-09
 
 ### Added

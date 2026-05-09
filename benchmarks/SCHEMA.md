@@ -70,7 +70,8 @@ Several fields may be `null` for different reasons:
 
 1. **Start the server** with the profile you want to benchmark:
    ```bash
-   kimari start --profile gtx1060
+   kimari start                    # Default profile (test)
+   kimari start --profile gtx1060  # Specific profile
    ```
 
 2. **Run the benchmark** with `--json` and `--output` to produce a standardized result file:
