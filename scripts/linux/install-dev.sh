@@ -37,7 +37,7 @@ pip install -e ".[dev]"
 # Check environment
 echo ""
 echo "[3/3] Checking environment..."
-$PYTHON scripts/linux/check-env.py || true
+$PYTHON scripts/common/check-env.py || true
 
 echo ""
 echo "✓ Development environment ready!"

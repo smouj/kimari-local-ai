@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.4--alpha-9b59b6.svg" alt="v0.1.4-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.5--alpha-9b59b6.svg" alt="v0.1.5-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,9 +32,9 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.4-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.5-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
-**Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
+**Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
 Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari provides an OpenAI-compatible API, a full-featured CLI, and integrations for Open WebUI and Continue (VS Code / JetBrains).
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.4-alpha**
+> **Kimari Local AI v0.1.5-alpha**
 
 ### ✅ Works Today
 
@@ -60,6 +60,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **KimariFit scoring system** with `--vram` override
 - **Benchmark framework** with TTFT measurement
 - **Security warnings** for `0.0.0.0` binding
+- **Experimental AMD ROCm** build support
 
 ### 🔨 Planned
 
@@ -107,14 +108,14 @@ kimari doctor
 # 4. Download a test model
 kimari pull test
 
-# 5. Start the server
-kimari start --profile test
+# 5. Start the server (uses 'test' profile by default)
+kimari start
 
 # 6. Chat with the model
 kimari chat "Hello, Kimari!"
 ```
 
-> **Note:** The `test` profile is the only profile usable out of the box. The `gtx1060` and `gtx1080` profiles require the Kimari-4B GGUF model (not yet published) — or you can use `--model` to point to your own GGUF file.
+> **Note:** The `test` profile is the default during alpha, using TinyLlama 1.1B. After `kimari pull test`, `kimari start` works without specifying `--profile`. The `gtx1060` and `gtx1080` profiles are ready for when Kimari-4B is released — or you can use `--model` to point to your own GGUF file.
 
 ### Linux (Ubuntu 22.04+)
 
@@ -143,7 +144,7 @@ pip install -e ".[dev]"
 bash scripts/linux/install-dev.sh
 
 # Verify environment
-python scripts/linux/check-env.py
+python scripts/common/check-env.py
 ```
 
 ### Manual Install (no pip)
@@ -154,7 +155,7 @@ If you prefer not to use `pip install -e .`, you can run Kimari directly:
 pip install -r cli/requirements.txt
 python -m kimari.cli.main doctor
 python -m kimari.cli.main pull test
-python -m kimari.cli.main start --profile test
+python -m kimari.cli.main start
 ```
 
 ---
@@ -163,13 +164,15 @@ python -m kimari.cli.main start --profile test
 
 Pre-configured settings optimized for specific GPU models. No manual tuning required — just pick a profile and go.
 
-| Profile | GPU | VRAM | Quantization | Context | Host |
-|---------|-----|------|-------------|---------|------|
-| `gtx1060` | GTX 1060 | 6 GB | Q4_K_M | 8,192 | `127.0.0.1` |
-| `gtx1080` | GTX 1080 | 8 GB | Q5_K_M | 16,384 | `127.0.0.1` |
-| `turbo` | 6 GB+ | 6 GB | IQ4_XS | 8,192 | `127.0.0.1` |
-| `test` | Any 6 GB+ | 6 GB | Q4_K_M | 4,096 | `127.0.0.1` |
-| `docker` | Open WebUI | 6 GB | Q4_K_M | 4,096 | `0.0.0.0` |
+| Profile | GPU | VRAM | Quantization | Context | Host | Status |
+|---------|-----|------|-------------|---------|------|--------|
+| `test` ⭐ | Any 6 GB+ | 6 GB | Q4_K_M | 4,096 | `127.0.0.1` | **Default (alpha)** |
+| `gtx1060` | GTX 1060 | 6 GB | Q4_K_M | 8,192 | `127.0.0.1` | Requires Kimari-4B |
+| `gtx1080` | GTX 1080 | 8 GB | Q5_K_M | 16,384 | `127.0.0.1` | Requires Kimari-4B |
+| `turbo` | 6 GB+ | 6 GB | IQ4_XS | 8,192 | `127.0.0.1` | Requires Kimari-4B |
+| `docker` | Open WebUI | 6 GB | Q4_K_M | 4,096 | `0.0.0.0` | ⚠️ Network-exposed |
+
+> ⭐ The `test` profile is the default during alpha. When Kimari-4B is published, `gtx1060` will become the new default.
 
 ---
 
@@ -187,10 +190,11 @@ kimari info --json                                   # JSON info output
 ### Server Management
 
 ```bash
-kimari start --profile gtx1080                       # Start server with a GPU profile
-kimari start --profile test --dry-run                # Preview command without running
-kimari start --profile test --host 0.0.0.0 --port 8080  # Override host and port
-kimari start --profile gtx1080 --daemon              # Start in background
+kimari start                                         # Start server (default: test profile)
+kimari start --profile gtx1080                       # Start with a specific GPU profile
+kimari start --dry-run                               # Preview command without running
+kimari start --host 0.0.0.0 --port 8080              # Override host and port
+kimari start --daemon                                # Start in background
 kimari stop                                          # Stop running server
 kimari status                                        # Check server status
 kimari status --json                                 # JSON status output
@@ -201,8 +205,8 @@ kimari logs --follow                                 # Tail logs in real time
 ### Models
 
 ```bash
-kimari pull test                                      # Download test model
-kimari pull recommended                               # Download recommended model
+kimari pull test                                      # Download test model (TinyLlama 1.1B)
+kimari pull recommended                               # Download recommended model (Qwen3-4B)
 kimari pull --all                                     # Download all available models
 kimari pull --list                                    # List available models in registry
 kimari pull test --dry-run                            # Preview download (no transfer)
@@ -210,6 +214,8 @@ kimari models                                         # List downloaded models
 kimari models --json                                  # JSON model listing
 kimari models --downloaded                            # Show only downloaded models
 ```
+
+> **SHA256 verification:** `kimari pull` supports SHA256 hash verification after download. However, model hashes in the registry are **not yet pinned** — verification is supported but not currently enforced. This will be updated in a future release.
 
 ### Profiles & Configuration
 
@@ -229,7 +235,7 @@ kimari config migrate --dry-run                       # Preview migration change
 ```bash
 kimari chat "Your message here"                       # Send a single message
 kimari chat                                          # Interactive chat mode
-kimari bench --profile gtx1080                        # Run benchmarks (tokens/s, TTFT)
+kimari bench --profile test                           # Run benchmarks (tokens/s, TTFT)
 kimari bench --profile gtx1080 --vram 8.0             # Override VRAM manually
 kimari bench --profile test --json                    # JSON benchmark output
 kimari fit --model models/file.gguf --ctx 8192        # Calculate KimariFit score
@@ -285,6 +291,7 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | **CLI** | Python 3.10+ command-line interface | ✅ Available |
 | **Open WebUI** | Full-featured web chat interface (Docker) | ✅ Available |
 | **Continue** | AI coding assistant for VS Code and JetBrains | ✅ Available |
+| **ROCm** | AMD GPU support via HIP/ROCm build | 🧪 Experimental |
 | **Local API** | FastAPI REST API for programmatic access | 🔨 Planned (v0.2) |
 | **Web Dashboard** | Minimal status/controls UI | 🔨 Planned (v0.3) |
 

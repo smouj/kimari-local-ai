@@ -28,7 +28,7 @@ pip install -e ".[dev]"
 # Check environment
 Write-Host ""
 Write-Host "[3/3] Checking environment..." -ForegroundColor Yellow
-python scripts/linux/check-env.py 2>$null
+python scripts/common/check-env.py 2>$null
 
 Write-Host ""
 Write-Host "Development environment ready!" -ForegroundColor Green

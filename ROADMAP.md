@@ -22,7 +22,7 @@
 - ✅ CI with Python 3.10/3.11/3.12 matrix
 - ✅ Install scripts (`install-dev.sh`, `install-dev.ps1`, `check-env.py`)
 
-## v0.1.4-alpha (Current)
+## v0.1.4-alpha (Released)
 
 - ✅ Fixed test profile model path (tinyllama instead of non-existent Kimari-base-test)
 - ✅ Fixed PRIVACY.md path references to match actual file locations
@@ -39,13 +39,26 @@
 - ✅ Fixed all documentation references to match actual model paths
 - ✅ Updated docs/PROJECT_STRUCTURE.md with new files
 
-## v0.1.5-alpha (Planned)
+## v0.1.5-alpha (Current)
+
+- ✅ Default profile changed to `test` for seamless first-run experience
+- ✅ `kimari/py.typed` created (PEP 561 marker)
+- ✅ `scripts/common/check-env.py` — cross-platform environment check
+- ✅ `scripts/linux/start-kimari.sh` — prefers `kimari` command, defaults to `test` profile
+- ✅ ASCII banner fixed to clearly read "KIMARI"
+- ✅ ROCm marked as **experimental** in documentation
+- ✅ All documentation dates corrected from 2025 to 2026
+- ✅ SHA256 verification note added (hashes not yet pinned in registry)
+- ✅ README and GETTING_STARTED updated for new default flow
+
+## v0.1.6-alpha (Planned)
 
 - Windows/WSL installation improvements
 - `kimari eval` command for evaluation suite
 - Package published on PyPI (or TestPyPI)
 - More models in registry
 - Advanced security: optional API authentication token implementation
+- Real SHA256 hashes pinned in model registry
 
 ## v0.2.0-alpha
 

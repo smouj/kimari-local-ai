@@ -5,7 +5,36 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.4-alpha] — 2025-05-09
+## [0.1.5-alpha] — 2026-05-09
+
+### Added
+- **`kimari/py.typed`** — PEP 561 type marker for the `kimari` package
+- **`scripts/common/check-env.py`** — Cross-platform environment check script (moved from `scripts/linux/`)
+- **New default profile: `test`** — The default profile is now `test` (TinyLlama) instead of `gtx1060` during alpha, since Kimari-4B is not yet published
+
+### Changed
+- **Default profile changed to `test`** — `kimari start` now uses the `test` profile by default, ensuring first-run success after `kimari pull test`. The `gtx1060` profile remains available for when Kimari-4B is released
+- **`scripts/linux/start-kimari.sh`** — Now prefers the installed `kimari` command, falls back to `python3 -m kimari.cli.main`. Default profile changed from `gtx1060` to `test`
+- **ASCII banner** — Replaced the ambiguous ASCII art with a clear "KIMARI" block-letter banner
+- **ROCm support** — Marked as **experimental** in documentation. AMD ROCm builds are available via `scripts/linux/build-llamacpp-rocm.sh` but are not yet tested at parity with CUDA
+- **Dates corrected** — All changelog entries and documentation dates updated from `2025` to `2026`
+- **Version bumped** to `0.1.5-alpha`
+
+### Fixed
+- **`pyproject.toml`** — Now correctly ships `kimari/py.typed` (previously declared but missing from the package)
+- **`scripts/windows/install-dev.ps1`** — No longer references `scripts/linux/check-env.py`; uses `scripts/common/check-env.py` instead
+- **`scripts/linux/install-dev.sh`** — Updated to use `scripts/common/check-env.py`
+- **README.md** — Fixed `check-env.py` path reference
+
+### Documentation
+- README.md updated to reflect `test` as default profile and streamlined first-run flow
+- GETTING_STARTED.md updated with clearer instructions
+- docs/COMPARISON.md — ROCm marked as experimental, date corrected
+- docs/PROJECT_STRUCTURE.md — Updated with `scripts/common/` directory and `kimari/py.typed`
+- PRIVACY.md — "Last updated" corrected to 2026
+- Added SHA256 verification note: model hashes in the registry are not yet pinned; verification is supported but not enforced
+
+## [0.1.4-alpha] — 2026-05-09
 
 ### Added
 - **`kimari bench --vram`** — Override VRAM in GiB for benchmark output on systems without GPU
@@ -39,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - docs/PROJECT_STRUCTURE.md updated with new files (SCHEMA.md, build-llamacpp-rocm.sh)
 - Makefile updated with `build-rocm` target
 
-## [0.1.3-alpha] — 2025-05-09
+## [0.1.3-alpha] — 2026-05-09
 
 ### Added
 - **Modular Python package** (`kimari/`) with proper `__init__.py` modules
@@ -111,7 +140,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README.md updated with new commands, pip install instructions, and links
 - ROADMAP.md updated with v0.1.3-alpha changes and future plans
 
-## [0.1.2-alpha] — 2025-05-08
+## [0.1.2-alpha] — 2026-05-08
 
 ### Added
 - `kimari pull` command for downloading GGUF models from registry
@@ -133,7 +162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI workflow with config validation, py_compile, and pytest
 - `make ci-local`, `make test`, `make lint` targets
 
-## [0.1.1-alpha] — 2025-05-07
+## [0.1.1-alpha] — 2026-05-07
 
 ### Added
 - Version constant `KIMARI_VERSION` in CLI
@@ -145,7 +174,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Makefile with common development targets
 - Documentation in `docs/` (vision, architecture, KimariFit, etc.)
 
-## [0.1.0-alpha] — 2025-05-06
+## [0.1.0-alpha] — 2026-05-06
 
 ### Added
 - Initial release of Kimari Local AI
