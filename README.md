@@ -33,7 +33,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## Project Status
 
-> **Kimari Local AI v0.1.3-alpha**
+> **Kimari Local AI v0.1.4-alpha**
 
 ### ✅ Works Today
 - CLI: `doctor`, `info`, `start`, `stop`, `status`, `chat`, `bench`, `fit`, `models`, `profiles`, `logs`, `pull`
@@ -48,6 +48,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - Continue.dev IDE integration
 - KimariFit scoring system with `--vram` override
 - Benchmark framework with TTFT measurement
+- `kimari bench --vram` override for systems without GPU detection
 - Security warnings for `0.0.0.0` binding
 
 ### 🔨 Planned
@@ -194,6 +195,7 @@ kimari config migrate --dry-run                       # Preview migration
 kimari chat "Your message here"                       # Send a single message
 kimari chat                                          # Interactive chat mode
 kimari bench --profile gtx1080                        # Run benchmarks (tokens/s, TTFT)
+kimari bench --profile gtx1080 --vram 8.0              # Override VRAM manually
 kimari bench --profile test --json                    # JSON benchmark output
 kimari fit --model models/file.gguf --ctx 8192        # KimariFit score
 kimari fit --model models/file.gguf --vram 8.0        # Override VRAM manually

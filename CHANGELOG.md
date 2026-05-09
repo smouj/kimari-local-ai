@@ -5,6 +5,40 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4-alpha] — 2025-03-09
+
+### Added
+- **`kimari bench --vram`** — Override VRAM in GiB for benchmark output on systems without GPU
+- **`llama_cpp_version`** — Detects llama.cpp version in benchmark output (via `llama-server --version`)
+- **`benchmarks/SCHEMA.md`** — Documented the standardized benchmark result JSON schema
+- **`scripts/linux/build-llamacpp-rocm.sh`** — Build llama.cpp with AMD ROCm/HIP support
+  - Configurable `KIMARI_AMDGPU_TARGETS` env var (default: gfx900 through gfx1101)
+  - Same pinned ref approach as CUDA build script
+- **CI improvements:**
+  - `build-package` job — builds the package with `python -m build` and validates with `twine check`
+  - `ruff format --check` step in lint-python job
+  - HTTPS URL validation in models registry validation step
+- **Enhanced test coverage:**
+  - Config migration tests (`test_migrate_config_current_no_changes`)
+  - Security validation tests (`test_validate_config_catches_0000_host`, `test_validate_config_catches_absolute_path`, `test_validate_config_catches_invalid_port`)
+  - Model hash verification tests (`test_verify_model_hash_unknown_model`, `test_pull_all_models_runs`)
+  - Total: 83 tests (up from 77)
+- **SECURITY.md** — Added "Optional API Authentication (Future)" section with nginx workaround example
+- **COMPARISON.md** — Added AMD ROCm build script mention in llama.cpp comparison and "When NOT to Use" section
+
+### Fixed
+- **Test profile model path** — Changed from non-existent `Kimari-base-test-Q4_K_M.gguf` to `tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf` (matches `kimari pull test`)
+- **PRIVACY.md** — Fixed incorrect file paths (`server/kimari.pid` → `.kimari-server.pid`, `server/kimari.log` → `kimari-server.log`)
+- **CI workflow** — Fixed YAML syntax error in `lint-scripts` job (missing `steps:` key)
+- **Model registry** — Removed duplicate `qwen3-4b-q4` entry (identical to `recommended`)
+- **Documentation** — Fixed all remaining references to old model name across docs, models/README.md, and index.html
+
+### Changed
+- Version bumped to 0.1.4-alpha
+- ROADMAP.md updated — v0.1.3-alpha marked as released, v0.1.4-alpha as current
+- docs/PROJECT_STRUCTURE.md updated with new files (SCHEMA.md, build-llamacpp-rocm.sh)
+- Makefile updated with `build-rocm` target
+
 ## [0.1.3-alpha] — 2025-05-09
 
 ### Added

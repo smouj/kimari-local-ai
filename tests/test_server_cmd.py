@@ -28,7 +28,7 @@ def test_build_server_cmd_model_path(sample_profile):
     cmd = build_server_cmd("/usr/bin/llama-server", sample_profile)
     model_idx = cmd.index("-m")
     model_path = cmd[model_idx + 1]
-    assert "Kimari-base-test-Q4_K_M.gguf" in model_path
+    assert "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf" in model_path
 
 
 def test_build_server_cmd_host_port(sample_profile):

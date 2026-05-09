@@ -95,3 +95,53 @@ def test_validate_config_catches_missing_default():
     is_valid, errors = validate_config(bad_config)
     assert not is_valid
     assert any("default_profile" in e for e in errors)
+
+
+def test_migrate_config_current_no_changes():
+    """migrate_config returns no changes when config is already current."""
+    from kimari.config.loader import migrate_config
+    changed, info = migrate_config(dry_run=True)
+    assert changed is False
+    assert "already up to date" in info.get("message", "").lower() or info.get("changes") == []
+
+
+def test_validate_config_catches_0000_host():
+    """validate_config catches 0.0.0.0 on non-docker profile."""
+    bad_config = {
+        "version": "1.0.0",
+        "config_version": 2,
+        "default_profile": "test",
+        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
+        "profiles": {"test": {"name": "Test", "model": "models/test.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "0.0.0.0", "port": 11435, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+    }
+    is_valid, errors = validate_config(bad_config)
+    assert not is_valid
+    assert any("0.0.0.0" in e for e in errors)
+
+
+def test_validate_config_catches_absolute_path():
+    """validate_config catches absolute model paths."""
+    bad_config = {
+        "version": "1.0.0",
+        "config_version": 2,
+        "default_profile": "test",
+        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
+        "profiles": {"test": {"name": "Test", "model": "/absolute/path/model.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "127.0.0.1", "port": 11435, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+    }
+    is_valid, errors = validate_config(bad_config)
+    assert not is_valid
+    assert any("absolute" in e.lower() for e in errors)
+
+
+def test_validate_config_catches_invalid_port():
+    """validate_config catches port outside valid range."""
+    bad_config = {
+        "version": "1.0.0",
+        "config_version": 2,
+        "default_profile": "test",
+        "server": {"health_endpoint": "/health", "chat_endpoint": "/v1/chat/completions", "models_endpoint": "/v1/models"},
+        "profiles": {"test": {"name": "Test", "model": "models/test.gguf", "ctx": 4096, "batch": 128, "ubatch": 64, "host": "127.0.0.1", "port": 80, "gpu_layers": "all", "quantization": "Q4_K_M"}},
+    }
+    is_valid, errors = validate_config(bad_config)
+    assert not is_valid
+    assert any("port" in e.lower() for e in errors)

@@ -7,6 +7,7 @@ JSON output with performance metrics.
 
 import json
 import platform
+import subprocess
 import time
 from pathlib import Path
 from typing import Optional
@@ -36,8 +37,27 @@ BENCHMARK_PROMPTS = [
 ]
 
 
+def _detect_llama_cpp_version() -> Optional[str]:
+    """Try to detect llama.cpp version from llama-server --version."""
+    try:
+        result = subprocess.run(
+            ["llama-server", "--version"],
+            capture_output=True, text=True, timeout=5,
+        )
+        output = (result.stdout or "") + (result.stderr or "")
+        # Extract version-like string from output
+        for line in output.strip().splitlines():
+            line = line.strip()
+            if line:
+                return line
+        return None
+    except Exception:
+        return None
+
+
 def run_benchmark(profile_name: str, config: dict, json_output: bool = False,
-                   output: Optional[str] = None):
+                   output: Optional[str] = None,
+                   vram_override: Optional[float] = None):
     """Run a basic benchmark on the Kimari server."""
     if requests is None:
         print("[ERROR] 'requests' is required. Install with: pip install -r cli/requirements.txt")
@@ -139,7 +159,7 @@ def run_benchmark(profile_name: str, config: dict, json_output: bool = False,
         "kimari_version": KIMARI_VERSION,
         "os": f"{platform.system()} {platform.release()}",
         "gpu_name": gpu["name"] if gpu else None,
-        "vram_total_mb": gpu["vram_mb"] if gpu else None,
+        "vram_total_mb": int(vram_override * 1024) if vram_override is not None else (gpu["vram_mb"] if gpu else None),
         "driver_version": gpu["driver"] if gpu else None,
         "cuda_version": cuda_ver,
         "model_name": Path(profile["model"]).stem,
@@ -159,7 +179,8 @@ def run_benchmark(profile_name: str, config: dict, json_output: bool = False,
             len([r for r in ok_results if r.get("time_to_first_token_ms") is not None]), 1
         ) if any(r.get("time_to_first_token_ms") is not None for r in ok_results) else None,
         "peak_vram_mb": None,  # Known limitation — cannot measure from CLI
-        "notes": "Automated benchmark via 'kimari bench'",
+        "llama_cpp_version": _detect_llama_cpp_version(),
+        "notes": "Automated benchmark via 'kimari bench'" + (" (VRAM manually overridden)" if vram_override is not None else ""),
     }
 
     # Build detailed bench data

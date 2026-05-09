@@ -939,6 +939,8 @@ def main():
                               help="Output benchmark results as JSON only")
     bench_parser.add_argument("--output", "-o", default=None, dest="output",
                               help="Save standardized benchmark results to a JSON file")
+    bench_parser.add_argument("--vram", type=float, default=None,
+                              help="Override VRAM in GiB (for systems without GPU)")
 
     # fit
     fit_parser = subparsers.add_parser("fit", help="Calculate KimariFit score")
@@ -1032,7 +1034,8 @@ def main():
         profile = args.profile or config.get("default_profile", "gtx1080")
         run_benchmark(profile, config,
                       json_output=getattr(args, "json_output", False),
-                      output=getattr(args, "output", None))
+                      output=getattr(args, "output", None),
+                      vram_override=getattr(args, "vram", None))
     elif args.command == "fit":
         calculate_kimarifit(args.model, args.ctx, config,
                             vram_override=getattr(args, "vram", None))

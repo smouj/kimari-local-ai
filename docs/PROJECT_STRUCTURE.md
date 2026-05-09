@@ -1,6 +1,6 @@
 # Kimari Local AI — Project Structure
 
-> Last updated: v0.1.3-alpha
+> Last updated: v0.1.4-alpha
 
 This document describes the organization of the Kimari Local AI codebase.
 
@@ -60,6 +60,7 @@ kimari-local-ai/
 ├── scripts/                   # Build and installation scripts
 │   ├── linux/                # Linux/WSL scripts
 │   │   ├── build-llamacpp-cuda.sh
+│   │   ├── build-llamacpp-rocm.sh
 │   │   ├── check-env.py
 │   │   ├── smoke-test.sh
 │   │   └── ...
@@ -74,6 +75,10 @@ kimari-local-ai/
 │
 ├── docker/                    # Docker Compose files
 ├── benchmarks/                # Benchmark results and templates
+│   ├── SCHEMA.md             # Benchmark result JSON schema documentation
+│   ├── README.md             # Benchmark overview
+│   ├── results/              # Saved benchmark results
+│   └── templates/            # Example result templates
 ├── models/                    # Downloaded GGUF models (gitignored)
 ├── .github/                   # GitHub Actions, issue templates
 ├── pyproject.toml             # Package configuration (pip installable)

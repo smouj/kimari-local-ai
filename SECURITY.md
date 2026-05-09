@@ -134,6 +134,52 @@ Only the **latest alpha release** receives security updates. We strongly recomme
 
 ---
 
+## Optional API Authentication (Future)
+
+Kimari currently has **no API authentication** for the local llama-server endpoint (`http://127.0.0.1:11435/v1`). This is acceptable for local-only use where the server binds to `127.0.0.1` (localhost), since only applications on your own machine can reach it.
+
+However, **this is not acceptable for network-exposed setups**. If you bind Kimari to `0.0.0.0` or expose it on a LAN/WAN, anyone who can reach the port has full, unauthenticated access to the API (see [Risks of Opening Ports](#risks-of-opening-ports-0000) above).
+
+### Planned: `kimari api` command (v0.2)
+
+A future `kimari api` command (planned for v0.2) will add optional **Bearer token authentication** to the llama-server endpoint. This will allow you to require an API key for all requests, making it safe to expose the server on a trusted network.
+
+The plan is documented in [`docs/WEB_UI_PLAN.md`](docs/WEB_UI_PLAN.md).
+
+### Workaround: Reverse proxy
+
+Until built-in authentication is available, users who need to expose the API on a network should place a **reverse proxy** (nginx, Caddy, etc.) in front of Kimari. The reverse proxy can handle:
+
+- **TLS/HTTPS** — Encrypt traffic between clients and the server.
+- **Authentication** — HTTP Basic Auth, Bearer tokens, or OAuth2 via the proxy.
+- **Access control** — IP allowlists, rate limiting, etc.
+
+Example nginx configuration:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name kimari.example.com;
+
+    ssl_certificate     /etc/nginx/ssl/kimari.crt;
+    ssl_certificate_key /etc/nginx/ssl/kimari.key;
+
+    location /v1/ {
+        # Require HTTP Basic Auth
+        auth_basic "Kimari API";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+
+        proxy_pass http://127.0.0.1:11435;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+> **Important:** Even with a reverse proxy, keep Kimari bound to `127.0.0.1` and let the proxy handle external connections.
+
+---
+
 ## Security Best Practices
 
 When using Kimari, follow these practices to minimize risk:
