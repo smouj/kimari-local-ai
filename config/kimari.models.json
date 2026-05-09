@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "models": [
+    {
+      "id": "test",
+      "display_name": "Test Model (TinyLlama 1.1B Q4_K_M)",
+      "repo": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF",
+      "url": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+      "filename": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+      "target_path": "models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+      "size_gb": 0.7,
+      "recommended_profile": "test",
+      "license_note": "Apache-2.0"
+    },
+    {
+      "id": "recommended",
+      "display_name": "Qwen3-4B Q4_K_M (Recommended)",
+      "repo": "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
+      "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/qwen3-4b-q4_k_m.gguf",
+      "filename": "qwen3-4b-q4_k_m.gguf",
+      "target_path": "models/qwen3-4b-q4_k_m.gguf",
+      "size_gb": 2.7,
+      "recommended_profile": "gtx1060",
+      "license_note": "Apache-2.0"
+    },
+    {
+      "id": "qwen3-4b-q4",
+      "display_name": "Qwen3-4B Q4_K_M",
+      "repo": "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
+      "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/qwen3-4b-q4_k_m.gguf",
+      "filename": "qwen3-4b-q4_k_m.gguf",
+      "target_path": "models/qwen3-4b-q4_k_m.gguf",
+      "size_gb": 2.7,
+      "recommended_profile": "gtx1060",
+      "license_note": "Apache-2.0"
+    },
+    {
+      "id": "smollm3-3b-q4",
+      "display_name": "SmolLM3-3B Q4_K_M",
+      "repo": "https://huggingface.co/HuggingFaceTB/SmolLM3-3B-GGUF",
+      "url": "https://huggingface.co/HuggingFaceTB/SmolLM3-3B-GGUF/resolve/main/smolm3-3b-q4_k_m.gguf",
+      "filename": "smolm3-3b-q4_k_m.gguf",
+      "target_path": "models/smolm3-3b-q4_k_m.gguf",
+      "size_gb": 2.0,
+      "recommended_profile": "gtx1060",
+      "license_note": "Apache-2.0"
+    }
+  ]
+}

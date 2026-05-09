@@ -78,6 +78,24 @@
       "quantization": "Q4_K_M",
       "estimated_model_size_gb": 2.5,
       "notes": "Small provisional GGUF for runtime validation. Place any compatible GGUF model at the path above."
+    },
+    "docker": {
+      "name": "Docker/Open WebUI",
+      "model": "models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+      "ctx": 4096,
+      "batch": 128,
+      "ubatch": 64,
+      "cache_type_k": "f16",
+      "cache_type_v": "f16",
+      "host": "0.0.0.0",
+      "port": 11435,
+      "gpu_layers": "all",
+      "threads": 4,
+      "vram_total_gb": 6.0,
+      "vram_safe_gb": 5.2,
+      "quantization": "Q4_K_M",
+      "estimated_model_size_gb": 0.7,
+      "notes": "Profile for Docker/Open WebUI usage. Binds to 0.0.0.0 so Docker containers can reach the API. DO NOT expose on public networks without a firewall."
     }
   }
 }
