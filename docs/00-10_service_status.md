@@ -1,11 +1,11 @@
 # Kimari — Service Status
 
-> **Last updated:** v0.1.2-alpha
+> **Last updated:** v0.1.4-alpha
 > **Document ID:** 00-10
 
 ---
 
-## Current Release: v0.1.2-alpha
+## Current Release: v0.1.4-alpha
 
 Kimari is in early alpha. The project provides a local-first LLM toolkit focused on
 GPU benchmarking, model management, and inference server orchestration for
@@ -28,16 +28,22 @@ is planned but not yet released.
 | `kimari chat` | ✅ Working | Interactive REPL chat and single-message mode |
 | `kimari bench --profile <name>` | ✅ Working | Token throughput benchmark with `--output` flag |
 | `kimari fit --model <path> --ctx <n>` | ✅ Working | KimariFit score for any GGUF model |
-| `kimari models` | ✅ Working | Lists available GGUF models in `models/` |
-| `kimari profiles` | ✅ Working | Lists and describes hardware profiles |
-| `kimari pull <name>` | ✅ Working | Downloads GGUF models from HuggingFace |
+| `kimari models` | ✅ Working | Lists available GGUF models in `models/`, `--json`, `--downloaded` |
+| `kimari profiles` | ✅ Working | Lists and describes hardware profiles, `--json` |
+| `kimari pull <name>` | ✅ Working | Downloads GGUF models from HuggingFace with resume and SHA256 |
 | `kimari pull --list` | ✅ Working | Lists models available for download |
-| **Config system** | ✅ Working | JSON-based profiles with schema validation |
+| `kimari pull --all` | ✅ Working | Downloads all models from registry |
+| `kimari info` | ✅ Working | Shows version, paths, profiles, endpoint info |
+| `kimari config path` | ✅ Working | Prints config file path |
+| `kimari config show` | ✅ Working | Displays full configuration (`--json` supported) |
+| `kimari config validate` | ✅ Working | Validates config against JSON Schema |
+| `kimari config migrate` | ✅ Working | Migrates config to current version with backup |
+| **Config system** | ✅ Working | JSON-based profiles with schema validation, migration, and `--json` output |
 | **GPU profiles** | ✅ Working | gtx1060, gtx1080, turbo, test, docker profiles |
 | **Scripts** | ✅ Working | Linux/Windows launch, healthcheck, smoke-test, build scripts |
 | **Open WebUI** | ✅ Working | Docker compose integration with dedicated profile |
 | **Automated CI** | ✅ Working | py_compile, bash syntax, JSON config, schema validation, pytest, CLI smoke test |
-| **Pytest suite** | ✅ Working | 50+ tests covering config, profiles, detection, state, CLI smoke |
+| **Pytest suite** | ✅ Working | 83 tests covering config, profiles, detection, state, CLI smoke, migration, security |
 | **Benchmark schema** | ✅ Working | Standardized result format with templates |
 | **Website/PWA** | 📋 Planned | Open WebUI available now; own PWA planned for v0.2 |
 
@@ -61,20 +67,38 @@ is planned but not yet released.
 
 ## Roadmap
 
-### v0.1.2 — Alpha (current)
+### v0.1.0 — Alpha
 - [x] CLI with core subcommands
 - [x] Profile-based configuration with JSON schema
 - [x] Basic website
 - [x] System health checks
 - [x] Documentation foundation
-- [x] Automated CI (compile, lint, config, schema, pytest)
-- [x] Test profile for runtime validation
+
+### v0.1.1 — Alpha
+- [x] Version constants, JSON Schema validation, requirements-dev, Makefile
+
+### v0.1.2 — Alpha
 - [x] `kimari pull` (model download)
 - [x] `--model`, `--host`, `--port`, `--ctx` overrides for `kimari start`
 - [x] Docker/Open WebUI profile
 - [x] Pytest test suite
 - [x] Benchmark result schema and templates
-- [x] CUDA documentation unified
+- [x] Automated CI (compile, lint, config, schema, pytest)
+
+### v0.1.3 — Alpha
+- [x] Modular Python package (`pip install -e .`)
+- [x] `kimari info` and `kimari config` commands
+- [x] Config migration system with `config_version`
+- [x] Model registry with extended metadata
+- [x] SHA256 hash verification and resume support
+- [x] `--json` output for all commands
+- [x] SECURITY.md and PRIVACY.md
+
+### v0.1.4 — Alpha (current)
+- [x] `kimari bench --vram` override
+- [x] AMD ROCm build script
+- [x] Enhanced test coverage (83 tests)
+- [x] CI improvements (build-package, ruff format, HTTPS validation)
 
 ### v0.2 — Beta
 - [ ] Real GPU benchmark data for all supported cards
@@ -108,8 +132,8 @@ is planned but not yet released.
 1. **Single GPU only** — Kimari currently targets one NVIDIA GPU per machine.
    Multi-GPU setups are not supported.
 
-2. **NVIDIA-only CUDA** — AMD (ROCm) and Apple Silicon (Metal) backends are not
-   yet implemented. Only NVIDIA CUDA is supported.
+2. **NVIDIA-focused** — AMD ROCm build script is available (`scripts/linux/build-llamacpp-rocm.sh`)
+   but not tested. Apple Silicon (Metal) is not supported.
 
 3. **Benchmark data is estimated** — The benchmark values in profiles are
    projected estimates, not measured values. Real benchmarks are a priority for
@@ -139,13 +163,8 @@ is planned but not yet released.
 Run the built-in diagnostics:
 
 ```bash
-kimari doctor
+kimari doctor          # Full system diagnostics
+kimari info            # Installation info (version, paths, profiles)
+kimari status          # Server status
+kimari config validate # Validate configuration
 ```
-
-This reports:
-- GPU detection and VRAM
-- CUDA toolkit version
-- Python version and dependencies
-- llama.cpp build status
-- Config file validity
-- Recommended profile

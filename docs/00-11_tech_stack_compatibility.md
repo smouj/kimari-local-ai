@@ -1,6 +1,6 @@
 # Kimari — Tech Stack Compatibility
 
-> **Last updated:** v0.1-alpha
+> **Last updated:** v0.1.4-alpha
 > **Document ID:** 00-11
 
 ---
@@ -41,7 +41,7 @@ Kimari targets **consumer-grade NVIDIA GPUs** with CUDA compute capability 6.1+.
 | GPU | Reason |
 |-----|--------|
 | GTX 900 series and older | Compute capability < 6.1 |
-| AMD Radeon (all) | No CUDA support; ROCm not yet implemented |
+| AMD Radeon (all) | No CUDA support; ROCm build script available but untested |
 | Intel Arc (all) | Not tested; no CUDA support |
 | Apple M1/M2/M3/M4 | No CUDA; Metal backend not yet implemented |
 
@@ -100,8 +100,13 @@ sudo apt update && sudo apt install cuda-toolkit-12-1
 ### Dependencies
 
 ```
-# cli/requirements.txt
+# pyproject.toml (pip install -e .)
 requests>=2.31.0
+
+# requirements-dev.txt (pip install -e ".[dev]")
+pytest>=7.0
+ruff>=0.1.0
+jsonschema>=4.0
 ```
 
 ---
@@ -149,13 +154,13 @@ cmake --build build -j$(nproc)
 
 | Profile | Model Size | Quantization | GPU VRAM | System RAM |
 |---------|-----------|-------------|----------|------------|
-| `minimal` | 7B | Q4_K_M | 5.5 GB | 8 GB |
-| `balanced` | 7B | Q5_K_M | 6.5 GB | 8 GB |
-| `quality` | 7B | Q8_0 | 8.0 GB | 12 GB |
-| `large` | 13B | Q4_K_M | 9.0 GB | 16 GB |
-| `max` | 13B | Q5_K_M | 10.5 GB | 16 GB |
+| `gtx1060` | ~4B | Q4_K_M | 6 GB | 8 GB |
+| `gtx1080` | ~4B | Q5_K_M | 8 GB | 8 GB |
+| `turbo` | ~4B | IQ4_XS | 6 GB | 8 GB |
+| `test` | 1.1B | Q4_K_M | 6 GB | 8 GB |
+| `docker` | ~4B | Q4_K_M | 6 GB | 8 GB |
 
-> VRAM estimates include model weights + KV cache for a 4096-token context window.
+> VRAM estimates include model weights + KV cache for profile-specific context windows.
 > Larger contexts require additional VRAM (~0.5 GB per 2048 tokens).
 
 ---

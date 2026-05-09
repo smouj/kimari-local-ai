@@ -8,7 +8,7 @@ To contribute your benchmark results:
 
 1. Run the benchmark with JSON output:
    ```bash
-   python cli/kimari_cli.py bench --profile gtx1060 --json --output benchmarks/results/my-gtx1060.json
+   kimari bench --profile gtx1060 --json --output benchmarks/results/my-gtx1060.json
    ```
 
 2. Or use the template from `benchmarks/templates/` and fill in your results manually.
