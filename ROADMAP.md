@@ -195,7 +195,7 @@
 - ✅ Release-check script expanded to 28 validation categories
 - ✅ New tests for v0.1.16 features
 
-## v0.1.17-alpha (Current)
+## v0.1.17-alpha (Released)
 
 - ✅ MODEL_CARD.md professional rewrite — "Planned / Training Design" status, base candidates, evaluation targets
 - ✅ docs/MODEL_TRAINING_PLAN.md — 7-phase training pipeline (selection → SFT → DPO/ORPO → eval → GGUF → HF → registry)
@@ -209,14 +209,32 @@
 - ✅ Release-check expanded to 35 validation categories
 - ✅ New tests for v0.1.17 features
 
-## v0.1.18-alpha (Planned)
+## v0.1.18-alpha (Current)
 
-- Choose base model for Kimari-4B
-- Build first SFT dataset
-- Run dry-run training pipeline
-- Create HF repo placeholder
-- Prepare first adapter training run
-- Improve KimariFit eval harness
+- ✅ docs/MODEL_DECISION_RECORD.md — ADR-001 for base model selection with weighted scoring
+- ✅ training/configs/base_candidates.yaml — 3 candidates with metadata, risk levels, scoring criteria
+- ✅ training/scripts/select_base_model.py — CLI scoring and ranking tool
+- ✅ dataset/samples/sft_seed.jsonl — 30 synthetic SFT samples across 10 categories
+- ✅ dataset/samples/preference_seed.jsonl — 20 synthetic preference pairs
+- ✅ training/scripts/prepare_dataset.py enhanced — --dedupe, --min-chars, --max-chars, --require-tags, --report
+- ✅ training/scripts/build_dataset_mix.py — Dataset mix builder with schema validation
+- ✅ eval/kimarifit.py — Dry-run and live evaluation harness
+- ✅ eval/rubrics/kimarifit_rubric.md — 9-criteria scoring rubric
+- ✅ eval/results/.gitkeep — Results directory placeholder
+- ✅ training/scripts/train_sft_lora.py improved — Enhanced --dry-run with training plan
+- ✅ training/scripts/export_gguf_plan.py — GGUF export planning tool
+- ✅ docs/FIRST_TRAINING_RUN.md — Step-by-step guide for first training run
+- ✅ Release-check expanded to 38 validation categories
+- ✅ New tests for v0.1.18 features
+
+## v0.1.19-alpha (Planned)
+
+- Choose base model formally (decision record → Accepted)
+- Prepare first real SFT dataset v0
+- Run first private adapter training
+- Improve eval scoring with real model outputs
+- Create Hugging Face repo placeholder
+- Prepare adapter-only preview if license allows
 
 ## v0.2.0-alpha
 

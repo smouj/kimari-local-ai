@@ -1,7 +1,7 @@
 # Model Card: Kimari-4B
 
-> **Version:** v0.1.17-alpha (project framework)
-> **Last Updated:** 2026-05-19
+> **Version:** v0.1.18-alpha (project framework)
+> **Last Updated:** 2026-05-20
 > **Developer:** Smouj ([@smouj013](https://x.com/smouj013))
 
 ---
@@ -118,6 +118,20 @@ The Kimari **software** (CLI, scripts, configurations) is released under the MIT
 | Weight release | **Not started** |
 
 Training has not begun. No GPUs have been allocated, no training scripts have been executed, and no checkpoints exist. The project is currently in the **training design** phase — defining requirements, evaluating base models, and planning data curation.
+
+---
+
+## Pipeline Status (v0.1.18-alpha)
+
+| Aspect | Status |
+|--------|--------|
+| Current model work | v0.1.18 pipeline dry-run |
+| Base selection status | Under review (ADR-001 Proposed) |
+| Dataset status | Seed synthetic only (30 SFT + 20 preference samples) |
+| Training status | Not started |
+| Evaluation status | Dry-run harness only (KimariFit rubric defined) |
+| GGUF export | Plan defined (Q4_K_M, Q5_K_M, IQ4_XS) |
+| HF release | Plan defined, not executed |
 
 ---
 
@@ -247,6 +261,8 @@ The following items must be completed before Kimari-4B weights can be released:
 | 15 | Community announcement published | ❌ Not started |
 
 > This checklist will be updated as progress is made. No item has been started as of v0.1.17-alpha.
+>
+> As of v0.1.18-alpha, the pipeline has been validated in dry-run mode. No real training, evaluation, or release has occurred.
 
 ---
 
@@ -254,6 +270,7 @@ The following items must be completed before Kimari-4B weights can be released:
 
 | Version | Date | Status | Changes |
 |---------|------|--------|---------|
+| 0.1.18-alpha | 2026-05-20 | Planned | Pipeline dry-run: base decision record, seed datasets, dataset mix builder, KimariFit dry-run harness, GGUF export plan |
 | 0.1.17-alpha | 2026-05-19 | Planned | Complete model card rewrite for v0.1.17-alpha; transparent status, honest evaluation targets, expanded safety and limitation sections |
 | — | TBD | Future | Initial training design document based on selected base model |
 | — | TBD | Future | First fine-tuning run and benchmark results |

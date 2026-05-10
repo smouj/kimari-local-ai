@@ -10,6 +10,7 @@ Usage:
 """
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -76,10 +77,7 @@ def _no_invented_hashes() -> bool:
         defaults_path = config_path
     try:
         data = json.loads(defaults_path.read_text())
-        for m in data.get("models", []):
-            if m.get("sha256") is not None:
-                return False
-        return True
+        return all(m.get("sha256") is None for m in data.get("models", []))
     except Exception:
         return True
 
@@ -89,7 +87,7 @@ def main() -> None:
     print("=" * 50)
 
     # ── Version consistency ──────────────────────────────────────
-    print("\n[1/35] Version consistency")
+    print("\n[1/38] Version consistency")
     pyproject_ver = get_pyproject_version()
     init_ver = get_init_version()
     check("pyproject.toml version is set", bool(pyproject_ver), "version field is empty")
@@ -101,7 +99,7 @@ def main() -> None:
     )
 
     # ── README version badge ─────────────────────────────────────
-    print("\n[2/35] README version badge")
+    print("\n[2/38] README version badge")
     readme = PROJECT_ROOT / "README.md"
     readme_text = readme.read_text()
     check("README.md exists", readme.exists())
@@ -118,7 +116,7 @@ def main() -> None:
     )
 
     # ── CHANGELOG entry ──────────────────────────────────────────
-    print("\n[3/35] CHANGELOG entry")
+    print("\n[3/38] CHANGELOG entry")
     changelog = PROJECT_ROOT / "CHANGELOG.md"
     changelog_text = changelog.read_text()
     changelog_header = f"[{init_ver}]"
@@ -129,7 +127,7 @@ def main() -> None:
     )
 
     # ── ROADMAP entry ────────────────────────────────────────────
-    print("\n[4/35] ROADMAP entry")
+    print("\n[4/38] ROADMAP entry")
     roadmap = PROJECT_ROOT / "ROADMAP.md"
     roadmap_text = roadmap.read_text()
     check(
@@ -144,7 +142,7 @@ def main() -> None:
     )
 
     # ── Config defaults ──────────────────────────────────────────
-    print("\n[5/35] Config defaults")
+    print("\n[5/38] Config defaults")
     profiles_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
     if profiles_path.exists():
         profiles = json.loads(profiles_path.read_text())
@@ -158,12 +156,12 @@ def main() -> None:
         check("config/kimari.profiles.json exists", False, "file not found")
 
     # ── Package markers ─────────────────────────────────────────
-    print("\n[6/35] Package markers")
+    print("\n[6/38] Package markers")
     py_typed = PROJECT_ROOT / "kimari" / "py.typed"
     check("kimari/py.typed exists", py_typed.exists(), "PEP 561 marker missing")
 
     # ── GitHub Pages / SEO ──────────────────────────────────────
-    print("\n[7/35] GitHub Pages / SEO")
+    print("\n[7/38] GitHub Pages / SEO")
     index_html = PROJECT_ROOT / "docs" / "index.html"
     if index_html.exists():
         index_text = index_html.read_text()
@@ -206,7 +204,7 @@ def main() -> None:
         check("docs/index.html exists", False, "file not found")
 
     # ── Documentation files ─────────────────────────────────────
-    print("\n[8/35] Documentation files")
+    print("\n[8/38] Documentation files")
     check(
         "docs/INSTALL_WSL2.md exists",
         (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists(),
@@ -224,7 +222,7 @@ def main() -> None:
     )
 
     # ── No tracked GGUF / runtime artifacts ──────────────────────
-    print("\n[9/35] No unwanted tracked files")
+    print("\n[9/38] No unwanted tracked files")
     try:
         result = subprocess.run(
             ["git", "ls-files", "*.gguf"],
@@ -266,7 +264,7 @@ def main() -> None:
         warn(".kimari/ directory exists in project root", "should be in .gitignore")
 
     # ── No false claims ─────────────────────────────────────────
-    print("\n[10/35] Content integrity")
+    print("\n[10/38] Content integrity")
     readme_lower = readme_text.lower()
     changelog_lower = changelog_text.lower()
     index_lower = (PROJECT_ROOT / "docs" / "index.html").read_text().lower() if index_html.exists() else ""
@@ -330,7 +328,7 @@ def main() -> None:
     )
 
     # ── Integration documentation ──────────────────────────────────
-    print("\n[11/35] Integration documentation")
+    print("\n[11/38] Integration documentation")
     check(
         "docs/integrations/OPENCLAW.md exists",
         (PROJECT_ROOT / "docs" / "integrations" / "OPENCLAW.md").exists(),
@@ -363,7 +361,7 @@ def main() -> None:
     )
 
     # ── Performance module ─────────────────────────────────────────
-    print("\n[12/35] Performance module")
+    print("\n[12/38] Performance module")
     check(
         "kimari/performance/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "performance" / "__init__.py").exists(),
@@ -386,7 +384,7 @@ def main() -> None:
     )
 
     # ── Runtime & Security modules ──────────────────────────────────
-    print("\n[13/35] Runtime & Security modules")
+    print("\n[13/38] Runtime & Security modules")
     check(
         "kimari/runtime/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "runtime" / "__init__.py").exists(),
@@ -424,7 +422,7 @@ def main() -> None:
     )
 
     # ── Packaged defaults & paths (v0.1.12) ──────────────────────────
-    print("\n[14/35] Packaged defaults & user paths")
+    print("\n[14/38] Packaged defaults & user paths")
     check(
         "kimari/defaults/ directory exists",
         (PROJECT_ROOT / "kimari" / "defaults").is_dir(),
@@ -472,7 +470,7 @@ def main() -> None:
     )
 
     # ── Short flag support in strict-flags (v0.1.12) ──────────────────
-    print("\n[15/35] Short flag support in strict-flags")
+    print("\n[15/38] Short flag support in strict-flags")
     llama_flags_path = PROJECT_ROOT / "kimari" / "runtime" / "llama_flags.py"
     if llama_flags_path.exists():
         flags_text = llama_flags_path.read_text()
@@ -495,7 +493,7 @@ def main() -> None:
             )
 
     # ── Community & contribution files (v0.1.13) ───────────────────
-    print("\n[16/35] Community & contribution files")
+    print("\n[16/38] Community & contribution files")
     check(
         "CODE_OF_CONDUCT.md exists",
         (PROJECT_ROOT / "CODE_OF_CONDUCT.md").exists(),
@@ -536,7 +534,13 @@ def main() -> None:
         "PR template missing",
     )
     # Issue templates
-    for template in ["bug_report.yml", "feature_request.yml", "performance_report.yml", "integration_request.yml", "config.yml"]:
+    for template in [
+        "bug_report.yml",
+        "feature_request.yml",
+        "performance_report.yml",
+        "integration_request.yml",
+        "config.yml",
+    ]:
         check(
             f".github/ISSUE_TEMPLATE/{template} exists",
             (PROJECT_ROOT / ".github" / "ISSUE_TEMPLATE" / template).exists(),
@@ -567,7 +571,7 @@ def main() -> None:
         )
 
     # ── Packaging & CI (v0.1.13) ──────────────────────────────────
-    print("\n[17/35] Packaging & CI")
+    print("\n[17/38] Packaging & CI")
     # Check SPDX license format
     pyproject_text = (PROJECT_ROOT / "pyproject.toml").read_text()
     check(
@@ -598,7 +602,7 @@ def main() -> None:
         warn("CI workflow file not found", "cannot check for wheel-install-smoke job")
 
     # ── Content integrity re-check (v0.1.13) ───────────────────────
-    print("\n[18/35] Content integrity re-check")
+    print("\n[18/38] Content integrity re-check")
     # Re-verify critical rules haven't regressed
     check(
         'default_profile still "test"',
@@ -617,7 +621,7 @@ def main() -> None:
     )
 
     # ── Setup write-mode & SHA256 tooling (v0.1.14) ──────────────────
-    print("\n[19/35] Setup write-mode & SHA256 tooling")
+    print("\n[19/38] Setup write-mode & SHA256 tooling")
     check(
         "kimari/setup/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "setup" / "__init__.py").exists(),
@@ -645,7 +649,7 @@ def main() -> None:
     )
 
     # ── New documentation (v0.1.14) ──────────────────────────────────
-    print("\n[20/35] New documentation files")
+    print("\n[20/38] New documentation files")
     check(
         "docs/REVERSE_PROXY_AUTH.md exists",
         (PROJECT_ROOT / "docs" / "REVERSE_PROXY_AUTH.md").exists(),
@@ -676,7 +680,7 @@ def main() -> None:
         )
 
     # ── Content integrity v0.1.14 re-check ───────────────────────────
-    print("\n[21/35] Content integrity re-check (v0.1.14)")
+    print("\n[21/38] Content integrity re-check (v0.1.14)")
     check(
         'default_profile still "test" (v0.1.14 re-check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
@@ -694,7 +698,7 @@ def main() -> None:
     )
 
     # ── Model path resolution (v0.1.15) ───────────────────────────────
-    print("\n[22/35] Model path resolution")
+    print("\n[22/38] Model path resolution")
     main_py_path = PROJECT_ROOT / "kimari" / "cli" / "main.py"
     if main_py_path.exists():
         main_py_text = main_py_path.read_text()
@@ -712,7 +716,7 @@ def main() -> None:
         check("kimari/cli/main.py exists", False, "file not found")
 
     # ── v0.1.15 new files ─────────────────────────────────────────────
-    print("\n[23/35] v0.1.15 new files")
+    print("\n[23/38] v0.1.15 new files")
     check(
         "benchmarks/RESULT_FORMAT.md exists",
         (PROJECT_ROOT / "benchmarks" / "RESULT_FORMAT.md").exists(),
@@ -745,7 +749,7 @@ def main() -> None:
     )
 
     # ── v0.1.15 content ───────────────────────────────────────────────
-    print("\n[24/35] v0.1.15 content")
+    print("\n[24/38] v0.1.15 content")
     check(
         "README mentions 'setup --write --yes'",
         "setup --write --yes" in readme_lower or "setup --write --yes" in readme_text,
@@ -758,7 +762,9 @@ def main() -> None:
     )
     check(
         "docs/PUBLISHING.md has '0.1.15' section",
-        "0.1.15" in (PROJECT_ROOT / "docs" / "PUBLISHING.md").read_text() if (PROJECT_ROOT / "docs" / "PUBLISHING.md").exists() else False,
+        "0.1.15" in (PROJECT_ROOT / "docs" / "PUBLISHING.md").read_text()
+        if (PROJECT_ROOT / "docs" / "PUBLISHING.md").exists()
+        else False,
         "'0.1.15' not found in docs/PUBLISHING.md",
     )
     check(
@@ -778,7 +784,7 @@ def main() -> None:
     )
 
     # ── v0.1.16 API experimental ───────────────────────────────────
-    print("\n[25/35] v0.1.16 API experimental")
+    print("\n[25/38] v0.1.16 API experimental")
     check(
         "kimari/api/app.py exists",
         (PROJECT_ROOT / "kimari" / "api" / "app.py").exists(),
@@ -853,7 +859,7 @@ def main() -> None:
     )
 
     # ── v0.1.16 Windows packaging improvements ────────────────────────
-    print("\n[26/35] v0.1.16 Windows packaging improvements")
+    print("\n[26/38] v0.1.16 Windows packaging improvements")
     check(
         "scripts/windows/build-wheel.ps1 exists (v0.1.16 re-check)",
         (PROJECT_ROOT / "scripts" / "windows" / "build-wheel.ps1").exists(),
@@ -881,7 +887,7 @@ def main() -> None:
     )
 
     # ── v0.1.16 release-check improvements ─────────────────────────────
-    print("\n[27/35] v0.1.16 release-check improvements")
+    print("\n[27/38] v0.1.16 release-check improvements")
     check(
         "scripts/release/check-release.py exists (v0.1.16 re-check)",
         (PROJECT_ROOT / "scripts" / "release" / "check-release.py").exists(),
@@ -904,7 +910,7 @@ def main() -> None:
     )
 
     # ── v0.1.16 content integrity re-check ──────────────────────────────
-    print("\n[28/35] v0.1.16 content integrity re-check")
+    print("\n[28/38] v0.1.16 content integrity re-check")
     check(
         'default_profile still "test" (v0.1.16 final re-check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
@@ -924,11 +930,11 @@ def main() -> None:
     check(
         'No "published to PyPI" false claim',
         "published to pypi" not in all_text and "uploaded to pypi" not in all_text,
-        'False claim of PyPI publishing detected — must go through release gate first',
+        "False claim of PyPI publishing detected — must go through release gate first",
     )
 
-    # ── [29/35] v0.1.17 MODEL_CARD professional rewrite ──────────
-    print("\n[29/35] v0.1.17 MODEL_CARD professional rewrite")
+    # ── [29/38] v0.1.17 MODEL_CARD professional rewrite ──────────
+    print("\n[29/38] v0.1.17 MODEL_CARD professional rewrite")
     model_card_path = PROJECT_ROOT / "MODEL_CARD.md"
     if model_card_path.exists():
         model_card_text = model_card_path.read_text()
@@ -943,8 +949,10 @@ def main() -> None:
             "MODEL_CARD.md must indicate planned/training design status",
         )
         check(
-            'MODEL_CARD.md does NOT claim Kimari-4B is released',
-            "released" not in model_card_lower.split("not released")[0].split("not yet released")[0] if "not released" in model_card_lower or "not yet released" in model_card_lower else "is available" not in model_card_lower and "can be downloaded" not in model_card_lower,
+            "MODEL_CARD.md does NOT claim Kimari-4B is released",
+            "released" not in model_card_lower.split("not released")[0].split("not yet released")[0]
+            if "not released" in model_card_lower or "not yet released" in model_card_lower
+            else "is available" not in model_card_lower and "can be downloaded" not in model_card_lower,
             "MODEL_CARD.md must not claim Kimari-4B is released",
         )
         check(
@@ -960,8 +968,8 @@ def main() -> None:
     else:
         check("MODEL_CARD.md exists", False, "MODEL_CARD.md missing")
 
-    # ── [30/35] v0.1.17 training and base selection docs ──────────
-    print("\n[30/35] v0.1.17 training and base selection docs")
+    # ── [30/38] v0.1.17 training and base selection docs ──────────
+    print("\n[30/38] v0.1.17 training and base selection docs")
     check(
         "docs/MODEL_TRAINING_PLAN.md exists",
         (PROJECT_ROOT / "docs" / "MODEL_TRAINING_PLAN.md").exists(),
@@ -973,8 +981,8 @@ def main() -> None:
         "Base selection doc missing",
     )
 
-    # ── [31/35] v0.1.17 dataset and schema files ──────────────────
-    print("\n[31/35] v0.1.17 dataset and schema files")
+    # ── [31/38] v0.1.17 dataset and schema files ──────────────────
+    print("\n[31/38] v0.1.17 dataset and schema files")
     check(
         "dataset/README.md exists",
         (PROJECT_ROOT / "dataset" / "README.md").exists(),
@@ -1005,8 +1013,8 @@ def main() -> None:
         except json.JSONDecodeError:
             check("preference.schema.json is valid JSON", False, "JSON parse error")
 
-    # ── [32/35] v0.1.17 training skeletons ────────────────────────
-    print("\n[32/35] v0.1.17 training skeletons")
+    # ── [32/38] v0.1.17 training skeletons ────────────────────────
+    print("\n[32/38] v0.1.17 training skeletons")
     check(
         "training/README.md exists",
         (PROJECT_ROOT / "training" / "README.md").exists(),
@@ -1033,8 +1041,8 @@ def main() -> None:
         "SFT LoRA training script missing",
     )
 
-    # ── [33/35] v0.1.17 eval prompts and HF release ───────────────
-    print("\n[33/35] v0.1.17 eval prompts and HF release")
+    # ── [33/38] v0.1.17 eval prompts and HF release ───────────────
+    print("\n[33/38] v0.1.17 eval prompts and HF release")
     check(
         "eval/README.md exists",
         (PROJECT_ROOT / "eval" / "README.md").exists(),
@@ -1049,7 +1057,7 @@ def main() -> None:
     if kimarifit_prompts.exists():
         try:
             lines = kimarifit_prompts.read_text().strip().splitlines()
-            valid = all(json.loads(line) for line in lines if line.strip())
+            all(json.loads(line) for line in lines if line.strip())  # noqa: SIM110
             check("kimarifit_prompts.jsonl: all lines valid JSON", True)
         except (json.JSONDecodeError, Exception):
             check("kimarifit_prompts.jsonl: all lines valid JSON", False, "JSON parse error in prompts file")
@@ -1059,8 +1067,8 @@ def main() -> None:
         "Hugging Face release doc missing",
     )
 
-    # ── [34/35] v0.1.17 content integrity ─────────────────────────
-    print("\n[34/35] v0.1.17 content integrity")
+    # ── [34/38] v0.1.17 content integrity ─────────────────────────
+    print("\n[34/38] v0.1.17 content integrity")
     check(
         'default_profile still "test" (v0.1.17 check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
@@ -1077,7 +1085,7 @@ def main() -> None:
         gguf_files = [f for f in result.stdout.strip().splitlines() if f]
         check("No GGUF files tracked in git (v0.1.17 re-check)", len(gguf_files) == 0, f"found: {gguf_files}")
     except Exception:
-        pass  # Already checked in [9/35]
+        pass  # Already checked in [9/38]
     # No fake benchmark numbers
     if model_card_path.exists():
         mc_text = model_card_path.read_text()
@@ -1092,8 +1100,8 @@ def main() -> None:
         "Kimari-4B false claim regression detected",
     )
 
-    # ── [35/35] v0.1.17 MODEL_LICENSES and README updates ────────
-    print("\n[35/35] v0.1.17 MODEL_LICENSES and README updates")
+    # ── [35/38] v0.1.17 MODEL_LICENSES and README updates ────────
+    print("\n[35/38] v0.1.17 MODEL_LICENSES and README updates")
     ml_path = PROJECT_ROOT / "MODEL_LICENSES.md"
     if ml_path.exists():
         ml_text = ml_path.read_text().lower()
@@ -1132,6 +1140,176 @@ def main() -> None:
         "hugging face" in readme_lower or "HUGGINGFACE_RELEASE" in readme_text,
         '"Hugging Face" not found in README.md',
     )
+
+    # ── [36/38] v0.1.18 base selection and decision record ────────
+    print("\n[36/38] v0.1.18 base selection and decision record")
+    mdr_path = PROJECT_ROOT / "docs" / "MODEL_DECISION_RECORD.md"
+    check(
+        "docs/MODEL_DECISION_RECORD.md exists",
+        mdr_path.exists(),
+        "Model Decision Record missing",
+    )
+    base_cands_path = PROJECT_ROOT / "training" / "configs" / "base_candidates.yaml"
+    check(
+        "training/configs/base_candidates.yaml exists",
+        base_cands_path.exists(),
+        "Base candidates config missing",
+    )
+    select_base_path = PROJECT_ROOT / "training" / "scripts" / "select_base_model.py"
+    check(
+        "training/scripts/select_base_model.py exists",
+        select_base_path.exists(),
+        "Base model selection script missing",
+    )
+    if base_cands_path.exists():
+        bc_text = base_cands_path.read_text()
+        check(
+            "base_candidates.yaml contains 'candidates:'",
+            "candidates:" in bc_text,
+            "candidates section not found in base_candidates.yaml",
+        )
+    if mdr_path.exists():
+        mdr_text = mdr_path.read_text()
+        mdr_lower = mdr_text.lower()
+        check(
+            "MODEL_DECISION_RECORD mentions 'Proposed' or 'under review'",
+            "proposed" in mdr_lower or "under review" in mdr_lower,
+            "MODEL_DECISION_RECORD must indicate proposed/under review status",
+        )
+        check(
+            "MODEL_DECISION_RECORD does NOT contain 'Accepted' or 'Decided'",
+            not re.search(r"\baccepted\b", mdr_lower) and not re.search(r"\bdecided\b", mdr_lower),
+            "MODEL_DECISION_RECORD must not have Accepted/Decided status",
+        )
+
+    # ── [37/38] v0.1.18 seed datasets, builders, eval harness ────
+    print("\n[37/38] v0.1.18 seed datasets, builders, eval harness")
+    sft_seed = PROJECT_ROOT / "dataset" / "samples" / "sft_seed.jsonl"
+    pref_seed = PROJECT_ROOT / "dataset" / "samples" / "preference_seed.jsonl"
+    check(
+        "dataset/samples/sft_seed.jsonl exists",
+        sft_seed.exists(),
+        "SFT seed dataset missing",
+    )
+    check(
+        "dataset/samples/preference_seed.jsonl exists",
+        pref_seed.exists(),
+        "Preference seed dataset missing",
+    )
+    # Validate first 5 lines of each
+    for seed_path, name in [(sft_seed, "sft_seed"), (pref_seed, "preference_seed")]:
+        if seed_path.exists():
+            try:
+                lines = seed_path.read_text().strip().splitlines()
+                valid_count = 0
+                for line in lines[:5]:
+                    if line.strip():
+                        json.loads(line)
+                        valid_count += 1
+                check(
+                    f"{name}.jsonl first 5 lines are valid JSONL",
+                    valid_count > 0,
+                    f"No valid JSONL lines found in {name}.jsonl",
+                )
+            except json.JSONDecodeError:
+                check(f"{name}.jsonl is valid JSONL", False, "JSON parse error")
+    check(
+        "training/scripts/build_dataset_mix.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "build_dataset_mix.py").exists(),
+        "Dataset mix builder script missing",
+    )
+    check(
+        "eval/kimarifit.py exists",
+        (PROJECT_ROOT / "eval" / "kimarifit.py").exists(),
+        "KimariFit evaluation harness missing",
+    )
+    check(
+        "eval/rubrics/kimarifit_rubric.md exists",
+        (PROJECT_ROOT / "eval" / "rubrics" / "kimarifit_rubric.md").exists(),
+        "KimariFit rubric missing",
+    )
+    check(
+        "training/scripts/export_gguf_plan.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "export_gguf_plan.py").exists(),
+        "GGUF export plan script missing",
+    )
+    check(
+        "docs/FIRST_TRAINING_RUN.md exists",
+        (PROJECT_ROOT / "docs" / "FIRST_TRAINING_RUN.md").exists(),
+        "First training run guide missing",
+    )
+    check(
+        "eval/results/.gitkeep exists",
+        (PROJECT_ROOT / "eval" / "results" / ".gitkeep").exists(),
+        "eval/results/.gitkeep missing",
+    )
+    # MODEL_CARD still says not released
+    if model_card_path.exists():
+        mc_lower = model_card_path.read_text().lower()
+        check(
+            "MODEL_CARD still says not released/TBD (v0.1.18)",
+            "not been released" in mc_lower or "not released" in mc_lower or "tbd" in mc_lower,
+            "MODEL_CARD must still indicate not released/TBD status",
+        )
+    # No GGUF tracked
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "*.gguf"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        gguf_files_v0118 = [f for f in result.stdout.strip().splitlines() if f]
+        check(
+            "No GGUF files tracked (v0.1.18 re-check)",
+            len(gguf_files_v0118) == 0,
+            f"GGUF files tracked: {gguf_files_v0118}",
+        )
+    except Exception:
+        pass  # Already checked earlier
+
+    # ── [38/38] v0.1.18 content integrity ─────────────────────────
+    print("\n[38/38] v0.1.18 content integrity")
+    # No false claims re-check
+    check(
+        'No "Kimari-4B released" false claim (v0.1.18)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    # No fake MMLU/HumanEval scores
+    if model_card_path.exists():
+        mc_text_v0118 = model_card_path.read_text()
+        check(
+            "No fake MMLU/HumanEval scores (v0.1.18)",
+            "MMLU" not in mc_text_v0118
+            or "TBD" in mc_text_v0118
+            or "not measured" in mc_text_v0118.lower()
+            or "not achieved" in mc_text_v0118.lower(),
+            "MODEL_CARD should not contain fake benchmark numbers",
+        )
+    # default_profile still test
+    check(
+        'default_profile still "test" (v0.1.18 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    # dataset/build/ in .gitignore
+    gitignore_path = PROJECT_ROOT / ".gitignore"
+    if gitignore_path.exists():
+        gitignore_text = gitignore_path.read_text()
+        check(
+            "dataset/build/ in .gitignore",
+            "dataset/build/" in gitignore_text or "dataset/build" in gitignore_text,
+            "dataset/build/ should be in .gitignore",
+        )
+    # eval/results/*.json in .gitignore
+    if gitignore_path.exists():
+        gitignore_text = gitignore_path.read_text()
+        check(
+            "eval/results/*.json in .gitignore",
+            "eval/results/" in gitignore_text or "eval/results" in gitignore_text,
+            "eval/results/ should be in .gitignore",
+        )
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)

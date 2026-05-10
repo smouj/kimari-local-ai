@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.17--alpha-9b59b6.svg" alt="v0.1.17-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.18--alpha-9b59b6.svg" alt="v0.1.18-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.17-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.18-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.17-alpha**
+> **Kimari Local AI v0.1.18-alpha**
 
 ### ✅ Works Today
 
@@ -511,9 +511,19 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 - **[MODEL_CARD.md](MODEL_CARD.md)** — Professional model card with honest status, base candidates, and evaluation targets
 - **[Training Plan](docs/MODEL_TRAINING_PLAN.md)** — 7-phase pipeline (selection → SFT → DPO/ORPO → eval → GGUF → HF → registry)
 - **[Base Selection](docs/MODEL_BASE_SELECTION.md)** — SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B comparison
+- **[Base Decision Record](docs/MODEL_DECISION_RECORD.md)** — ADR with scoring criteria for base model selection
 - **[Model Licenses](MODEL_LICENSES.md)** — License layers for code, weights, and base models
 - **[Dataset Policy](dataset/README.md)** — SFT and Preference JSONL schemas with validation
 - **[Hugging Face Release](docs/HUGGINGFACE_RELEASE.md)** — Pre-upload checklist and HF model card template
+- **[First Training Run](docs/FIRST_TRAINING_RUN.md)** — Step-by-step guide for first training run
+- **[KimariFit Rubric](eval/rubrics/kimarifit_rubric.md)** — Evaluation criteria and scoring rubric
+
+### Pipeline Tools
+
+- **`select_base_model.py`** — Scores and ranks base model candidates by license, capability, and hardware criteria
+- **`build_dataset_mix.py`** — Validates and builds training-ready dataset mixes from SFT and preference seeds
+- **`eval/kimarifit.py`** — Dry-run and live evaluation harness for KimariFit prompts
+- **`export_gguf_plan.py`** — Plans GGUF export quantizations without requiring llama.cpp tools
 
 ### Base Model Candidates
 
@@ -638,7 +648,9 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Benchmark Submissions](docs/BENCHMARK_SUBMISSIONS.md) | Community benchmark submission workflow |
 | [Model Training Plan](docs/MODEL_TRAINING_PLAN.md) | 7-phase training pipeline for Kimari-4B |
 | [Base Model Selection](docs/MODEL_BASE_SELECTION.md) | Candidate comparison and selection criteria |
+| [Base Decision Record](docs/MODEL_DECISION_RECORD.md) | ADR for base model selection with scoring |
 | [Hugging Face Release](docs/HUGGINGFACE_RELEASE.md) | HF release checklist and model card template |
+| [First Training Run](docs/FIRST_TRAINING_RUN.md) | Step-by-step guide for first training run |
 | [API Plan (v0.2)](docs/API_PLAN.md) | FastAPI REST API design for v0.2 |
 
 ---

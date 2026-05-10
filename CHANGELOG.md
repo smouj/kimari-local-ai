@@ -5,6 +5,35 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.18-alpha] — 2026-05-20
+
+### Added
+- **docs/MODEL_DECISION_RECORD.md** — Architecture Decision Record (ADR-001) for base model selection; candidate shortlist (SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B); weighted scoring criteria (license clarity, redistribution compatibility, tokenizer stability, GGUF support, coding ability, Spanish technical, agent/JSON, inference viability, training cost); status "Proposed" (not Accepted); required validations before final choice
+- **training/configs/base_candidates.yaml** — YAML config listing 3 candidates with id, hf_repo, params, license, context_length, tokenizer_family, expected_vram_q4/q5, risk_level, notes, status; scoring criteria weights; selection status and next steps
+- **training/scripts/select_base_model.py** — CLI tool for base model candidate scoring and ranking; `--config`, `--json`, `--prefer-license-open`, `--prefer-coding`, `--prefer-spanish`, `--target-vram`; heuristic scoring transparent; marks SmolLM3 as recommendation for low legal friction; marks Qwen as "license review required"; marks Llama as "license constraints"; works without PyYAML (fallback parser); no network calls
+- **dataset/samples/sft_seed.jsonl** — 30 synthetic SFT samples across 10 categories (python debugging, bash, docker, linux troubleshooting, windows troubleshooting, spanish technical, local AI setup, OpenAI-compatible API, OpenClaw integration, security safe behavior); all source="synthetic-kimari-seed", license="MIT-compatible synthetic"; no private data, no secrets, no copyrighted material
+- **dataset/samples/preference_seed.jsonl** — 20 synthetic preference pairs (chosen/rejected); focused on technical precision, safer commands, no invented benchmarks, no 0.0.0.0 exposure, honest limitations, better code practices; all source="synthetic-kimari-seed", license="MIT-compatible synthetic"
+- **training/scripts/prepare_dataset.py enhanced** — Added `--dedupe` (SHA-256 content hash deduplication), `--min-chars`, `--max-chars`, `--require-tags`, `--report report.json` (JSON report with input_records, output_records, dropped_empty, dropped_missing_source, dropped_missing_license, dropped_too_short, dropped_too_long, duplicates_removed, tag_counts); no network calls; backward compatible
+- **training/scripts/build_dataset_mix.py** — CLI dataset mix builder; `--sft`, `--preference`, `--output-dir`, `--max-sft`, `--max-preference`, `--report`; validates both datasets against schemas; cleans records; writes sft.train.jsonl, preference.train.jsonl, report.json; no network calls; no downloads
+- **eval/kimarifit.py** — Evaluation harness; `--prompts`, `--dry-run`, `--endpoint`, `--json`, `--output`, `--timeout`; dry-run validates prompts, groups by categories, shows evaluation plan, no network; with endpoint calls OpenAI-compatible chat completions; timeout configurable; saves results; does not run in CI
+- **eval/rubrics/kimarifit_rubric.md** — 9-criteria scoring rubric (correctness, safety, command_reliability, spanish_technical_quality, json_validity, agent_usefulness, local_hardware_awareness, no_hallucinated_benchmarks, no_unsafe_exposure_advice); each criterion 0-5 with detailed level descriptions; weights and grade interpretation
+- **eval/results/.gitkeep** — Placeholder for evaluation results directory; `eval/results/*.json` added to .gitignore
+- **training/scripts/train_sft_lora.py improved** — Enhanced `--dry-run`: checks base_model not TBD (warns clearly), checks dataset_path exists, prints structured training plan with ✓/⚠/✗ status, calculates estimated steps if dataset exists, does not import transformers in dry-run, returns exit 0 in dry-run even without dependencies installed
+- **training/scripts/export_gguf_plan.py** — GGUF export planning tool; `--model-dir`, `--output-dir`, `--quant` (Q4_K_M,Q5_K_M,IQ4_XS), `--dry-run`; prints expected conversion commands (convert_hf_to_gguf.py, llama-quantize); validates GGUF not in repo; works without llama.cpp tools; no network calls
+- **docs/FIRST_TRAINING_RUN.md** — Step-by-step guide for first real training run; prerequisites, base model selection, dataset seed preparation, build_dataset_mix, train_sft_lora --dry-run, real training (outside CI), KimariFit evaluation, GGUF export, hash/pin, HF release only if license/eval pass; safety reminders throughout
+- **RELEASE_CHECKLIST.md** — Added v0.1.18 Checks section with 20 items
+- **scripts/release/check-release.py** — Expanded from 35 to 38 validation categories; added sections for base selection and decision record, seed datasets/builders/eval harness, v0.1.18 content integrity (gitignore checks, no fake benchmarks re-check)
+- **New tests** (`tests/test_release_v0118.py`) — Tests for base_candidates.yaml, select_base_model --json, sft/preference seed validation, prepare_dataset with report, build_dataset_mix, kimarifit dry-run, train_sft_lora dry-run, export_gguf_plan dry-run, MODEL_CARD no weights, MODEL_DECISION_RECORD, FIRST_TRAINING_RUN, no GGUF tracked, version consistency, release-check
+
+### Changed
+- **Version bumped** to `0.1.18-alpha`
+- **MODEL_CARD.md** — Updated version to v0.1.18-alpha; added Pipeline Status table (base selection under review, dataset seed synthetic only, training not started, evaluation dry-run harness only, GGUF plan defined, HF plan defined); added v0.1.18-alpha to version history
+- **README.md** — Updated version badge to v0.1.18-alpha; added Pipeline Tools section (select_base_model.py, build_dataset_mix.py, eval/kimarifit.py, export_gguf_plan.py); added links to MODEL_DECISION_RECORD.md, FIRST_TRAINING_RUN.md, KimariFit Rubric; updated documentation table
+- **docs/index.html** — Updated hero badge to v0.1.18-alpha; updated What's New chips (base decision record, seed datasets, dataset mix builder, KimariFit eval harness, GGUF export plan); updated Kimari-4B Model Roadmap (pipeline dry-run, under review, seed synthetic only)
+- **docs/MODEL_TRAINING_PLAN.md** — Added v0.1.18-alpha Additions section (base decision record, seed datasets, dataset mix builder, KimariFit dry-run harness, GGUF export plan, first training run guide)
+- **ROADMAP.md** — v0.1.17-alpha marked as Released; v0.1.18-alpha marked as Current; v0.1.19-alpha Planned section updated
+- **.gitignore** — Added `eval/results/*.json` and `dataset/build/`
+
 ## [0.1.17-alpha] — 2026-05-19
 
 ### Added

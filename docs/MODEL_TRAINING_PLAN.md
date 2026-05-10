@@ -692,3 +692,44 @@ Each phase produces artifacts that the next phase depends on. No skipping, no pa
 ---
 
 *This plan is subject to change based on experimental results, resource availability, and community feedback. It represents the current best understanding of the path to Kimari-4B, not a commitment to specific outcomes.*
+
+---
+
+## v0.1.18-alpha Additions
+
+The following pipeline components were added in v0.1.18-alpha to enable reproducible dry-run training:
+
+### Base Model Decision Record (ADR-001)
+
+A formal Architecture Decision Record has been created at [docs/MODEL_DECISION_RECORD.md](MODEL_DECISION_RECORD.md) documenting:
+- Candidate shortlist (SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B)
+- Weighted scoring criteria (license clarity, redistribution, tokenizer, GGUF, coding, Spanish, agent/JSON, inference, training cost)
+- Current status: Proposed (not yet Accepted)
+- `training/scripts/select_base_model.py` — CLI tool for heuristic scoring and ranking
+
+### Seed Datasets
+
+- `dataset/samples/sft_seed.jsonl` — 30 synthetic SFT samples across 10 categories
+- `dataset/samples/preference_seed.jsonl` — 20 synthetic preference pairs (chosen/rejected)
+- All samples are original, synthetic, MIT-compatible — no private data, no secrets, no copyrighted material
+
+### Dataset Mix Builder
+
+- `training/scripts/build_dataset_mix.py` — Validates SFT and preference datasets against schemas, cleans records, and outputs training-ready JSONL files with a report
+- `training/scripts/prepare_dataset.py` — Enhanced with `--dedupe`, `--min-chars`, `--max-chars`, `--require-tags`, and `--report` options
+
+### KimariFit Dry-Run Harness
+
+- `eval/kimarifit.py` — Evaluation harness that validates prompts in dry-run mode or calls an OpenAI-compatible endpoint for live evaluation
+- `eval/rubrics/kimarifit_rubric.md` — 9-criteria scoring rubric with 0-5 levels
+- Dry-run does not require a running model or network access
+
+### GGUF Export Plan
+
+- `training/scripts/export_gguf_plan.py` — Plans GGUF conversion and quantization commands without requiring llama.cpp tools installed
+- Supports Q4_K_M, Q5_K_M, IQ4_XS quantization formats
+- Validates that GGUF files are not committed to the repository
+
+### First Training Run Guide
+
+- `docs/FIRST_TRAINING_RUN.md` — Step-by-step guide for the first real training run, from base model selection through HF release
