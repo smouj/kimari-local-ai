@@ -66,7 +66,7 @@ def main() -> None:
     print("=" * 50)
 
     # ── Version consistency ──────────────────────────────────────
-    print("\n[1/13] Version consistency")
+    print("\n[1/15] Version consistency")
     pyproject_ver = get_pyproject_version()
     init_ver = get_init_version()
     check("pyproject.toml version is set", bool(pyproject_ver), "version field is empty")
@@ -363,7 +363,7 @@ def main() -> None:
     )
 
     # ── Runtime & Security modules ──────────────────────────────────
-    print("\n[13/13] Runtime & Security modules")
+    print("\n[13/15] Runtime & Security modules")
     check(
         "kimari/runtime/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "runtime" / "__init__.py").exists(),
@@ -399,6 +399,77 @@ def main() -> None:
         (PROJECT_ROOT / "scripts" / "windows" / "README.md").exists(),
         "Windows scripts README missing",
     )
+
+    # ── Packaged defaults & paths (v0.1.12) ──────────────────────────
+    print("\n[14/15] Packaged defaults & user paths")
+    check(
+        "kimari/defaults/ directory exists",
+        (PROJECT_ROOT / "kimari" / "defaults").is_dir(),
+        "Packaged defaults directory missing",
+    )
+    check(
+        "kimari/defaults/kimari.profiles.json exists",
+        (PROJECT_ROOT / "kimari" / "defaults" / "kimari.profiles.json").exists(),
+        "Default profiles JSON missing from packaged defaults",
+    )
+    check(
+        "kimari/defaults/kimari.profiles.schema.json exists",
+        (PROJECT_ROOT / "kimari" / "defaults" / "kimari.profiles.schema.json").exists(),
+        "Default schema JSON missing from packaged defaults",
+    )
+    check(
+        "kimari/defaults/kimari.models.json exists",
+        (PROJECT_ROOT / "kimari" / "defaults" / "kimari.models.json").exists(),
+        "Default models JSON missing from packaged defaults",
+    )
+    check(
+        "kimari/core/paths.py exists",
+        (PROJECT_ROOT / "kimari" / "core" / "paths.py").exists(),
+        "User paths module missing",
+    )
+    check(
+        "config/ directory still exists (for dev)",
+        (PROJECT_ROOT / "config" / "kimari.profiles.json").exists(),
+        "config/ directory missing — needed for editable installs",
+    )
+
+    # Check pyproject.toml package-data includes defaults
+    pyproject_text = (PROJECT_ROOT / "pyproject.toml").read_text()
+    check(
+        "pyproject.toml includes defaults/*.json in package-data",
+        "defaults" in pyproject_text,
+        "defaults/*.json not found in pyproject.toml package-data",
+    )
+
+    # Check README mentions packaged defaults / user paths
+    check(
+        "README mentions 'packaged defaults' or 'user paths'",
+        "packaged defaults" in readme_lower or "user paths" in readme_lower or "kimari home" in readme_lower,
+        "'packaged defaults' or 'user paths' not found in README.md",
+    )
+
+    # ── Short flag support in strict-flags (v0.1.12) ──────────────────
+    print("\n[15/15] Short flag support in strict-flags")
+    llama_flags_path = PROJECT_ROOT / "kimari" / "runtime" / "llama_flags.py"
+    if llama_flags_path.exists():
+        flags_text = llama_flags_path.read_text()
+        check(
+            "SHORT_TO_LONG mapping exists in llama_flags.py",
+            "SHORT_TO_LONG" in flags_text,
+            "SHORT_TO_LONG alias mapping missing from llama_flags.py",
+        )
+        check(
+            "supports_flag checks alias mapping",
+            "SHORT_TO_LONG" in flags_text and "LONG_TO_SHORT" in flags_text,
+            "Alias checking in supports_flag may be incomplete",
+        )
+        # Check key short flags are mapped
+        for short_flag in ["-m", "-c", "-ngl", "-b", "-ub", "-t"]:
+            check(
+                f"SHORT_TO_LONG maps {short_flag!r}",
+                f'"{short_flag}"' in flags_text,
+                f"{short_flag!r} not found in SHORT_TO_LONG mapping",
+            )
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)

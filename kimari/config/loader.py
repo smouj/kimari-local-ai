@@ -3,6 +3,11 @@ Configuration loading, validation, and migration for Kimari.
 
 Handles loading profiles, validating against JSON Schema, migrating
 old configurations to newer versions, and security checks.
+
+Config resolution order:
+1. User config directory (``~/.config/kimari/kimari.profiles.json`` or ``%APPDATA%\\Kimari\\``)
+2. Repo-root ``config/kimari.profiles.json`` (editable installs / development)
+3. Packaged defaults (``kimari/defaults/kimari.profiles.json``)
 """
 
 import json
@@ -10,21 +15,102 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from kimari.core.constants import (
-    CONFIG_PATH,
-    CONFIG_SCHEMA_PATH,
-    CURRENT_CONFIG_VERSION,
-)
+from kimari.core.constants import CURRENT_CONFIG_VERSION
+from kimari.core.paths import get_defaults_dir, get_user_config_dir, get_user_config_path
 from kimari.utils.colors import Color
 
 
+def _resolve_config_path() -> Path:
+    """Resolve the config file path using the standard resolution order.
+
+    1. User config dir
+    2. Repo-root config/ (editable installs)
+    3. Packaged defaults
+    """
+    # 1. User config dir
+    user_path = get_user_config_path()
+    if user_path.exists():
+        return user_path
+
+    # 2. Repo-root config/ (for editable installs / development)
+    from kimari.core.constants import PROJECT_ROOT
+
+    repo_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
+    if repo_path.exists():
+        return repo_path
+
+    # 3. Packaged defaults
+    defaults_path = Path(get_defaults_dir()) / "kimari.profiles.json"
+    if defaults_path.exists():
+        return defaults_path
+
+    return user_path  # Return user path even if it doesn't exist (will fail gracefully)
+
+
+def _ensure_user_config() -> Path:
+    """Ensure user config exists by copying from defaults if needed.
+
+    Returns the path to the user config file.
+    """
+    user_path = get_user_config_path()
+    if user_path.exists():
+        return user_path
+
+    # Try to copy from defaults
+    defaults_dir = get_defaults_dir()
+    defaults_path = defaults_dir / "kimari.profiles.json"
+
+    if defaults_path.exists():
+        user_config_dir = get_user_config_dir()
+        user_config_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(defaults_path, user_path)
+        # Also copy schema and models registry if they don't exist
+        for name in ("kimari.profiles.schema.json", "kimari.models.json"):
+            src = defaults_dir / name
+            dst = user_config_dir / name
+            if src.exists() and not dst.exists():
+                shutil.copy2(src, dst)
+        return user_path
+
+    # Fallback: try repo-root config
+    from kimari.core.constants import PROJECT_ROOT
+
+    repo_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
+    if repo_path.exists():
+        user_config_dir = get_user_config_dir()
+        user_config_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(repo_path, user_path)
+        for name in ("kimari.profiles.schema.json", "kimari.models.json"):
+            src = PROJECT_ROOT / "config" / name
+            dst = user_config_dir / name
+            if src.exists() and not dst.exists():
+                shutil.copy2(src, dst)
+        return user_path
+
+    return user_path
+
+
 def load_config() -> dict:
-    """Load and return the Kimari profiles configuration."""
-    if not CONFIG_PATH.exists():
-        print(f"[ERROR] Config not found: {CONFIG_PATH}")
-        print("Run this command from the kimari-local-ai root directory.")
+    """Load and return the Kimari profiles configuration.
+
+    Resolution order:
+    1. User config directory (platform-specific)
+    2. Repo-root config/ (editable installs / development)
+    3. Packaged defaults (kimari/defaults/)
+
+    If no config is found, attempts to copy defaults to user config dir.
+    """
+    config_path = _resolve_config_path()
+    if not config_path.exists():
+        # Try to copy defaults
+        config_path = _ensure_user_config()
+    if not config_path.exists():
+        print("[ERROR] Config not found. Searched:")
+        print(f"  User config: {get_user_config_path()}")
+        print(f"  Defaults:    {get_defaults_dir() / 'kimari.profiles.json'}")
+        print("  Run 'kimari config path' to see where Kimari looks for config.")
         raise SystemExit(1)
-    with open(CONFIG_PATH) as f:
+    with open(config_path) as f:
         return json.load(f)
 
 
@@ -38,6 +124,30 @@ def get_profile(config: dict, profile_name: str) -> dict:
     return profiles[profile_name]
 
 
+def _resolve_schema_path() -> Path:
+    """Resolve the schema file path."""
+    from kimari.core.paths import get_user_schema_path
+
+    # 1. User schema
+    user_schema = get_user_schema_path()
+    if user_schema.exists():
+        return user_schema
+
+    # 2. Repo-root schema
+    from kimari.core.constants import PROJECT_ROOT
+
+    repo_schema = PROJECT_ROOT / "config" / "kimari.profiles.schema.json"
+    if repo_schema.exists():
+        return repo_schema
+
+    # 3. Packaged defaults
+    defaults_schema = Path(get_defaults_dir()) / "kimari.profiles.schema.json"
+    if defaults_schema.exists():
+        return defaults_schema
+
+    return user_schema
+
+
 def validate_config(config: dict, schema: dict | None = None) -> tuple[bool, list]:
     """Validate configuration against JSON Schema.
 
@@ -46,9 +156,10 @@ def validate_config(config: dict, schema: dict | None = None) -> tuple[bool, lis
     errors = []
 
     if schema is None:
-        if not CONFIG_SCHEMA_PATH.exists():
+        schema_path = _resolve_schema_path()
+        if not schema_path.exists():
             return True, ["Schema file not found"]
-        with open(CONFIG_SCHEMA_PATH) as f:
+        with open(schema_path) as f:
             schema = json.load(f)
 
     try:
@@ -150,14 +261,15 @@ def migrate_config(dry_run: bool = False) -> tuple[bool, dict]:
     if dry_run:
         return True, migration_info
 
-    # Create backup
+    # Create backup at user config location
+    config_path = _resolve_config_path()
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
-    backup_path = CONFIG_PATH.parent / f"kimari.profiles.json.bak.{timestamp}"
-    shutil.copy2(CONFIG_PATH, backup_path)
+    backup_path = config_path.parent / f"kimari.profiles.json.bak.{timestamp}"
+    shutil.copy2(config_path, backup_path)
     migration_info["backup_path"] = str(backup_path)
 
     # Write updated config
-    with open(CONFIG_PATH, "w") as f:
+    with open(config_path, "w") as f:
         json.dump(config, f, indent=2)
         f.write("\n")
 
@@ -165,8 +277,8 @@ def migrate_config(dry_run: bool = False) -> tuple[bool, dict]:
 
 
 def get_config_path() -> Path:
-    """Return the absolute path to kimari.profiles.json."""
-    return CONFIG_PATH.resolve()
+    """Return the absolute path to the active kimari.profiles.json."""
+    return _resolve_config_path().resolve()
 
 
 def show_config(json_output: bool = False) -> dict:
@@ -181,11 +293,12 @@ def show_config(json_output: bool = False) -> dict:
         return config
 
     # Human-readable
+    config_path = _resolve_config_path()
     print(f"\n  {Color.BOLD}Kimari Configuration{Color.RESET}\n")
     print(f"  Version:          {config.get('version', 'N/A')}")
     print(f"  Config version:   {config.get('config_version', 1)}")
     print(f"  Default profile:  {config.get('default_profile', 'N/A')}")
-    print(f"  Config path:      {CONFIG_PATH}")
+    print(f"  Config path:      {config_path}")
 
     print(f"\n  {Color.BOLD}Server Endpoints{Color.RESET}")
     server = config.get("server", {})

@@ -1,8 +1,8 @@
 """
 Local auth token management for Kimari.
 
-Handles creating, reading, and deleting auth tokens stored in
-``.kimari/auth.json``.  Tokens are generated with ``secrets.token_urlsafe``
+Handles creating, reading, and deleting auth tokens stored in the
+user state directory.  Tokens are generated with ``secrets.token_urlsafe``
 and persisted alongside metadata (creation timestamp, preview, usage note).
 
 These tokens are **prepared for future Kimari API / reverse proxy use**.
@@ -12,36 +12,17 @@ until a reverse-proxy or application-layer auth mechanism is added.
 Security guidelines
 -------------------
 - Never print the full token in logs; only the *preview* (first 8 chars) is safe.
-- Only ``show_token()`` (and the ``kimari auth show`` CLI command) should
+- Only ``show_token()`` (and the ``kimari token show`` CLI command) should
   reveal the full token to the user.
 - Tests must use ``tmp_path`` or ``monkeypatch`` — never write to the real
-  ``.kimari/`` directory during testing.
+  user state directory during testing.
 """
 
 import json
 import secrets
 from datetime import datetime, timezone
-from pathlib import Path
 
-from kimari.core.constants import PROJECT_ROOT
-
-# ─── Path helpers ─────────────────────────────────────────────────────────────
-
-
-def get_auth_dir() -> Path:
-    """Return the ``.kimari`` directory path under the project root.
-
-    Creates the directory if it does not already exist.
-    """
-    auth_dir = PROJECT_ROOT / ".kimari"
-    auth_dir.mkdir(parents=True, exist_ok=True)
-    return auth_dir
-
-
-def get_auth_path() -> Path:
-    """Return the path to ``.kimari/auth.json``."""
-    return get_auth_dir() / "auth.json"
-
+from kimari.core.paths import get_auth_path
 
 # ─── Token CRUD ───────────────────────────────────────────────────────────────
 
@@ -49,7 +30,7 @@ _AUTH_NOTE = "Prepared for future Kimari API / reverse proxy use. llama-server d
 
 
 def create_token() -> dict:
-    """Generate a new auth token and persist it to ``.kimari/auth.json``.
+    """Generate a new auth token and persist it to the user state directory.
 
     Returns:
         A dict with keys ``token``, ``created_at``, ``preview``, and ``note``.
@@ -69,6 +50,7 @@ def create_token() -> dict:
     }
 
     auth_path = get_auth_path()
+    auth_path.parent.mkdir(parents=True, exist_ok=True)
     with open(auth_path, "w") as f:
         json.dump(auth_data, f, indent=2)
 
@@ -76,7 +58,7 @@ def create_token() -> dict:
 
 
 def show_token() -> dict | None:
-    """Read the existing auth token from ``.kimari/auth.json``.
+    """Read the existing auth token.
 
     Returns:
         The full auth dict if the file exists and is valid JSON,
@@ -98,7 +80,7 @@ def show_token() -> dict | None:
 
 
 def delete_token() -> bool:
-    """Delete ``.kimari/auth.json``.
+    """Delete the auth token file.
 
     Returns:
         ``True`` if the file was deleted, ``False`` if it did not exist.

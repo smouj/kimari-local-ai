@@ -181,3 +181,34 @@ Work Log:
 Files created:
 - `kimari/runtime/__init__.py`
 - `kimari/runtime/llama_flags.py`
+
+---
+Task ID: 16
+Agent: Main Agent
+Task: v0.1.12-alpha Final validations and delivery
+
+Work Log:
+- Verified all 200+ tests passing (pytest)
+- Verified ruff check clean on kimari/ and tests/ (pre-existing scripts/ errors not from v0.1.12)
+- Verified check-release.py all checks passed (15/15 categories)
+- Built wheel and sdist with `python -m build` — SUCCESS
+- Ran `twine check dist/*` — PASSED for both .whl and .tar.gz
+- Verified wheel contains all 3 defaults JSON files (kimari.profiles.json, kimari.profiles.schema.json, kimari.models.json)
+- Tested wheel install in clean venv — all CLI commands work:
+  - `kimari --version` → v0.1.12-alpha
+  - `kimari config path` → packaged defaults (no repo root dependency)
+  - `kimari setup --json` → correct JSON output
+  - `kimari start --dry-run` → correct command with user paths
+  - `kimari token create` → token stored in /home/z/.local/state/kimari/auth.json
+- Verified paths module resolves correctly from wheel: XDG-compliant user directories
+- Verified SHORT_TO_LONG flag aliases work for all 6 short flags (-m, -c, -ngl, -b, -ub, -t)
+- Verified token storage in user state dir (not inside package)
+- Confirmed docs/PUBLISHING.md exists (from v0.1.9-alpha, Task 12 verified complete)
+
+Stage Summary:
+- v0.1.12-alpha is fully validated and ready for commit/push
+- P0 (wheel missing config) → FIXED: kimari/defaults/ with package-data
+- P0 (short flags not parsed) → FIXED: parse_supported_flags + SHORT_TO_LONG mapping
+- P1 (tokens in PROJECT_ROOT) → FIXED: paths module with XDG user directories
+- Wheel install works correctly without repo root dependency
+- All 3 critical risks resolved

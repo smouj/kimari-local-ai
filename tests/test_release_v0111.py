@@ -1,5 +1,5 @@
 """
-Tests for v0.1.11-alpha: Runtime llama_flags, security tokens, CLI setup/token commands,
+Tests for v0.1.12-alpha: Runtime llama_flags, security tokens, CLI setup/token commands,
 version consistency, file existence, and release checks.
 """
 
@@ -133,12 +133,10 @@ def test_detect_llama_server_version_missing_binary():
 
 
 def test_create_token(tmp_path, monkeypatch):
-    """Create a token using tmp_path (monkeypatch get_auth_dir and get_auth_path), verify token is non-empty, has created_at, has preview."""
+    """Create a token using tmp_path (monkeypatch KIMARI_STATE_DIR), verify token is non-empty, has created_at, has preview."""
     import kimari.security.tokens as tokens_mod
 
-    auth_dir = tmp_path / ".kimari"
-    auth_dir.mkdir()
-    monkeypatch.setattr(tokens_mod, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(tmp_path / "state"))
 
     result = tokens_mod.create_token()
     assert result["token"], "Token should be non-empty"
@@ -151,9 +149,7 @@ def test_show_token(tmp_path, monkeypatch):
     """Create then show a token, verify it matches."""
     import kimari.security.tokens as tokens_mod
 
-    auth_dir = tmp_path / ".kimari"
-    auth_dir.mkdir()
-    monkeypatch.setattr(tokens_mod, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(tmp_path / "state"))
 
     created = tokens_mod.create_token()
     shown = tokens_mod.show_token()
@@ -166,9 +162,7 @@ def test_show_token_missing(tmp_path, monkeypatch):
     """Show token when none exists returns None."""
     import kimari.security.tokens as tokens_mod
 
-    auth_dir = tmp_path / ".kimari"
-    auth_dir.mkdir()
-    monkeypatch.setattr(tokens_mod, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(tmp_path / "state"))
 
     result = tokens_mod.show_token()
     assert result is None
@@ -178,9 +172,7 @@ def test_delete_token(tmp_path, monkeypatch):
     """Create then delete, verify returns True."""
     import kimari.security.tokens as tokens_mod
 
-    auth_dir = tmp_path / ".kimari"
-    auth_dir.mkdir()
-    monkeypatch.setattr(tokens_mod, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(tmp_path / "state"))
 
     tokens_mod.create_token()
     result = tokens_mod.delete_token()
@@ -191,9 +183,7 @@ def test_delete_token_missing(tmp_path, monkeypatch):
     """Delete when none exists returns False."""
     import kimari.security.tokens as tokens_mod
 
-    auth_dir = tmp_path / ".kimari"
-    auth_dir.mkdir()
-    monkeypatch.setattr(tokens_mod, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(tmp_path / "state"))
 
     result = tokens_mod.delete_token()
     assert result is False
@@ -258,9 +248,7 @@ def test_token_create_and_show(tmp_path, monkeypatch):
     """kimari token create then kimari token show (use tmp_path to avoid writing to repo)."""
     import kimari.security.tokens as tokens_mod
 
-    auth_dir = tmp_path / ".kimari"
-    auth_dir.mkdir()
-    monkeypatch.setattr(tokens_mod, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(tmp_path / "state"))
 
     created = tokens_mod.create_token()
     shown = tokens_mod.show_token()
@@ -272,9 +260,7 @@ def test_token_delete(tmp_path, monkeypatch):
     """kimari token delete runs without error."""
     import kimari.security.tokens as tokens_mod
 
-    auth_dir = tmp_path / ".kimari"
-    auth_dir.mkdir()
-    monkeypatch.setattr(tokens_mod, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(tmp_path / "state"))
 
     # Create then delete
     tokens_mod.create_token()
@@ -285,11 +271,11 @@ def test_token_delete(tmp_path, monkeypatch):
 # ─── Version consistency tests ─────────────────────────────────────────────────
 
 
-def test_version_is_0111():
-    """kimari/__init__.py version is '0.1.11-alpha'."""
+def test_version_is_0112():
+    """kimari/__init__.py version is '0.1.12-alpha'."""
     from kimari import __version__
 
-    assert __version__ == "0.1.11-alpha"
+    assert __version__ == "0.1.12-alpha"
 
 
 def test_pyproject_version_matches():
@@ -308,11 +294,11 @@ def test_pyproject_version_matches():
 
 
 def test_cli_info_version():
-    """kimari info --json shows '0.1.11-alpha'."""
+    """kimari info --json shows '0.1.12-alpha'."""
     result = _run_kimari("info", "--json")
     assert result.returncode == 0
     data = json.loads(result.stdout)
-    assert data["kimari_version"] == "0.1.11-alpha"
+    assert data["kimari_version"] == "0.1.12-alpha"
 
 
 # ─── File existence tests ─────────────────────────────────────────────────────

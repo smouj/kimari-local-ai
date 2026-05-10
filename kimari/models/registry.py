@@ -15,17 +15,73 @@ try:
 except ImportError:
     requests = None  # type: ignore
 
-from kimari.core.constants import MODELS_DIR, MODELS_REGISTRY_PATH, PROJECT_ROOT
+from kimari.core.constants import PROJECT_ROOT
+from kimari.core.paths import (
+    get_defaults_dir,
+    get_user_models_dir,
+    get_user_models_registry_path,
+)
 from kimari.utils.colors import Color, info, ok, warn
 
 
+def _resolve_model_target(target_path: str) -> Path:
+    """Resolve a model target_path to an actual filesystem path.
+
+    Checks in order:
+    1. User models directory (``~/.local/share/kimari/models/`` or equivalent)
+    2. Repo-root ``models/`` (editable installs)
+    """
+    user_path = get_user_models_dir() / Path(target_path).name
+    if user_path.exists():
+        return user_path
+
+    repo_path = PROJECT_ROOT / target_path
+    if repo_path.exists():
+        return repo_path
+
+    # Default: return user path (even if it doesn't exist yet)
+    return user_path
+
+
+def _resolve_models_registry_path() -> Path:
+    """Resolve the models registry path.
+
+    Order:
+    1. User config directory
+    2. Repo-root config/ (editable installs)
+    3. Packaged defaults (kimari/defaults/)
+    """
+    user_path = get_user_models_registry_path()
+    if user_path.exists():
+        return user_path
+
+    repo_path = PROJECT_ROOT / "config" / "kimari.models.json"
+    if repo_path.exists():
+        return repo_path
+
+    defaults_path = Path(get_defaults_dir()) / "kimari.models.json"
+    if defaults_path.exists():
+        return defaults_path
+
+    return user_path
+
+
 def load_models_registry() -> dict:
-    """Load the models registry from config/kimari.models.json."""
-    if not MODELS_REGISTRY_PATH.exists():
-        print(f"[ERROR] Models registry not found: {MODELS_REGISTRY_PATH}")
-        print("Run this command from the kimari-local-ai root directory.")
+    """Load the models registry.
+
+    Resolution order:
+    1. User config directory
+    2. Repo-root config/kimari.models.json
+    3. Packaged defaults (kimari/defaults/kimari.models.json)
+    """
+    registry_path = _resolve_models_registry_path()
+    if not registry_path.exists():
+        print("[ERROR] Models registry not found. Searched:")
+        print(f"  User config: {get_user_models_registry_path()}")
+        print(f"  Repo root:   {PROJECT_ROOT / 'config' / 'kimari.models.json'}")
+        print(f"  Defaults:    {Path(get_defaults_dir()) / 'kimari.models.json'}")
         raise SystemExit(1)
-    with open(MODELS_REGISTRY_PATH) as f:
+    with open(registry_path) as f:
         return json.load(f)
 
 
@@ -48,7 +104,7 @@ def list_registry_models(
 
     result = []
     for m in models:
-        target = PROJECT_ROOT / m["target_path"]
+        target = _resolve_model_target(m["target_path"])
         m_copy = dict(m)
         m_copy["downloaded"] = target.exists()
 
@@ -74,7 +130,7 @@ def list_registry_models(
 
     print(f"\n  {Color.BOLD}Available Models for Download{Color.RESET}\n")
     for m in result:
-        target = PROJECT_ROOT / m["target_path"]
+        target = _resolve_model_target(m["target_path"])
         is_downloaded = target.exists()
         status_str = (
             f"{Color.GREEN}✓ downloaded{Color.RESET}" if is_downloaded else f"{Color.DIM}not downloaded{Color.RESET}"
@@ -133,7 +189,7 @@ def verify_model_hash(model_id: str) -> bool | None:
         warn(f"No SHA256 hash defined for model '{model_id}'.")
         return None
 
-    target = PROJECT_ROOT / model_entry["target_path"]
+    target = _resolve_model_target(model_entry["target_path"])
     if not target.exists():
         print(f"[ERROR] Model file not found: {target}")
         raise SystemExit(1)
@@ -180,7 +236,7 @@ def pull_model(model_id: str, dry_run: bool = False, force: bool = False):
 
     url = model_entry["url"]
     filename = model_entry["filename"]
-    target_path = PROJECT_ROOT / model_entry["target_path"]
+    target_path = _resolve_model_target(model_entry["target_path"])
     size_gb = model_entry.get("size_gb", "?")
     display_name = model_entry.get("display_name", model_id)
 
@@ -220,8 +276,9 @@ def pull_model(model_id: str, dry_run: bool = False, force: bool = False):
             print(f"\n  {Color.YELLOW}[FORCE]{Color.RESET} Deleting existing file: {target_path}")
             target_path.unlink()
 
-    # Create models/ directory if needed
-    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    # Create models/ directory if needed (user models dir)
+    models_dir = Path(get_user_models_dir())
+    models_dir.mkdir(parents=True, exist_ok=True)
 
     # Download with resume support
     print(f"\n  {Color.BOLD}Downloading:{Color.RESET} {Color.CYAN}{display_name}{Color.RESET}")
@@ -353,7 +410,7 @@ def pull_all_models(dry_run: bool = False, force: bool = False):
     print(f"  Models: {len(models)} | Total size: {total_size:.1f} GB\n")
 
     for m in models:
-        target = PROJECT_ROOT / m["target_path"]
+        target = _resolve_model_target(m["target_path"])
         status = "✓" if target.exists() else " "
         print(f"  [{status}] {m['id']:<20} {m['display_name']} ({m['size_gb']} GB)")
 
@@ -368,7 +425,7 @@ def pull_all_models(dry_run: bool = False, force: bool = False):
             return
 
     for m in models:
-        target = PROJECT_ROOT / m["target_path"]
+        target = _resolve_model_target(m["target_path"])
         if target.exists() and not force:
             info(f"Skipping {m['id']} (already downloaded)")
             continue
@@ -377,7 +434,22 @@ def pull_all_models(dry_run: bool = False, force: bool = False):
 
 
 def scan_models_dir_for_gguf() -> list:
-    """Scan models/ directory for .gguf files, return list of relative paths."""
-    if not MODELS_DIR.exists():
-        return []
-    return sorted([str(f.relative_to(PROJECT_ROOT)) for f in MODELS_DIR.glob("*.gguf")])
+    """Scan models/ directories for .gguf files, return list of relative paths.
+
+    Checks both user models dir and repo-root models/ dir.
+    """
+    found: list[str] = []
+    user_models = get_user_models_dir()
+    if user_models.exists():
+        for f in user_models.glob("*.gguf"):
+            found.append(str(f))
+
+    # Also check repo-root models/
+    repo_models = PROJECT_ROOT / "models"
+    if repo_models.exists() and repo_models != user_models:
+        for f in repo_models.glob("*.gguf"):
+            path_str = str(f)
+            if path_str not in found:
+                found.append(path_str)
+
+    return sorted(found)

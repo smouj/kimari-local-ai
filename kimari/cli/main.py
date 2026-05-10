@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
 try:
     import requests
@@ -49,6 +50,7 @@ from kimari.core.detection import (
     recommend_profile,
 )
 from kimari.core.errors import parse_log_errors, read_log_tail
+from kimari.core.paths import get_user_models_dir
 from kimari.core.state import (
     clear_state,
     ensure_state_dir,
@@ -92,7 +94,7 @@ def run_optimize(
     vram_total_gb = profile.get("vram_total_gb", 6.0)
 
     # Try to read GGUF metadata for better accuracy
-    model_path = PROJECT_ROOT / profile.get("model", "")
+    model_path = _resolve_model_path(profile.get("model", ""))
     if model_path.exists():
         meta = read_gguf_metadata(str(model_path))
         if meta.get("parse_success") and meta.get("file_size_bytes") and meta["file_size_bytes"] > 0:
@@ -236,6 +238,25 @@ def run_perf(
         )
 
 
+def _resolve_model_path(model_rel_path: str) -> Path:
+    """Resolve a model relative path to an actual filesystem path.
+
+    Checks in order:
+    1. User models directory
+    2. Repo-root models/ (editable installs)
+    """
+    user_path = get_user_models_dir() / Path(model_rel_path).name
+    if user_path.exists():
+        return user_path
+
+    repo_path = PROJECT_ROOT / model_rel_path
+    if repo_path.exists():
+        return repo_path
+
+    # Default: return user path (even if doesn't exist yet)
+    return user_path
+
+
 def build_server_cmd(
     llama_server: str,
     profile: dict,
@@ -250,7 +271,7 @@ def build_server_cmd(
     New performance fields (flash_attn, parallel, mlock, no_mmap) are
     only added when the profile defines them.
     """
-    model_path = PROJECT_ROOT / (model_override if model_override else profile["model"])
+    model_path = _resolve_model_path(model_override if model_override else profile["model"])
     host = host_override if host_override else profile.get("host", "127.0.0.1")
     port = port_override if port_override else profile.get("port", 11435)
     ctx = ctx_override if ctx_override else profile.get("ctx", 8192)
@@ -335,7 +356,7 @@ def start_server(
             ctx_override=ctx_override,
         )
     else:
-        model_path = PROJECT_ROOT / effective_model
+        model_path = _resolve_model_path(effective_model)
         cmd = [
             "llama-server",
             "-m",
@@ -382,7 +403,7 @@ def start_server(
 
     # Dry run
     if dry_run:
-        model_path = PROJECT_ROOT / effective_model
+        model_path = _resolve_model_path(effective_model)
         if not model_path.exists():
             print(f"  {Color.YELLOW}[WARN]{Color.RESET} Model not found: {model_path}")
             print(f"  {Color.YELLOW}[WARN]{Color.RESET} Place a GGUF model before actually starting.\n")
@@ -983,7 +1004,7 @@ def run_doctor(config: dict, json_output: bool = False):
     # Model
     default_profile = config.get("default_profile", "test")
     profile = config.get("profiles", {}).get(default_profile, {})
-    model_path = PROJECT_ROOT / profile.get("model", "models/Kimari-4B-Q4_K_M.gguf")
+    model_path = _resolve_model_path(profile.get("model", "models/Kimari-4B-Q4_K_M.gguf"))
     if model_path.exists():
         size_mb = model_path.stat().st_size / (1024 * 1024)
         model_str = f"{model_path.name} ({size_mb:.1f} MB)"
@@ -1110,7 +1131,7 @@ def show_info(config: dict, json_output: bool = False):
         "kimari_version": KIMARI_VERSION,
         "project_root": str(PROJECT_ROOT),
         "config_path": str(CONFIG_PATH),
-        "models_dir": str(PROJECT_ROOT / "models"),
+        "models_dir": str(get_user_models_dir()),
         "state_dir": str(STATE_DIR),
         "llama_server_path": llama_server,
         "default_profile": default_profile,
@@ -1131,7 +1152,7 @@ def show_info(config: dict, json_output: bool = False):
     print(f"  Project root:     {PROJECT_ROOT}")
     print(f"  Config path:      {CONFIG_PATH}")
     print(f"  Config version:   {config.get('config_version', 1)}")
-    print(f"  Models dir:       {PROJECT_ROOT / 'models'}")
+    print(f"  Models dir:       {get_user_models_dir()}")
     print(f"  State dir:        {STATE_DIR}")
     print(f"  llama-server:     {llama_server or 'not found'}")
     print(f"  Default profile:  {default_profile}")
@@ -1231,10 +1252,17 @@ def run_setup(
         warnings.append("llama-server not found — build it or set LLAMA_SERVER")
 
     # Local GGUF models
-    models_dir = PROJECT_ROOT / "models"
+    models_dir = get_user_models_dir()
     local_models_list: list[str] = []
     if models_dir.exists():
         local_models_list = sorted(f.name for f in models_dir.glob("*.gguf"))
+    # Also check repo-root models/
+    repo_models = PROJECT_ROOT / "models"
+    if repo_models.exists() and repo_models != models_dir:
+        for f in repo_models.glob("*.gguf"):
+            if f.name not in local_models_list:
+                local_models_list.append(f.name)
+        local_models_list.sort()
     if not local_models_list:
         warnings.append("No GGUF models found — run 'kimari pull test'")
 
@@ -1323,11 +1351,19 @@ def list_models(
     verify: bool = False,
 ):
     """List available models (downloaded + registry)."""
-    if not (PROJECT_ROOT / "models").exists():
-        print("[ERROR] models/ directory not found.")
-        return
+    user_models = get_user_models_dir()
+    repo_models = PROJECT_ROOT / "models"
 
-    gguf_files = list((PROJECT_ROOT / "models").glob("*.gguf"))
+    # Collect GGUF files from both directories
+    gguf_files: list[Path] = []
+    seen_names: set[str] = set()
+
+    for models_dir in [user_models, repo_models]:
+        if models_dir.exists():
+            for f in sorted(models_dir.glob("*.gguf")):
+                if f.name not in seen_names:
+                    gguf_files.append(f)
+                    seen_names.add(f.name)
 
     if json_output:
         result = []
@@ -1336,7 +1372,7 @@ def list_models(
             result.append(
                 {
                     "name": f.name,
-                    "path": str(f.relative_to(PROJECT_ROOT)),
+                    "path": str(f),
                     "size_mb": round(size_mb, 1),
                     "size_gb": round(size_mb / 1024, 2),
                 }
@@ -1594,9 +1630,12 @@ def main():
     ensure_state_dir()
 
     # Load config (needed for most commands)
+    # Always try load_config() — it resolves user config, repo-root, and packaged defaults
     config = {}
-    if CONFIG_PATH.exists():
+    try:
         config = load_config()
+    except SystemExit:
+        config = {}
 
     if not args.command:
         parser.print_help()
