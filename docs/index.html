@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.14-alpha — TestPyPI validation, setup write-mode, SHA256 tooling, reverse proxy auth guide
+      v0.1.15-alpha — Model path fix, setup --yes, hash pinning workflow, benchmark sharing, Windows wheel install
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -637,6 +637,21 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-title">Windows Helper Scripts</div>
       <div class="feature-desc">PowerShell launcher and doctor scripts for Windows users. Full setup, diagnostics, and model pull.</div>
     </div>
+    <div class="feature-card">
+      <span class="feature-icon">🗺️</span>
+      <div class="feature-title">Model Path Resolution</div>
+      <div class="feature-desc"><code>resolve_model_path()</code> finds models from absolute path, CWD, user dir, or repo root. Works from wheel installs.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">✅</span>
+      <div class="feature-title">Non-Interactive Setup</div>
+      <div class="feature-desc"><code>kimari setup --write --yes</code> persists configuration without prompts. Shows preview before writing.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📌</span>
+      <div class="feature-title">Hash Pinning Workflow</div>
+      <div class="feature-desc"><code>kimari models pin-hash --dry-run</code> previews, <code>--write</code> pins, <code>--yes</code> skips confirmation.</div>
+    </div>
   </div>
 </section>
 
@@ -782,7 +797,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.14-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.15-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -819,7 +834,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.14-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.15-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -1221,7 +1236,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.14-alpha — Setup write-mode, SHA256 model verification, reverse proxy auth guide, API plan for v0.2.</p>
+    <p class="section-desc">Kimari Local AI v0.1.15-alpha — Model path resolution, setup --yes, hash pinning workflow, benchmark result sharing, Windows wheel install.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1245,6 +1260,12 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>SHA256 model hash/verify (<code>kimari models hash/verify</code>)</td><td>✅ Implemented in v0.1.14-alpha</td></tr>
         <tr><td>Reverse proxy auth guide</td><td>✅ Documented in v0.1.14-alpha</td></tr>
         <tr><td>API plan for v0.2</td><td>✅ Designed in v0.1.14-alpha</td></tr>
+        <tr><td><code>resolve_model_path()</code> (model path resolution)</td><td>✅ Implemented in v0.1.15-alpha</td></tr>
+        <tr><td><code>kimari setup --write --yes</code> (non-interactive)</td><td>✅ Implemented in v0.1.15-alpha</td></tr>
+        <tr><td><code>kimari models pin-hash --dry-run/--yes</code></td><td>✅ Implemented in v0.1.15-alpha</td></tr>
+        <tr><td>Benchmark result sharing (<code>benchmarks/RESULT_FORMAT.md</code>)</td><td>✅ Documented in v0.1.15-alpha</td></tr>
+        <tr><td>Windows wheel install scripts</td><td>✅ Added in v0.1.15-alpha</td></tr>
+        <tr><td>API OpenAPI draft</td><td>📋 Drafted in v0.1.15-alpha</td></tr>
         <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>

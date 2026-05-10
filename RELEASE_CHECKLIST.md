@@ -34,6 +34,10 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] `kimari setup --json` returns valid JSON
 - [ ] `kimari start --dry-run --strict-flags` works or warns correctly
 - [ ] `kimari token create/show/delete` tested with tmp dir or safe environment
+- [ ] `kimari setup --write --yes` writes config without prompt
+- [ ] `kimari setup --write` (without --yes) prompts for confirmation
+- [ ] `kimari models pin-hash <model-id> --dry-run` shows patch
+- [ ] `kimari models pin-hash <model-id> --write` with tmp registry
 
 ## Setup Write-Mode
 
@@ -94,6 +98,18 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] README mentions `models hash` and `models verify`
 - [ ] README links to reverse proxy auth guide
 - [ ] README links to API plan
+- [ ] README mentions `setup --write --yes`
+- [ ] README mentions `pin-hash` workflow
+- [ ] Model path resolver tested
+- [ ] start_server uses resolve_model_path()
+- [ ] benchmarks/RESULT_FORMAT.md exists
+- [ ] benchmarks/examples/perf-result.example.json exists
+- [ ] docs/API_OPENAPI_DRAFT.yaml exists
+- [ ] Windows wheel scripts exist (scripts/windows/build-wheel.ps1, install-from-wheel.ps1, install-from-testpypi.ps1)
+- [ ] docs/PUBLISHING.md contains v0.1.15 TestPyPI section
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+- [ ] No "Responses API supported" false claim anywhere
 - [ ] New profiles exist (gtx1060-safe, gtx1060-fast, gtx1080-balanced, gtx1080-longctx, ide-local, agent-local, openclaw-local, hermes-local)
 - [ ] Windows scripts exist (scripts/windows/kimari-launcher.ps1, kimari-doctor.ps1)
 - [ ] llama-server flag detection tests pass

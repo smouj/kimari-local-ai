@@ -5,6 +5,34 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.15-alpha] — 2026-05-17
+
+### Fixed
+- **P0: `start_server()` model path resolution** — Replaced `PROJECT_ROOT / effective_model` with `resolve_model_path()` in the real startup path. Previously, only `--dry-run` used the resolver; the real path assumed repo-root, breaking wheel installs
+
+### Added
+- **Robust `resolve_model_path()`** — New public helper that resolves models in order: absolute path → CWD-relative → user models dir → repo-root models/ → fallback to user models dir. Works correctly when installed from wheel (no repo root)
+- **`kimari setup --write --yes`** — Non-interactive mode for setup write; skips confirmation when `--yes` is provided
+- **`kimari setup --write` confirmation** — Without `--yes`, requires interactive confirmation on TTY; in non-interactive environments, `--yes` is mandatory
+- **Setup preview before write** — Shows summary (config_path, backup_path, selected_profile, integration, models_dir, state_dir) before writing
+- **`preview_setup_changes()`** and **`apply_setup_changes()`** — New functions in `kimari/setup/writer.py` with atomic write (write .tmp then rename)
+- **`kimari models pin-hash --yes`** — Non-interactive confirmation for hash pinning
+- **`kimari models pin-hash --dry-run`** — Shows the patch that would be applied without writing
+- **Benchmark result sharing format** — `benchmarks/RESULT_FORMAT.md` documents the JSON structure for sharing performance results; `benchmarks/examples/perf-result.example.json` provides a template
+- **Windows wheel packaging scripts** — `scripts/windows/build-wheel.ps1`, `scripts/windows/install-from-wheel.ps1`, `scripts/windows/install-from-testpypi.ps1`
+- **Reverse proxy auth refinement** — `docs/REVERSE_PROXY_AUTH.md` updated with Caddy `reverse_proxy` with header check, nginx `map` for Authorization, diagram (client → proxy auth → Kimari/llama-server on 127.0.0.1), "Do not expose llama-server directly" section
+- **OpenAPI 3.1 draft** — `docs/API_OPENAPI_DRAFT.yaml` with planned endpoints (health, status, config, profiles, models, server start/stop, optimize, perf dry-run); marked as draft, not implemented
+- **TestPyPI validation** — Documented in `docs/PUBLISHING.md` with result or credentials-unavailable notice
+- **New tests** (`tests/test_release_v0115.py`) — Tests for resolve_model_path, setup --write --yes, pin-hash --dry-run, benchmark format, OpenAPI draft, Windows scripts, release check
+
+### Changed
+- **Version bumped** to `0.1.15-alpha`
+- **`kimari/setup/writer.py`** — Added `preview_setup_changes()`, `apply_setup_changes()`, `confirm_setup_write()`, atomic write (write .tmp then rename)
+- **`kimari/cli/main.py`** — `run_setup()` now supports `--yes` flag with confirmation prompt; `pin_model_hash()` now supports `--yes` and `--dry-run`
+- **`scripts/release/check-release.py`** — Added checks for resolve_model_path helper, start_server not using PROJECT_ROOT directly, benchmark result format, OpenAPI draft, Windows wheel scripts, README mentions
+- **README.md** — Added sections: model path resolution, setup --write --yes, pin-hash workflow, benchmark sharing, Windows wheel install
+- **docs/index.html** — Updated for v0.1.15-alpha focus areas
+
 ## [0.1.14-alpha] — 2026-05-16
 
 ### Added

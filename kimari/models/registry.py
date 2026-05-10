@@ -9,6 +9,7 @@ import datetime
 import hashlib
 import json
 import shutil
+import sys
 import time
 from pathlib import Path
 
@@ -619,7 +620,7 @@ def verify_model_hash_v2(model_id_or_path: str | Path, json_output: bool = False
         return None
 
 
-def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False) -> dict | None:
+def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False, yes: bool = False) -> dict | None:
     """Pin the SHA256 hash of a registry model into the user models registry.
 
     Computes the SHA256 of the local file for a registry model and optionally
@@ -630,6 +631,8 @@ def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False
         write: If True, write the hash to the user registry. If False (default),
                only show what would be changed.
         json_output: If True, return a structured dict; otherwise print human-readable output.
+        yes: If True, skip confirmation prompt when write=True. If False and
+             write=True, check for TTY and prompt; refuse in non-interactive mode.
 
     Returns:
         A dict when json_output is True, otherwise None.
@@ -653,6 +656,7 @@ def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False
                 "written": False,
                 "user_registry_path": str(get_user_models_registry_path()),
                 "backup_path": None,
+                "confirmed": False,
             }
         print(f"[ERROR] {msg}")
         return None
@@ -668,6 +672,7 @@ def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False
                 "written": False,
                 "user_registry_path": str(get_user_models_registry_path()),
                 "backup_path": None,
+                "confirmed": False,
             }
         print(f"[ERROR] {msg}")
         return None
@@ -685,6 +690,7 @@ def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False
                 "written": False,
                 "user_registry_path": str(user_registry_path),
                 "backup_path": None,
+                "confirmed": False,
             }
         print(f"\n  {Color.YELLOW}[DRY RUN]{Color.RESET} Would pin SHA256 for {Color.CYAN}{model_id}{Color.RESET}")
         print(f"  SHA256:  {actual_hash}")
@@ -692,7 +698,53 @@ def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False
         print(f"  Use {Color.CYAN}--write{Color.RESET} to actually write the hash.")
         return None
 
-    # write=True path
+    # write=True path — confirmation check
+    if not yes:
+        if sys.stdin.isatty():
+            try:
+                response = input(f"  Pin SHA256 for {model_id}? [y/N] ").strip().lower()
+                if response not in ("y", "yes"):
+                    if json_output:
+                        return {
+                            "model_id": model_id,
+                            "sha256": actual_hash,
+                            "would_write": True,
+                            "written": False,
+                            "user_registry_path": str(user_registry_path),
+                            "backup_path": None,
+                            "confirmed": False,
+                        }
+                    print("  Cancelled.")
+                    return None
+            except (EOFError, KeyboardInterrupt):
+                if json_output:
+                    return {
+                        "model_id": model_id,
+                        "sha256": actual_hash,
+                        "would_write": True,
+                        "written": False,
+                        "user_registry_path": str(user_registry_path),
+                        "backup_path": None,
+                        "confirmed": False,
+                    }
+                print("\n  Cancelled.")
+                return None
+        else:
+            # Non-interactive: refuse without --yes
+            if json_output:
+                return {
+                    "model_id": model_id,
+                    "sha256": actual_hash,
+                    "would_write": True,
+                    "written": False,
+                    "user_registry_path": str(user_registry_path),
+                    "backup_path": None,
+                    "confirmed": False,
+                    "requires_yes": True,
+                }
+            warn("Non-interactive mode — use --yes to confirm pin-hash write.")
+            return None
+
     # Prepare the registry data to write
     registry_to_write = dict(registry)
     models_list = [dict(m) for m in registry_to_write.get("models", [])]
@@ -727,6 +779,7 @@ def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False
             "written": True,
             "user_registry_path": str(user_registry_path),
             "backup_path": str(backup_path) if backup_path else None,
+            "confirmed": True,
         }
 
     ok(f"SHA256 pinned for {model_id}")

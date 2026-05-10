@@ -1,0 +1,480 @@
+openapi: "3.1.0"
+info:
+  title: Kimari Local AI — Planned API (Draft)
+  description: |
+    This is a **design document only**. The endpoints described here are
+    planned for a future release of Kimari Local AI and are **not yet
+    available** in any shipped version.
+
+    This draft is intended for:
+    - Collecting early feedback on the API surface
+    - Guiding implementation priorities
+    - Documenting design decisions before code is written
+
+    Do NOT build clients against these endpoints yet.
+  version: "0.0.0-draft"
+  x-draft: true
+
+servers:
+  - url: http://127.0.0.1:11435
+    description: Local llama-server (default Kimari binding)
+
+security: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        Optional Bearer token. When a Kimari token is configured and a
+        reverse proxy is in front of llama-server, the proxy validates
+        this token. llama-server itself does not enforce authentication.
+
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        uptime_s:
+          type: number
+          description: Server uptime in seconds
+      required: [status]
+
+    ServerStatus:
+      type: object
+      properties:
+        running:
+          type: boolean
+        pid:
+          type: integer
+          nullable: true
+        profile:
+          type: string
+          nullable: true
+        model:
+          type: string
+          nullable: true
+        port:
+          type: integer
+          nullable: true
+        host:
+          type: string
+          nullable: true
+      required: [running]
+
+    ConfigInfo:
+      type: object
+      properties:
+        config_version:
+          type: integer
+        profiles:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              model:
+                type: string
+              host:
+                type: string
+              port:
+                type: integer
+        default_profile:
+          type: string
+      required: [config_version]
+
+    ProfileDetail:
+      type: object
+      properties:
+        name:
+          type: string
+        model:
+          type: string
+        host:
+          type: string
+        port:
+          type: integer
+        ctx:
+          type: integer
+          nullable: true
+        batch:
+          type: integer
+          nullable: true
+        ubatch:
+          type: integer
+          nullable: true
+        gpu_layers:
+          type: integer
+          nullable: true
+        flash_attn:
+          type: boolean
+          nullable: true
+      required: [name, model]
+
+    ModelEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        display_name:
+          type: string
+        filename:
+          type: string
+        size_gb:
+          type: number
+        status:
+          type: string
+          enum: [available, downloaded, deprecated]
+        downloaded:
+          type: boolean
+      required: [id, display_name, filename, status]
+
+    ServerStartRequest:
+      type: object
+      properties:
+        profile:
+          type: string
+          description: Profile name to start
+        daemon:
+          type: boolean
+          default: false
+      required: [profile]
+
+    ServerStartResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [started, already_running]
+        pid:
+          type: integer
+          nullable: true
+        profile:
+          type: string
+      required: [status]
+
+    ServerStopResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [stopped, not_running]
+        pid:
+          type: integer
+          nullable: true
+      required: [status]
+
+    OptimizeRequest:
+      type: object
+      properties:
+        profile:
+          type: string
+        vram_gb:
+          type: number
+          nullable: true
+          description: Override detected VRAM
+        performance_mode:
+          type: string
+          enum: [safe, balanced, fast]
+          default: balanced
+      required: [profile]
+
+    OptimizeResponse:
+      type: object
+      properties:
+        profile:
+          type: string
+        recommended:
+          type: object
+          properties:
+            ctx:
+              type: integer
+            batch:
+              type: integer
+            ubatch:
+              type: integer
+            cache_type_k:
+              type: string
+            cache_type_v:
+              type: string
+            gpu_layers:
+              type: integer
+            flash_attn:
+              type: boolean
+            parallel:
+              type: integer
+          required: [ctx, batch, ubatch, cache_type_k, cache_type_v, gpu_layers, flash_attn, parallel]
+        estimated_vram_gb:
+          type: number
+        estimated_ram_gb:
+          type: number
+        confidence:
+          type: string
+          enum: [high, medium, low]
+        warnings:
+          type: array
+          items:
+            type: string
+      required: [profile, recommended, estimated_vram_gb, estimated_ram_gb, confidence, warnings]
+
+    PerfDryRunResponse:
+      type: object
+      properties:
+        profile:
+          type: string
+        mode:
+          type: string
+        command:
+          type: string
+          description: The llama-server command that would be executed
+        env_flags:
+          type: object
+          additionalProperties:
+            type: string
+        estimated_vram_gb:
+          type: number
+        estimated_ram_gb:
+          type: number
+        warnings:
+          type: array
+          items:
+            type: string
+      required: [profile, mode, command, estimated_vram_gb, estimated_ram_gb, warnings]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
+          nullable: true
+      required: [error]
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Returns server health status. This endpoint is served by llama-server directly.
+      operationId: getHealth
+      responses:
+        "200":
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+        "503":
+          description: Server is unhealthy
+
+  /status:
+    get:
+      summary: Server status
+      description: Returns Kimari server process status including PID, profile, and model info.
+      operationId: getStatus
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Server status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerStatus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /config:
+    get:
+      summary: Current configuration
+      description: Returns the current Kimari configuration including profiles and defaults.
+      operationId: getConfig
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Configuration info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigInfo"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /profiles:
+    get:
+      summary: List profiles
+      description: Returns all configured GPU profiles with their settings.
+      operationId: getProfiles
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProfileDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /models:
+    get:
+      summary: List models
+      description: Returns available and downloaded models from the Kimari model registry.
+      operationId: getModels
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModelEntry"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /server/start:
+    post:
+      summary: Start server
+      description: Starts the Kimari llama-server with the specified profile.
+      operationId: startServer
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServerStartRequest"
+      responses:
+        "200":
+          description: Server started or already running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerStartResponse"
+        "400":
+          description: Invalid request (unknown profile, missing model, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /server/stop:
+    post:
+      summary: Stop server
+      description: Stops the running Kimari llama-server process.
+      operationId: stopServer
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Server stopped or not running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerStopResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /optimize:
+    post:
+      summary: Get optimization recommendations
+      description: Returns recommended settings for the specified profile and VRAM configuration.
+      operationId: optimize
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OptimizeRequest"
+      responses:
+        "200":
+          description: Optimization recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimizeResponse"
+        "400":
+          description: Invalid request (unknown profile, invalid VRAM, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /perf/dry-run:
+    post:
+      summary: Performance dry run
+      description: Simulates starting the server and returns the command and resource estimates without actually starting.
+      operationId: perfDryRun
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OptimizeRequest"
+      responses:
+        "200":
+          description: Dry-run result with command and estimates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PerfDryRunResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

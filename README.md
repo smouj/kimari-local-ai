@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.14--alpha-9b59b6.svg" alt="v0.1.14-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.15--alpha-9b59b6.svg" alt="v0.1.15-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.14-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.15-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.14-alpha**
+> **Kimari Local AI v0.1.15-alpha**
 
 ### ✅ Works Today
 
@@ -72,6 +72,11 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Local auth tokens** — `kimari token create` prepares tokens for future API/reverse proxy use
 - **Model hash verification** — `kimari models hash/verify` computes and checks SHA256 hashes of local GGUF files
 - **Windows helper scripts** — PowerShell launcher and doctor for Windows users
+- **Model path resolution** — `resolve_model_path()` finds models from absolute path, CWD, user models dir, repo root, or fallback
+- **Non-interactive setup** — `kimari setup --write --yes` writes config without prompt
+- **Hash pinning workflow** — `kimari models pin-hash` with `--dry-run` / `--write` / `--yes` flags
+- **Benchmark result sharing** — standardized format in `benchmarks/RESULT_FORMAT.md`
+- **Windows wheel install** — PowerShell scripts for wheel build, install, and TestPyPI install
 
 ### 🔨 Planned
 
@@ -261,6 +266,7 @@ kimari fit --model models/file.gguf --vram 8.0        # Override VRAM for Kimari
 kimari setup                              # Detect environment and recommend configuration
 kimari setup --json                       # JSON output for automation
 kimari setup --write                      # Persist detected configuration to user config dir
+kimari setup --write --yes                # Non-interactive: shows preview, writes without prompt
 kimari setup --integration openclaw       # Recommend OpenClaw integration
 kimari setup --dry-run                    # Preview without detection
 ```
@@ -272,11 +278,13 @@ kimari models hash <path>                 # Compute SHA256 hash of a local GGUF 
 kimari models hash <path> --json          # JSON output
 kimari models verify <model-id-or-path>   # Verify model hash against registry
 kimari models verify <model-id> --json    # JSON output
-kimari models pin-hash <model-id>         # Preview pinning hash to user registry (dry-run)
-kimari models pin-hash <model-id> --write # Actually pin hash to user registry
+kimari models pin-hash <model-id>                # Preview pinning hash (dry-run)
+kimari models pin-hash <model-id> --dry-run      # Preview patch without writing
+kimari models pin-hash <model-id> --write         # Write with confirmation
+kimari models pin-hash <model-id> --write --yes   # Write without prompt
 ```
 
-> **Note:** SHA256 hashes in the registry are not yet pinned. `kimari models verify` will report "hash not pinned" until hashes are explicitly set. Use `kimari models pin-hash <model-id> --write` to compute and pin real hashes for your local files.
+> **Note:** SHA256 hashes in the registry are not yet pinned. `kimari models verify` will report "hash not pinned" until hashes are explicitly set. Use `pin-hash --write` to compute and pin real hashes. Use `--dry-run` to preview the patch, `--yes` to skip the confirmation prompt.
 
 ### Token Management
 
@@ -395,6 +403,41 @@ Kimari works when installed from PyPI — no need to run from the repo root:
 kimari config path                         # Show where your config lives
 export KIMARI_HOME=~/.kimari               # Override all paths at once
 export KIMARI_CONFIG_DIR=/etc/kimari       # Override config dir only
+```
+
+### Model Path Resolution
+
+`resolve_model_path()` locates model files by searching in order:
+
+1. **Absolute path** — used as-is if the model path is already absolute
+2. **CWD-relative** — resolved relative to the current working directory
+3. **User models dir** — the platform-specific user data models directory
+4. **Repo-root** — the `models/` directory under the project root (editable installs)
+5. **Fallback** — returns the original path if nothing is found
+
+This ensures models are found correctly whether Kimari is installed from a wheel, run from the repo, or configured with custom paths.
+
+### Benchmark Result Sharing
+
+Share benchmark results using the standardized format defined in `benchmarks/RESULT_FORMAT.md`. This makes it easy to compare performance across hardware:
+
+- Follow the JSON schema in `benchmarks/RESULT_FORMAT.md`
+- Include GPU, model, quantization, context size, tokens/s, and TTFT
+- Submit results via PR to `benchmarks/results/`
+
+### Windows Wheel Install
+
+Windows users can install from a built wheel or TestPyPI using the new PowerShell scripts:
+
+```powershell
+# Build a wheel locally
+.\scripts\windows\build-wheel.ps1
+
+# Install from a built wheel
+.\scripts\windows\install-from-wheel.ps1
+
+# Install from TestPyPI
+.\scripts\windows\install-from-testpypi.ps1
 ```
 
 ## 🔌 IDE & Agent Integrations

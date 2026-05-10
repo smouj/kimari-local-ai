@@ -148,7 +148,7 @@
 - ✅ check-release.py expanded to 18 validation categories
 - ✅ RELEASE_CHECKLIST.md expanded with community and packaging checks
 
-## v0.1.14-alpha (Current)
+## v0.1.14-alpha (Released)
 
 - ✅ `kimari setup --write` — persist detected configuration with backup
 - ✅ Setup persistence module (`kimari/setup/writer.py`)
@@ -164,14 +164,28 @@
 - ✅ check-release.py expanded to 21 validation categories
 - ✅ RELEASE_CHECKLIST.md expanded with setup write-mode and SHA256 tooling checks
 
-## v0.1.15-alpha (Planned)
+## v0.1.15-alpha (Current)
 
-- Actual PyPI decision after TestPyPI validation
-- Setup write-mode UX refinements
+- ✅ **P0 fix:** `start_server()` uses `resolve_model_path()` instead of `PROJECT_ROOT / effective_model`
+- ✅ Robust `resolve_model_path()` — absolute, CWD-relative, user models dir, repo-root, fallback
+- ✅ Setup write-mode UX — `--yes` flag, confirmation prompt, preview summary
+- ✅ Setup writer improvements — `preview_setup_changes()`, `apply_setup_changes()`, atomic write
+- ✅ SHA256 pin-hash workflow — `--yes`, `--dry-run`, confirmation prompt
+- ✅ Benchmark result sharing format (`benchmarks/RESULT_FORMAT.md`, example JSON)
+- ✅ Windows wheel packaging scripts (`build-wheel.ps1`, `install-from-wheel.ps1`, `install-from-testpypi.ps1`)
+- ✅ Reverse proxy auth refinement — diagrams, Caddy/nginx map examples
+- ✅ OpenAPI 3.1 draft (`docs/API_OPENAPI_DRAFT.yaml`)
+- ✅ TestPyPI validation documented
+- ✅ check-release.py and RELEASE_CHECKLIST expanded
+
+## v0.1.16-alpha (Planned)
+
+- Actual PyPI decision if TestPyPI passes
+- Real verified SHA256 pinning for registry models
+- FastAPI prototype implementation
 - Windows installer packaging
-- Optional FastAPI prototype branch for v0.2
-- Real SHA256 pinning for verified registry models
-- Benchmark result sharing format
+- Setup UX polish
+- Benchmark community submission workflow
 
 ## v0.2.0-alpha
 

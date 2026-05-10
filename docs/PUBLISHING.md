@@ -412,3 +412,78 @@ kimari token delete
 deactivate
 rm -rf /tmp/kimari-test-v014
 ```
+
+## v0.1.15 TestPyPI Validation
+
+> **Date:** 2026-05-17
+> **Version:** 0.1.15-alpha
+> **Purpose:** Validate that the v0.1.15-alpha wheel builds, installs, and runs correctly — including model path resolution, setup --yes, pin-hash workflow, and Windows wheel scripts.
+
+### Notes
+
+- **Model path resolution:** `resolve_model_path()` searches absolute → CWD → user models dir → repo root → fallback, fixing model discovery when installed from wheel.
+- **Non-interactive setup:** `kimari setup --write --yes` writes config without confirmation prompt (shows preview first).
+- **Hash pinning workflow:** `kimari models pin-hash <model-id> --dry-run` previews the patch; `--write --yes` writes without prompt.
+- **Benchmark result sharing:** `benchmarks/RESULT_FORMAT.md` defines the standardized format for sharing benchmark results.
+- **Windows wheel scripts:** PowerShell scripts for building, installing from wheel, and installing from TestPyPI on Windows.
+- **API OpenAPI draft:** `docs/API_OPENAPI_DRAFT.yaml` contains the initial OpenAPI 3.0 spec for the future v0.2 API.
+
+### Commands Executed
+
+```bash
+python -m build
+twine check dist/*
+```
+
+### Result
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Upload to TestPyPI | | TestPyPI upload not executed: credentials unavailable |
+| Clean venv creation | | |
+| Install from TestPyPI | | |
+| `kimari --version` | | |
+| `kimari config path` | | |
+| `kimari setup --write --yes` | | |
+| `kimari start --dry-run` (uses resolve_model_path) | | |
+| `kimari models pin-hash test --dry-run` | | |
+| `kimari models pin-hash test --write --yes` | | |
+| `kimari token create` | | |
+| `kimari token show` | | |
+| `kimari token delete` | | |
+| Result documented | | |
+| Real PyPI upload blocked | | |
+
+> **TestPyPI upload not executed: credentials unavailable.** This is the safe default. All local build and twine checks pass.
+
+### Validation Commands (Copy-Paste)
+
+```bash
+# 1. Clean and build
+rm -rf dist/ build/ *.egg-info kimari/*.egg-info
+python -m build
+twine check dist/*
+
+# 2. Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# 3. Verify in clean venv
+python -m venv /tmp/kimari-test-v015
+source /tmp/kimari-test-v015/bin/activate
+pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kimari-local-ai
+
+# 4. Validate all commands
+kimari --version
+kimari config path
+kimari setup --write --yes
+kimari start --dry-run
+kimari models pin-hash test --dry-run
+kimari models pin-hash test --write --yes
+kimari token create
+kimari token show
+kimari token delete
+
+# 5. Clean up
+deactivate
+rm -rf /tmp/kimari-test-v015
+```
