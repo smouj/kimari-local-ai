@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kimari.local/dataset/schema/preference.schema.json",
+  "title": "Kimari Preference Dataset Entry",
+  "description": "Schema for Preference (chosen/rejected) training data entries in JSONL format. Used for DPO/ORPO preference tuning. Each line in a preference dataset file must be a valid JSON object conforming to this schema.",
+  "type": "object",
+  "required": ["prompt", "chosen", "rejected", "source", "license"],
+  "additionalProperties": false,
+  "properties": {
+    "prompt": {
+      "type": "string",
+      "description": "The input prompt or question presented to the model.",
+      "minLength": 1
+    },
+    "chosen": {
+      "type": "string",
+      "description": "The preferred/higher-quality response. Must be demonstrably better than the rejected response.",
+      "minLength": 1
+    },
+    "rejected": {
+      "type": "string",
+      "description": "The less-preferred/lower-quality response. Must be meaningfully different from the chosen response.",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of this data point. Must be a traceable, descriptive source identifier — not 'unknown'.",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "description": "License under which this data is shared. Must be a valid SPDX identifier or well-known license name — not 'unknown'.",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "description": "Categorization tags for filtering and organization. Use lowercase, hyphenated format.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

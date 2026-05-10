@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.16-alpha — Experimental API, PyPI release gate, model hashing, community benchmarks, Windows packaging
+      v0.1.17-alpha — Kimari-4B model planning, training pipeline, base selection, dataset schemas, Hugging Face readiness
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -475,19 +475,36 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <strong>Kimari</strong> is the framework. <strong>Kimari-4B</strong> is not released yet.
 </div>
 
-<!-- ═══════ v0.1.16-alpha FOCUS ═══════ -->
+<!-- ═══════ v0.1.17-alpha FOCUS ═══════ -->
 <div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.16-alpha</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.17-alpha</span>
       <span style="font-size:1.1rem;font-weight:800;">What's New</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-flask" style="color:var(--kimari-teal);"></i> Experimental API</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-lock" style="color:var(--kimari-purple-light);"></i> PyPI release gate</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-hashtag" style="color:var(--kimari-cyan);"></i> Model hashing</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-chart-bar" style="color:var(--kimari-teal);"></i> Community benchmarks</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-brands fa-windows" style="color:var(--kimari-purple-light);"></i> Windows packaging</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-file-alt" style="color:var(--kimari-teal);"></i> 🧠 MODEL_CARD rewrite</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-list-check" style="color:var(--kimari-purple-light);"></i> 📋 Training plan</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-magnifying-glass" style="color:var(--kimari-cyan);"></i> 🔍 Base selection</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-database" style="color:var(--kimari-teal);"></i> 📊 Dataset schemas</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--kimari-purple-light);"></i> 🤗 HF release plan</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ KIMARI-4B MODEL ROADMAP ═══════ -->
+<div style="max-width:1280px;margin:0 auto;padding:0 24px 24px;">
+  <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px 32px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-size:.75rem;font-weight:700;letter-spacing:.05em;">🧠 Kimari-4B</span>
+      <span style="font-size:1.05rem;font-weight:800;">Model Roadmap</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.7rem;font-weight:600;color:#f87171;">PLANNED — NO WEIGHTS YET</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;font-size:.88rem;color:var(--kimari-text-muted);">
+      <div><strong style="color:var(--kimari-text);">Status</strong><br>Planned / Training Design</div>
+      <div><strong style="color:var(--kimari-text);">Base Selection</strong><br>SmolLM3, Qwen2.5, Llama 3.2</div>
+      <div><strong style="color:var(--kimari-text);">Training Plan</strong><br>7-phase pipeline defined</div>
+      <div><strong style="color:var(--kimari-text);">Weights</strong><br>Not released yet</div>
     </div>
   </div>
 </div>
@@ -669,6 +686,11 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-title">Hash Pinning Workflow</div>
       <div class="feature-desc"><code>kimari models pin-hash --dry-run</code> previews, <code>--write</code> pins, <code>--yes</code> skips confirmation.</div>
     </div>
+    <div class="feature-card">
+      <span class="feature-icon">🧠</span>
+      <div class="feature-title">Model Training Plan</div>
+      <div class="feature-desc">7-phase pipeline for Kimari-4B: base selection, SFT, DPO/ORPO, evaluation, GGUF export, Hugging Face release.</div>
+    </div>
   </div>
 </section>
 
@@ -814,7 +836,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.16-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.17-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -1253,6 +1275,18 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="doc-card-title">Privacy Policy</div>
       <div class="doc-card-desc">Data handling, telemetry, and privacy commitments.</div>
     </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/MODEL_TRAINING_PLAN.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Model Training Plan</div>
+      <div class="doc-card-desc">7-phase training pipeline for Kimari-4B: SFT, DPO/ORPO, evaluation, GGUF export.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/MODEL_BASE_SELECTION.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Base Model Selection</div>
+      <div class="doc-card-desc">Comparison of candidate base models for Kimari-4B fine-tuning.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/HUGGINGFACE_RELEASE.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Hugging Face Release</div>
+      <div class="doc-card-desc">Plan for publishing Kimari-4B weights to Hugging Face Hub.</div>
+    </a>
   </div>
 </section>
 
@@ -1261,7 +1295,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.16-alpha — Experimental API, PyPI release gate, model hashing, community benchmarks, Windows packaging.</p>
+    <p class="section-desc">Kimari Local AI v0.1.17-alpha — Kimari-4B model planning, training pipeline, base selection, dataset schemas, Hugging Face readiness.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1296,6 +1330,11 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Model hashing docs (<code>docs/MODEL_HASHING.md</code>)</td><td>✅ Documented in v0.1.16-alpha</td></tr>
         <tr><td>Community benchmark submissions (<code>docs/BENCHMARK_SUBMISSIONS.md</code>)</td><td>✅ Documented in v0.1.16-alpha</td></tr>
         <tr><td>Windows packaging (<code>scripts/windows/</code>)</td><td>✅ Packaged in v0.1.16-alpha</td></tr>
+        <tr><td>MODEL_CARD rewrite</td><td>✅ Rewritten in v0.1.17-alpha</td></tr>
+        <tr><td>Training plan (<code>docs/MODEL_TRAINING_PLAN.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
+        <tr><td>Base selection (<code>docs/MODEL_BASE_SELECTION.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
+        <tr><td>Dataset schemas</td><td>✅ Defined in v0.1.17-alpha</td></tr>
+        <tr><td>Hugging Face release plan (<code>docs/HUGGINGFACE_RELEASE.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
         <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>

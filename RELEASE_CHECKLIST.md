@@ -204,6 +204,30 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] No "Responses API supported" false claim anywhere
 
+## v0.1.17 Checks
+
+- [ ] MODEL_CARD.md exists and says "Planned / Not Released" or "Training Design" (not released)
+- [ ] docs/MODEL_TRAINING_PLAN.md exists
+- [ ] docs/MODEL_BASE_SELECTION.md exists
+- [ ] MODEL_LICENSES.md exists and mentions SmolLM3, Qwen, Llama candidates
+- [ ] dataset/README.md exists with dataset policy
+- [ ] dataset/schema/sft.schema.json exists and parses as valid JSON
+- [ ] dataset/schema/preference.schema.json exists and parses as valid JSON
+- [ ] training/README.md exists
+- [ ] training/configs/kimari_sft_lora.example.yaml exists
+- [ ] training/configs/kimari_orpo.example.yaml exists
+- [ ] training/scripts/prepare_dataset.py exists and supports --help
+- [ ] training/scripts/train_sft_lora.py exists and supports --dry-run
+- [ ] eval/README.md exists
+- [ ] eval/kimarifit_prompts.jsonl exists and each line is valid JSON
+- [ ] docs/HUGGINGFACE_RELEASE.md exists
+- [ ] No GGUF files tracked in git
+- [ ] No claim that Kimari-4B is released
+- [ ] No fake MMLU/HumanEval numbers in MODEL_CARD
+- [ ] No weights or model files committed
+- [ ] No HF API keys or secrets in any file
+- [ ] `default_profile` is still `"test"`
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

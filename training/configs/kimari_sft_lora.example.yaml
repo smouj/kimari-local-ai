@@ -1,0 +1,45 @@
+# Kimari SFT LoRA Training Configuration
+# WARNING: These are starting points, NOT final hyperparameters.
+# Adjust based on base model selection and evaluation results.
+
+# Base model — TBD until selection is made
+base_model: "TBD"  # e.g., "HuggingFaceTB/SmolLM3-3B" (pending selection)
+
+# Output
+output_dir: "./training/runs/kimari-sft-v0.1"
+dataset_path: "./dataset/cleaned/sft_train.jsonl"
+
+# Sequence
+max_seq_length: 4096  # or 8192 depending on base model context
+
+# LoRA
+lora_r: 32  # or 64 for more capacity
+lora_alpha: 64  # typically 2x lora_r
+lora_dropout: 0.05
+lora_target_modules:  # TBD based on base model architecture
+  - "q_proj"
+  - "v_proj"
+  # - "k_proj"
+  # - "o_proj"
+  # - "gate_proj"
+  # - "up_proj"
+  # - "down_proj"
+
+# Training
+learning_rate: 2.0e-4  # SFT adapter starting point
+num_train_epochs: 2  # 2-3 epochs typical for SFT
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8  # effective batch = 2 * 8 = 16
+warmup_ratio: 0.1
+save_steps: 100
+eval_steps: 100
+logging_steps: 10
+
+# Precision
+bf16: true  # Use if GPU supports it (Ampere+)
+fp16: false  # Fallback for older GPUs
+
+# Misc
+seed: 42
+gradient_checkpointing: true
+report_to: "none"  # or "wandb" if tracking
