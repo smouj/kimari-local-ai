@@ -1,6 +1,6 @@
 # Model Card: Kimari-4B
 
-> **Version:** v0.1.19-alpha (project framework)
+> **Version:** v0.1.20-alpha (project framework)
 > **Last Updated:** 2026-05-21
 > **Developer:** Smouj ([@smouj013](https://x.com/smouj013))
 
@@ -121,11 +121,11 @@ Training has not begun. No GPUs have been allocated, no training scripts have be
 
 ---
 
-## Pipeline Status (v0.1.19-alpha)
+## Pipeline Status (v0.1.20-alpha)
 
 | Aspect | Status |
 |--------|--------|
-| Current model work | v0.1.19 private SFT candidate accepted |
+| Current model work | v0.1.20 private SFT runbook and preview gate |
 | Base selection status | SmolLM3-3B accepted for first private SFT candidate |
 | Dataset status | v0 synthetic dataset prepared (SFT + preference + holdout) |
 | Training status | Not started (configs and validation ready) |
@@ -246,7 +246,8 @@ The following items must be completed before Kimari-4B weights can be released:
 |---|------|--------|
 | 1 | Base model selected and license reviewed | 🟡 In Progress (SmolLM3-3B accepted for private training) |
 | 2 | License compatibility confirmed for all planned formats | ❌ Not started |
-| 3 | Training data curated and documented | ❌ Not started |
+| 3 | Seed dataset v0 prepared and documented | 🔶 In Progress |
+| 3b | Full training dataset curated | ❌ Not started |
 | 4 | Fine-tuning completed | ❌ Not started |
 | 5 | Base model benchmarks measured (pre-fine-tune baseline) | ❌ Not started |
 | 6 | Fine-tuned model benchmarks measured | ❌ Not started |
@@ -270,9 +271,10 @@ The following items must be completed before Kimari-4B weights can be released:
 
 | Version | Date | Status | Changes |
 |---------|------|--------|---------|
-| 0.1.19-alpha | 2026-05-21 | Planned | SmolLM3-3B accepted for first private SFT candidate; dataset v0; training readiness validation; KimariFit scoring plan; v0 training configs; HF placeholder plan |
-| 0.1.18-alpha | 2026-05-20 | Planned | Pipeline dry-run: base decision record, seed datasets, dataset mix builder, KimariFit dry-run harness, GGUF export plan |
-| 0.1.17-alpha | 2026-05-19 | Planned | Complete model card rewrite for v0.1.17-alpha; transparent status, honest evaluation targets, expanded safety and limitation sections |
+| 0.1.20-alpha | 2026-05-22 | Current | Private SFT runbook; baseline eval plan; adapter artifact policy; preview gate; compare runs tool; pipeline dry-run orchestration |
+| 0.1.19-alpha | 2026-05-21 | Released | SmolLM3-3B accepted for first private SFT candidate; dataset v0; training readiness validation; KimariFit scoring plan; v0 training configs; HF placeholder plan |
+| 0.1.18-alpha | 2026-05-20 | Released | Pipeline dry-run: base decision record, seed datasets, dataset mix builder, KimariFit dry-run harness, GGUF export plan |
+| 0.1.17-alpha | 2026-05-19 | Released | Complete model card rewrite for v0.1.17-alpha; transparent status, honest evaluation targets, expanded safety and limitation sections |
 | — | TBD | Future | Initial training design document based on selected base model |
 | — | TBD | Future | First fine-tuning run and benchmark results |
 | — | TBD | Future | Weight release (safetensors + GGUF) |

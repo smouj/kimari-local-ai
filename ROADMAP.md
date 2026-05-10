@@ -227,7 +227,7 @@
 - ✅ Release-check expanded to 38 validation categories
 - ✅ New tests for v0.1.18 features
 
-## v0.1.19-alpha (Current)
+## v0.1.19-alpha (Released)
 
 - ✅ SmolLM3-3B accepted for first private SFT candidate
 - ✅ Base model acceptance document (docs/BASE_MODEL_ACCEPTANCE.md)
@@ -239,15 +239,26 @@
 - ✅ HF placeholder plan
 - ✅ Release-check improvements
 
-## v0.1.20-alpha (Planned)
+## v0.1.20-alpha (Current)
 
-- Run first private SFT adapter
-- Evaluate private adapter against base SmolLM3
-- Compare against base SmolLM3 and alternative candidates
-- Decide if adapter preview is safe for limited distribution
-- Prepare HF placeholder repository
-- Prepare GGUF export after eval passes
-- ORPO preference tuning after SFT converges
+- ✅ MODEL_CARD checklist and version history fixes
+- ✅ Baseline eval plan for SmolLM3-3B without fine-tuning
+- ✅ Adapter artifact policy (what can/cannot be committed)
+- ✅ Private SFT run manifest (private_sft_run.v0.yaml)
+- ✅ Private SFT dry-run validation script
+- ✅ Full v0 pipeline dry-run orchestration
+- ✅ Private training runbook
+- ✅ Adapter preview gate (BLOCKED by default)
+- ✅ Compare runs tool (baseline vs adapter)
+- ✅ .gitignore updated for training artifacts
+
+## v0.1.21-alpha (Planned)
+
+- Execute first private SFT outside CI
+- Evaluate baseline vs adapter with KimariFit
+- Decide ORPO/DPO next step based on SFT results
+- Create HF placeholder if gate allows docs-only
+- Prepare adapter manifest if private run succeeds
 
 ## v0.2.0-alpha
 

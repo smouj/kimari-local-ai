@@ -7,6 +7,21 @@ kimari-server.log
 models/*.gguf
 models/*.safetensors
 models/*.bin
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+
+# Training artifacts (never commit weights/checkpoints)
+training/runs/
+training/adapters/
+training/logs/
+training/checkpoints/
+wandb/
+lightning_logs/
+tensorboard/
 
 # Environment
 .env

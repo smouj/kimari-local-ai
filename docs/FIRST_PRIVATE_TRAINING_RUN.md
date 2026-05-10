@@ -276,6 +276,10 @@ Refer to `docs/BASE_MODEL_ACCEPTANCE.md` for the complete pre-release checklist 
 | [MODEL_DECISION_RECORD.md](MODEL_DECISION_RECORD.md) | ADR-001 — base model candidate comparison |
 | [FIRST_TRAINING_RUN.md](FIRST_TRAINING_RUN.md) | General training run guide (less specific than this document) |
 | [dataset/v0/README.md](../dataset/v0/README.md) | Dataset v0 policy, format, and file descriptions |
+| [PRIVATE_TRAINING_RUNBOOK.md](PRIVATE_TRAINING_RUNBOOK.md) | Step-by-step runbook for the first private SFT |
+| [ADAPTER_ARTIFACT_POLICY.md](ADAPTER_ARTIFACT_POLICY.md) | What can/cannot be committed, naming conventions, hash recording |
+| [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Criteria for transitioning from private adapter to preview |
+| [BASELINE_EVAL_PLAN.md](BASELINE_EVAL_PLAN.md) | Baseline evaluation of SmolLM3-3B before fine-tuning |
 
 ---
 

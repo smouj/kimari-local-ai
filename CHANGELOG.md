@@ -5,7 +5,35 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.19-alpha] — 2026-05-21
+## [0.1.20-alpha] — 2026-05-22
+
+### Added
+- **MODEL_CARD.md checklist fix** — "Training data curated" split into "Seed dataset v0 prepared and documented → In Progress" and "Full training dataset curated → Not started"; version history updated for v0.1.19-alpha
+- **docs/BASELINE_EVAL_PLAN.md** — Baseline evaluation plan for SmolLM3-3B before SFT; categories (coding, bash, docker, linux, windows, spanish technical, integrations, security, no false claims); outputs in eval/results/; not committed by default; manual_review_required
+- **docs/ADAPTER_ARTIFACT_POLICY.md** — Defines private adapter lifecycle; storage in training/adapters/; gitignore rules for safetensors/optimizer/checkpoints/logs; naming convention (kimari-smollm3-sft-v0); what can/cannot be committed; release gate before publication
+- **docs/PRIVATE_TRAINING_RUNBOOK.md** — Step-by-step runbook for first private SFT; environment setup → dataset build → baseline eval → SFT → adapter save → KimariFit eval → ORPO decision; no publication without gate
+- **docs/ADAPTER_PREVIEW_GATE.md** — Criteria for transitioning adapter from private to preview; states (BLOCKED, PENDING, APPROVED_FOR_PRIVATE_TESTING, APPROVED_FOR_PUBLIC_PREVIEW); default BLOCKED; 10+ requirements including license verification, baseline comparison, safety review
+- **training/configs/private_sft_run.v0.yaml** — Run manifest for first private SFT; run_id, status=planned, base_model, dataset paths, output_dir, public_release_allowed=false, hf_upload_allowed=false
+- **training/scripts/run_private_sft_dryrun.py** — CLI dry-run validation for private SFT; validates dataset build, base model, output_dir gitignored, no public/HF release; prints commands, expected outputs, blocked actions; --json output
+- **training/scripts/build_v0_pipeline.py** — Orchestrates full v0 pipeline dry-run; validate_training_ready → build_dataset_mix → train_sft_lora --dry-run → export_gguf_plan --dry-run → kimarifit --score-plan; --dry-run --json; no heavy outputs
+- **eval/baseline/README.md** — Baseline eval documentation; SmolLM3-3B before fine-tuning; outputs not committed; how to compare with adapter
+- **eval/scripts/compare_runs.py** — CLI tool for comparing baseline vs adapter eval results; --baseline --candidate --json; counts categories, missing outputs, manual_review_required; no invented scores; returns comparison_status
+- **tests/fixtures/baseline_eval_result.json** — Synthetic baseline eval fixture for compare_runs testing
+- **tests/fixtures/adapter_eval_result.json** — Synthetic adapter eval fixture for compare_runs testing
+- **RELEASE_CHECKLIST.md** — Added v0.1.20 Checks section
+- **scripts/release/check-release.py** — Expanded with v0.1.20 checks (baseline eval plan, adapter artifact policy, private training runbook, preview gate, private SFT run config, dryrun script, pipeline script, compare_runs, gitignore blocks, MODEL_CARD fixes)
+- **New tests** (`tests/test_release_v0120.py`) — Tests for MODEL_CARD fixes, baseline eval plan, adapter policy, private run config, dryrun script, pipeline dry-run, compare_runs, gitignore blocks, preview gate, release check
+
+### Changed
+- **Version bumped** to `0.1.20-alpha`
+- **MODEL_CARD.md** — Fixed checklist (seed dataset → In Progress); fixed version history (0.1.19-alpha → Released)
+- **eval/kimarifit.py** — Added --output for dry-run plan JSON; optional --run-id and --model-label; includes score_status
+- **docs/FIRST_PRIVATE_TRAINING_RUN.md** — Added references to PRIVATE_TRAINING_RUNBOOK, adapter artifact policy, preview gate, baseline eval plan
+- **docs/HF_PLACEHOLDER_PLAN.md** — Added note about ADAPTER_PREVIEW_GATE blocking uploads; no adapter/GGUF/fake benchmarks
+- **README.md** — Added private SFT run preparation, baseline eval plan, adapter artifact policy, preview gate sections
+- **docs/index.html** — Added v0.1.20 focus block (private SFT runbook, adapter policy, preview gate, no public weights)
+- **.gitignore** — Added training/runs/, training/adapters/, training/logs/, training/checkpoints/, wandb/, lightning_logs/, tensorboard/, *.safetensors, *.bin, *.pt, *.pth, *.ckpt, *.gguf
+- **ROADMAP.md** — v0.1.19-alpha marked as Released; v0.1.20-alpha marked as Current; v0.1.21-alpha Planned
 
 ### Added
 - **docs/MODEL_DECISION_RECORD.md updated** — Status changed from "Proposed" to "Accepted for first private training run"; SmolLM3-3B formally accepted as experimental base for first private SFT; public release base still subject to eval and license review
