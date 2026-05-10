@@ -1771,6 +1771,22 @@ def main():
     setup_parser.add_argument("--profile", "-p", default=None, help="Profile to recommend")
     setup_parser.add_argument("--integration", default=None, help="Integration target (openclaw, hermes, continue)")
 
+    # api (experimental)
+    api_parser = subparsers.add_parser("api", help="Start experimental Kimari REST API")
+    api_parser.add_argument("--host", default="127.0.0.1", help="Bind address (default: 127.0.0.1)")
+    api_parser.add_argument("--port", type=int, default=11436, help="API port (default: 11436)")
+    api_parser.add_argument(
+        "--experimental",
+        action="store_true",
+        help="Required to actually start the API (otherwise shows warning)",
+    )
+    api_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would happen without starting the server",
+    )
+    api_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
+
     # token
     token_parser = subparsers.add_parser("token", help="Manage local auth tokens")
     token_sub = token_parser.add_subparsers(dest="token_command", help="Token subcommands")
@@ -1930,6 +1946,16 @@ def main():
             json_output=getattr(args, "json_output", False),
             profile_name=getattr(args, "profile", None),
             integration=getattr(args, "integration", None),
+        )
+    elif args.command == "api":
+        from kimari.api.server import run_api_command
+
+        run_api_command(
+            host=args.host,
+            port=args.port,
+            experimental=args.experimental,
+            dry_run=args.dry_run,
+            json_output=getattr(args, "json_output", False),
         )
     elif args.command == "token":
         from kimari.security.tokens import create_token, delete_token, show_token

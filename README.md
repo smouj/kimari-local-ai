@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.15--alpha-9b59b6.svg" alt="v0.1.15-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.16--alpha-9b59b6.svg" alt="v0.1.16-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.15-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.16-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.15-alpha**
+> **Kimari Local AI v0.1.16-alpha**
 
 ### ✅ Works Today
 
@@ -77,6 +77,11 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Hash pinning workflow** — `kimari models pin-hash` with `--dry-run` / `--write` / `--yes` flags
 - **Benchmark result sharing** — standardized format in `benchmarks/RESULT_FORMAT.md`
 - **Windows wheel install** — PowerShell scripts for wheel build, install, and TestPyPI install
+- **Experimental API** — `kimari api --experimental` on port 11436 (unstable)
+- **PyPI release gate** — documented criteria, status PENDING
+- **Model hashing docs** — full workflow in `docs/MODEL_HASHING.md`
+- **Benchmark submissions** — community workflow in `docs/BENCHMARK_SUBMISSIONS.md`
+- **Windows packaging** — scripts and docs in `scripts/windows/`
 
 ### 🔨 Planned
 
@@ -440,6 +445,57 @@ Windows users can install from a built wheel or TestPyPI using the new PowerShel
 .\scripts\windows\install-from-testpypi.ps1
 ```
 
+## 🧪 Experimental API
+
+An experimental REST API is available for testing. It is **not** the planned v0.2 FastAPI server — it is a separate, unstable endpoint.
+
+```bash
+pip install "kimari-local-ai[api]"
+kimari api --experimental
+# Listens on http://127.0.0.1:11436
+```
+
+> ⚠️ **Experimental** — This API may change or be removed without notice. Not for production use.
+>
+> See [docs/API_EXPERIMENTAL.md](docs/API_EXPERIMENTAL.md) for details.
+
+## 🔐 PyPI Release Gate
+
+The PyPI publishing workflow is documented but **not yet active**. Status: **PENDING**. No package is published on real PyPI.
+
+See [docs/PYPI_RELEASE_GATE.md](docs/PYPI_RELEASE_GATE.md) for the gate criteria and current status.
+
+## #️⃣ Model Hashing
+
+Verify model integrity and pin SHA256 hashes to the registry:
+
+```bash
+kimari models hash <path>          # Compute SHA256 of a GGUF file
+kimari models verify <model-id>    # Verify against registry
+kimari models pin-hash <model-id>  # Pin hash (--dry-run / --write / --yes)
+```
+
+See [docs/MODEL_HASHING.md](docs/MODEL_HASHING.md) for the full workflow.
+
+## 📤 Benchmark Submissions
+
+Share benchmark results with the community using the standardized format. Submit via PR to `benchmarks/results/`.
+
+See [docs/BENCHMARK_SUBMISSIONS.md](docs/BENCHMARK_SUBMISSIONS.md) for the community workflow and format.
+
+## 🪟 Windows Install
+
+PowerShell scripts for building, installing, and testing on Windows:
+
+```powershell
+.\scripts\windows\build-wheel.ps1
+.\scripts\windows\install-from-wheel.ps1
+```
+
+See [scripts/windows/README.md](scripts/windows/README.md) for details.
+
+---
+
 ## 🔌 IDE & Agent Integrations
 
 Kimari works as a local backend for AI coding assistants and autonomous agents via its OpenAI-compatible API.
@@ -534,6 +590,10 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Continue Integration](docs/integrations/CONTINUE.md) | Use Kimari as IDE coding assistant |
 | [OpenAI-Compatible Clients](docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md) | Generic client integration guide |
 | [Reverse Proxy Auth](docs/REVERSE_PROXY_AUTH.md) | nginx/Caddy auth setup for local API |
+| [Experimental API](docs/API_EXPERIMENTAL.md) | Experimental REST API (port 11436) |
+| [PyPI Release Gate](docs/PYPI_RELEASE_GATE.md) | PyPI publishing gate criteria and status |
+| [Model Hashing](docs/MODEL_HASHING.md) | SHA256 hash verification and pinning workflow |
+| [Benchmark Submissions](docs/BENCHMARK_SUBMISSIONS.md) | Community benchmark submission workflow |
 | [API Plan (v0.2)](docs/API_PLAN.md) | FastAPI REST API design for v0.2 |
 
 ---

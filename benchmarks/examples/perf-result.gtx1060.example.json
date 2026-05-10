@@ -1,0 +1,31 @@
+{
+  "kimari_version": "0.1.16-alpha",
+  "profile": "gtx1060",
+  "model_filename": "qwen3-4b-q4_k_m.gguf",
+  "model_sha256": null,
+  "quantization": "Q4_K_M",
+
+  "gpu": "NVIDIA GeForce GTX 1060 6GB",
+  "driver": "550.54.14",
+  "cuda": "12.4",
+  "os": "Linux 5.15.0-107-generic",
+  "python": "3.12.3",
+
+  "ctx": 8192,
+  "batch": 256,
+  "ubatch": 128,
+  "cache_type_k": "f16",
+  "cache_type_v": "f16",
+  "flash_attn": true,
+  "parallel": 4,
+
+  "tokens_per_second": 15.23,
+  "prompt_tokens_per_second": 320.5,
+  "ttft_ms": 847.3,
+
+  "vram_used_gb": 4.82,
+  "ram_used_gb": 2.14,
+
+  "timestamp": "2025-06-15T14:30:00Z",
+  "notes": "Stable run on idle system, no thermal throttling observed"
+}

@@ -308,6 +308,110 @@ kimari --version
 
 > **Note:** TestPyPI may not have the latest version immediately. Check the [TestPyPI project page](https://test.pypi.org/project/kimari-local-ai/) for availability.
 
+## Pre-Installation Validation
+
+Before running any install script, validate that your environment meets the minimum requirements.
+
+### Python 3.10+ Validation
+
+Kimari requires **Python 3.10 or later**. Verify your Python version:
+
+```powershell
+python --version
+```
+
+Expected output (example): `Python 3.12.3`
+
+If the version is below 3.10, or Python is not found:
+
+1. Install Python 3.10+ from [python.org](https://www.python.org/downloads/).
+2. During installation, **check "Add Python to PATH"**.
+3. Restart your terminal after installation.
+4. Re-run `python --version` to confirm.
+
+The install scripts (`install-from-wheel.ps1` and `install-from-testpypi.ps1`) validate the Python version automatically and will exit with an error if Python < 3.10 is detected.
+
+### Virtual Environment (venv) Check
+
+It is strongly recommended to install Kimari inside a virtual environment to avoid conflicts with system packages.
+
+**Create and activate a venv:**
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+**Verify the venv is active:**
+
+```powershell
+# Should show the venv's Python, not the system Python
+Get-Command python | Select-Object Source
+```
+
+If you see a path inside `.venv\`, the venv is active. If not, re-activate it:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+The install scripts accept a `-VenvPath` parameter to create and activate a venv automatically:
+
+```powershell
+.\scripts\windows\install-from-wheel.ps1 -WheelPath .\dist\kimari_local_ai-0.1.16a0-py3-none-any.whl -VenvPath .venv
+```
+
+### `kimari --version` Check
+
+After installation, verify the CLI is working:
+
+```powershell
+kimari --version
+```
+
+Expected output: `0.1.16-alpha` (or the version you installed)
+
+If this fails with "command not found":
+
+1. Ensure the venv is activated.
+2. Try `python -m kimari.cli.main --version` as a fallback.
+3. Restart your terminal and try again (the PATH may need refreshing).
+
+### `kimari setup --json` Check
+
+Verify that Kimari can detect your environment:
+
+```powershell
+kimari setup --json
+```
+
+This outputs structured JSON with detected hardware, recommended profile, and available models. A successful run confirms the core CLI is functioning correctly.
+
+### CUDA / llama-server Missing
+
+If CUDA or llama-server is not detected, Kimari will still install and run — but GPU-accelerated inference will not be available.
+
+**What to do if CUDA is missing:**
+
+- Install the [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) (11.0 or later).
+- Ensure your NVIDIA GPU drivers are up to date.
+- Kimari can run in **CPU-only mode** without CUDA, but performance will be significantly lower.
+
+**What to do if llama-server is missing:**
+
+- Build llama-server from source (see the "llama-server not found" troubleshooting section below).
+- Or download a pre-built binary from [llama.cpp releases](https://github.com/ggerganov/llama.cpp/releases).
+- Set the `LLAMA_SERVER` environment variable if the binary is not on PATH.
+
+**Important:** The install scripts do **not** automatically download models. After installation, you must manually pull a model:
+
+```powershell
+kimari pull test       # Download a small test model
+kimari pull --list     # See all available models
+```
+
+---
+
 ## Setup and Configuration
 
 ### Guided Setup

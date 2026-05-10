@@ -16,8 +16,8 @@ info:
   x-draft: true
 
 servers:
-  - url: http://127.0.0.1:11435
-    description: Local llama-server (default Kimari binding)
+  - url: http://127.0.0.1:11436
+    description: Local Kimari API server (experimental, default port 11436)
 
 security: []
 
@@ -26,10 +26,13 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
+      x-experimental: true
       description: |
-        Optional Bearer token. When a Kimari token is configured and a
-        reverse proxy is in front of llama-server, the proxy validates
-        this token. llama-server itself does not enforce authentication.
+        Optional Bearer token (experimental in v0.1.16-alpha). When
+        enabled, the API validates the token using the existing
+        kimari/security/tokens.py module. Not enforced by default.
+        The `--auth` flag or `api.auth_enabled = true` in config
+        activates token checking on all endpoints except GET /health.
 
   schemas:
     HealthStatus:
@@ -259,7 +262,10 @@ paths:
   /health:
     get:
       summary: Health check
-      description: Returns server health status. This endpoint is served by llama-server directly.
+      description: |
+        Returns Kimari API health status. This endpoint is always
+        accessible, even when auth is enabled. Returns the API version
+        and uptime.
       operationId: getHealth
       responses:
         "200":
@@ -274,7 +280,10 @@ paths:
   /status:
     get:
       summary: Server status
-      description: Returns Kimari server process status including PID, profile, and model info.
+      description: |
+        Returns Kimari server process status including PID, profile,
+        model info, and uptime. Equivalent to `kimari status --json`.
+        Requires auth when enabled.
       operationId: getStatus
       security:
         - BearerAuth: []
@@ -295,7 +304,11 @@ paths:
   /config:
     get:
       summary: Current configuration
-      description: Returns the current Kimari configuration including profiles and defaults.
+      description: |
+        Returns the current resolved Kimari configuration including
+        profiles, defaults, and paths. Sensitive fields (tokens, API keys)
+        are masked. Equivalent to `kimari config show --json`.
+        Requires auth when enabled.
       operationId: getConfig
       security:
         - BearerAuth: []
@@ -316,7 +329,10 @@ paths:
   /profiles:
     get:
       summary: List profiles
-      description: Returns all configured GPU profiles with their settings.
+      description: |
+        Returns all configured GPU profiles with their settings including
+        hardware targets and model associations. Equivalent to
+        `kimari profiles list --json`. Requires auth when enabled.
       operationId: getProfiles
       security:
         - BearerAuth: []
@@ -339,7 +355,10 @@ paths:
   /models:
     get:
       summary: List models
-      description: Returns available and downloaded models from the Kimari model registry.
+      description: |
+        Returns available and downloaded models from the Kimari model
+        registry including sizes, quantization levels, and download status.
+        Equivalent to `kimari models list --json`. Requires auth when enabled.
       operationId: getModels
       security:
         - BearerAuth: []
@@ -361,8 +380,13 @@ paths:
 
   /server/start:
     post:
-      summary: Start server
-      description: Starts the Kimari llama-server with the specified profile.
+      summary: Start server (planned)
+      description: |
+        Starts the Kimari llama-server with the specified profile.
+        **Currently returns 501 Not Implemented** — planned for a future
+        release. Will start llama-server as a subprocess with the given
+        profile settings when implemented. Equivalent to `kimari start`.
+        Requires auth when enabled.
       operationId: startServer
       security:
         - BearerAuth: []
@@ -373,8 +397,14 @@ paths:
             schema:
               $ref: "#/components/schemas/ServerStartRequest"
       responses:
+        "501":
+          description: Not Implemented — server start is planned for a future release
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "200":
-          description: Server started or already running
+          description: Server started or already running (future)
           content:
             application/json:
               schema:
@@ -394,14 +424,24 @@ paths:
 
   /server/stop:
     post:
-      summary: Stop server
-      description: Stops the running Kimari llama-server process.
+      summary: Stop server (planned)
+      description: |
+        Stops the currently running Kimari llama-server process.
+        **Currently returns 501 Not Implemented** — planned for a future
+        release. Will stop the running subprocess when implemented.
+        Equivalent to `kimari stop`. Requires auth when enabled.
       operationId: stopServer
       security:
         - BearerAuth: []
       responses:
+        "501":
+          description: Not Implemented — server stop is planned for a future release
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "200":
-          description: Server stopped or not running
+          description: Server stopped or not running (future)
           content:
             application/json:
               schema:
@@ -416,8 +456,13 @@ paths:
   /optimize:
     post:
       summary: Get optimization recommendations
-      description: Returns recommended settings for the specified profile and VRAM configuration.
-      operationId: optimize
+      description: |
+        Returns recommended settings for the specified profile and VRAM
+        configuration. Includes context, batch, cache type, GPU layers,
+        flash attention, and parallel recommendations with confidence
+        levels. Equivalent to `kimari optimize --json`.
+        Requires auth when enabled.
+      operationId: optimizeProfile
       security:
         - BearerAuth: []
       requestBody:
@@ -449,7 +494,12 @@ paths:
   /perf/dry-run:
     post:
       summary: Performance dry run
-      description: Simulates starting the server and returns the command and resource estimates without actually starting.
+      description: |
+        Simulates starting the server and returns the llama-server command
+        and resource estimates without actually starting. Returns predicted
+        tokens/s, memory usage, context window, and the full command that
+        would be executed. Equivalent to `kimari perf --dry-run --json`.
+        Requires auth when enabled.
       operationId: perfDryRun
       security:
         - BearerAuth: []
