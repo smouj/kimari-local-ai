@@ -5,7 +5,29 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.13-alpha] — 2026-05-15
+## [0.1.14-alpha] — 2026-05-16
+
+### Added
+- **`kimari setup --write`** — Persists detected configuration to user config dir with automatic timestamped backup; `--json` output includes `would_write`, `written`, `config_path`, `backup_path`; no config written without explicit `--write` flag
+- **Setup persistence module** (`kimari/setup/writer.py`) — `build_setup_patch()`, `write_setup_config()`, `backup_config()`, `load_setup_summary()`; pure functions, testable with `tmp_path`, no new dependencies
+- **`kimari models hash <path>`** — Computes SHA256 hash of a local GGUF file; `--json` output includes `path`, `sha256`, `size_bytes`, `file_exists`
+- **`kimari models verify <model-id-or-path>`** — Verifies model hash against registry; reports `match`, `mismatch`, `not_pinned`, or `computed_only`; `--json` output
+- **`kimari models pin-hash <model-id>`** — Pins computed SHA256 to user registry; dry-run by default; `--write` creates backup before modifying; `--json` output
+- **`get_effective_models_registry()`** — Returns merged registry (user overrides packaged defaults)
+- **Reverse proxy auth guide** (`docs/REVERSE_PROXY_AUTH.md`) — nginx and Caddy examples with Bearer token validation; warning that `llama-server` does not apply auth natively; troubleshooting for 401, connection refused, wrong port, CORS
+- **API plan** (`docs/API_PLAN.md`) — Technical design for v0.2.0-alpha FastAPI REST API (`kimari api`); 9 proposed endpoints; optional Bearer token auth; architecture diagram; risks and testing plan; NOT implemented yet
+- **`docs/PUBLISHING.md`** — Added v0.1.14 TestPyPI actual validation section with checklist, result table, and validation commands
+- **`scripts/windows/README.md`** — Added sections for wheel/TestPyPI install, `kimari setup --write`, auth tokens, and model hash verification
+- **RELEASE_CHECKLIST.md** — Added Setup Write-Mode, SHA256 Tooling, and New Documentation check sections; added `setup --write`, `models hash`, `models verify` checks in Packaging & CI and Content Review sections
+- **`scripts/release/check-release.py`** — Added 3 new validation categories (21 total): Setup write-mode & SHA256 tooling, New documentation files, Content integrity v0.1.14 re-check; added `_no_invented_hashes()` helper
+- **New tests** (`tests/test_release_v0114.py`) — Tests for version consistency, setup writer, SHA256 tooling, documentation, README links, release check improvements, and no false claims
+
+### Changed
+- **Version bumped** to `0.1.14-alpha`
+- **`kimari/cli/main.py`** — Added `--write` flag to setup parser; added `models hash`, `models verify`, `models pin-hash` subcommands; setup `run_setup()` now accepts `write` parameter and integrates with `kimari/setup/writer.py`
+- **`kimari/models/registry.py`** — Added `compute_model_hash()`, `verify_model_hash_v2()`, `pin_model_hash()`, `get_effective_models_registry()`; added `datetime` and `shutil` imports
+- **`README.md`** — Added setup write-mode and model hash verification sections; added links to REVERSE_PROXY_AUTH.md and API_PLAN.md; updated version badge
+- **`docs/index.html`** — Updated version references to v0.1.14-alpha; added reverse proxy auth and API plan doc cards; updated status section
 
 ### Added
 - **Code of Conduct** (`CODE_OF_CONDUCT.md`) — Based on Contributor Covenant 3.0; covers issues, PRs, discussions, GitHub Pages, docs, integrations; private reporting via email (no public issues); TODO: replace with dedicated contact before broad launch

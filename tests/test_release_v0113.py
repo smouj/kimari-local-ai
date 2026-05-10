@@ -1,5 +1,5 @@
 """
-Release validation tests for Kimari Local AI v0.1.13-alpha.
+Release validation tests for Kimari Local AI v0.1.14-alpha.
 
 Verifies community standards, packaging polish, CI configuration,
 and contributor readiness for the v0.1.13 release.
@@ -202,19 +202,19 @@ class TestVersionConsistency:
 
     def test_pyproject_version(self):
         text = (PROJECT_ROOT / "pyproject.toml").read_text()
-        assert "0.1.13-alpha" in text
+        assert "0.1.14-alpha" in text
 
     def test_init_version(self):
         text = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
-        assert "0.1.13-alpha" in text
+        assert "0.1.14-alpha" in text
 
     def test_readme_version_badge(self):
         text = (PROJECT_ROOT / "README.md").read_text()
-        assert "0.1.13-alpha" in text
+        assert "0.1.14-alpha" in text
 
     def test_index_html_version(self):
         text = (PROJECT_ROOT / "docs" / "index.html").read_text()
-        assert "0.1.13-alpha" in text
+        assert "0.1.14-alpha" in text
 
 
 class TestNoFalseClaims:

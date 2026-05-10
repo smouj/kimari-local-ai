@@ -35,6 +35,30 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] `kimari start --dry-run --strict-flags` works or warns correctly
 - [ ] `kimari token create/show/delete` tested with tmp dir or safe environment
 
+## Setup Write-Mode
+
+- [ ] `kimari setup --write` tested with KIMARI_HOME temporal
+- [ ] Config backup created when writing to existing config
+- [ ] `kimari setup --json` includes would_write/written/config_path/backup_path
+- [ ] Setup writer module exists (kimari/setup/writer.py)
+- [ ] No config written without `--write` flag
+
+## SHA256 Tooling
+
+- [ ] `kimari models hash <path>` computes SHA256 of local file
+- [ ] `kimari models verify <model-id>` detects hash not pinned
+- [ ] `kimari models verify <model-id>` detects match/mismatch with registry
+- [ ] `kimari models pin-hash <model-id>` dry-run by default
+- [ ] `kimari models pin-hash <model-id> --write` creates backup before modifying user registry
+- [ ] No invented hashes (sha256 null until explicitly pinned)
+
+## New Documentation
+
+- [ ] `docs/REVERSE_PROXY_AUTH.md` exists
+- [ ] `docs/API_PLAN.md` exists
+- [ ] `docs/PUBLISHING.md` updated with v0.1.14 TestPyPI section
+- [ ] `scripts/windows/README.md` updated with wheel/TestPyPI install, setup --write, models hash
+
 ## Build & Package
 
 - [ ] `python -m build` — builds without errors
@@ -66,6 +90,10 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md exists
 - [ ] config/integrations/ directory with example configs exists
 - [ ] No "Responses API supported" false claim anywhere
+- [ ] README mentions `kimari setup --write`
+- [ ] README mentions `models hash` and `models verify`
+- [ ] README links to reverse proxy auth guide
+- [ ] README links to API plan
 - [ ] New profiles exist (gtx1060-safe, gtx1060-fast, gtx1080-balanced, gtx1080-longctx, ide-local, agent-local, openclaw-local, hermes-local)
 - [ ] Windows scripts exist (scripts/windows/kimari-launcher.ps1, kimari-doctor.ps1)
 - [ ] llama-server flag detection tests pass
@@ -99,6 +127,10 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] `kimari setup --json` works from wheel install
 - [ ] `kimari start --dry-run` works from wheel install
 - [ ] `kimari token create/show/delete` works from wheel install
+- [ ] `kimari setup --write` works from wheel install
+- [ ] `kimari models hash` works from wheel install
+- [ ] No PyPI real without TestPyPI validated
+- [ ] No hashes invented in registry
 
 ## Publishing (Manual)
 

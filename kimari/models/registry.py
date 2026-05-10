@@ -5,8 +5,10 @@ Handles loading the model registry, listing models, downloading GGUF files,
 and validating model integrity via SHA256 hashes.
 """
 
+import datetime
 import hashlib
 import json
+import shutil
 import time
 from pathlib import Path
 
@@ -431,6 +433,308 @@ def pull_all_models(dry_run: bool = False, force: bool = False):
             continue
         print(f"\n  {'[DRY RUN] ' if dry_run else ''}Downloading {m['id']}...")
         pull_model(m["id"], dry_run=dry_run, force=force)
+
+
+def get_effective_models_registry() -> dict:
+    """Return the effective models registry dict, merging user registry with packaged defaults.
+
+    If a user registry exists, it takes precedence. Otherwise, falls back to the
+    standard resolution order (repo-root config, then packaged defaults).
+    """
+    user_registry_path = get_user_models_registry_path()
+    if user_registry_path.exists():
+        with open(user_registry_path) as f:
+            return json.load(f)
+
+    # Fall back to the standard resolution order
+    return load_models_registry()
+
+
+def compute_model_hash(model_path: str | Path, json_output: bool = False) -> str | dict | None:
+    """Compute the SHA256 hash of a local GGUF model file.
+
+    Args:
+        model_path: Path to the GGUF file.
+        json_output: If True, return a structured dict; otherwise print and return the hash string.
+
+    Returns:
+        Hash string (json_output=False), dict (json_output=True), or None if file not found.
+    """
+    filepath = Path(model_path)
+
+    if not filepath.exists():
+        if json_output:
+            return {"path": str(filepath), "sha256": None, "size_bytes": 0, "file_exists": False}
+        print(f"[ERROR] File not found: {filepath}")
+        return None
+
+    actual_hash = _compute_sha256(filepath, progress=not json_output)
+    file_size = filepath.stat().st_size
+
+    if json_output:
+        return {"path": str(filepath), "sha256": actual_hash, "size_bytes": file_size, "file_exists": True}
+
+    size_mb = file_size / (1024 * 1024)
+    print(f"\n  {Color.BOLD}Model Hash{Color.RESET}")
+    print(f"  Path:   {filepath}")
+    print(f"  Size:   {size_mb:.1f} MB ({file_size:,} bytes)")
+    print(f"  SHA256: {actual_hash}")
+    return actual_hash
+
+
+def verify_model_hash_v2(model_id_or_path: str | Path, json_output: bool = False) -> dict | None:
+    """Verify a model's SHA256 hash against the registry, or compute hash for a file path.
+
+    If *model_id_or_path* matches a registry entry by ID, the stored hash is compared.
+    If it looks like a file path instead, the hash is computed and checked against all
+    registry entries.
+
+    Args:
+        model_id_or_path: A model ID from the registry or a filesystem path.
+        json_output: If True, return a structured dict; otherwise print human-readable output.
+
+    Returns:
+        A dict when json_output is True, otherwise None.
+    """
+    registry = get_effective_models_registry()
+    models = registry.get("models", [])
+
+    # Try to match by model ID first
+    model_entry = None
+    for m in models:
+        if m["id"] == model_id_or_path:
+            model_entry = m
+            break
+
+    if model_entry is not None:
+        model_id = model_entry["id"]
+        expected_hash = model_entry.get("sha256") or None
+        target = _resolve_model_target(model_entry["target_path"])
+
+        if not target.exists():
+            msg = f"Model file not found: {target}"
+            if json_output:
+                return {
+                    "model_id": model_id,
+                    "status": "not_pinned" if expected_hash is None else "mismatch",
+                    "expected_hash": expected_hash,
+                    "actual_hash": None,
+                    "file_path": str(target),
+                }
+            print(f"[ERROR] {msg}")
+            return None
+
+        actual_hash = _compute_sha256(target, progress=not json_output)
+
+        if expected_hash is None:
+            if json_output:
+                return {
+                    "model_id": model_id,
+                    "status": "not_pinned",
+                    "expected_hash": None,
+                    "actual_hash": actual_hash,
+                    "file_path": str(target),
+                }
+            warn(f"SHA256 is not pinned for model '{model_id}'.")
+            print(f"  Computed hash: {actual_hash}")
+            print(f"  Use 'kimari models --pin {model_id}' to pin this hash.")
+            return None
+
+        if actual_hash == expected_hash:
+            if json_output:
+                return {
+                    "model_id": model_id,
+                    "status": "match",
+                    "expected_hash": expected_hash,
+                    "actual_hash": actual_hash,
+                    "file_path": str(target),
+                }
+            ok(f"SHA256 hash verified for {model_id}")
+            print(f"  Expected: {expected_hash}")
+            print(f"  Actual:   {actual_hash}")
+            return None
+        else:
+            if json_output:
+                return {
+                    "model_id": model_id,
+                    "status": "mismatch",
+                    "expected_hash": expected_hash,
+                    "actual_hash": actual_hash,
+                    "file_path": str(target),
+                }
+            print(f"  {Color.RED}[FAIL]{Color.RESET} SHA256 mismatch for {model_id}")
+            print(f"  Expected: {expected_hash}")
+            print(f"  Actual:   {actual_hash}")
+            return None
+
+    # Treat as a file path
+    filepath = Path(model_id_or_path)
+    if not filepath.exists():
+        msg = f"Not a registry model ID and file not found: {model_id_or_path}"
+        if json_output:
+            return {
+                "model_id": str(model_id_or_path),
+                "status": "computed_only",
+                "expected_hash": None,
+                "actual_hash": None,
+                "file_path": str(filepath),
+            }
+        print(f"[ERROR] {msg}")
+        return None
+
+    actual_hash = _compute_sha256(filepath, progress=not json_output)
+
+    # Check if the hash matches any registry entry
+    matched_entry = None
+    for m in models:
+        if m.get("sha256") and m["sha256"] == actual_hash:
+            matched_entry = m
+            break
+
+    if matched_entry is not None:
+        if json_output:
+            return {
+                "model_id": matched_entry["id"],
+                "status": "match",
+                "expected_hash": matched_entry["sha256"],
+                "actual_hash": actual_hash,
+                "file_path": str(filepath),
+            }
+        ok(f"SHA256 matches registry entry: {matched_entry['id']}")
+        print(f"  Expected: {matched_entry['sha256']}")
+        print(f"  Actual:   {actual_hash}")
+        return None
+    else:
+        if json_output:
+            return {
+                "model_id": str(model_id_or_path),
+                "status": "computed_only",
+                "expected_hash": None,
+                "actual_hash": actual_hash,
+                "file_path": str(filepath),
+            }
+        info("No matching registry entry for this hash.")
+        print(f"  SHA256: {actual_hash}")
+        print(f"  Path:   {filepath}")
+        return None
+
+
+def pin_model_hash(model_id: str, write: bool = False, json_output: bool = False) -> dict | None:
+    """Pin the SHA256 hash of a registry model into the user models registry.
+
+    Computes the SHA256 of the local file for a registry model and optionally
+    writes it to the user-level models registry.
+
+    Args:
+        model_id: A model ID from the registry.
+        write: If True, write the hash to the user registry. If False (default),
+               only show what would be changed.
+        json_output: If True, return a structured dict; otherwise print human-readable output.
+
+    Returns:
+        A dict when json_output is True, otherwise None.
+    """
+    registry = get_effective_models_registry()
+    models = registry.get("models", [])
+
+    model_entry = None
+    for m in models:
+        if m["id"] == model_id:
+            model_entry = m
+            break
+
+    if model_entry is None:
+        msg = f"Model '{model_id}' not found in registry."
+        if json_output:
+            return {
+                "model_id": model_id,
+                "sha256": None,
+                "would_write": False,
+                "written": False,
+                "user_registry_path": str(get_user_models_registry_path()),
+                "backup_path": None,
+            }
+        print(f"[ERROR] {msg}")
+        return None
+
+    target = _resolve_model_target(model_entry["target_path"])
+    if not target.exists():
+        msg = f"Model file not found: {target}"
+        if json_output:
+            return {
+                "model_id": model_id,
+                "sha256": None,
+                "would_write": False,
+                "written": False,
+                "user_registry_path": str(get_user_models_registry_path()),
+                "backup_path": None,
+            }
+        print(f"[ERROR] {msg}")
+        return None
+
+    actual_hash = _compute_sha256(target, progress=not json_output)
+    user_registry_path = get_user_models_registry_path()
+    backup_path = None
+
+    if not write:
+        if json_output:
+            return {
+                "model_id": model_id,
+                "sha256": actual_hash,
+                "would_write": True,
+                "written": False,
+                "user_registry_path": str(user_registry_path),
+                "backup_path": None,
+            }
+        print(f"\n  {Color.YELLOW}[DRY RUN]{Color.RESET} Would pin SHA256 for {Color.CYAN}{model_id}{Color.RESET}")
+        print(f"  SHA256:  {actual_hash}")
+        print(f"  Target:  {user_registry_path}")
+        print(f"  Use {Color.CYAN}--write{Color.RESET} to actually write the hash.")
+        return None
+
+    # write=True path
+    # Prepare the registry data to write
+    registry_to_write = dict(registry)
+    models_list = [dict(m) for m in registry_to_write.get("models", [])]
+
+    # Update the matching model's sha256
+    for m in models_list:
+        if m["id"] == model_id:
+            m["sha256"] = actual_hash
+            break
+
+    registry_to_write["models"] = models_list
+
+    # Create backup if user registry already exists
+    if user_registry_path.exists():
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_path = user_registry_path.with_name(f"kimari.models.json.bak.{timestamp}")
+        shutil.copy2(user_registry_path, backup_path)
+
+    # Ensure parent directory exists
+    user_registry_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Write the full registry to the user path
+    with open(user_registry_path, "w") as f:
+        json.dump(registry_to_write, f, indent=2)
+        f.write("\n")
+
+    if json_output:
+        return {
+            "model_id": model_id,
+            "sha256": actual_hash,
+            "would_write": False,
+            "written": True,
+            "user_registry_path": str(user_registry_path),
+            "backup_path": str(backup_path) if backup_path else None,
+        }
+
+    ok(f"SHA256 pinned for {model_id}")
+    print(f"  SHA256:  {actual_hash}")
+    print(f"  Written: {user_registry_path}")
+    if backup_path:
+        print(f"  Backup:  {backup_path}")
+    return None
 
 
 def scan_models_dir_for_gguf() -> list:
