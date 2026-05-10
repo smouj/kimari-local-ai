@@ -273,3 +273,88 @@ Then retry the launcher.
 2. Try upgrading pip first: `python -m pip install --upgrade pip`
 3. Install manually: `pip install -e .`
 4. If behind a proxy, configure pip: `pip config set global.proxy http://proxy:port`
+
+## Installing from Wheel or TestPyPI
+
+### From a Built Wheel
+
+If you have a pre-built `.whl` file:
+
+```powershell
+# Create a virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Install from the wheel
+pip install .\dist\kimari_local_ai-0.1.14a0-py3-none-any.whl
+
+# Verify
+kimari --version
+```
+
+### From TestPyPI (When Available)
+
+```powershell
+# Create a virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Install from TestPyPI
+pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kimari-local-ai
+
+# Verify
+kimari --version
+```
+
+> **Note:** TestPyPI may not have the latest version immediately. Check the [TestPyPI project page](https://test.pypi.org/project/kimari-local-ai/) for availability.
+
+## Setup and Configuration
+
+### Guided Setup
+
+Kimari can detect your environment and recommend the best configuration:
+
+```powershell
+# Detect environment and show recommendations
+kimari setup
+
+# JSON output for automation
+kimari setup --json
+
+# Persist detected configuration to your user config directory
+kimari setup --write
+```
+
+The `--write` flag creates a backup before writing and persists the recommended profile, integration settings, and hardware summary.
+
+### Auth Tokens
+
+Create a local auth token for future API or reverse proxy use:
+
+```powershell
+# Generate a new token
+kimari token create
+
+# Show the current token
+kimari token show
+
+# Delete the token
+kimari token delete
+```
+
+> **Note:** These tokens are prepared for future Kimari API / reverse proxy use. `llama-server` does not apply auth natively. See [docs/REVERSE_PROXY_AUTH.md](../../docs/REVERSE_PROXY_AUTH.md) for reverse proxy setup.
+
+### Model Hash Verification
+
+Verify the integrity of downloaded models:
+
+```powershell
+# Compute SHA256 hash of a local model file
+kimari models hash .\models\tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+
+# Verify a model against the registry
+kimari models verify test
+
+# Pin a model's hash to your user registry (dry-run by default)
+kimari models pin-hash test
+```

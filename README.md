@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.13--alpha-9b59b6.svg" alt="v0.1.13-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.14--alpha-9b59b6.svg" alt="v0.1.14-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.13-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.14-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.13-alpha**
+> **Kimari Local AI v0.1.14-alpha**
 
 ### ✅ Works Today
 
@@ -67,8 +67,10 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Hermes Agent integration** — Local OpenAI-compatible backend
 - **Continue.dev integration** — IDE coding assistant (VS Code / JetBrains)
 - **Guided setup** — `kimari setup` detects your environment and recommends configuration
+- **Setup write-mode** — `kimari setup --write` persists detected configuration with automatic backup
 - **Runtime flag validation** — `kimari start --dry-run --strict-flags` checks llama-server compatibility
 - **Local auth tokens** — `kimari token create` prepares tokens for future API/reverse proxy use
+- **Model hash verification** — `kimari models hash/verify` computes and checks SHA256 hashes of local GGUF files
 - **Windows helper scripts** — PowerShell launcher and doctor for Windows users
 
 ### 🔨 Planned
@@ -258,9 +260,23 @@ kimari fit --model models/file.gguf --vram 8.0        # Override VRAM for Kimari
 ```bash
 kimari setup                              # Detect environment and recommend configuration
 kimari setup --json                       # JSON output for automation
+kimari setup --write                      # Persist detected configuration to user config dir
 kimari setup --integration openclaw       # Recommend OpenClaw integration
 kimari setup --dry-run                    # Preview without detection
 ```
+
+### Model Hash Verification
+
+```bash
+kimari models hash <path>                 # Compute SHA256 hash of a local GGUF file
+kimari models hash <path> --json          # JSON output
+kimari models verify <model-id-or-path>   # Verify model hash against registry
+kimari models verify <model-id> --json    # JSON output
+kimari models pin-hash <model-id>         # Preview pinning hash to user registry (dry-run)
+kimari models pin-hash <model-id> --write # Actually pin hash to user registry
+```
+
+> **Note:** SHA256 hashes in the registry are not yet pinned. `kimari models verify` will report "hash not pinned" until hashes are explicitly set. Use `kimari models pin-hash <model-id> --write` to compute and pin real hashes for your local files.
 
 ### Token Management
 
@@ -323,11 +339,26 @@ Detects your OS, GPU, CUDA, llama-server binary, and local models, then recommen
 ```bash
 kimari setup                              # Full environment detection
 kimari setup --json                       # JSON output for automation
+kimari setup --write                      # Persist detected configuration with backup
 kimari setup --integration openclaw       # Recommend OpenClaw integration
 kimari setup --integration hermes         # Recommend Hermes integration
 kimari setup --integration continue       # Recommend Continue IDE integration
 kimari setup --dry-run                    # Preview without detection
 ```
+
+With `--write`, Kimari persists the recommended profile, integration settings, and hardware summary to your user config directory. A timestamped backup is created before any changes.
+
+### Model Hash Verification
+
+Verify the integrity of your downloaded models:
+
+```bash
+kimari models hash ./models/model.gguf    # Compute SHA256 of a local GGUF file
+kimari models verify test                 # Verify model against registry
+kimari models pin-hash test --write       # Pin real hash to user registry
+```
+
+SHA256 hashes in the registry are currently `null` (not yet pinned). Use `pin-hash --write` to compute and pin real hashes for your local files.
 
 ### Runtime Flag Validation
 
@@ -459,6 +490,8 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Hermes Integration](docs/integrations/HERMES.md) | Connect Hermes Agent to Kimari |
 | [Continue Integration](docs/integrations/CONTINUE.md) | Use Kimari as IDE coding assistant |
 | [OpenAI-Compatible Clients](docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md) | Generic client integration guide |
+| [Reverse Proxy Auth](docs/REVERSE_PROXY_AUTH.md) | nginx/Caddy auth setup for local API |
+| [API Plan (v0.2)](docs/API_PLAN.md) | FastAPI REST API design for v0.2 |
 
 ---
 

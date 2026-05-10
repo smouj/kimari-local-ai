@@ -303,3 +303,70 @@ Stage Summary:
 - 7 community document links added (CODE_OF_CONDUCT.md, CONTRIBUTING.md, SUPPORT.md, SECURITY.md, GOVERNANCE.md, MAINTAINERS.md, GitHub Issues)
 - Concise format — just links, no duplication of contributing content
 - 1 file changed
+
+---
+Task ID: 20
+Agent: Main Agent
+Task: v0.1.13-alpha Final validations and delivery
+
+Work Log:
+- Ran pytest: 250 tests passing
+- Ran ruff check kimari/ tests/: All checks passed
+- Ran ruff format --check: All files formatted
+- Ran check-release.py: 18/18 categories PASSED (0 warnings)
+- Built wheel and sdist with python -m build: SUCCESS
+- Ran twine check dist/*: PASSED both
+- Verified wheel contains all 3 defaults JSON files
+- Verified sdist contains all community files (via MANIFEST.in)
+- Tested wheel install in clean venv:
+  - kimari --version → v0.1.13-alpha
+  - kimari config path → packaged defaults
+  - kimari setup --json → correct JSON
+  - kimari start --dry-run → correct command
+  - kimari token create/show/delete → all work
+- Committed and pushed to GitHub main (19004ef)
+- Created and pushed tag v0.1.13-alpha
+
+Stage Summary:
+- v0.1.13-alpha fully delivered and pushed
+- 20 tasks completed, 29 files changed, +1506 -106
+- 250 tests passing, ruff clean, check-release 18/18 PASS
+- Wheel install from clean venv verified working
+- SPDX license format eliminates setuptools deprecation warnings
+- MANIFEST.in ensures sdist includes community files
+- wheel-install-smoke CI job added
+- All community standard files in place (CoC, Support, Contributing, Governance, Maintainers)
+- Issue templates (4 + config.yml) and improved PR template added
+- GitHub Pages and README updated with community sections
+
+
+---
+Task ID: v0.1.14-alpha
+Agent: main
+Task: Implement v0.1.14-alpha — TestPyPI validation, setup write-mode, SHA256 tooling, reverse proxy auth guide, API plan
+
+Work Log:
+- Version bumped to 0.1.14-alpha across pyproject.toml, __init__.py, README.md, docs/index.html
+- Created kimari/setup/__init__.py and kimari/setup/writer.py with build_setup_patch, write_setup_config, backup_config, load_setup_summary
+- Added compute_model_hash, verify_model_hash_v2, pin_model_hash, get_effective_models_registry to kimari/models/registry.py
+- Updated CLI: added --write flag to setup, added models hash/verify/pin-hash subcommands
+- Created docs/REVERSE_PROXY_AUTH.md (nginx/Caddy examples, token setup, troubleshooting)
+- Created docs/API_PLAN.md (FastAPI REST API design for v0.2.0-alpha, 9 endpoints, auth, risks)
+- Updated docs/PUBLISHING.md with v0.1.14 TestPyPI validation section
+- Updated scripts/windows/README.md with wheel/TestPyPI install, setup --write, models hash
+- Updated README.md with setup write-mode, model hash verification sections, reverse proxy/API plan links
+- Updated docs/index.html with new doc cards, version references, status section
+- Updated RELEASE_CHECKLIST.md with Setup Write-Mode, SHA256 Tooling, New Documentation sections
+- Updated scripts/release/check-release.py to 21 categories with _no_invented_hashes helper
+- Created tests/test_release_v0114.py with version, setup writer, SHA256, docs, README, no false claims tests
+- Updated CHANGELOG.md with v0.1.14-alpha entry
+- Updated ROADMAP.md: v0.1.13-alpha Released, v0.1.14-alpha Current, v0.1.15-alpha Planned
+
+Stage Summary:
+- 296 tests passing, ruff clean, check-release.py all checks passed
+- Wheel builds and installs correctly in clean venv
+- kimari setup --write persists config with backup
+- kimari models hash/verify/pin-hash work correctly
+- No invented SHA256 hashes (all null in packaged defaults)
+- TestPyPI upload not executed: credentials unavailable (documented)
+- All CLI commands work from wheel install

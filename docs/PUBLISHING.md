@@ -330,3 +330,85 @@ kimari token delete
 deactivate
 rm -rf /tmp/kimari-test-v013
 ```
+
+## v0.1.14 TestPyPI Actual Validation
+
+> **Purpose:** End-to-end validation that the v0.1.14-alpha wheel installs and works correctly from TestPyPI — including new setup --write and models hash/verify commands.
+
+### Notes
+
+- **Setup write-mode:** `kimari setup --write` now persists detected configuration to the user config dir with automatic backup.
+- **SHA256 tooling:** `kimari models hash <path>` computes real hashes; `kimari models verify <model>` checks against registry; `kimari models pin-hash <model> --write` pins hash to user registry.
+- **Registry merge:** User registry can now override packaged defaults via `get_effective_models_registry()`.
+- **No new dependencies:** Still only `requests>=2.31.0` as runtime dependency.
+
+### Checklist
+
+- [ ] `twine upload --repository testpypi dist/*` succeeds
+- [ ] Clean venv creation (`python -m venv /tmp/kimari-test-v014`)
+- [ ] `pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kimari-local-ai` succeeds
+- [ ] `kimari --version` prints `0.1.14-alpha`
+- [ ] `kimari config path` shows packaged defaults (not repo root)
+- [ ] `kimari setup --json` outputs correct JSON with would_write/written/config_path
+- [ ] `kimari setup --write` persists config with backup
+- [ ] `kimari start --dry-run` generates correct command with user paths
+- [ ] `kimari models hash <path>` computes SHA256 of local file
+- [ ] `kimari models verify test` reports "hash not pinned"
+- [ ] `kimari token create/show/delete` works
+- [ ] Result documented in table below
+- [ ] **NOT uploading to real PyPI until all TestPyPI checks pass**
+
+### Result
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Upload to TestPyPI | | |
+| Clean venv creation | | |
+| Install from TestPyPI | | |
+| `kimari --version` | | |
+| `kimari config path` | | |
+| `kimari setup --json` | | |
+| `kimari setup --write` | | |
+| `kimari start --dry-run` | | |
+| `kimari models hash` | | |
+| `kimari models verify test` | | |
+| `kimari token create` | | |
+| `kimari token show` | | |
+| `kimari token delete` | | |
+| Result documented | | |
+| Real PyPI upload blocked | | |
+
+> **TestPyPI upload not executed: credentials unavailable.** This is documented and does not block the release. All build and twine check validations pass locally.
+
+### Validation Commands (Copy-Paste)
+
+```bash
+# 1. Clean and build
+rm -rf dist/ build/ *.egg-info kimari/*.egg-info
+python -m build
+twine check dist/*
+
+# 2. Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# 3. Verify in clean venv
+python -m venv /tmp/kimari-test-v014
+source /tmp/kimari-test-v014/bin/activate
+pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kimari-local-ai
+
+# 4. Validate all commands
+kimari --version
+kimari config path
+kimari setup --json
+kimari setup --write
+kimari start --dry-run
+kimari models hash /tmp/test-model.gguf
+kimari models verify test
+kimari token create
+kimari token show
+kimari token delete
+
+# 5. Clean up
+deactivate
+rm -rf /tmp/kimari-test-v014
+```

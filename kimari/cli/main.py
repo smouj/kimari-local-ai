@@ -1171,6 +1171,7 @@ def show_info(config: dict, json_output: bool = False):
 def run_setup(
     config: dict,
     dry_run: bool = False,
+    write: bool = False,
     json_output: bool = False,
     profile_name: str | None = None,
     integration: str | None = None,
@@ -1179,6 +1180,8 @@ def run_setup(
 
     Detects OS, Python, GPU, CUDA, ROCm, llama-server, and local models,
     then recommends a profile and next commands.
+
+    With --write, persists the detected configuration to the user config dir.
     """
     import platform as _platform
     import shutil
@@ -1302,6 +1305,45 @@ def run_setup(
         "warnings": warnings,
     }
 
+    # ── Write-mode: persist detected configuration ─────────────────
+    from kimari.core.paths import get_user_config_dir, get_user_config_path
+
+    hardware_summary = {
+        "os": os_info,
+        "python": python_version,
+        "gpu": gpu_info,
+        "cuda": cuda_info,
+        "rocm": rocm_info,
+        "llama_server": llama_server_info,
+    }
+    paths_info = {
+        "config_dir": str(get_user_config_dir()),
+        "models_dir": str(get_user_models_dir()),
+    }
+
+    from kimari.setup.writer import build_setup_patch, write_setup_config
+
+    config_path = get_user_config_path()
+    patch = build_setup_patch(
+        recommended_profile=recommended_profile,
+        integration=integration,
+        hardware_summary=hardware_summary,
+        paths_info=paths_info,
+        config=config,
+    )
+
+    if write and patch["would_write"]:
+        write_result = write_setup_config(patch, config_path)
+        result["would_write"] = True
+        result["written"] = write_result["written"]
+        result["config_path"] = write_result["config_path"]
+        result["backup_path"] = write_result.get("backup_path")
+    else:
+        result["would_write"] = patch["would_write"]
+        result["written"] = False
+        result["config_path"] = str(config_path)
+        result["backup_path"] = None
+
     if json_output:
         print(json.dumps(result, indent=2))
         return
@@ -1329,6 +1371,20 @@ def run_setup(
         print(f"\n  {Color.BOLD}Integration:{Color.RESET} {integration}")
 
     print(f"\n  {Color.BOLD}Recommended Profile:{Color.RESET} {Color.GREEN}{recommended_profile}{Color.RESET}")
+
+    # Show write-mode status
+    if write:
+        if result["written"]:
+            print(f"\n  {Color.GREEN}✓ Configuration written{Color.RESET}")
+            print(f"  Config:  {result['config_path']}")
+            if result.get("backup_path"):
+                print(f"  Backup:  {result['backup_path']}")
+        elif result["would_write"]:
+            print(f"\n  {Color.YELLOW}⚠ Would write but something went wrong{Color.RESET}")
+        else:
+            print(f"\n  {Color.DIM}No changes needed — configuration already matches.{Color.RESET}")
+    elif patch["would_write"]:
+        print(f"\n  {Color.DIM}Tip: Use --write to persist this configuration.{Color.RESET}")
 
     print(f"\n  {Color.BOLD}Next Steps:{Color.RESET}")
     for cmd in next_commands:
@@ -1565,6 +1621,22 @@ def main():
         action="store_true",
         help="Verify SHA256 hashes of downloaded models",
     )
+    models_sub = models_parser.add_subparsers(dest="models_command", help="Model subcommands")
+
+    models_hash_parser = models_sub.add_parser("hash", help="Compute SHA256 hash of a local model file")
+    models_hash_parser.add_argument("path", help="Path to GGUF model file or model ID from registry")
+    models_hash_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
+
+    models_verify_parser = models_sub.add_parser("verify", help="Verify SHA256 hash of a model against registry")
+    models_verify_parser.add_argument("model", help="Model ID from registry or path to GGUF file")
+    models_verify_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
+
+    models_pin_parser = models_sub.add_parser("pin-hash", help="Pin SHA256 hash of a model to user registry")
+    models_pin_parser.add_argument("model_id", help="Model ID from registry")
+    models_pin_parser.add_argument(
+        "--write", action="store_true", help="Actually write to user registry (default: dry-run)"
+    )
+    models_pin_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
 
     # profiles
     profiles_parser = subparsers.add_parser("profiles", help="List configured GPU profiles")
@@ -1613,6 +1685,7 @@ def main():
     # setup
     setup_parser = subparsers.add_parser("setup", help="Guided setup and environment detection")
     setup_parser.add_argument("--dry-run", action="store_true", help="Preview without detecting")
+    setup_parser.add_argument("--write", action="store_true", help="Persist detected configuration to user config dir")
     setup_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
     setup_parser.add_argument("--profile", "-p", default=None, help="Profile to recommend")
     setup_parser.add_argument("--integration", default=None, help="Integration target (openclaw, hermes, continue)")
@@ -1694,12 +1767,28 @@ def main():
             matrix=getattr(args, "matrix", False),
         )
     elif args.command == "models":
-        list_models(
-            json_output=getattr(args, "json_output", False),
-            downloaded_only=getattr(args, "downloaded", False),
-            status_filter=getattr(args, "status_filter", None),
-            verify=getattr(args, "verify", False),
-        )
+        models_cmd = getattr(args, "models_command", None)
+        if models_cmd == "hash":
+            from kimari.models.registry import compute_model_hash
+
+            compute_model_hash(args.path, json_output=getattr(args, "json_output", False))
+        elif models_cmd == "verify":
+            from kimari.models.registry import verify_model_hash_v2
+
+            verify_model_hash_v2(args.model, json_output=getattr(args, "json_output", False))
+        elif models_cmd == "pin-hash":
+            from kimari.models.registry import pin_model_hash
+
+            pin_model_hash(
+                args.model_id, write=getattr(args, "write", False), json_output=getattr(args, "json_output", False)
+            )
+        else:
+            list_models(
+                json_output=getattr(args, "json_output", False),
+                downloaded_only=getattr(args, "downloaded", False),
+                status_filter=getattr(args, "status_filter", None),
+                verify=getattr(args, "verify", False),
+            )
     elif args.command == "profiles":
         list_profiles(config, json_output=getattr(args, "json_output", False))
     elif args.command == "pull":
@@ -1749,6 +1838,7 @@ def main():
         run_setup(
             config,
             dry_run=args.dry_run,
+            write=getattr(args, "write", False),
             json_output=getattr(args, "json_output", False),
             profile_name=getattr(args, "profile", None),
             integration=getattr(args, "integration", None),

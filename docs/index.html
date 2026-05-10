@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.13-alpha — Guided setup, runtime validation, local auth tokens, Windows helper scripts
+      v0.1.14-alpha — TestPyPI validation, setup write-mode, SHA256 tooling, reverse proxy auth guide
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -782,7 +782,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.13-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.14-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -819,7 +819,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.13-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.14-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -1221,7 +1221,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.13-alpha — Guided setup, runtime validation, local auth tokens, Windows helper scripts, performance profiles, and OpenClaw/Hermes/Continue integration.</p>
+    <p class="section-desc">Kimari Local AI v0.1.14-alpha — Setup write-mode, SHA256 model verification, reverse proxy auth guide, API plan for v0.2.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1241,10 +1241,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Modular package (<code>pip install -e .</code>)</td><td>✅ Implemented in v0.1.4-alpha</td></tr>
         <tr><td>Release validation (<code>check-release.py</code>)</td><td>✅ Implemented in v0.1.8-alpha</td></tr>
         <tr><td>WSL2 Installation Guide</td><td>✅ Implemented in v0.1.10-alpha</td></tr>
-        <tr><td><code>kimari setup</code> (guided detection)</td><td>✅ Implemented in v0.1.13-alpha</td></tr>
-        <tr><td>Runtime flag validation (<code>--strict-flags</code>)</td><td>✅ Implemented in v0.1.13-alpha</td></tr>
-        <tr><td>Local auth tokens (<code>kimari token</code>)</td><td>✅ Implemented in v0.1.13-alpha</td></tr>
-        <tr><td>Windows helper scripts</td><td>✅ Implemented in v0.1.13-alpha</td></tr>
+        <tr><td><code>kimari setup --write</code> (persist config)</td><td>✅ Implemented in v0.1.14-alpha</td></tr>
+        <tr><td>SHA256 model hash/verify (<code>kimari models hash/verify</code>)</td><td>✅ Implemented in v0.1.14-alpha</td></tr>
+        <tr><td>Reverse proxy auth guide</td><td>✅ Documented in v0.1.14-alpha</td></tr>
+        <tr><td>API plan for v0.2</td><td>✅ Designed in v0.1.14-alpha</td></tr>
         <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>
@@ -1302,6 +1302,14 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <a href="https://github.com/smouj/kimari-local-ai/issues" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">GitHub Issues</div>
       <div class="doc-card-desc">Report bugs, request features, and track progress.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/REVERSE_PROXY_AUTH.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Reverse Proxy Auth</div>
+      <div class="doc-card-desc">nginx/Caddy setup for local API authentication.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/API_PLAN.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">API Plan (v0.2)</div>
+      <div class="doc-card-desc">FastAPI REST API design for programmatic access.</div>
     </a>
   </div>
 </section>

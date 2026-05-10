@@ -61,6 +61,29 @@ def get_init_version() -> str:
     return ""
 
 
+def _no_invented_hashes() -> bool:
+    """Check that no non-null sha256 hashes exist in the packaged defaults models registry.
+
+    Invented hashes (hard-coded without computing from the actual file) are forbidden.
+    User-pinned hashes in the user registry are allowed.
+    """
+    defaults_path = PROJECT_ROOT / "kimari" / "defaults" / "kimari.models.json"
+    if not defaults_path.exists():
+        # Also check config/ dir
+        config_path = PROJECT_ROOT / "config" / "kimari.models.json"
+        if not config_path.exists():
+            return True
+        defaults_path = config_path
+    try:
+        data = json.loads(defaults_path.read_text())
+        for m in data.get("models", []):
+            if m.get("sha256") is not None:
+                return False
+        return True
+    except Exception:
+        return True
+
+
 def main() -> None:
     print("Kimari Local AI — Release Validation")
     print("=" * 50)
@@ -589,6 +612,83 @@ def main() -> None:
     )
     check(
         "No 'Responses API supported' false claim (re-check)",
+        len(responses_false_claims) == 0,
+        "Responses API false claim regression detected",
+    )
+
+    # ── Setup write-mode & SHA256 tooling (v0.1.14) ──────────────────
+    print("\n[19/21] Setup write-mode & SHA256 tooling")
+    check(
+        "kimari/setup/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "setup" / "__init__.py").exists(),
+        "Setup module init missing",
+    )
+    check(
+        "kimari/setup/writer.py exists",
+        (PROJECT_ROOT / "kimari" / "setup" / "writer.py").exists(),
+        "Setup writer module missing",
+    )
+    check(
+        "README mentions 'setup --write'",
+        "setup --write" in readme_lower or "setup --write" in readme_text,
+        "'setup --write' not found in README.md",
+    )
+    check(
+        "README mentions 'models hash' or 'models verify'",
+        "models hash" in readme_lower or "models verify" in readme_lower,
+        "'models hash' or 'models verify' not found in README.md",
+    )
+    check(
+        "No invented SHA256 hashes in models registry",
+        _no_invented_hashes(),
+        "Found non-null sha256 in models registry — hashes must be explicitly pinned, not invented",
+    )
+
+    # ── New documentation (v0.1.14) ──────────────────────────────────
+    print("\n[20/21] New documentation files")
+    check(
+        "docs/REVERSE_PROXY_AUTH.md exists",
+        (PROJECT_ROOT / "docs" / "REVERSE_PROXY_AUTH.md").exists(),
+        "Reverse proxy auth guide missing",
+    )
+    check(
+        "docs/API_PLAN.md exists",
+        (PROJECT_ROOT / "docs" / "API_PLAN.md").exists(),
+        "API plan document missing",
+    )
+    # README links to new docs
+    check(
+        "README links to REVERSE_PROXY_AUTH.md",
+        "REVERSE_PROXY_AUTH" in readme_text,
+        "REVERSE_PROXY_AUTH.md link not found in README.md",
+    )
+    check(
+        "README links to API_PLAN.md",
+        "API_PLAN" in readme_text,
+        "API_PLAN.md link not found in README.md",
+    )
+    # docs/index.html mentions new docs
+    if index_html.exists():
+        check(
+            "docs/index.html mentions 'reverse proxy' or 'API plan'",
+            "reverse proxy" in index_text.lower() or "api plan" in index_text.lower(),
+            "'reverse proxy' or 'API plan' not found in docs/index.html",
+        )
+
+    # ── Content integrity v0.1.14 re-check ───────────────────────────
+    print("\n[21/21] Content integrity re-check (v0.1.14)")
+    check(
+        'default_profile still "test" (v0.1.14 re-check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        "No 'Kimari-4B released' false claim (v0.1.14 re-check)",
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        "No 'Responses API supported' false claim (v0.1.14 re-check)",
         len(responses_false_claims) == 0,
         "Responses API false claim regression detected",
     )

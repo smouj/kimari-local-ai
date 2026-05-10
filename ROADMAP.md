@@ -130,7 +130,7 @@
 - ✅ `kimari config path` shows active config location
 - ✅ No "run from repo root" requirement after install
 
-## v0.1.13-alpha (Current)
+## v0.1.13-alpha (Released)
 
 - ✅ Code of Conduct (CODE_OF_CONDUCT.md) — Contributor Covenant 3.0
 - ✅ Support guide (SUPPORT.md) — help channels and scope
@@ -148,14 +148,30 @@
 - ✅ check-release.py expanded to 18 validation categories
 - ✅ RELEASE_CHECKLIST.md expanded with community and packaging checks
 
-## v0.1.14-alpha (Planned)
+## v0.1.14-alpha (Current)
 
-- Actual TestPyPI upload/install result documented
-- Real SHA256 hashes if computable reliably
-- `kimari setup` write-mode (persist detected settings)
+- ✅ `kimari setup --write` — persist detected configuration with backup
+- ✅ Setup persistence module (`kimari/setup/writer.py`)
+- ✅ `kimari models hash <path>` — compute SHA256 of local GGUF file
+- ✅ `kimari models verify <model-id>` — verify against registry (not_pinned/match/mismatch)
+- ✅ `kimari models pin-hash <model-id>` — pin hash to user registry (dry-run default)
+- ✅ `get_effective_models_registry()` — user registry overrides packaged defaults
+- ✅ No invented SHA256 hashes in packaged defaults (all null until explicitly pinned)
+- ✅ Reverse proxy auth guide (`docs/REVERSE_PROXY_AUTH.md`) — nginx/Caddy examples
+- ✅ API plan (`docs/API_PLAN.md`) — FastAPI REST API design for v0.2.0-alpha
+- ✅ TestPyPI validation section in PUBLISHING.md
+- ✅ Windows README updated with wheel/TestPyPI install, setup --write, models hash
+- ✅ check-release.py expanded to 21 validation categories
+- ✅ RELEASE_CHECKLIST.md expanded with setup write-mode and SHA256 tooling checks
+
+## v0.1.15-alpha (Planned)
+
+- Actual PyPI decision after TestPyPI validation
+- Setup write-mode UX refinements
 - Windows installer packaging
-- Optional reverse proxy auth guide
-- FastAPI preparation for v0.2
+- Optional FastAPI prototype branch for v0.2
+- Real SHA256 pinning for verified registry models
+- Benchmark result sharing format
 
 ## v0.2.0-alpha
 
