@@ -74,6 +74,32 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] README mentions `--strict-flags`
 - [ ] README mentions `kimari token create`
 
+## Community & Contribution
+
+- [ ] `CODE_OF_CONDUCT.md` exists
+- [ ] Conduct contact reviewed (TODO: replace with dedicated private contact before broad public launch)
+- [ ] `CONTRIBUTING.md` exists and is up to date
+- [ ] `SUPPORT.md` exists
+- [ ] `GOVERNANCE.md` exists
+- [ ] `MAINTAINERS.md` exists
+- [ ] Issue templates exist (bug_report.yml, feature_request.yml, performance_report.yml, integration_request.yml, config.yml)
+- [ ] PR template exists (.github/pull_request_template.md)
+- [ ] README links to Code of Conduct / Contributing / Support
+- [ ] docs/index.html mentions Community / Code of Conduct / Contributing
+
+## Packaging & CI
+
+- [ ] `pyproject.toml` license uses SPDX format (no setuptools deprecation warning)
+- [ ] `MANIFEST.in` includes community files in sdist
+- [ ] `wheel-install-smoke` CI job exists and passes
+- [ ] Wheel contains `kimari/defaults/*.json` (packaged defaults)
+- [ ] `pip install dist/*.whl` works in clean venv
+- [ ] `kimari --version` works from wheel install
+- [ ] `kimari config path` works from wheel install
+- [ ] `kimari setup --json` works from wheel install
+- [ ] `kimari start --dry-run` works from wheel install
+- [ ] `kimari token create/show/delete` works from wheel install
+
 ## Publishing (Manual)
 
 ### TestPyPI (Pre-release Validation)

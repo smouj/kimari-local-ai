@@ -1,4 +1,4 @@
-"""Tests for v0.1.12-alpha: Packaged defaults, user paths, short flag support, config resolution chain, state/tokens in user dirs, release checks."""
+"""Tests for v0.1.13-alpha: Packaged defaults, user paths, short flag support, config resolution chain, state/tokens in user dirs, release checks."""
 
 import json
 import subprocess
@@ -18,10 +18,10 @@ def _run_kimari(*args: str) -> subprocess.CompletedProcess:
 
 
 def test_version_is_0112():
-    """kimari/__init__.py version is '0.1.12-alpha'."""
+    """kimari/__init__.py version is '0.1.13-alpha'."""
     from kimari import __version__
 
-    assert __version__ == "0.1.12-alpha"
+    assert __version__ == "0.1.13-alpha"
 
 
 def test_pyproject_version_matches():
@@ -39,11 +39,11 @@ def test_pyproject_version_matches():
 
 
 def test_cli_info_version():
-    """kimari info --json shows '0.1.12-alpha'."""
+    """kimari info --json shows '0.1.13-alpha'."""
     result = _run_kimari("info", "--json")
     assert result.returncode == 0
     data = json.loads(result.stdout)
-    assert data["kimari_version"] == "0.1.12-alpha"
+    assert data["kimari_version"] == "0.1.13-alpha"
 
 
 # --- Packaged defaults tests ---
@@ -250,16 +250,26 @@ def test_strict_flags_no_false_positive_with_base_cmd():
     flags = parse_supported_flags(help_text)
     cmd = [
         "llama-server",
-        "-m", "model.gguf",
-        "--host", "127.0.0.1",
-        "--port", "11435",
-        "-ngl", "all",
-        "-c", "4096",
-        "-b", "128",
-        "-ub", "64",
-        "--cache-type-k", "f16",
-        "--cache-type-v", "f16",
-        "-t", "4",
+        "-m",
+        "model.gguf",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "11435",
+        "-ngl",
+        "all",
+        "-c",
+        "4096",
+        "-b",
+        "128",
+        "-ub",
+        "64",
+        "--cache-type-k",
+        "f16",
+        "--cache-type-v",
+        "f16",
+        "-t",
+        "4",
     ]
     _, unsupported = filter_unsupported_flags(cmd, flags)
     assert unsupported == [], f"False positive unsupported flags: {unsupported}"

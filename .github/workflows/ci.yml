@@ -210,6 +210,60 @@ jobs:
             test -f "$f" && echo "$f: OK" || { echo "$f: MISSING"; exit 1; }
           done
 
+  wheel-install-smoke:
+    name: Wheel Install Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build tools
+        run: pip install build
+      - name: Build wheel
+        run: python -m build
+      - name: Create test venv
+        run: python -m venv /tmp/kimari-wheel-test
+      - name: Install from wheel
+        run: |
+          source /tmp/kimari-wheel-test/bin/activate
+          pip install dist/*.whl
+      - name: Test kimari --version
+        run: |
+          source /tmp/kimari-wheel-test/bin/activate
+          kimari --version
+      - name: Test kimari config path
+        run: |
+          source /tmp/kimari-wheel-test/bin/activate
+          kimari config path
+      - name: Test kimari setup --json
+        run: |
+          source /tmp/kimari-wheel-test/bin/activate
+          kimari setup --json
+      - name: Test kimari start --dry-run
+        run: |
+          source /tmp/kimari-wheel-test/bin/activate
+          kimari start --dry-run
+      - name: Test kimari token create/show/delete
+        run: |
+          source /tmp/kimari-wheel-test/bin/activate
+          kimari token create
+          kimari token show
+          kimari token delete
+      - name: Verify defaults in wheel
+        run: |
+          source /tmp/kimari-wheel-test/bin/activate
+          python -c "
+          import zipfile, glob
+          wheels = glob.glob('dist/*.whl')
+          assert wheels, 'No wheel found'
+          with zipfile.ZipFile(wheels[0]) as z:
+              names = z.namelist()
+              for f in ['kimari/defaults/kimari.profiles.json', 'kimari/defaults/kimari.profiles.schema.json', 'kimari/defaults/kimari.models.json']:
+                  assert f in names, f'{f} missing from wheel'
+          print('All defaults JSON files present in wheel')
+          "
+
   release-check:
     name: Release Validation
     runs-on: ubuntu-latest

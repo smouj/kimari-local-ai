@@ -5,6 +5,29 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.13-alpha] — 2026-05-15
+
+### Added
+- **Code of Conduct** (`CODE_OF_CONDUCT.md`) — Based on Contributor Covenant 3.0; covers issues, PRs, discussions, GitHub Pages, docs, integrations; private reporting via email (no public issues); TODO: replace with dedicated contact before broad launch
+- **Support guide** (`SUPPORT.md`) — Where to get help, what goes in GitHub Issues vs Discussions vs SECURITY.md vs CODE_OF_CONDUCT.md; links to WSL2 guide, publishing guide, integration docs; no guaranteed commercial support during alpha
+- **Governance document** (`GOVERNANCE.md`) — Project maintained by Smouj; technical decisions by maintainer; contributions via PR; acceptance criteria; security and conduct priority; versioning and release process
+- **Maintainers document** (`MAINTAINERS.md`) — Smouj (@smouj) as maintainer with responsibilities; how to become a maintainer in the future
+- **Issue templates** — `.github/ISSUE_TEMPLATE/bug_report.yml` (OS, Python, GPU, CUDA/ROCm, version, logs), `feature_request.yml`, `performance_report.yml` (model, quantization, profile, tokens/s, TTFT, VRAM/RAM), `integration_request.yml` (OpenClaw/Hermes/Continue/Open WebUI/other), `config.yml` (disables blank issues, links to security, conduct, discussions)
+- **Improved PR template** (`.github/pull_request_template.md`) — Expanded checklist: tests, ruff, docs, changelog, no GGUF, no secrets, no false claims, no unsafe 0.0.0.0, default_profile check, release-check
+- **`wheel-install-smoke` CI job** — Builds wheel, installs in clean venv, tests `kimari --version`, `config path`, `setup --json`, `start --dry-run`, `token create/show/delete`, verifies defaults JSON in wheel
+- **`MANIFEST.in`** — Includes community files (CODE_OF_CONDUCT.md, CONTRIBUTING.md, SUPPORT.md, GOVERNANCE.md, MAINTAINERS.md, etc.) in sdist; excludes GGUF, .kimari/, logs, dist/build
+- **RELEASE_CHECKLIST.md** — Added "Community & Contribution" and "Packaging & CI" sections with new checks
+- **`scripts/release/check-release.py`** — Added 3 new validation categories (18 total): Community & contribution files, Packaging & CI, Content integrity re-check
+- **New tests** (`tests/test_release_v0113.py`) — 40+ tests covering community files, issue templates, PR template, packaging, CI, README links, version consistency, no false claims
+
+### Changed
+- **Version bumped** to `0.1.13-alpha`
+- **`pyproject.toml`** — `license = "MIT"` (SPDX format, replacing `{text = "MIT"}`); removed `License :: OSI Approved :: MIT License` classifier (superseded by SPDX expression)
+- **`CONTRIBUTING.md`** — Rewritten with 9 non-negotiable rules table, GPU profile and integration proposal processes, CHANGELOG/ROADMAP update instructions, expanded PR checklist, links to Code of Conduct and GOVERNANCE.md
+- **`README.md`** — Added "Community & Contribution" section linking to CODE_OF_CONDUCT.md, CONTRIBUTING.md, SUPPORT.md, SECURITY.md, GOVERNANCE.md, MAINTAINERS.md, Issue Templates
+- **`docs/index.html`** — Added "Community" section with cards linking to Code of Conduct, Contributing, Support, Security, Governance, GitHub Issues; added Community nav link
+- **`docs/PUBLISHING.md`** — Added "v0.1.13 TestPyPI Actual Validation" section with checklist, result table, and validation commands
+
 ## [0.1.12-alpha] — 2026-05-14
 
 ### Added

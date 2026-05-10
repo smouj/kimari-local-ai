@@ -20,7 +20,7 @@ body:
     attributes:
       label: Proposed Solution
       description: Describe the feature or behavior you'd like to see.
-      placeholder: "Add a `kimari config` command that opens an interactive wizard to set profile options..."
+      placeholder: "Add a `kimari config set` command that updates profile options directly..."
     validations:
       required: true
   - type: textarea
@@ -41,9 +41,12 @@ body:
         - Model Management (kimari pull)
         - Web UI (Open WebUI / PWA)
         - IDE Integration (Continue)
+        - Agent Integration (OpenClaw / Hermes)
         - KimariFit Scoring
-        - Benchmarks
+        - Benchmarks / Performance
         - Documentation
+        - Packaging / Installation
+        - Security
         - Other
     validations:
       required: true

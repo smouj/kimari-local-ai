@@ -471,6 +471,128 @@ def main() -> None:
                 f"{short_flag!r} not found in SHORT_TO_LONG mapping",
             )
 
+    # ── Community & contribution files (v0.1.13) ───────────────────
+    print("\n[16/18] Community & contribution files")
+    check(
+        "CODE_OF_CONDUCT.md exists",
+        (PROJECT_ROOT / "CODE_OF_CONDUCT.md").exists(),
+        "Code of Conduct missing",
+    )
+    # Check CoC mentions Contributor Covenant
+    coc_path = PROJECT_ROOT / "CODE_OF_CONDUCT.md"
+    if coc_path.exists():
+        coc_text = coc_path.read_text().lower()
+        check(
+            "CODE_OF_CONDUCT.md mentions Contributor Covenant",
+            "contributor covenant" in coc_text,
+            "Contributor Covenant attribution missing",
+        )
+    check(
+        "CONTRIBUTING.md exists",
+        (PROJECT_ROOT / "CONTRIBUTING.md").exists(),
+        "Contributing guide missing",
+    )
+    check(
+        "SUPPORT.md exists",
+        (PROJECT_ROOT / "SUPPORT.md").exists(),
+        "Support guide missing",
+    )
+    check(
+        "GOVERNANCE.md exists",
+        (PROJECT_ROOT / "GOVERNANCE.md").exists(),
+        "Governance doc missing",
+    )
+    check(
+        "MAINTAINERS.md exists",
+        (PROJECT_ROOT / "MAINTAINERS.md").exists(),
+        "Maintainers doc missing",
+    )
+    check(
+        ".github/PULL_REQUEST_TEMPLATE.md exists",
+        (PROJECT_ROOT / ".github" / "pull_request_template.md").exists(),
+        "PR template missing",
+    )
+    # Issue templates
+    for template in ["bug_report.yml", "feature_request.yml", "performance_report.yml", "integration_request.yml", "config.yml"]:
+        check(
+            f".github/ISSUE_TEMPLATE/{template} exists",
+            (PROJECT_ROOT / ".github" / "ISSUE_TEMPLATE" / template).exists(),
+            f"Issue template {template} missing",
+        )
+    # README links to community docs
+    check(
+        "README links to Code of Conduct",
+        "CODE_OF_CONDUCT.md" in readme_text,
+        "CODE_OF_CONDUCT.md link not found in README.md",
+    )
+    check(
+        "README links to Contributing",
+        "CONTRIBUTING.md" in readme_text,
+        "CONTRIBUTING.md link not found in README.md",
+    )
+    check(
+        "README links to Support",
+        "SUPPORT.md" in readme_text,
+        "SUPPORT.md link not found in README.md",
+    )
+    # docs/index.html mentions community
+    if index_html.exists():
+        check(
+            "docs/index.html mentions 'community' or 'Code of Conduct'",
+            "community" in index_text.lower() or "code of conduct" in index_text.lower(),
+            "'community' or 'Code of Conduct' not found in docs/index.html",
+        )
+
+    # ── Packaging & CI (v0.1.13) ──────────────────────────────────
+    print("\n[17/18] Packaging & CI")
+    # Check SPDX license format
+    pyproject_text = (PROJECT_ROOT / "pyproject.toml").read_text()
+    check(
+        "pyproject.toml uses SPDX license format",
+        'license = "MIT"' in pyproject_text,
+        'pyproject.toml should use license = "MIT" (SPDX), not license = {text = "MIT"}',
+    )
+    check(
+        "pyproject.toml has no License classifier (superseded by SPDX)",
+        "License ::" not in pyproject_text,
+        "License classifier should be removed when using SPDX license expression",
+    )
+    check(
+        "MANIFEST.in exists",
+        (PROJECT_ROOT / "MANIFEST.in").exists(),
+        "MANIFEST.in missing — sdist may not include community files",
+    )
+    # Check CI has wheel-install-smoke job
+    ci_yml = PROJECT_ROOT / ".github" / "workflows" / "ci.yml"
+    if ci_yml.exists():
+        ci_text = ci_yml.read_text()
+        check(
+            "CI has wheel-install-smoke job",
+            "wheel-install-smoke" in ci_text,
+            "wheel-install-smoke CI job missing",
+        )
+    else:
+        warn("CI workflow file not found", "cannot check for wheel-install-smoke job")
+
+    # ── Content integrity re-check (v0.1.13) ───────────────────────
+    print("\n[18/18] Content integrity re-check")
+    # Re-verify critical rules haven't regressed
+    check(
+        'default_profile still "test"',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        "No 'Kimari-4B released' false claim (re-check)",
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        "No 'Responses API supported' false claim (re-check)",
+        len(responses_false_claims) == 0,
+        "Responses API false claim regression detected",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:

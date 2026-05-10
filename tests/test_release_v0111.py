@@ -1,5 +1,5 @@
 """
-Tests for v0.1.12-alpha: Runtime llama_flags, security tokens, CLI setup/token commands,
+Tests for v0.1.13-alpha: Runtime llama_flags, security tokens, CLI setup/token commands,
 version consistency, file existence, and release checks.
 """
 
@@ -272,10 +272,10 @@ def test_token_delete(tmp_path, monkeypatch):
 
 
 def test_version_is_0112():
-    """kimari/__init__.py version is '0.1.12-alpha'."""
+    """kimari/__init__.py version is '0.1.13-alpha'."""
     from kimari import __version__
 
-    assert __version__ == "0.1.12-alpha"
+    assert __version__ == "0.1.13-alpha"
 
 
 def test_pyproject_version_matches():
@@ -294,11 +294,11 @@ def test_pyproject_version_matches():
 
 
 def test_cli_info_version():
-    """kimari info --json shows '0.1.12-alpha'."""
+    """kimari info --json shows '0.1.13-alpha'."""
     result = _run_kimari("info", "--json")
     assert result.returncode == 0
     data = json.loads(result.stdout)
-    assert data["kimari_version"] == "0.1.12-alpha"
+    assert data["kimari_version"] == "0.1.13-alpha"
 
 
 # ─── File existence tests ─────────────────────────────────────────────────────
