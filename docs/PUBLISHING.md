@@ -258,3 +258,75 @@ pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/
 - Rotate tokens if they're ever exposed
 - The `.pypirc` file should have `chmod 600` permissions
 - Do not configure automated production PyPI publishing from CI yet
+
+## v0.1.13 TestPyPI Actual Validation
+
+> **Purpose:** End-to-end validation that the v0.1.13-alpha wheel installs and works correctly from TestPyPI — without any dependency on the repo root.
+
+### Notes
+
+- **Packaged defaults:** The wheel now includes all 3 defaults JSON files (`kimari.profiles.json`, `kimari.profiles.schema.json`, `kimari.models.json`) under `kimari/defaults/` via `package-data`. Config should work from a TestPyPI install without the repo root.
+- **SPDX license format:** License changed to SPDX identifier `"MIT"` in `pyproject.toml` — no more `setuptools` warnings during build/install.
+- **MANIFEST.in added:** sdist now includes community files (`CODE_OF_CONDUCT.md`, `SUPPORT.md`, `GOVERNANCE.md`, `MAINTAINERS.md`, `CONTRIBUTING.md`, `SECURITY.md`, etc.) so the source distribution is complete.
+
+### Checklist
+
+- [ ] `twine upload --repository testpypi dist/*` succeeds
+- [ ] Clean venv creation (`python -m venv /tmp/kimari-test-v013`)
+- [ ] `pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kimari-local-ai` succeeds
+- [ ] `kimari --version` prints `0.1.13-alpha`
+- [ ] `kimari config path` shows packaged defaults (not repo root)
+- [ ] `kimari setup --json` outputs correct JSON
+- [ ] `kimari start --dry-run` generates correct command with user paths
+- [ ] `kimari token create` stores token in user state dir
+- [ ] `kimari token show` displays stored token
+- [ ] `kimari token delete` removes stored token
+- [ ] Result documented in table below
+- [ ] **NOT uploading to real PyPI until all TestPyPI checks pass**
+
+### Result
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Upload to TestPyPI | | |
+| Clean venv creation | | |
+| Install from TestPyPI | | |
+| `kimari --version` | | |
+| `kimari config path` | | |
+| `kimari setup --json` | | |
+| `kimari start --dry-run` | | |
+| `kimari token create` | | |
+| `kimari token show` | | |
+| `kimari token delete` | | |
+| Result documented | | |
+| Real PyPI upload blocked | | |
+
+### Validation Commands (Copy-Paste)
+
+```bash
+# 1. Clean and build
+rm -rf dist/ build/ *.egg-info kimari/*.egg-info
+python -m build
+twine check dist/*
+
+# 2. Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# 3. Verify in clean venv
+python -m venv /tmp/kimari-test-v013
+source /tmp/kimari-test-v013/bin/activate
+pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kimari-local-ai
+
+# 4. Validate all commands
+kimari --version
+kimari config path
+kimari setup --json
+kimari start --dry-run
+kimari token create
+kimari token show
+kimari token delete
+
+# 5. Clean up
+deactivate
+rm -rf /tmp/kimari-test-v013
+```

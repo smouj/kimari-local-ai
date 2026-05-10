@@ -1,0 +1,63 @@
+name: Integration Request
+description: Request support for a specific tool, agent, or IDE integration
+title: "[Integration] "
+labels: ["integration"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Want to connect Kimari to a specific tool or agent? Let us know!
+        Kimari already supports OpenClaw, Hermes, Continue, and Open WebUI.
+  - type: input
+    id: tool_name
+    attributes:
+      label: Tool / Agent / IDE Name
+      description: What do you want to integrate with?
+      placeholder: "OpenClaw / Hermes / Continue / Open WebUI / Cursor / Aider / other"
+    validations:
+      required: true
+  - type: input
+    id: tool_url
+    attributes:
+      label: Project URL
+      description: Link to the tool's repository or website.
+      placeholder: "https://github.com/..."
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      description: How would you use this integration? What workflow does it enable?
+      placeholder: "I want to use Kimari as the local LLM backend for [tool] so that..."
+    validations:
+      required: true
+  - type: dropdown
+    id: integration_type
+    attributes:
+      label: Integration Type
+      description: How does this tool connect to LLMs?
+      options:
+        - OpenAI-compatible API (Chat Completions)
+        - OpenAI-compatible API (Completions)
+        - Custom API
+        - IDE Extension
+        - CLI Tool
+        - Web UI
+        - Agent Framework
+        - Other / Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: api_details
+    attributes:
+      label: API / Connection Details
+      description: What API endpoints or configuration does the tool expect? Paste examples if available.
+      placeholder: |
+        The tool expects:
+        - Base URL: http://localhost:11435/v1
+        - API Key: optional
+        - Model: model-name
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information, configuration examples, or references.

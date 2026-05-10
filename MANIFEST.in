@@ -1,0 +1,24 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include ROADMAP.md
+include CODE_OF_CONDUCT.md
+include CONTRIBUTING.md
+include SUPPORT.md
+include GOVERNANCE.md
+include MAINTAINERS.md
+include SECURITY.md
+include PRIVACY.md
+include RELEASE_CHECKLIST.md
+
+recursive-include docs *.md *.html *.png *.svg
+recursive-include config *.json *.example.json *.example.yaml
+
+exclude *.gguf
+exclude .kimari/*
+exclude kimari-server.log
+exclude .kimari-server.pid
+prune dist
+prune build
+prune .git
+prune .github

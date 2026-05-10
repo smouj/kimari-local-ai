@@ -1,0 +1,102 @@
+name: Performance Report
+description: Report performance metrics or issues for a specific model/profile combination
+title: "[Perf] "
+labels: ["performance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share your Kimari performance data! This helps us improve profiles and benchmarks.
+        Run `kimari bench --profile <profile> --json` to get structured benchmark output.
+  - type: input
+    id: model
+    attributes:
+      label: Model (GGUF filename)
+      description: Which GGUF model were you running?
+      placeholder: "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+    validations:
+      required: true
+  - type: input
+    id: quantization
+    attributes:
+      label: Quantization
+      description: What quantization format was used?
+      placeholder: "Q4_K_M / Q5_K_M / IQ4_XS"
+    validations:
+      required: true
+  - type: input
+    id: profile
+    attributes:
+      label: GPU Profile
+      description: Which Kimari profile were you using?
+      placeholder: "test / gtx1060 / gtx1080"
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU Model and VRAM
+      description: Your NVIDIA GPU and VRAM.
+      placeholder: "GTX 1060 6GB / GTX 1080 8GB"
+    validations:
+      required: true
+  - type: input
+    id: context
+    attributes:
+      label: Context Size
+      description: Context size used (tokens).
+      placeholder: "4096 / 8192 / 16384"
+  - type: input
+    id: batch
+    attributes:
+      label: Batch / Micro-batch Size
+      description: Batch size and micro-batch size if customized.
+      placeholder: "batch=128, ubatch=64"
+  - type: input
+    id: cache
+    attributes:
+      label: Cache Type K/V
+      description: Cache types for K and V.
+      placeholder: "f16/f16 / q8_0/q8_0"
+  - type: input
+    id: tokens_per_sec
+    attributes:
+      label: Tokens/s
+      description: Measured tokens per second (prompt eval + generation).
+      placeholder: "24.5 t/s"
+  - type: input
+    id: ttft
+    attributes:
+      label: TTFT (Time to First Token)
+      description: Time to first token in seconds, if measured.
+      placeholder: "0.8s"
+  - type: input
+    id: vram_usage
+    attributes:
+      label: VRAM Usage
+      description: Peak VRAM usage during inference.
+      placeholder: "3.2 GB / 6.0 GB"
+  - type: input
+    id: ram_usage
+    attributes:
+      label: RAM Usage
+      description: Peak system RAM usage if known.
+      placeholder: "2.1 GB"
+  - type: textarea
+    id: command
+    attributes:
+      label: Command Used
+      description: The exact command you used to start/benchmark.
+      placeholder: "kimari start --profile test"
+      render: shell
+  - type: textarea
+    id: benchmark_output
+    attributes:
+      label: Benchmark Output
+      description: Paste the output of `kimari bench --json` if available.
+      render: json
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Notes
+      description: Any other observations (flash attention, GPU layers, driver version, etc.).

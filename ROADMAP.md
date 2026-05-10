@@ -118,7 +118,7 @@
 - ✅ TestPyPI validation checklist in docs/PUBLISHING.md
 - ✅ Release-check improvements for new modules
 
-## v0.1.12-alpha (Current)
+## v0.1.12-alpha (Released)
 
 - ✅ Packaged defaults (`kimari/defaults/`) ship inside wheel
 - ✅ User path management (`kimari/core/paths.py`) with platform-aware dirs
@@ -130,14 +130,32 @@
 - ✅ `kimari config path` shows active config location
 - ✅ No "run from repo root" requirement after install
 
-## v0.1.13-alpha (Planned)
+## v0.1.13-alpha (Current)
 
-- Actual TestPyPI upload/install verification
-- `kimari setup` write-mode (persist detected settings)
+- ✅ Code of Conduct (CODE_OF_CONDUCT.md) — Contributor Covenant 3.0
+- ✅ Support guide (SUPPORT.md) — help channels and scope
+- ✅ Contributing guide improved — 9 non-negotiable rules, proposal processes
+- ✅ Governance document (GOVERNANCE.md) — project decisions and structure
+- ✅ Maintainers document (MAINTAINERS.md) — maintainer responsibilities
+- ✅ Issue templates — bug report, feature request, performance report, integration request, config.yml
+- ✅ Improved PR template — expanded checklist with community standards
+- ✅ Packaging polish — SPDX license format, no more setuptools warnings
+- ✅ MANIFEST.in — community files included in sdist
+- ✅ `wheel-install-smoke` CI job — builds and tests wheel in clean venv
+- ✅ TestPyPI readiness documentation updated
+- ✅ README community section added
+- ✅ GitHub Pages community section added
+- ✅ check-release.py expanded to 18 validation categories
+- ✅ RELEASE_CHECKLIST.md expanded with community and packaging checks
+
+## v0.1.14-alpha (Planned)
+
+- Actual TestPyPI upload/install result documented
 - Real SHA256 hashes if computable reliably
+- `kimari setup` write-mode (persist detected settings)
 - Windows installer packaging
 - Optional reverse proxy auth guide
-- FastAPI planning for v0.2
+- FastAPI preparation for v0.2
 
 ## v0.2.0-alpha
 

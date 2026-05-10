@@ -212,3 +212,94 @@ Stage Summary:
 - P1 (tokens in PROJECT_ROOT) → FIXED: paths module with XDG user directories
 - Wheel install works correctly without repo root dependency
 - All 3 critical risks resolved
+
+---
+Task ID: 2-6
+Agent: Community Docs Agent
+Task: Create CODE_OF_CONDUCT.md, SUPPORT.md, improve CONTRIBUTING.md, create GOVERNANCE.md, MAINTAINERS.md
+
+Work Log:
+- Read worklog.md to understand prior agent work and project history
+- Read existing CONTRIBUTING.md to preserve good content during rewrite
+- Read SECURITY.md, ROADMAP.md, and project structure to ensure cross-references are accurate
+- Created CODE_OF_CONDUCT.md — Contributor Covenant 3.0 adapted for Kimari Local AI, with full sections (Our Pledge, Expected Behavior, Unacceptable Behavior, Enforcement Responsibilities, Scope including integrations OpenClaw/Hermes/Continue, Enforcement with 4-tier guidelines, Attribution), contact via smouj013@users.noreply.github.com with TODO note for dedicated private contact, explicit note not to use public issues for conduct reports
+- Created SUPPORT.md — Help channels table (Issues, Discussions, docs), what goes in Issues vs what doesn't (security → SECURITY.md, conduct → CODE_OF_CONDUCT.md, questions → Discussions), installation help references (INSTALL_WSL2.md, GETTING_STARTED.md), publishing (PUBLISHING.md), integrations (docs/integrations/), diagnostics commands (kimari doctor, kimari info --json), no guaranteed commercial support during alpha
+- Rewrote CONTRIBUTING.md — Preserved existing good content (Python/Bash/JSON style, Getting Started flow), added Python 3.10+ requirement, pip install -e ".[dev]" setup, python -m pytest tests/ -q, ruff check/format commands, make ci-local, 9 non-negotiable rules table (no model downloads in tests, no llama-server real in CI, no inventing benchmarks, no claiming Kimari-4B published, no changing default_profile from "test", no real tokens, no secrets, no unsafe 0.0.0.0, no GGUF), GPU profile proposal process (config/kimari.profiles.json + kimari/defaults/kimari.profiles.json), integration proposal process (docs/integrations/ + config/integrations/), documenting changes (CHANGELOG.md + ROADMAP.md), expanded PR checklist with 12 items, links to Code of Conduct and GOVERNANCE.md
+- Created GOVERNANCE.md — Maintainer (Smouj @smouj), technical decisions by maintainer, community input via Issues and Discussions, acceptance criteria table (tests pass, ruff clean, docs updated, no false claims, no security issues, no GGUF, no secrets), security/conduct priority, no roadmap promises during alpha, semver with -alpha suffix (0.1.X-alpha), release process (check-release.py → build → twine → tag), references to community health docs
+- Created MAINTAINERS.md — Maintainer Smouj (@smouj), GitHub link, 6 responsibilities (release management, security response, PR review, roadmap decisions, technical quality, community health), no private emails unless confirmed public, how to become a maintainer (consistent contributions, trust, nomination)
+
+Stage Summary:
+- 5 community documentation files created/updated for v0.1.13-alpha
+- CODE_OF_CONDUCT.md: Full Contributor Covenant 3.0 with private contact TODO
+- SUPPORT.md: Complete support guide with channel routing and diagnostics
+- CONTRIBUTING.md: Comprehensive rewrite with rules, profiles, integrations, expanded checklist
+- GOVERNANCE.md: Project governance, acceptance criteria, versioning, release process
+- MAINTAINERS.md: Maintainer info, responsibilities, future maintainer path
+- All files cross-reference each other and existing project docs (SECURITY.md, ROADMAP.md, etc.)
+- No violations of important rules (no FastAPI/dashboard/PWA mentions, no Kimari-4B claims, no fake hashes, default_profile is "test", no real tokens, no repo-root dependency, no private emails)
+
+---
+Task ID: 14
+Agent: Sub Agent
+Task: Add Community section to docs/index.html
+
+Work Log:
+- Read worklog.md to understand project history and prior work (v0.1.13-alpha, community docs created in Task 2-6)
+- Read docs/index.html to find Docs section (line 1135) and Footer (line 1272) for insertion point
+- Added Community section between Trust section and Footer (after line 1270)
+  - section-label: "Community" with fa-people-group icon
+  - section-title: "Open-Source Community"
+  - section-desc: Brief description about being open and transparent
+  - docs-grid with 6 doc-cards linking to:
+    1. Code of Conduct (CODE_OF_CONDUCT.md)
+    2. Contributing Guide (CONTRIBUTING.md)
+    3. Support (SUPPORT.md)
+    4. Security (SECURITY.md)
+    5. Governance (GOVERNANCE.md)
+    6. GitHub Issues (https://github.com/smouj/kimari-local-ai/issues)
+- Added "Community" nav link in both desktop nav and mobile menu (after Docs, before GitHub)
+- Used same CSS classes as existing sections: doc-card, docs-grid, section-label, section-title, section-desc, reveal
+- Version remains v0.1.13-alpha (unchanged)
+- No FastAPI/dashboard/PWA references added
+- No Kimari-4B publication claims
+
+Stage Summary:
+- docs/index.html updated with Community section (6 doc-cards) and nav links
+- Minimal addition, consistent with existing page style
+- Links point to community docs created in Task 2-6
+Task ID: 12
+Agent: PUBLISHING Update Agent
+Task: Update docs/PUBLISHING.md with v0.1.13 TestPyPI section
+
+Work Log:
+- Read worklog.md to understand previous agent work and project history
+- Read existing docs/PUBLISHING.md to understand current structure and content
+- Appended new "v0.1.13 TestPyPI Actual Validation" section after the "Security Notes" section at the end of the file
+- Section includes: purpose statement, 3 notes (packaged defaults, SPDX license, MANIFEST.in), 12-item checklist with all required items, empty result table with 12 rows, and copy-paste validation commands block
+- Preserved all existing content unchanged
+
+Stage Summary:
+- docs/PUBLISHING.md updated with v0.1.13 TestPyPI Actual Validation section
+- 12-item checklist covers: twine upload, clean venv, pip install with --extra-index-url, kimari --version, kimari config path, kimari setup --json, kimari start --dry-run, token create/show/delete, result documented, no real PyPI until validated
+- Result table ready to be filled when TestPyPI validation is actually executed
+- Notes document key v0.1.13 changes: packaged defaults in wheel, SPDX license format, MANIFEST.in for community files
+
+---
+Task ID: 13
+Agent: Sub Agent
+Task: Update README community section
+
+Work Log:
+- Read worklog.md to understand prior work (v0.1.13-alpha, community docs created in Task 2-6)
+- Read README.md to find existing Contributing section (## 🤝 Contributing at line 483)
+- Replaced the old "## 🤝 Contributing" section (which had a brief welcome message and link to CONTRIBUTING.md) with new "## 🏛️ Community & Contribution" section
+- New section includes 7 bullet links: Code of Conduct, Contributing Guide, Support, Security, Governance, Maintainers, Issue Templates
+- Kept a brief "We welcome contributions! See CONTRIBUTING.md for guidelines." line at the bottom of the section
+- Verified placement: section sits between Open WebUI Integration and License, exactly where the old Contributing section was
+- Verified all existing content intact, no FastAPI/dashboard/PWA references added, no Kimari-4B claims, version badge still v0.1.13-alpha
+
+Stage Summary:
+- README.md: Replaced "🤝 Contributing" with "🏛️ Community & Contribution" section
+- 7 community document links added (CODE_OF_CONDUCT.md, CONTRIBUTING.md, SUPPORT.md, SECURITY.md, GOVERNANCE.md, MAINTAINERS.md, GitHub Issues)
+- Concise format — just links, no duplication of contributing content
+- 1 file changed

@@ -21,9 +21,9 @@ body:
       label: Steps to Reproduce
       description: Steps to reproduce the behavior.
       placeholder: |
-        1. Run `python cli/kimari_cli.py start --profile test`
+        1. Run `kimari start --profile test`
         2. Wait for server to start
-        3. Run `python cli/kimari_cli.py chat "Hello"`
+        3. Run `kimari chat "Hello"`
         4. See error
     validations:
       required: true
@@ -50,11 +50,19 @@ body:
       description: Paste any relevant log output. You can run `kimari logs` to get server logs.
       render: shell
   - type: input
-    id: version
+    id: os
     attributes:
-      label: Kimari Version
-      description: What version of Kimari are you running?
-      placeholder: "0.1.2-alpha"
+      label: Operating System
+      description: What OS are you running on?
+      placeholder: "Ubuntu 22.04 / Windows 11 / macOS 14"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python Version
+      description: Run `python --version` to check.
+      placeholder: "3.11.5"
     validations:
       required: true
   - type: input
@@ -69,24 +77,36 @@ body:
     id: cuda
     attributes:
       label: CUDA Version
-      description: What version of CUDA is installed?
+      description: Run `nvcc --version` or `nvidia-smi` to check.
       placeholder: "11.8"
   - type: input
-    id: os
+    id: rocm
     attributes:
-      label: Operating System
-      description: What OS are you running on?
-      placeholder: "Ubuntu 22.04"
+      label: ROCm Version (if applicable)
+      description: Only for AMD GPU users. Run `hipcc --version` to check.
+      placeholder: "6.0 (experimental)"
+  - type: input
+    id: version
+    attributes:
+      label: Kimari Version
+      description: Run `kimari --version` to check.
+      placeholder: "0.1.13-alpha"
     validations:
       required: true
   - type: input
-    id: python
+    id: llama_server
     attributes:
-      label: Python Version
-      description: What version of Python are you using?
-      placeholder: "3.11.5"
+      label: llama-server Path/Version
+      description: Path to llama-server binary and version if known.
+      placeholder: "/usr/local/bin/llama-server (or 'Not found')"
+  - type: input
+    id: command
+    attributes:
+      label: Command Executed
+      description: The exact kimari command you ran.
+      placeholder: "kimari start --profile test --dry-run"
   - type: textarea
     id: additional
     attributes:
       label: Additional Context
-      description: Any other context about the problem (model used, profile, custom config, etc.).
+      description: Any other context about the problem (model used, profile, custom config, environment variables, etc.).
