@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.9--alpha-9b59b6.svg" alt="v0.1.9-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.10--alpha-9b59b6.svg" alt="v0.1.10-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.9-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.10-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.9-alpha**
+> **Kimari Local AI v0.1.10-alpha**
 
 ### ✅ Works Today
 
@@ -61,6 +61,11 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Benchmark framework** with TTFT measurement
 - **Security warnings** for `0.0.0.0` binding
 - **Experimental AMD ROCm** build support
+- **Performance optimization** — `kimari optimize` recommends optimal settings per GPU profile
+- **Performance diagnostics** — `kimari perf` shows tuning matrix for all modes
+- **OpenClaw integration** — Chat Completions backend for AI agents
+- **Hermes Agent integration** — Local OpenAI-compatible backend
+- **Continue.dev integration** — IDE coding assistant (VS Code / JetBrains)
 
 ### 🔨 Planned
 
@@ -173,6 +178,8 @@ Pre-configured settings optimized for specific GPU models. No manual tuning requ
 | `docker` | Open WebUI | 6 GB | Q4_K_M | 4,096 | `0.0.0.0` | ⚠️ Network-exposed |
 
 > ⭐ The `test` profile is the default during alpha. When Kimari-4B is published, `gtx1060` will become the new default.
+>
+> The `test` profile is the default during alpha. When Kimari-4B is published, `gtx1060` will become the new default. Performance-tuned profiles (`gtx1060-safe`, `gtx1060-fast`, etc.) are available for specific use cases.
 
 ---
 
@@ -244,6 +251,63 @@ kimari fit --model models/file.gguf --vram 8.0        # Override VRAM for Kimari
 
 ---
 
+## ⚡ Performance Tuning
+
+Kimari includes tools to help you find the best settings for your GPU without guesswork.
+
+### `kimari optimize`
+
+Analyzes your profile and recommends optimal settings for VRAM, context, batch sizes, and cache types:
+
+```bash
+kimari optimize                              # Analyze default profile
+kimari optimize --profile gtx1060            # Optimize for GTX 1060
+kimari optimize --profile test --mode fast   # Fast mode recommendations
+kimari optimize --profile test --json        # JSON output for automation
+```
+
+### `kimari perf`
+
+Shows a performance matrix across all modes (safe, balanced, fast, ide, agent):
+
+```bash
+kimari perf --profile test --dry-run         # Default mode overview
+kimari perf --profile gtx1060 --matrix       # All modes compared
+kimari perf --profile test --json --dry-run  # JSON output
+```
+
+### Performance Profiles
+
+| Profile | GPU | Mode | Cache | Context | Use Case |
+|---------|-----|------|-------|---------|----------|
+| `gtx1060-safe` | GTX 1060 | safe | q8_0/q8_0 | 4,096 | Maximum stability, no OOM |
+| `gtx1060-fast` | GTX 1060 | fast | q8_0/q8_0 | 8,192 | Speed priority |
+| `gtx1080-balanced` | GTX 1080 | balanced | q8_0/f16 | 8,192 | Quality/speed balance |
+| `gtx1080-longctx` | GTX 1080 | balanced | q8_0/q8_0 | 16,384 | Long conversations |
+| `ide-local` | Any 6 GB+ | ide | q8_0/q8_0 | 4,096 | Continue, Cursor, VS Code |
+| `agent-local` | Any 6 GB+ | agent | q8_0/q8_0 | 4,096 | OpenClaw, Hermes |
+| `openclaw-local` | Any 6 GB+ | agent | q8_0/q8_0 | 4,096 | OpenClaw integration |
+| `hermes-local` | Any 6 GB+ | agent | q8_0/q8_0 | 4,096 | Hermes Agent integration |
+
+> All new profiles use TinyLlama during alpha. When Kimari-4B is released, the GPU-specific profiles will use it by default.
+
+## 🔌 IDE & Agent Integrations
+
+Kimari works as a local backend for AI coding assistants and autonomous agents via its OpenAI-compatible API.
+
+| Integration | Config | Recommended Profile |
+|-------------|--------|--------------------|
+| [OpenClaw](docs/integrations/OPENCLAW.md) | `config/integrations/openclaw.kimari.example.json` | `openclaw-local` |
+| [Hermes Agent](docs/integrations/HERMES.md) | `config/integrations/hermes.kimari.example.yaml` | `hermes-local` |
+| [Continue.dev](docs/integrations/CONTINUE.md) | `config/integrations/continue.kimari.example.yaml` | `ide-local` |
+| [Any OpenAI client](docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md) | — | Any |
+
+All integrations use **Chat Completions** (`/v1/chat/completions`). Responses API is not yet supported.
+
+See [docs/integrations/](docs/integrations/) for detailed setup guides.
+
+---
+
 ## 📐 KimariFit Score
 
 The KimariFit formula measures useful intelligence density per GiB of VRAM. It answers a simple question: *"Will this model run well on my GPU?"*
@@ -290,7 +354,9 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 |-------|-----------|--------|
 | **CLI** | Python 3.10+ command-line interface | ✅ Available |
 | **Open WebUI** | Full-featured web chat interface (Docker) | ✅ Available |
-| **Continue** | AI coding assistant for VS Code and JetBrains | ✅ Available |
+| **Continue** | AI coding assistant for VS Code and JetBrains | ✅ Available (Chat + Edit) |
+| **OpenClaw** | AI agent framework with local model support | ✅ Available (Chat Completions) |
+| **Hermes** | AI agent supporting OpenAI-compatible servers | ✅ Available (Chat Completions) |
 | **ROCm** | AMD GPU support via HIP/ROCm build | 🧪 Experimental |
 | **Local API** | FastAPI REST API for programmatic access | 🔨 Planned (v0.2) |
 | **Web Dashboard** | Minimal status/controls UI | 🔨 Planned (v0.3) |
@@ -313,6 +379,10 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Release Checklist](RELEASE_CHECKLIST.md) | Pre-release validation checklist |
 | [Security](SECURITY.md) | Security policy and best practices |
 | [Privacy](PRIVACY.md) | Privacy policy (no telemetry) |
+| [OpenClaw Integration](docs/integrations/OPENCLAW.md) | Connect OpenClaw to Kimari's local API |
+| [Hermes Integration](docs/integrations/HERMES.md) | Connect Hermes Agent to Kimari |
+| [Continue Integration](docs/integrations/CONTINUE.md) | Use Kimari as IDE coding assistant |
+| [OpenAI-Compatible Clients](docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md) | Generic client integration guide |
 
 ---
 

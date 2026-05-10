@@ -1,0 +1,12 @@
+# Kimari Local AI configuration for Continue.dev
+# Start Kimari with: kimari start --profile ide-local
+
+models:
+  - title: Kimari Local
+    provider: openai
+    apiBase: http://127.0.0.1:11435/v1
+    apiKey: kimari-local
+    model: kimari
+    roles:
+      - chat
+      - edit

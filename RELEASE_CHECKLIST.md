@@ -28,6 +28,8 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] `pip install -e .` — installs without errors
 - [ ] `kimari --version` — installed entry point works
 - [ ] `kimari start --dry-run` — installed entry point works
+- [ ] `kimari optimize --profile test --json` — returns valid JSON
+- [ ] `kimari perf --profile test --dry-run` — runs without error
 
 ## Build & Package
 
@@ -54,6 +56,13 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] README links to Release Checklist
 - [ ] ROADMAP marks current version as "Current"
 - [ ] No "Kimari-4B released" false claim anywhere
+- [ ] docs/integrations/OPENCLAW.md exists and mentions Chat Completions (not Responses API)
+- [ ] docs/integrations/HERMES.md exists
+- [ ] docs/integrations/CONTINUE.md exists
+- [ ] docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md exists
+- [ ] config/integrations/ directory with example configs exists
+- [ ] No "Responses API supported" false claim anywhere
+- [ ] New profiles exist (gtx1060-safe, gtx1060-fast, gtx1080-balanced, gtx1080-longctx, ide-local, agent-local, openclaw-local, hermes-local)
 
 ## Publishing (Manual)
 

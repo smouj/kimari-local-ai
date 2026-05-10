@@ -65,7 +65,175 @@ from kimari.models.registry import (
 from kimari.profiles.manager import list_profiles
 from kimari.utils.colors import Color, fail, info, ok, warn
 
-# ─── Server Management ───────────────────────────────────────────────────────
+# ─── Performance Commands ─────────────────────────────────────────────────────
+
+
+def run_optimize(
+    config: dict,
+    profile_name: str | None = None,
+    mode: str = "balanced",
+    json_output: bool = False,
+):
+    """Analyze a profile and recommend optimal settings.
+
+    Does NOT execute models or make network calls. Pure analysis.
+    """
+    from kimari.performance import (
+        read_gguf_metadata,
+        recommend_profile_settings,
+        vram_safe_budget,
+    )
+
+    if not profile_name:
+        profile_name = config.get("default_profile", "test")
+
+    profile = get_profile(config, profile_name)
+    model_size_gb = profile.get("estimated_model_size_gb", 1.0)
+    vram_total_gb = profile.get("vram_total_gb", 6.0)
+
+    # Try to read GGUF metadata for better accuracy
+    model_path = PROJECT_ROOT / profile.get("model", "")
+    if model_path.exists():
+        meta = read_gguf_metadata(str(model_path))
+        if meta.get("parse_success") and meta.get("file_size_bytes") and meta["file_size_bytes"] > 0:
+            model_size_gb = meta["file_size_bytes"] / (1024**3)
+
+    # Get recommendations
+    settings = recommend_profile_settings(vram_total_gb, model_size_gb, mode)
+
+    # Build output
+    result = {
+        "profile": profile_name,
+        "profile_name": profile.get("name", ""),
+        "model": profile.get("model", ""),
+        "model_size_gb": round(model_size_gb, 2),
+        "vram_total_gb": vram_total_gb,
+        "vram_safe_budget_gb": vram_safe_budget(vram_total_gb),
+        "performance_mode": mode,
+        "recommendations": {
+            "ctx": settings["ctx"],
+            "batch": settings["batch"],
+            "ubatch": settings["ubatch"],
+            "cache_type_k": settings["cache_type_k"],
+            "cache_type_v": settings["cache_type_v"],
+            "gpu_layers": settings["gpu_layers"],
+            "flash_attn": settings["flash_attn"],
+            "parallel": settings["parallel"],
+        },
+        "estimates": {
+            "expected_vram_gb": settings["expected_vram_gb"],
+            "expected_ram_gb": settings["expected_ram_gb"],
+        },
+        "confidence": settings["confidence"],
+        "warnings": settings["warnings"],
+    }
+
+    if json_output:
+        print(json.dumps(result, indent=2))
+        return
+
+    # Human-readable output
+    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Optimize{Color.RESET}")
+    print(f"  Profile:  {Color.GREEN}{profile_name}{Color.RESET} ({profile.get('name', '')})")
+    print(f"  Model:    {profile.get('model', '')}")
+    print(f"  VRAM:     {vram_total_gb} GiB (safe: {vram_safe_budget(vram_total_gb):.2f} GiB)")
+    print(f"  Mode:     {mode}")
+    print(f"\n  {Color.BOLD}Recommendations:{Color.RESET}")
+    rec = result["recommendations"]
+    est = result["estimates"]
+    print(f"    Context:       {rec['ctx']:,} tokens")
+    print(f"    Batch:         {rec['batch']} / ubatch {rec['ubatch']}")
+    print(f"    Cache K/V:     {rec['cache_type_k']} / {rec['cache_type_v']}")
+    print(f"    GPU layers:    {rec['gpu_layers']}")
+    print(f"    Flash Attn:    {'on' if rec['flash_attn'] else 'off'}")
+    print(f"    Parallel:      {rec['parallel']}")
+    print(f"\n  {Color.BOLD}Estimates:{Color.RESET}")
+    print(f"    VRAM needed:   {est['expected_vram_gb']:.2f} GiB")
+    print(f"    RAM needed:    {est['expected_ram_gb']:.2f} GiB")
+    print(f"    Confidence:    {settings['confidence']}")
+
+    if settings["warnings"]:
+        print(f"\n  {Color.YELLOW}Warnings:{Color.RESET}")
+        for w in settings["warnings"]:
+            print(f"    ⚠ {w}")
+    print()
+
+
+def run_perf(
+    config: dict,
+    profile_name: str | None = None,
+    dry_run: bool = True,
+    json_output: bool = False,
+    matrix: bool = False,
+):
+    """Performance diagnostic and tuning helper.
+
+    In dry-run mode (default), shows a matrix of recommended settings.
+    Does NOT execute benchmarks or start servers in dry-run mode.
+    """
+    from kimari.performance import recommend_profile_settings, vram_safe_budget
+
+    if not profile_name:
+        profile_name = config.get("default_profile", "test")
+
+    profile = get_profile(config, profile_name)
+    model_size_gb = profile.get("estimated_model_size_gb", 1.0)
+    vram_total_gb = profile.get("vram_total_gb", 6.0)
+
+    modes = ["safe", "balanced", "fast", "ide", "agent"] if matrix else [profile.get("performance_mode", "balanced")]
+
+    results = []
+    for mode in modes:
+        settings = recommend_profile_settings(vram_total_gb, model_size_gb, mode)
+        results.append({"mode": mode, **settings})
+
+    output = {
+        "profile": profile_name,
+        "model": profile.get("model", ""),
+        "model_size_gb": model_size_gb,
+        "vram_total_gb": vram_total_gb,
+        "vram_safe_budget_gb": vram_safe_budget(vram_total_gb),
+        "dry_run": dry_run,
+        "modes": results,
+    }
+
+    if json_output:
+        print(json.dumps(output, indent=2))
+        return
+
+    # Human-readable output
+    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Perf{Color.RESET}")
+    print(f"  Profile: {Color.GREEN}{profile_name}{Color.RESET} ({profile.get('name', '')})")
+    print(f"  Model:   {profile.get('model', '')}")
+    print(f"  VRAM:    {vram_total_gb} GiB (safe: {vram_safe_budget(vram_total_gb):.2f} GiB)")
+    if dry_run:
+        print(f"  {Color.YELLOW}[DRY RUN]{Color.RESET} Showing recommendations only\n")
+    else:
+        print(f"  {Color.DIM}(Requires running server for actual benchmarks){Color.RESET}\n")
+
+    for r in results:
+        mode = r["mode"]
+        print(f"  {Color.BOLD}Mode: {mode}{Color.RESET}")
+        print(
+            f"    ctx={r['ctx']:,}  batch={r['batch']}/{r['ubatch']}  "
+            f"kv={r['cache_type_k']}/{r['cache_type_v']}  "
+            f"gpu={r['gpu_layers']}  flash={'on' if r['flash_attn'] else 'off'}  "
+            f"parallel={r['parallel']}"
+        )
+        print(
+            f"    vram≈{r['expected_vram_gb']:.2f} GiB  ram≈{r['expected_ram_gb']:.2f} GiB  "
+            f"confidence={r['confidence']}"
+        )
+        if r["warnings"]:
+            for w in r["warnings"]:
+                print(f"    {Color.YELLOW}⚠ {w}{Color.RESET}")
+        print()
+
+    if not matrix:
+        print(f"  {Color.DIM}Tip: Use --matrix to see all performance modes at once.{Color.RESET}")
+        print(
+            f"  {Color.DIM}Tip: Use kimari optimize --profile {profile_name} --mode <mode> for detailed analysis.{Color.RESET}"
+        )
 
 
 def build_server_cmd(
@@ -79,6 +247,8 @@ def build_server_cmd(
     """Build the llama-server command list for a given profile.
 
     Optional overrides replace the profile values when provided.
+    New performance fields (flash_attn, parallel, mlock, no_mmap) are
+    only added when the profile defines them.
     """
     model_path = PROJECT_ROOT / (model_override if model_override else profile["model"])
     host = host_override if host_override else profile.get("host", "127.0.0.1")
@@ -109,6 +279,19 @@ def build_server_cmd(
 
     if profile.get("threads"):
         cmd.extend(["-t", str(profile["threads"])])
+
+    # New performance flags (only added when profile defines them)
+    if profile.get("flash_attn") == "on":
+        cmd.append("--flash-attn")
+
+    if profile.get("parallel") and profile["parallel"] > 1:
+        cmd.extend(["--parallel", str(profile["parallel"])])
+
+    if profile.get("mlock") is True:
+        cmd.append("--mlock")
+
+    if profile.get("no_mmap") is True:
+        cmd.append("--no-mmap")
 
     return cmd
 
@@ -1092,6 +1275,43 @@ def main():
         help="Override VRAM in GiB (for systems without GPU)",
     )
 
+    # optimize
+    optimize_parser = subparsers.add_parser("optimize", help="Recommend optimal settings for a profile")
+    optimize_parser.add_argument(
+        "--profile",
+        "-p",
+        default=None,
+        help="GPU profile to optimize (default: from config)",
+    )
+    optimize_parser.add_argument(
+        "--mode",
+        "-m",
+        default=None,
+        help="Performance mode: safe, balanced, fast, ide, agent (default: from profile)",
+    )
+    optimize_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
+
+    # perf
+    perf_parser = subparsers.add_parser("perf", help="Performance diagnostic and tuning helper")
+    perf_parser.add_argument(
+        "--profile",
+        "-p",
+        default=None,
+        help="GPU profile to analyze (default: from config)",
+    )
+    perf_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=True,
+        help="Show recommendations only (default: True)",
+    )
+    perf_parser.add_argument(
+        "--matrix",
+        action="store_true",
+        help="Show all performance modes at once",
+    )
+    perf_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
+
     # models
     models_parser = subparsers.add_parser("models", help="List available GGUF models")
     models_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
@@ -1204,6 +1424,19 @@ def main():
         )
     elif args.command == "fit":
         calculate_kimarifit(args.model, args.ctx, config, vram_override=getattr(args, "vram", None))
+    elif args.command == "optimize":
+        profile = args.profile or config.get("default_profile", "test")
+        mode = args.mode or config.get("profiles", {}).get(profile, {}).get("performance_mode", "balanced")
+        run_optimize(config, profile_name=profile, mode=mode, json_output=getattr(args, "json_output", False))
+    elif args.command == "perf":
+        profile = args.profile or config.get("default_profile", "test")
+        run_perf(
+            config,
+            profile_name=profile,
+            dry_run=getattr(args, "dry_run", True),
+            json_output=getattr(args, "json_output", False),
+            matrix=getattr(args, "matrix", False),
+        )
     elif args.command == "models":
         list_models(
             json_output=getattr(args, "json_output", False),

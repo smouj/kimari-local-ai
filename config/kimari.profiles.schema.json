@@ -11,7 +11,7 @@
     },
     "config_version": {
       "type": "integer",
-      "description": "Configuration migration version (current: 2)",
+      "description": "Configuration migration version (current: 3)",
       "minimum": 1
     },
     "default_profile": {
@@ -31,7 +31,7 @@
     "profiles": {
       "type": "object",
       "patternProperties": {
-        "^[a-z0-9_]+$": {
+        "^[a-z0-9_-]+$": {
           "type": "object",
           "required": ["name", "model", "ctx", "batch", "ubatch", "host", "port", "gpu_layers", "quantization"],
           "additionalProperties": false,
@@ -51,6 +51,11 @@
             "vram_safe_gb": { "type": "number", "minimum": 0 },
             "quantization": { "type": "string" },
             "estimated_model_size_gb": { "type": "number", "description": "Estimated model file size in GiB (approximate)" },
+            "performance_mode": { "type": "string", "enum": ["safe", "balanced", "fast", "longctx", "ide", "agent"], "description": "Performance optimization mode" },
+            "flash_attn": { "type": "string", "enum": ["auto", "on", "off"], "description": "Flash attention setting" },
+            "parallel": { "type": "integer", "minimum": 1, "description": "Number of parallel sequences" },
+            "mlock": { "type": "boolean", "description": "Lock model in RAM to prevent swapping" },
+            "no_mmap": { "type": "boolean", "description": "Disable mmap for model loading" },
             "notes": { "type": "string" }
           }
         }

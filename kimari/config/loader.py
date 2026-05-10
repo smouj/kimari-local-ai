@@ -120,6 +120,26 @@ def migrate_config(dry_run: bool = False) -> tuple[bool, dict]:
         # Set config_version
         config["config_version"] = 2
 
+    # Migration from v2 to v3
+    if current_version < 3:
+        # Add optional performance fields to existing profiles
+        optional_fields = {
+            "performance_mode": "balanced",
+            "flash_attn": "auto",
+            "parallel": 1,
+            "mlock": False,
+            "no_mmap": False,
+        }
+        for name, profile in config.get("profiles", {}).items():
+            for field, default in optional_fields.items():
+                if field not in profile:
+                    profile[field] = default
+                    changes.append(f"Added '{field}' to profile '{name}'")
+
+        # Set config_version
+        config["config_version"] = 3
+        changes.append("Upgraded config_version to 3 (performance fields)")
+
     migration_info = {
         "from_version": current_version,
         "to_version": CURRENT_CONFIG_VERSION,

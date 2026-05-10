@@ -84,7 +84,7 @@
 - ✅ CI release-check job — runs check-release.py in CI
 - ✅ TestPyPI publishing documentation (manual workflow)
 
-## v0.1.9-alpha (Current)
+## v0.1.9-alpha (Released)
 
 - ✅ GitHub Pages revamp — hero, alpha honesty strip, Quick Start before Features, Hardware Targets, Trust section, topics chips, improved footer
 - ✅ SEO/social metadata — canonical URL, Open Graph, Twitter Cards, JSON-LD SoftwareApplication
@@ -94,13 +94,29 @@
 - ✅ RELEASE_CHECKLIST.md — added SEO, WSL2, publishing, GitHub Pages checks
 - ✅ check-release.py — 10 validation categories including SEO, docs, false claim detection
 
-## v0.1.10-alpha (Planned)
+## v0.1.10-alpha (Current)
 
-- TestPyPI actual install verification (real upload + install test)
-- Optional `kimari setup` interactive command
+- ✅ Performance estimation module — VRAM/RAM estimation with confidence levels and warnings
+- ✅ GGUF metadata reader — Lightweight reader for model architecture data
+- ✅ `kimari optimize` command — Profile analysis with mode-based recommendations
+- ✅ `kimari perf` command — Performance diagnostic with matrix mode
+- ✅ 8 new GPU profiles — gtx1060-safe, gtx1060-fast, gtx1080-balanced, gtx1080-longctx, ide-local, agent-local, openclaw-local, hermes-local
+- ✅ New profile fields — performance_mode, flash_attn, parallel, mlock, no_mmap
+- ✅ Extended build_server_cmd — --flash-attn, --parallel, --mlock, --no-mmap flags
+- ✅ OpenClaw integration — docs + config example
+- ✅ Hermes Agent integration — docs + config example
+- ✅ Continue.dev integration — docs + config example
+- ✅ Generic OpenAI-compatible client guide — curl, Python, Node.js, troubleshooting
+
+## v0.1.11-alpha (Planned)
+
+- TestPyPI actual upload/install verification
+- `kimari setup` interactive command
 - Real SHA256 hashes if computable reliably
-- More robust Windows launcher/installer
-- GitHub release automation preparation
+- Windows installer/launcher
+- Optional local auth token
+- Responses API compatibility research
+- llama-server --help based flag detection
 
 ## v0.2.0-alpha
 

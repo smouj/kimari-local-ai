@@ -51,9 +51,21 @@ def test_get_profile_invalid(sample_config):
 
 
 def test_all_five_profiles_exist(sample_config):
-    """All five expected profiles exist in config."""
-    expected = {"gtx1060", "gtx1080", "turbo", "test", "docker"}
-    assert expected == set(sample_config["profiles"].keys())
+    """All expected profiles exist in config (5 original + 8 new)."""
+    expected_original = {"gtx1060", "gtx1080", "turbo", "test", "docker"}
+    expected_new = {
+        "gtx1060-safe",
+        "gtx1060-fast",
+        "gtx1080-balanced",
+        "gtx1080-longctx",
+        "ide-local",
+        "agent-local",
+        "openclaw-local",
+        "hermes-local",
+    }
+    expected = expected_original | expected_new
+    actual = set(sample_config["profiles"].keys())
+    assert expected.issubset(actual), f"Missing profiles: {expected - actual}"
 
 
 def test_docker_profile_uses_0000(sample_config):

@@ -66,7 +66,7 @@ def main() -> None:
     print("=" * 50)
 
     # ── Version consistency ──────────────────────────────────────
-    print("\n[1/10] Version consistency")
+    print("\n[1/12] Version consistency")
     pyproject_ver = get_pyproject_version()
     init_ver = get_init_version()
     check("pyproject.toml version is set", bool(pyproject_ver), "version field is empty")
@@ -78,7 +78,7 @@ def main() -> None:
     )
 
     # ── README version badge ─────────────────────────────────────
-    print("\n[2/10] README version badge")
+    print("\n[2/12] README version badge")
     readme = PROJECT_ROOT / "README.md"
     readme_text = readme.read_text()
     check("README.md exists", readme.exists())
@@ -95,7 +95,7 @@ def main() -> None:
     )
 
     # ── CHANGELOG entry ──────────────────────────────────────────
-    print("\n[3/10] CHANGELOG entry")
+    print("\n[3/12] CHANGELOG entry")
     changelog = PROJECT_ROOT / "CHANGELOG.md"
     changelog_text = changelog.read_text()
     changelog_header = f"[{init_ver}]"
@@ -106,7 +106,7 @@ def main() -> None:
     )
 
     # ── ROADMAP entry ────────────────────────────────────────────
-    print("\n[4/10] ROADMAP entry")
+    print("\n[4/12] ROADMAP entry")
     roadmap = PROJECT_ROOT / "ROADMAP.md"
     roadmap_text = roadmap.read_text()
     check(
@@ -121,7 +121,7 @@ def main() -> None:
     )
 
     # ── Config defaults ──────────────────────────────────────────
-    print("\n[5/10] Config defaults")
+    print("\n[5/12] Config defaults")
     profiles_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
     if profiles_path.exists():
         profiles = json.loads(profiles_path.read_text())
@@ -135,12 +135,12 @@ def main() -> None:
         check("config/kimari.profiles.json exists", False, "file not found")
 
     # ── Package markers ─────────────────────────────────────────
-    print("\n[6/10] Package markers")
+    print("\n[6/12] Package markers")
     py_typed = PROJECT_ROOT / "kimari" / "py.typed"
     check("kimari/py.typed exists", py_typed.exists(), "PEP 561 marker missing")
 
     # ── GitHub Pages / SEO ──────────────────────────────────────
-    print("\n[7/10] GitHub Pages / SEO")
+    print("\n[7/12] GitHub Pages / SEO")
     index_html = PROJECT_ROOT / "docs" / "index.html"
     if index_html.exists():
         index_text = index_html.read_text()
@@ -168,7 +168,7 @@ def main() -> None:
         check("docs/index.html exists", False, "file not found")
 
     # ── Documentation files ─────────────────────────────────────
-    print("\n[8/10] Documentation files")
+    print("\n[8/12] Documentation files")
     check(
         "docs/INSTALL_WSL2.md exists",
         (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists(),
@@ -186,7 +186,7 @@ def main() -> None:
     )
 
     # ── No tracked GGUF / runtime artifacts ──────────────────────
-    print("\n[9/10] No unwanted tracked files")
+    print("\n[9/12] No unwanted tracked files")
     try:
         result = subprocess.run(
             ["git", "ls-files", "*.gguf"],
@@ -228,7 +228,7 @@ def main() -> None:
         warn(".kimari/ directory exists in project root", "should be in .gitignore")
 
     # ── No false claims ─────────────────────────────────────────
-    print("\n[10/10] Content integrity")
+    print("\n[10/12] Content integrity")
     readme_lower = readme_text.lower()
     changelog_lower = changelog_text.lower()
     index_lower = (PROJECT_ROOT / "docs" / "index.html").read_text().lower() if index_html.exists() else ""
@@ -248,6 +248,87 @@ def main() -> None:
         "No 'Kimari-4B released' false claim",
         len(false_claims) == 0,
         f"found false claims: {false_claims}",
+    )
+
+    # Check that no file claims "Responses API supported" (case insensitive)
+    # It should only say "planned" or "future"
+    responses_api_false_patterns = [
+        "responses api supported",
+        "responses api is supported",
+    ]
+    responses_false_claims = [p for p in responses_api_false_patterns if p in all_text]
+    check(
+        "No 'Responses API supported' false claim",
+        len(responses_false_claims) == 0,
+        f"found false claims: {responses_false_claims} — should only say 'planned' or 'future'",
+    )
+
+    # Check that README mentions optimize and perf commands
+    check(
+        "README mentions 'optimize' command",
+        "optimize" in readme_lower,
+        "'optimize' not found in README.md",
+    )
+    check(
+        "README mentions 'perf' command",
+        "perf" in readme_lower,
+        "'perf' not found in README.md",
+    )
+
+    # ── Integration documentation ──────────────────────────────────
+    print("\n[11/12] Integration documentation")
+    check(
+        "docs/integrations/OPENCLAW.md exists",
+        (PROJECT_ROOT / "docs" / "integrations" / "OPENCLAW.md").exists(),
+        "OpenClaw integration doc missing",
+    )
+    check(
+        "docs/integrations/HERMES.md exists",
+        (PROJECT_ROOT / "docs" / "integrations" / "HERMES.md").exists(),
+        "Hermes integration doc missing",
+    )
+    check(
+        "docs/integrations/CONTINUE.md exists",
+        (PROJECT_ROOT / "docs" / "integrations" / "CONTINUE.md").exists(),
+        "Continue integration doc missing",
+    )
+    check(
+        "docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md exists",
+        (PROJECT_ROOT / "docs" / "integrations" / "OPENAI_COMPATIBLE_CLIENTS.md").exists(),
+        "OpenAI compatible clients integration doc missing",
+    )
+    check(
+        "config/integrations/ directory exists",
+        (PROJECT_ROOT / "config" / "integrations").is_dir(),
+        "config/integrations/ directory missing",
+    )
+    check(
+        "config/integrations/openclaw.kimari.example.json exists",
+        (PROJECT_ROOT / "config" / "integrations" / "openclaw.kimari.example.json").exists(),
+        "OpenClaw example config missing",
+    )
+
+    # ── Performance module ─────────────────────────────────────────
+    print("\n[12/12] Performance module")
+    check(
+        "kimari/performance/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "performance" / "__init__.py").exists(),
+        "Performance module init missing",
+    )
+    check(
+        "kimari/performance/estimator.py exists",
+        (PROJECT_ROOT / "kimari" / "performance" / "estimator.py").exists(),
+        "VRAM/RAM estimator missing",
+    )
+    check(
+        "kimari/performance/recommender.py exists",
+        (PROJECT_ROOT / "kimari" / "performance" / "recommender.py").exists(),
+        "Settings recommender missing",
+    )
+    check(
+        "kimari/performance/gguf_metadata.py exists",
+        (PROJECT_ROOT / "kimari" / "performance" / "gguf_metadata.py").exists(),
+        "GGUF metadata reader missing",
     )
 
     # ── Summary ──────────────────────────────────────────────────
