@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.18--alpha-9b59b6.svg" alt="v0.1.18-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.19--alpha-9b59b6.svg" alt="v0.1.19-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.18-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.19-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.18-alpha**
+> **Kimari Local AI v0.1.19-alpha**
 
 ### ✅ Works Today
 
@@ -504,7 +504,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. No base model selected yet.
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate.
 
 ### What's Ready
 
@@ -529,11 +529,22 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 
 | Candidate | License | Strength | Risk |
 |-----------|---------|----------|------|
-| SmolLM3-3B | Apache 2.0 | Clean legal path for derivatives | Less coding capability |
+| SmolLM3-3B | Apache 2.0 | ✅ Accepted for private training | Less coding capability |
 | Qwen2.5-3B-Instruct | qwen-research | Strong coding/JSON/multilingual | License review required |
 | Llama 3.2 3B | Meta Community | Strong general performance | Redistribution constraints |
 
-> No final selection yet. See [docs/MODEL_BASE_SELECTION.md](docs/MODEL_BASE_SELECTION.md) for the full comparison.
+> SmolLM3-3B accepted for first private SFT. See [Base Model Acceptance](docs/BASE_MODEL_ACCEPTANCE.md) and [docs/MODEL_BASE_SELECTION.md](docs/MODEL_BASE_SELECTION.md) for the full comparison.
+
+### v0 Pipeline
+
+- **SmolLM3-3B accepted** for first private SFT candidate (see [Base Model Acceptance](docs/BASE_MODEL_ACCEPTANCE.md))
+- **Dataset v0** — Synthetic SFT + preference + eval holdout in `dataset/v0/`
+- **Training readiness validator** — `validate_training_ready.py` checks all prerequisites
+- **v0 training configs** — SFT LoRA and ORPO example configs for SmolLM3-3B
+- **KimariFit scoring dimensions** — 9 evaluation dimensions defined
+- **[First Private Training Run](docs/FIRST_PRIVATE_TRAINING_RUN.md)** — Step-by-step guide
+
+> No weights released yet. No real benchmarks. SmolLM3 is accepted for private training only.
 
 ### Training Approach
 

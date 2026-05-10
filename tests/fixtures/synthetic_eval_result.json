@@ -1,0 +1,57 @@
+{
+  "total": 5,
+  "ok": 3,
+  "errors": 2,
+  "categories": {
+    "python": 2,
+    "bash": 2,
+    "docker": 1
+  },
+  "results": [
+    {
+      "id": "test-001",
+      "category": "python",
+      "prompt": "Write a Python function",
+      "response": "def hello(): pass",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 1.5
+    },
+    {
+      "id": "test-002",
+      "category": "python",
+      "prompt": "Debug this code",
+      "response": "The issue is...",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 2.1
+    },
+    {
+      "id": "test-003",
+      "category": "bash",
+      "prompt": "Write a bash script",
+      "response": "",
+      "status": "error",
+      "error": "Request timed out",
+      "elapsed_seconds": 60.0
+    },
+    {
+      "id": "test-004",
+      "category": "bash",
+      "prompt": "Explain this command",
+      "response": "This command...",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 1.8
+    },
+    {
+      "id": "test-005",
+      "category": "docker",
+      "prompt": "Create a Dockerfile",
+      "response": "",
+      "status": "error",
+      "error": "URL error: connection refused",
+      "elapsed_seconds": 5.0
+    }
+  ]
+}

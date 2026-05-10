@@ -251,6 +251,27 @@ twine upload dist/*
 - [ ] `default_profile` is still `"test"`
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.19 Checks
+
+- [ ] docs/BASE_MODEL_ACCEPTANCE.md exists and says "private training" (not public release)
+- [ ] dataset/v0/ directory exists with sft_v0.jsonl, preference_v0.jsonl, eval_holdout.jsonl
+- [ ] dataset/v0/README.md exists with dataset policy
+- [ ] training/scripts/validate_training_ready.py exists and --json works
+- [ ] eval/scoring/kimarifit_dimensions.json exists and parses as valid JSON
+- [ ] eval/scripts/summarize_results.py exists and --json works on synthetic data
+- [ ] training/configs/kimari_sft_lora.v0.example.yaml exists
+- [ ] training/configs/kimari_orpo.v0.example.yaml exists
+- [ ] docs/FIRST_PRIVATE_TRAINING_RUN.md exists
+- [ ] docs/HF_PLACEHOLDER_PLAN.md exists
+- [ ] MODEL_CARD.md says no weights released
+- [ ] No GGUF files tracked in git
+- [ ] No fake benchmark numbers in MODEL_CARD
+- [ ] base_candidates.yaml has accepted_private_training_candidate status
+- [ ] SmolLM3 selected_for_private_sft: true
+- [ ] SmolLM3 selected_for_public_release: false
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

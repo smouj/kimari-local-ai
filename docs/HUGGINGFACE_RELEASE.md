@@ -339,6 +339,43 @@ GGUF files are binary model files that should never be in the Git repository. Th
 
 ---
 
+## Placeholder Repository Rules
+
+Before any model weights are ready for distribution, a placeholder repository may be created on Hugging Face to signal project intent and reserve the repository name.
+
+### Allowed in Placeholder
+
+| File | Purpose |
+|------|---------|
+| `README.md` | Placeholder model card stating "Coming Soon — No weights available yet" |
+| `MODEL_CARD.md` | Reference to Kimari project model card |
+| `MODEL_LICENSES.md` | License layers document |
+| Summary of `docs/HUGGINGFACE_RELEASE.md` | Release process documentation |
+
+### NOT Allowed in Placeholder
+
+| Prohibited | Reason |
+|------------|--------|
+| Model weights (safetensors) | No weights exist yet |
+| Adapter weights | No adapter trained yet |
+| GGUF files | No quantized model yet |
+| Benchmark results | No evaluation performed yet — fake benchmarks are forbidden |
+| Training data | License and privacy restrictions |
+| HF API keys/tokens | Security risk |
+
+### When to Create the Placeholder
+
+- After the base model is formally accepted for private training
+- After the license has been reviewed (at least preliminarily)
+- No automated upload process — manual creation only
+- No token/credential committed to any repository
+
+### Transition from Placeholder to Full Release
+
+When all hard blocks in the "Hard Blocks" section above are resolved, the placeholder can be updated to a full release with actual model weights, evaluation results, and quantized variants.
+
+---
+
 ## Relationship to Other Project Documents
 
 | Document | Relationship |
