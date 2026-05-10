@@ -1,0 +1,40 @@
+# Kimari ORPO Training Configuration
+# WARNING: These are starting points, NOT final hyperparameters.
+# ORPO must only run AFTER SFT is complete.
+
+# Base model or SFT adapter
+base_model_or_adapter: "TBD"  # Path to SFT adapter or base model
+preference_dataset_path: "./dataset/cleaned/preference_train.jsonl"
+
+# Output
+output_dir: "./training/runs/kimari-orpo-v0.1"
+
+# Sequence
+max_seq_length: 4096
+
+# ORPO parameters
+# beta controls the strength of the preference optimization
+# Higher beta = stronger preference signal
+beta: 0.1  # starting point, may need tuning
+
+# Training
+learning_rate: 5.0e-5  # Conservative for preference tuning
+num_train_epochs: 1  # Usually 1 epoch is enough for preference
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 4
+warmup_ratio: 0.1
+save_steps: 100
+eval_steps: 100
+
+# Precision
+bf16: true
+fp16: false
+
+# Misc
+seed: 42
+gradient_checkpointing: true
+report_to: "none"
+
+# Safety: ORPO modifies model behavior significantly.
+# Always evaluate safety refusal after preference tuning.
+# Do NOT use preference data that encourages harmful outputs.

@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.16--alpha-9b59b6.svg" alt="v0.1.16-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.17--alpha-9b59b6.svg" alt="v0.1.17-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.16-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.17-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.16-alpha**
+> **Kimari Local AI v0.1.17-alpha**
 
 ### ✅ Works Today
 
@@ -82,10 +82,17 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Model hashing docs** — full workflow in `docs/MODEL_HASHING.md`
 - **Benchmark submissions** — community workflow in `docs/BENCHMARK_SUBMISSIONS.md`
 - **Windows packaging** — scripts and docs in `scripts/windows/`
+- **Model training plan** — 7-phase training pipeline for Kimari-4B in `docs/MODEL_TRAINING_PLAN.md`
+- **Base model selection** — Candidate comparison in `docs/MODEL_BASE_SELECTION.md`
+- **Dataset policy and schemas** — SFT/Preference JSONL formats with validation in `dataset/`
+- **Training skeletons** — LoRA SFT and ORPO configs with `--dry-run` in `training/`
+- **Evaluation prompt seed** — 35 KimariFit prompts across 10 categories in `eval/kimarifit_prompts.jsonl`
+- **Hugging Face release plan** — Pre-upload checklist in `docs/HUGGINGFACE_RELEASE.md`
+- **MODEL_CARD professional rewrite** — Honest "Planned / Training Design" status with base candidates
 
 ### 🔨 Planned
 
-- **Kimari-4B** — Target model under development. Weights not yet available.
+- **Kimari-4B** — Target model under development. Training plan defined, base selection underway. Weights not yet available.
 - **Local REST API** — FastAPI-based API for programmatic access (v0.2)
 - **Web Dashboard** — Minimal status/controls UI (v0.3)
 - **VRAM reporting** — Real-time memory usage in `kimari status`
@@ -96,7 +103,6 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - RAG support
 - Tool/function calling
 - Authentication/authorization for API
-- Fine-tuning pipeline
 - macOS / CPU-only support
 
 ---
@@ -494,6 +500,42 @@ PowerShell scripts for building, installing, and testing on Windows:
 
 See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
+## 🧠 Kimari-4B Model Work
+
+Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
+
+> **Status: Planned / Training Design** — No weights released yet. No base model selected yet.
+
+### What's Ready
+
+- **[MODEL_CARD.md](MODEL_CARD.md)** — Professional model card with honest status, base candidates, and evaluation targets
+- **[Training Plan](docs/MODEL_TRAINING_PLAN.md)** — 7-phase pipeline (selection → SFT → DPO/ORPO → eval → GGUF → HF → registry)
+- **[Base Selection](docs/MODEL_BASE_SELECTION.md)** — SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B comparison
+- **[Model Licenses](MODEL_LICENSES.md)** — License layers for code, weights, and base models
+- **[Dataset Policy](dataset/README.md)** — SFT and Preference JSONL schemas with validation
+- **[Hugging Face Release](docs/HUGGINGFACE_RELEASE.md)** — Pre-upload checklist and HF model card template
+
+### Base Model Candidates
+
+| Candidate | License | Strength | Risk |
+|-----------|---------|----------|------|
+| SmolLM3-3B | Apache 2.0 | Clean legal path for derivatives | Less coding capability |
+| Qwen2.5-3B-Instruct | qwen-research | Strong coding/JSON/multilingual | License review required |
+| Llama 3.2 3B | Meta Community | Strong general performance | Redistribution constraints |
+
+> No final selection yet. See [docs/MODEL_BASE_SELECTION.md](docs/MODEL_BASE_SELECTION.md) for the full comparison.
+
+### Training Approach
+
+1. **SFT with LoRA/QLoRA** on selected base model
+2. **Preference tuning** (DPO or ORPO) after SFT
+3. **Evaluation** with KimariFit prompts and safety checks
+4. **GGUF export** (Q4_K_M, Q5_K_M, IQ4_XS)
+5. **Hugging Face release** if license and eval pass
+
+> Local GTX 1060/1080 is for inference/testing only. Training requires rented GPU (RTX 4090+, A100).
+> See [docs/MODEL_TRAINING_PLAN.md](docs/MODEL_TRAINING_PLAN.md) for details.
+
 ---
 
 ## 🔌 IDE & Agent Integrations
@@ -594,6 +636,9 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [PyPI Release Gate](docs/PYPI_RELEASE_GATE.md) | PyPI publishing gate criteria and status |
 | [Model Hashing](docs/MODEL_HASHING.md) | SHA256 hash verification and pinning workflow |
 | [Benchmark Submissions](docs/BENCHMARK_SUBMISSIONS.md) | Community benchmark submission workflow |
+| [Model Training Plan](docs/MODEL_TRAINING_PLAN.md) | 7-phase training pipeline for Kimari-4B |
+| [Base Model Selection](docs/MODEL_BASE_SELECTION.md) | Candidate comparison and selection criteria |
+| [Hugging Face Release](docs/HUGGINGFACE_RELEASE.md) | HF release checklist and model card template |
 | [API Plan (v0.2)](docs/API_PLAN.md) | FastAPI REST API design for v0.2 |
 
 ---

@@ -178,7 +178,7 @@
 - ✅ TestPyPI validation documented
 - ✅ check-release.py and RELEASE_CHECKLIST expanded
 
-## v0.1.16-alpha (Current)
+## v0.1.16-alpha (Released)
 
 - ✅ Experimental FastAPI API skeleton (`kimari/api/`) — `app.py`, `schemas.py`, `server.py`
 - ✅ Optional `api` dependency in `pyproject.toml` (`pip install kimari-local-ai[api]`)
@@ -195,14 +195,28 @@
 - ✅ Release-check script expanded to 28 validation categories
 - ✅ New tests for v0.1.16 features
 
-## v0.1.17-alpha (Planned)
+## v0.1.17-alpha (Current)
 
-- TestPyPI actual result
-- FastAPI start/stop implementation
-- API auth hardening
-- PyPI real decision
-- Verified model hashes
-- Windows installer packaging
+- ✅ MODEL_CARD.md professional rewrite — "Planned / Training Design" status, base candidates, evaluation targets
+- ✅ docs/MODEL_TRAINING_PLAN.md — 7-phase training pipeline (selection → SFT → DPO/ORPO → eval → GGUF → HF → registry)
+- ✅ docs/MODEL_BASE_SELECTION.md — SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B comparison
+- ✅ MODEL_LICENSES.md improved — SmolLM3, Qwen, Llama candidate license details
+- ✅ dataset/README.md rewritten — SFT/Preference JSONL schemas, forbidden data policy
+- ✅ dataset/schema/ — sft.schema.json and preference.schema.json
+- ✅ training/ — README, configs (SFT LoRA, ORPO), scripts (prepare_dataset.py, train_sft_lora.py)
+- ✅ eval/ — README and 35 KimariFit prompts across 10 categories
+- ✅ docs/HUGGINGFACE_RELEASE.md — Pre-upload checklist and HF model card template
+- ✅ Release-check expanded to 35 validation categories
+- ✅ New tests for v0.1.17 features
+
+## v0.1.18-alpha (Planned)
+
+- Choose base model for Kimari-4B
+- Build first SFT dataset
+- Run dry-run training pipeline
+- Create HF repo placeholder
+- Prepare first adapter training run
+- Improve KimariFit eval harness
 
 ## v0.2.0-alpha
 

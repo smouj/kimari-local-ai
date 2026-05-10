@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kimari.local/dataset/schema/sft.schema.json",
+  "title": "Kimari SFT Dataset Entry",
+  "description": "Schema for Supervised Fine-Tuning (SFT) training data entries in JSONL format. Each line in an SFT dataset file must be a valid JSON object conforming to this schema.",
+  "type": "object",
+  "required": ["messages", "source", "license"],
+  "additionalProperties": false,
+  "properties": {
+    "messages": {
+      "type": "array",
+      "description": "Ordered list of conversation turns. Must contain at least one user-assistant exchange.",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["role", "content"],
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "The role of the speaker in this conversation turn.",
+            "enum": ["system", "user", "assistant"]
+          },
+          "content": {
+            "type": "string",
+            "description": "The content of this conversation turn.",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of this data point. Must be a traceable, descriptive source identifier — not 'unknown'.",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "description": "License under which this data is shared. Must be a valid SPDX identifier or well-known license name — not 'unknown'.",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "description": "Categorization tags for filtering and organization. Use lowercase, hyphenated format.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

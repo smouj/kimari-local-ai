@@ -5,6 +5,35 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.17-alpha] — 2026-05-19
+
+### Added
+- **MODEL_CARD.md professional rewrite** — Status updated to "Planned / Training Design"; base model candidates table (SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B); evaluation targets clearly marked "Not Achieved"; release checklist with all items "Not started"
+- **docs/MODEL_TRAINING_PLAN.md** — 7-phase training pipeline: base selection → dataset design → SFT → preference tuning (DPO/ORPO) → evaluation → GGUF export → Hugging Face release → Kimari registry integration; hardware requirements (local GTX for inference only, rented GPU for training); method comparison (SFT with LoRA/QLoRA, DPO vs ORPO tradeoffs)
+- **docs/MODEL_BASE_SELECTION.md** — Comparison table of 3 main candidates and 1 optional; 10-column analysis (params, license, context, strengths, risks, GTX compatibility, fine-tuning risk, release suitability, status); recommendation framework without final selection
+- **MODEL_LICENSES.md improved** — Added specific candidate sections (SmolLM3 Apache 2.0, Qwen qwen-research, Llama Meta Community License); decision framework for determining final license; "No Weights Released Yet" section; dataset redistribution guidelines
+- **dataset/README.md rewritten** — Comprehensive dataset policy; SFT and Preference JSONL formats with field specifications; forbidden data table (no private data, no secrets, no copyrighted dumps, no credentials, no malware); quality guidelines; validation process
+- **dataset/schema/sft.schema.json** — JSON Schema draft-07 for SFT format validation (messages array with role/content, source, license, tags)
+- **dataset/schema/preference.schema.json** — JSON Schema draft-07 for Preference format validation (prompt, chosen, rejected, source, license, tags)
+- **training/README.md** — Training code documentation; folder structure; dependency list; safety notes; no training in CI
+- **training/configs/kimari_sft_lora.example.yaml** — Example SFT LoRA configuration with starting hyperparameters (all marked as starting points, not final)
+- **training/configs/kimari_orpo.example.yaml** — Example ORPO preference tuning configuration with beta parameter and safety notes
+- **training/scripts/prepare_dataset.py** — JSONL dataset validator/cleaner; validates SFT and Preference schemas; filters empty messages and records without license/source; no network calls; CLI with --input/--output/--schema
+- **training/scripts/train_sft_lora.py** — SFT LoRA training skeleton; --dry-run validates config without training; --config reads YAML; clear error messages for missing dependencies; blocks execution if base_model is "TBD"
+- **training/runs/, training/adapters/, training/logs/** — Output directories with .gitkeep
+- **eval/README.md** — Evaluation documentation with 8 categories; KimariFit, coding, sysadmin, Spanish, JSON/tool-use, safety, latency, memory
+- **eval/kimarifit_prompts.jsonl** — 35 evaluation prompts across 10 categories (python, typescript, bash, docker, linux_troubleshooting, windows_troubleshooting, spanish_technical, json_mode, openclaw_agent, local_security)
+- **docs/HUGGINGFACE_RELEASE.md** — HF release checklist with 4 hard blocks (license reviewed, eval results exist, model card honest, license compatibility); expected files table; prohibited files; 4-phase release process; HF model card template
+- **RELEASE_CHECKLIST.md** — Added v0.1.17 Checks section with 21 items
+- **scripts/release/check-release.py** — Expanded from 28 to 35 validation categories; added sections for MODEL_CARD rewrite, training docs, dataset schemas, training skeletons, eval prompts, content integrity, MODEL_LICENSES/README updates
+- **New tests** (`tests/test_release_v0117.py`) — Tests for MODEL_CARD status, training docs, base selection, dataset schemas, training configs, eval prompts, HF release doc, no false claims, no fake benchmarks
+
+### Changed
+- **Version bumped** to `0.1.17-alpha`
+- **README.md** — Added Kimari-4B Model Work section; added 7 new "Works Today" items; updated version badge and references; added training plan, base selection, and HF release links to documentation table; removed "Fine-tuning pipeline" from "Not Included Yet"
+- **docs/index.html** — Updated hero badge to v0.1.17-alpha; added Kimari-4B Model Roadmap block with "PLANNED — NO WEIGHTS YET" badge; updated What's New chips; added Model Training Plan feature card; added 3 new doc cards
+- **ROADMAP.md** — v0.1.16-alpha marked as Released; v0.1.17-alpha marked as Current; v0.1.18-alpha Planned section added
+
 ## [0.1.16-alpha] — 2026-05-18
 
 ### Added
