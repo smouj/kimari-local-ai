@@ -1,0 +1,8 @@
+# Kimari Local AI configuration for Hermes Agent
+# Start Kimari with: kimari start --profile hermes-local
+
+provider: openai
+base_url: http://127.0.0.1:11435/v1
+api_key: kimari-local
+model: kimari
+timeout: 300

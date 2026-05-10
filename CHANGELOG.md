@@ -5,6 +5,38 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.10-alpha] — 2026-05-12
+
+### Added
+- **Performance estimation module** (`kimari/performance/`) — Pure functions for VRAM estimation, RAM estimation, and settings recommendation with confidence levels and warnings
+  - `estimate_vram_usage()` — Estimates VRAM using formula: model_gpu_part + kv_cache + compute_overhead + cuda_overhead with KV dtype factors (f16, q8_0, q4_0, q4_1, f32)
+  - `estimate_ram_usage()` — Estimates RAM with mmap/no-mmap paths and OS margins
+  - `recommend_context()` — Finds largest fitting context size from safe VRAM budget
+  - `recommend_kv_cache()` — Recommends KV cache types based on VRAM headroom
+  - `recommend_batch()` — Safe/balanced/fast batch profiles with VRAM scaling
+  - `recommend_gpu_layers()` — Full or partial GPU offload recommendations
+  - `recommend_profile_settings()` — Combines all recommendations into complete profile
+- **GGUF metadata reader** (`kimari/performance/gguf_metadata.py`) — Lightweight reader for GGUFv2/v3 files, extracts n_layer, n_embd, n_head, context_length, architecture; graceful fallback to defaults
+- **`kimari optimize` command** — Analyzes a profile and recommends optimal settings (ctx, batch, ubatch, cache types, gpu_layers, flash_attn, parallel, VRAM/RAM estimates, warnings); supports `--json` and `--mode` (safe/balanced/fast/ide/agent)
+- **`kimari perf` command** — Performance diagnostic helper; `--dry-run` shows recommendations, `--matrix` shows all modes, `--json` for structured output
+- **8 new GPU profiles** — `gtx1060-safe`, `gtx1060-fast`, `gtx1080-balanced`, `gtx1080-longctx`, `ide-local`, `agent-local`, `openclaw-local`, `hermes-local`
+- **New profile fields** — `performance_mode` (safe/balanced/fast/longctx/ide/agent), `flash_attn` (auto/on/off), `parallel`, `mlock`, `no_mmap`
+- **`build_server_cmd` extended** — Now adds `--flash-attn`, `--parallel`, `--mlock`, `--no-mmap` flags when profile defines them
+- **Config version 3** — Migration adds new performance fields to existing profiles
+- **OpenClaw integration** — `docs/integrations/OPENCLAW.md` with Chat Completions configuration and `config/integrations/openclaw.kimari.example.json`
+- **Hermes Agent integration** — `docs/integrations/HERMES.md` with endpoint configuration and `config/integrations/hermes.kimari.example.yaml`
+- **Continue.dev integration** — `docs/integrations/CONTINUE.md` with YAML config for chat/edit roles and `config/integrations/continue.kimari.example.yaml`
+- **Generic OpenAI-compatible client guide** — `docs/integrations/OPENAI_COMPATIBLE_CLIENTS.md` with curl, Python, Node.js examples, Open WebUI notes, and troubleshooting
+
+### Changed
+- **Version bumped** to `0.1.10-alpha`
+- **JSON Schema** updated to v3 — allows hyphens in profile names, adds `performance_mode`, `flash_attn`, `parallel`, `mlock`, `no_mmap` properties
+- **GTX 1060 safe VRAM budget** — Now uses 82% (4.9 GB) instead of 87% (5.2 GB) for more conservative estimation
+- **GTX 1080 safe VRAM budget** — Now uses 86% (6.8 GB) instead of 87% (7.0 GB)
+
+### Fixed
+- **Config validation** — Schema now accepts new performance fields and profile names with hyphens
+
 ## [0.1.9-alpha] — 2026-05-11
 
 ### Added

@@ -13,7 +13,7 @@ def test_index_html_contains_version():
     """docs/index.html contains the current version string."""
     index_html = PROJECT_ROOT / "docs" / "index.html"
     text = index_html.read_text()
-    assert "0.1.9-alpha" in text, "Current version not found in docs/index.html"
+    assert "0.1.10-alpha" in text, "Current version not found in docs/index.html"
 
 
 def test_index_html_has_canonical():

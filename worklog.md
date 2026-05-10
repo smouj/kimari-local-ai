@@ -108,3 +108,35 @@ Stage Summary:
 - All validations pass
 - Committed and pushed to GitHub
 - Git tag v0.1.8-alpha created and pushed
+
+---
+Task ID: v0.1.9-alpha
+Agent: Main Agent
+Task: v0.1.9-alpha — GitHub Pages revamp, SEO metadata, WSL2 guide, publishing docs, release-check improvements
+
+Work Log:
+- Version bump to 0.1.9-alpha in pyproject.toml, kimari/__init__.py, README.md badge, docs/index.html, tests/test_cli_smoke.py, tests/test_release_v018.py
+- Delegated GitHub Pages revamp to frontend-styling-expert agent: hero improved with explicit GPU mention, alpha honesty strip, Quick Start before Features, Hardware Targets section, Trust section, topics chips, SEO metadata (canonical, og:*, twitter:*, JSON-LD), accessibility improvements (aria labels, role attributes, semantic button), improved footer with doc links
+- Created docs/INSTALL_WSL2.md: complete WSL2 guide covering Windows 10/11, Ubuntu setup, NVIDIA drivers, CUDA on WSL, build/install/pull/start flow, Open WebUI optional, and troubleshooting (nvidia-smi, nvcc, llama-server, port busy, model not found, CUDA OOM)
+- Created docs/PUBLISHING.md: manual TestPyPI/PyPI publishing guide with pre-publish checklist, build/twine workflow, clean venv verification, API token configuration, .pypirc setup, and common issues
+- Improved RELEASE_CHECKLIST.md: added 7 new checks (GitHub Pages, SEO metadata, WSL2 guide, publishing guide, README links, ROADMAP current, no false claims)
+- Improved scripts/release/check-release.py: expanded from 7 to 10 validation categories, added index.html version/SEO checks, docs existence checks, false claim detection for Kimari-4B
+- Created tests/test_release_v019.py: 11 tests covering index.html version, canonical URL, Open Graph, Twitter Card, JSON-LD, WSL2 guide existence/troubleshooting, publishing guide, TestPyPI mention, README Kimari-4B honesty
+- Updated CHANGELOG.md with v0.1.9-alpha entry
+- Updated ROADMAP.md: v0.1.8-alpha as Released, v0.1.9-alpha as Current, v0.1.10-alpha as Planned
+- Updated docs/COMPARISON.md and docs/PROJECT_STRUCTURE.md versions
+- Verified GitHub topics (20 topics confirmed via API)
+- Fixed check-release.py false positive on "Kimari-4B is not released" matching "kimari-4b is released"
+- All 109 tests passing, ruff clean, build/twine PASSED, make ci-local passed
+
+Stage Summary:
+- Version: v0.1.9-alpha
+- 16 files changed, 1020 insertions, 144 deletions
+- GitHub Pages fully revamped with SEO, social metadata, accessibility
+- WSL2 installation guide created
+- Publishing guide (TestPyPI/PyPI) created
+- Release validation expanded to 10 categories
+- 11 new tests (109 total, up from 98)
+- All validations pass
+- Committed and pushed to GitHub
+- Git tag v0.1.9-alpha created and pushed

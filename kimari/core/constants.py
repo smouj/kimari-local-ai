@@ -54,4 +54,4 @@ KIMARI_ASCII = f"""
 
 # ─── Config Version ───────────────────────────────────────────────────────────
 
-CURRENT_CONFIG_VERSION = 2
+CURRENT_CONFIG_VERSION = 3

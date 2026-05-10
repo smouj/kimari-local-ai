@@ -418,6 +418,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <a href="#overview">Overview</a>
       <a href="#quickstart">Quick Start</a>
       <a href="#features">Features</a>
+      <a href="#performance">Performance</a>
+      <a href="#integrations">Integrations</a>
       <a href="#hardware">Hardware</a>
       <a href="#cli">CLI</a>
       <a href="#profiles">Profiles</a>
@@ -436,6 +438,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <a href="#overview" onclick="closeMobile()">Overview</a>
   <a href="#quickstart" onclick="closeMobile()">Quick Start</a>
   <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#performance" onclick="closeMobile()">Performance</a>
+  <a href="#integrations" onclick="closeMobile()">Integrations</a>
   <a href="#hardware" onclick="closeMobile()">Hardware</a>
   <a href="#cli" onclick="closeMobile()">CLI</a>
   <a href="#profiles" onclick="closeMobile()">Profiles</a>
@@ -451,7 +455,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.9-alpha — GitHub Pages revamp, WSL2 guide, publishing docs, SEO metadata
+      v0.1.10-alpha — Performance profiles, optimize/perf commands, OpenClaw/Hermes/Continue integration
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -614,6 +618,80 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
 </section>
 
+<!-- ═══════ PERFORMANCE MODES ═══════ -->
+<section class="section" id="performance">
+  <div class="reveal">
+    <span class="section-label"><i class="fa-solid fa-gauge-high"></i> Performance</span>
+    <h2 class="section-title">Tuned for Your Hardware</h2>
+    <p class="section-desc">No guesswork. Kimari analyzes your GPU and model, then recommends the best settings.</p>
+  </div>
+  <div class="reveal" style="overflow-x:auto;">
+    <table class="status-table">
+      <thead>
+        <tr><th>Command</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>kimari optimize --profile test</code></td><td>Recommend optimal ctx, batch, cache, GPU layers for your profile</td></tr>
+        <tr><td><code>kimari optimize --profile gtx1060 --mode balanced --json</code></td><td>JSON output for automation and IDEs</td></tr>
+        <tr><td><code>kimari perf --profile test --matrix --dry-run</code></td><td>Compare all performance modes at once</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="reveal" style="overflow-x:auto; margin-top: 32px;">
+    <table class="status-table">
+      <thead>
+        <tr><th>Profile</th><th>GPU</th><th>Mode</th><th>Cache</th><th>Context</th><th>Use Case</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>gtx1060-safe</code></td><td>GTX 1060</td><td>safe</td><td>q8_0</td><td>4K</td><td>Max stability, no OOM</td></tr>
+        <tr><td><code>gtx1060-fast</code></td><td>GTX 1060</td><td>fast</td><td>q8_0</td><td>8K</td><td>Speed priority</td></tr>
+        <tr><td><code>gtx1080-balanced</code></td><td>GTX 1080</td><td>balanced</td><td>q8_0/f16</td><td>8K</td><td>Quality/speed balance</td></tr>
+        <tr><td><code>gtx1080-longctx</code></td><td>GTX 1080</td><td>balanced</td><td>q8_0</td><td>16K</td><td>Long conversations</td></tr>
+        <tr><td><code>ide-local</code></td><td>Any 6 GB+</td><td>ide</td><td>q8_0</td><td>4K</td><td>Continue, VS Code, JetBrains</td></tr>
+        <tr><td><code>agent-local</code></td><td>Any 6 GB+</td><td>agent</td><td>q8_0</td><td>4K</td><td>OpenClaw, Hermes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════ INTEGRATIONS ═══════ -->
+<section class="section" id="integrations">
+  <div class="reveal">
+    <span class="section-label"><i class="fa-solid fa-plug"></i> Integrations</span>
+    <h2 class="section-title">Works With Your Tools</h2>
+    <p class="section-desc">OpenAI-compatible API means Kimari works with agents, IDEs, and chat UIs out of the box.</p>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fa-solid fa-robot"></i></div>
+      <h3>OpenClaw</h3>
+      <p>Chat Completions backend for AI agents. Configure with <code>baseUrl</code>, <code>apiKey</code>, and <code>api: "openai-completions"</code>.</p>
+      <div class="terminal-block" style="margin-top:12px">
+        <div class="terminal-header"><span class="terminal-dot" style="background:#ff5f57"></span><span class="terminal-dot" style="background:#febc2e"></span><span class="terminal-dot" style="background:#28c840"></span><span class="terminal-title">terminal</span></div>
+        <pre class="terminal-body">kimari start --profile openclaw-local</pre>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+      <h3>Hermes Agent</h3>
+      <p>Local OpenAI-compatible server for autonomous agents. Supports quantized models and high timeout configuration.</p>
+      <div class="terminal-block" style="margin-top:12px">
+        <div class="terminal-header"><span class="terminal-dot" style="background:#ff5f57"></span><span class="terminal-dot" style="background:#febc2e"></span><span class="terminal-dot" style="background:#28c840"></span><span class="terminal-title">terminal</span></div>
+        <pre class="terminal-body">kimari start --profile hermes-local</pre>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fa-solid fa-code"></i></div>
+      <h3>Continue.dev</h3>
+      <p>AI coding assistant for VS Code and JetBrains. Chat and edit roles with local inference.</p>
+      <div class="terminal-block" style="margin-top:12px">
+        <div class="terminal-header"><span class="terminal-dot" style="background:#ff5f57"></span><span class="terminal-dot" style="background:#febc2e"></span><span class="terminal-dot" style="background:#28c840"></span><span class="terminal-title">terminal</span></div>
+        <pre class="terminal-body">kimari start --profile ide-local</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════ HARDWARE TARGETS ═══════ -->
 <section class="section" id="hardware">
   <div class="reveal">
@@ -682,7 +760,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.9-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.10-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -719,7 +797,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.9-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.10-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -1121,7 +1199,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.9-alpha — Framework/runtime/CLI is functional. GitHub Pages revamp, WSL2 guide, publishing docs, SEO metadata, and release validation.</p>
+    <p class="section-desc">Kimari Local AI v0.1.10-alpha — Performance profiles, optimize/perf commands, OpenClaw/Hermes/Continue integration, VRAM estimation, and release validation.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1140,7 +1218,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td><code>kimari info</code> / <code>kimari config</code></td><td>✅ Implemented in v0.1.4-alpha</td></tr>
         <tr><td>Modular package (<code>pip install -e .</code>)</td><td>✅ Implemented in v0.1.4-alpha</td></tr>
         <tr><td>Release validation (<code>check-release.py</code>)</td><td>✅ Implemented in v0.1.8-alpha</td></tr>
-        <tr><td>WSL2 Installation Guide</td><td>✅ Implemented in v0.1.9-alpha</td></tr>
+        <tr><td>WSL2 Installation Guide</td><td>✅ Implemented in v0.1.10-alpha</td></tr>
         <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>

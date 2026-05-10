@@ -1,0 +1,9 @@
+{
+  "baseUrl": "http://127.0.0.1:11435/v1",
+  "apiKey": "kimari-local",
+  "api": "openai-completions",
+  "timeoutSeconds": 300,
+  "model": "kimari",
+  "_kimari_profile": "openclaw-local",
+  "_notes": "Start Kimari with: kimari start --profile openclaw-local"
+}
