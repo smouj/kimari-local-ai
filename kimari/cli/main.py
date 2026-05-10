@@ -1201,6 +1201,7 @@ def run_setup(
     config: dict,
     dry_run: bool = False,
     write: bool = False,
+    yes: bool = False,
     json_output: bool = False,
     profile_name: str | None = None,
     integration: str | None = None,
@@ -1348,9 +1349,15 @@ def run_setup(
     paths_info = {
         "config_dir": str(get_user_config_dir()),
         "models_dir": str(get_user_models_dir()),
+        "state_dir": str(STATE_DIR),
     }
 
-    from kimari.setup.writer import build_setup_patch, write_setup_config
+    from kimari.setup.writer import (
+        apply_setup_changes,
+        build_setup_patch,
+        confirm_setup_write,
+        preview_setup_changes,
+    )
 
     config_path = get_user_config_path()
     patch = build_setup_patch(
@@ -1362,16 +1369,31 @@ def run_setup(
     )
 
     if write and patch["would_write"]:
-        write_result = write_setup_config(patch, config_path)
-        result["would_write"] = True
-        result["written"] = write_result["written"]
-        result["config_path"] = write_result["config_path"]
-        result["backup_path"] = write_result.get("backup_path")
+        preview = preview_setup_changes(patch, config_path)
+        confirmed = confirm_setup_write(preview, yes=yes)
+
+        if confirmed:
+            write_result = apply_setup_changes(patch, config_path)
+            result["would_write"] = True
+            result["written"] = write_result["written"]
+            result["config_path"] = write_result["config_path"]
+            result["backup_path"] = write_result.get("backup_path")
+            result["requires_confirmation"] = preview["requires_confirmation"]
+            result["confirmed"] = True
+        else:
+            result["would_write"] = True
+            result["written"] = False
+            result["config_path"] = str(config_path)
+            result["backup_path"] = None
+            result["requires_confirmation"] = preview["requires_confirmation"]
+            result["confirmed"] = False
     else:
         result["would_write"] = patch["would_write"]
         result["written"] = False
         result["config_path"] = str(config_path)
         result["backup_path"] = None
+        result["requires_confirmation"] = False
+        result["confirmed"] = False
 
     if json_output:
         print(json.dumps(result, indent=2))
@@ -1408,12 +1430,31 @@ def run_setup(
             print(f"  Config:  {result['config_path']}")
             if result.get("backup_path"):
                 print(f"  Backup:  {result['backup_path']}")
+        elif result.get("confirmed") is False and result.get("would_write"):
+            print(f"\n  {Color.YELLOW}⚠ Write cancelled — confirmation denied{Color.RESET}")
+            print(f"  Use {Color.CYAN}--yes{Color.RESET} to skip the confirmation prompt.")
         elif result["would_write"]:
             print(f"\n  {Color.YELLOW}⚠ Would write but something went wrong{Color.RESET}")
         else:
             print(f"\n  {Color.DIM}No changes needed — configuration already matches.{Color.RESET}")
     elif patch["would_write"]:
+        # Show preview of what --write would do
+        preview = preview_setup_changes(patch, get_user_config_path())
+        print(f"\n  {Color.BOLD}Changes that --write would make:{Color.RESET}")
+        print(f"  Config:   {preview['config_path']}")
+        if preview.get("backup_path"):
+            print(f"  Backup:   {preview['backup_path']}")
+        print(f"  Profile:  {preview['selected_profile']}")
+        if preview.get("integration"):
+            print(f"  Integration: {preview['integration']}")
+        if preview.get("models_dir"):
+            print(f"  Models:   {preview['models_dir']}")
+        if preview.get("state_dir"):
+            print(f"  State:    {preview['state_dir']}")
+        for change in preview.get("changes", []):
+            print(f"  • {change}")
         print(f"\n  {Color.DIM}Tip: Use --write to persist this configuration.{Color.RESET}")
+        print(f"  {Color.DIM}     Use --write --yes to skip confirmation.{Color.RESET}")
 
     print(f"\n  {Color.BOLD}Next Steps:{Color.RESET}")
     for cmd in next_commands:
@@ -1665,6 +1706,12 @@ def main():
     models_pin_parser.add_argument(
         "--write", action="store_true", help="Actually write to user registry (default: dry-run)"
     )
+    models_pin_parser.add_argument(
+        "--yes", action="store_true", help="Skip confirmation prompt (required in non-interactive mode)"
+    )
+    models_pin_parser.add_argument(
+        "--dry-run", action="store_true", help="Show what would be pinned without writing (default behavior)"
+    )
     models_pin_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
 
     # profiles
@@ -1715,6 +1762,11 @@ def main():
     setup_parser = subparsers.add_parser("setup", help="Guided setup and environment detection")
     setup_parser.add_argument("--dry-run", action="store_true", help="Preview without detecting")
     setup_parser.add_argument("--write", action="store_true", help="Persist detected configuration to user config dir")
+    setup_parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Skip confirmation prompt (required in non-interactive mode)",
+    )
     setup_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
     setup_parser.add_argument("--profile", "-p", default=None, help="Profile to recommend")
     setup_parser.add_argument("--integration", default=None, help="Integration target (openclaw, hermes, continue)")
@@ -1808,8 +1860,14 @@ def main():
         elif models_cmd == "pin-hash":
             from kimari.models.registry import pin_model_hash
 
+            # --dry-run explicitly forces write=False regardless of --write
+            effective_write = getattr(args, "write", False) and not getattr(args, "dry_run", False)
+
             pin_model_hash(
-                args.model_id, write=getattr(args, "write", False), json_output=getattr(args, "json_output", False)
+                args.model_id,
+                write=effective_write,
+                json_output=getattr(args, "json_output", False),
+                yes=getattr(args, "yes", False),
             )
         else:
             list_models(
@@ -1868,6 +1926,7 @@ def main():
             config,
             dry_run=args.dry_run,
             write=getattr(args, "write", False),
+            yes=getattr(args, "yes", False),
             json_output=getattr(args, "json_output", False),
             profile_name=getattr(args, "profile", None),
             integration=getattr(args, "integration", None),
