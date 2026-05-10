@@ -30,6 +30,10 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] `kimari start --dry-run` — installed entry point works
 - [ ] `kimari optimize --profile test --json` — returns valid JSON
 - [ ] `kimari perf --profile test --dry-run` — runs without error
+- [ ] `kimari setup --dry-run` works
+- [ ] `kimari setup --json` returns valid JSON
+- [ ] `kimari start --dry-run --strict-flags` works or warns correctly
+- [ ] `kimari token create/show/delete` tested with tmp dir or safe environment
 
 ## Build & Package
 
@@ -63,6 +67,12 @@ Use this checklist before publishing any Kimari Local AI release.
 - [ ] config/integrations/ directory with example configs exists
 - [ ] No "Responses API supported" false claim anywhere
 - [ ] New profiles exist (gtx1060-safe, gtx1060-fast, gtx1080-balanced, gtx1080-longctx, ide-local, agent-local, openclaw-local, hermes-local)
+- [ ] Windows scripts exist (scripts/windows/kimari-launcher.ps1, kimari-doctor.ps1)
+- [ ] llama-server flag detection tests pass
+- [ ] TestPyPI validation result documented if executed
+- [ ] README mentions `kimari setup`
+- [ ] README mentions `--strict-flags`
+- [ ] README mentions `kimari token create`
 
 ## Publishing (Manual)
 

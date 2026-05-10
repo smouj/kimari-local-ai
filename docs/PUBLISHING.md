@@ -176,6 +176,56 @@ password = <your-pypi-token>
 
 Set permissions: `chmod 600 ~/.pypirc`
 
+## v0.1.11 TestPyPI Validation
+
+After implementing v0.1.11-alpha features, validate on TestPyPI:
+
+```bash
+# 1. Clean and build
+rm -rf dist/ build/ *.egg-info kimari/*.egg-info
+python -m build
+twine check dist/*
+
+# 2. Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# 3. Verify in clean venv
+python -m venv /tmp/kimari-test-v011
+source /tmp/kimari-test-v011/bin/activate
+pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ kimari-local-ai
+
+# 4. Validate
+kimari --version
+kimari setup --dry-run
+kimari start --dry-run --strict-flags
+kimari token create
+kimari token show
+kimari token delete
+deactivate
+rm -rf /tmp/kimari-test-v011
+```
+
+### Checklist
+
+- [ ] `twine check dist/*` passes
+- [ ] Upload to TestPyPI succeeds
+- [ ] Clean venv install from TestPyPI succeeds
+- [ ] `kimari --version` prints `0.1.11-alpha`
+- [ ] `kimari setup --dry-run` works
+- [ ] `kimari start --dry-run --strict-flags` works or warns correctly
+- [ ] `kimari token create/show/delete` works
+- [ ] Result recorded below
+
+### Result
+
+| Check | Status |
+|-------|--------|
+| Upload OK | |
+| Clean venv OK | |
+| Install from TestPyPI OK | |
+| kimari --version OK | |
+| kimari start --dry-run OK | |
+
 ## Common Issues
 
 ### "File already exists" on TestPyPI

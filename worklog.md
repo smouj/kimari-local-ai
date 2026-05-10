@@ -140,3 +140,44 @@ Stage Summary:
 - All validations pass
 - Committed and pushed to GitHub
 - Git tag v0.1.9-alpha created and pushed
+
+---
+Task ID: 2
+Agent: Sub Agent
+Task: Create the runtime module for detecting llama-server supported flags
+
+Work Log:
+
+1. **Created `kimari/runtime/__init__.py`** — Module init with docstring and exports for all 5 public functions:
+   - `detect_llama_server_help`
+   - `detect_llama_server_version`
+   - `parse_supported_flags`
+   - `supports_flag`
+   - `filter_unsupported_flags`
+
+2. **Created `kimari/runtime/llama_flags.py`** — Main implementation with 5 functions:
+   - `detect_llama_server_help(binary_path: str) -> str`: Runs `llama-server --help` with 10s timeout. Returns stdout text, or empty string on FileNotFoundError/TimeoutExpired/OSError. Also falls back to stderr if stdout is empty but stderr has content.
+   - `detect_llama_server_version(binary_path: str) -> str`: Runs `llama-server --version` with 10s timeout. Same graceful error handling as above.
+   - `parse_supported_flags(help_text: str) -> set[str]`: Parses help text lines to extract `--` flags. Handles `--flag=VALUE` (strips value), trailing punctuation, and validates with regex `^--[a-zA-Z]`.
+   - `supports_flag(flag: str, supported_flags: set[str]) -> bool`: Simple membership check.
+   - `filter_unsupported_flags(cmd: list[str], supported_flags: set[str]) -> tuple[list[str], list[str]]`: Filters command list, returning (supported_cmd, unsupported_flags). Handles:
+     - Boolean flags (standalone): removed entirely if unsupported
+     - Flags with values (defined in `FLAGS_WITH_VALUES` set): both flag and its value removed if unsupported, value skipped if it's not another flag
+     - Non-flag arguments (binary path, model path, etc.): always kept
+     - `FLAGS_WITH_VALUES` = {--parallel, --cache-type-k, --cache-type-v, -t, -b, -ub, -c, -ngl, --host, --port, -m}
+
+3. **Validation**:
+   - `py_compile` on both files → ✅ PASS
+   - `ruff check kimari/runtime/` → ✅ All checks passed
+   - `ruff format --check kimari/runtime/` → ✅ 2 files already formatted
+   - Comprehensive functional tests → ✅ ALL PASS:
+     - detect functions return empty string on missing binary
+     - parse_supported_flags extracts correct flags from fake help text (16 flags)
+     - supports_flag membership check works
+     - filter_unsupported_flags handles boolean flags, flags with values, unsupported FLAGS_WITH_VALUES entries
+     - All 5 functions importable from kimari.runtime
+   - Existing test suite: 6 pre-existing failures (version mismatch in release tests) — none related to this task
+
+Files created:
+- `kimari/runtime/__init__.py`
+- `kimari/runtime/llama_flags.py`

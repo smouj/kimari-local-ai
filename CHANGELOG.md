@@ -5,6 +5,23 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.11-alpha] — 2026-05-13
+
+### Added
+- **`kimari setup` command** — Guided environment detection: OS, Python, GPU, CUDA, ROCm (experimental), llama-server, local GGUF models; recommends profile and next steps; supports `--dry-run`, `--json`, `--profile`, `--integration` (openclaw/hermes/continue)
+- **Runtime flag detection** (`kimari/runtime/llama_flags.py`) — Detects llama-server supported flags via `--help` parsing; `detect_llama_server_help()`, `detect_llama_server_version()`, `parse_supported_flags()`, `supports_flag()`, `filter_unsupported_flags()`
+- **`--strict-flags` option** on `kimari start` — When used with `--dry-run`, checks if llama-server supports all profile flags; fails on unsupported flags in strict mode, warns otherwise
+- **Local auth tokens** (`kimari/security/tokens.py`) — `kimari token create/show/delete`; saves to `.kimari/auth.json`; uses `secrets.token_urlsafe(32)`; documented as "prepared for future Kimari API / reverse proxy use" (llama-server does not apply auth natively)
+- **Windows launcher script** (`scripts/windows/kimari-launcher.ps1`) — Comprehensive PowerShell launcher: venv setup, pip install, doctor, model pull, server start
+- **Windows doctor script** (`scripts/windows/kimari-doctor.ps1`) — PowerShell diagnostic: Python, CUDA, llama-server, models, port checks with troubleshooting advice
+- **Windows scripts README** (`scripts/windows/README.md`) — Documentation for all Windows helper scripts
+- **TestPyPI validation section** in `docs/PUBLISHING.md` — Step-by-step TestPyPI validation checklist for v0.1.11
+
+### Changed
+- **Version bumped** to `0.1.11-alpha`
+- **RELEASE_CHECKLIST.md** — Added checks for setup, strict-flags, token, Windows scripts, flag detection
+- **scripts/release/check-release.py** — Added 13th validation category for runtime/security modules; added README checks for setup/strict-flags/token; added index.html checks for setup/strict-flags/token
+
 ## [0.1.10-alpha] — 2026-05-12
 
 ### Added
