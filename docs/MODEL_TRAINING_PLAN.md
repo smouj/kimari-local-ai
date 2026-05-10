@@ -733,3 +733,51 @@ A formal Architecture Decision Record has been created at [docs/MODEL_DECISION_R
 ### First Training Run Guide
 
 - `docs/FIRST_TRAINING_RUN.md` — Step-by-step guide for the first real training run, from base model selection through HF release
+
+---
+
+## v0.1.19-alpha Additions
+
+The following components were added in v0.1.19-alpha to advance from pipeline dry-run to first private training readiness:
+
+### Private SFT Candidate Accepted
+
+SmolLM3-3B (HuggingFaceTB/SmolLM3-3B) has been formally accepted as the experimental base for the first private SFT training run. This acceptance is documented in:
+- [docs/BASE_MODEL_ACCEPTANCE.md](BASE_MODEL_ACCEPTANCE.md) — Formal acceptance record with scope and exclusions
+- [docs/MODEL_DECISION_RECORD.md](MODEL_DECISION_RECORD.md) — ADR-001 status updated to "Accepted for first private training run"
+- `training/configs/base_candidates.yaml` — SmolLM3-3B marked as `accepted_private_training_candidate`
+
+**Important:** This acceptance is for private training only. Public release of fine-tuned weights remains subject to evaluation results, full license verification, and safety review.
+
+### Dataset v0
+
+An expanded synthetic dataset for first private training:
+- `dataset/v0/sft_v0.jsonl` — 80+ synthetic SFT examples across 15 categories
+- `dataset/v0/preference_v0.jsonl` — 40+ synthetic preference pairs focused on honesty, safety, and quality
+- `dataset/v0/eval_holdout.jsonl` — 20+ evaluation examples with expected/forbidden traits
+- `dataset/v0/README.md` — Dataset v0 policy and format documentation
+
+All data is synthetic, MIT-compatible, with no private data, secrets, or copyrighted content.
+
+### Training Readiness Validation
+
+- `training/scripts/validate_training_ready.py` — Validates that all prerequisites for first training are met: base acceptance, dataset validity, minimum counts, forbidden strings check, no GGUF, no false claims
+
+### KimariFit Scoring Plan
+
+- `eval/scoring/kimarifit_dimensions.json` — 9 scoring dimensions with max scores, descriptions, and pass/fail examples
+- `eval/kimarifit.py` enhanced with `--score-plan` and `--rubric` flags for scoring plan output
+- `eval/scripts/summarize_results.py` — Summarizes evaluation results without requiring a model
+
+### v0 Training Configs
+
+- `training/configs/kimari_sft_lora.v0.example.yaml` — SFT LoRA config based on SmolLM3-3B (starting point only)
+- `training/configs/kimari_orpo.v0.example.yaml` — ORPO config for post-SFT preference tuning (experimental)
+
+### First Private Training Run Guide
+
+- [docs/FIRST_PRIVATE_TRAINING_RUN.md](FIRST_PRIVATE_TRAINING_RUN.md) — Step-by-step guide from environment setup through adapter output, with safety reminders throughout
+
+### Hugging Face Placeholder Plan
+
+- [docs/HF_PLACEHOLDER_PLAN.md](HF_PLACEHOLDER_PLAN.md) — Plan for docs-only placeholder repository on Hugging Face (no weights, adapters, GGUF, or fake benchmarks until eval/license pass)

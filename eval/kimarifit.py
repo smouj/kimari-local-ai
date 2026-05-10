@@ -4,11 +4,15 @@
 In dry-run mode: validates prompts JSONL, groups by categories,
 shows evaluation plan, no network calls.
 
+With --score-plan: also outputs scoring plan with dimensions from
+eval/scoring/kimarifit_dimensions.json.
+
 With --endpoint: calls OpenAI-compatible chat completions API.
 No model downloads. Does not run in CI.
 
 Usage:
     python eval/kimarifit.py --prompts eval/kimarifit_prompts.jsonl --dry-run
+    python eval/kimarifit.py --prompts eval/kimarifit_prompts.jsonl --dry-run --score-plan
     python eval/kimarifit.py --prompts eval/kimarifit_prompts.jsonl --endpoint http://localhost:8080/v1
 """
 
@@ -21,6 +25,8 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+DIMENSIONS_PATH = Path(__file__).resolve().parent / "scoring" / "kimarifit_dimensions.json"
 
 
 def load_prompts(path: Path) -> list[dict]:
@@ -50,6 +56,29 @@ def group_by_category(prompts: list[dict]) -> dict[str, list[dict]]:
         cat = p["category"]
         categories.setdefault(cat, []).append(p)
     return categories
+
+
+def load_scoring_dimensions() -> list[dict]:
+    """Load scoring dimensions from eval/scoring/kimarifit_dimensions.json.
+
+    Returns list of dimension dicts with id, max_score, description.
+    Falls back to empty list if file not found.
+    """
+    if not DIMENSIONS_PATH.exists():
+        return []
+    try:
+        with open(DIMENSIONS_PATH) as f:
+            data = json.load(f)
+        return [
+            {
+                "name": d.get("id", d.get("name", "unknown")),
+                "max_score": d.get("max_score", 5),
+                "description": d.get("description", ""),
+            }
+            for d in data.get("dimensions", [])
+        ]
+    except (json.JSONDecodeError, OSError):
+        return []
 
 
 def call_chat_completion(
@@ -114,6 +143,10 @@ def main() -> None:
         "--model", type=str, default="local-model", help="Model name for API calls (default: local-model)"
     )
     parser.add_argument("--max-tokens", type=int, default=256, help="Max tokens per response (default: 256)")
+    parser.add_argument(
+        "--score-plan", action="store_true", help="In dry-run, also output scoring plan with dimensions"
+    )
+    parser.add_argument("--rubric", type=Path, default=None, help="Path to rubric markdown file")
 
     args = parser.parse_args()
 
@@ -139,6 +172,23 @@ def main() -> None:
             "endpoint": args.endpoint or "not specified",
         }
 
+        if args.score_plan:
+            # Load scoring dimensions
+            dimensions = load_scoring_dimensions()
+            max_total = sum(d["max_score"] for d in dimensions) if dimensions else 0
+
+            # Build warnings
+            warnings: list[str] = []
+            if not args.endpoint:
+                warnings.append("no evaluator endpoint specified")
+            warnings.append("scoring requires manual review")
+
+            plan["prompt_count"] = len(prompts)
+            plan["category_counts"] = {cat: len(prompts_list) for cat, prompts_list in categories.items()}
+            plan["scoring_dimensions"] = dimensions
+            plan["max_total_score"] = max_total
+            plan["warnings"] = warnings
+
         if args.json_output:
             print(json.dumps(plan, indent=2))
         else:
@@ -151,6 +201,22 @@ def main() -> None:
                 print(f"  {cat}: {count} prompts")
             print()
             print(f"Endpoint: {plan['endpoint']}")
+
+            if args.score_plan:
+                dimensions = plan.get("scoring_dimensions", [])
+                max_total = plan.get("max_total_score", 0)
+                warnings = plan.get("warnings", [])
+                print()
+                print("Scoring Plan:")
+                print(f"  Dimensions: {len(dimensions)}")
+                print(f"  Max total score: {max_total}")
+                for dim in dimensions:
+                    print(f"    {dim['name']}: max {dim['max_score']} — {dim['description']}")
+                if warnings:
+                    print("  Warnings:")
+                    for w in warnings:
+                        print(f"    - {w}")
+
             print()
             print("Dry-run complete. No API calls were made.")
 
@@ -204,6 +270,7 @@ def main() -> None:
                 "status": result.get("status", "error"),
                 "error": result.get("error", ""),
                 "elapsed_seconds": round(elapsed, 2),
+                "score_status": "manual_review_required",
             }
         )
 
@@ -221,6 +288,7 @@ def main() -> None:
     else:
         print(f"\n{'=' * 40}")
         print(f"Results: {summary['ok']}/{summary['total']} successful, {summary['errors']} errors")
+        print("Score status: manual_review_required — no automatic scoring applied")
 
     if args.output:
         with open(args.output, "w") as f:

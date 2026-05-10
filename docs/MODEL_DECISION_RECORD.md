@@ -4,9 +4,9 @@
 |------------------|---------------------------------------------------|
 | ADR Number       | 001                                               |
 | Title            | Select Base Model for Kimari-4B Fine-Tuning       |
-| Status           | Proposed                                          |
-| Decision Date    | TBD                                               |
-| Last Updated     | 2026-05-20                                        |
+| Status           | Accepted for first private training run            |
+| Decision Date    | 2026-05-21                                        |
+| Last Updated     | 2026-05-21                                        |
 
 ---
 
@@ -90,7 +90,22 @@ Llama-3.2-3B-Instruct is the strongest general model with the largest context wi
 
 ## Decision
 
-**Not final yet.** No base model has been selected. All candidates remain under review. The formal decision is expected in v0.1.19-alpha after license verification and, if hardware permits, baseline evaluation.
+**Accepted for first private training run.** SmolLM3-3B is accepted as the experimental base for the first private SFT training run, based on:
+
+- Apache 2.0 license listed on HF model card
+- 3B-class model suitable for GTX 1060/1080 quantized inference
+- Open weights and training details
+- Long-context support (16K)
+- Lower redistribution friction than Qwen/Llama candidates
+
+**Final public release base: still subject to eval and license review.** SmolLM3 is accepted for private experimentation only. Public distribution of fine-tuned weights requires:
+1. Evaluation results confirming quality targets are met
+2. Full license verification for derivative distribution
+3. Safety review completion
+4. Model card update with real benchmarks
+
+Qwen2.5-3B-Instruct remains a capability candidate with license review required.
+Llama 3.2 3B remains a constrained candidate with license constraints.
 
 ---
 

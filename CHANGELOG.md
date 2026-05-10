@@ -5,6 +5,38 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.19-alpha] — 2026-05-21
+
+### Added
+- **docs/MODEL_DECISION_RECORD.md updated** — Status changed from "Proposed" to "Accepted for first private training run"; SmolLM3-3B formally accepted as experimental base for first private SFT; public release base still subject to eval and license review
+- **docs/BASE_MODEL_ACCEPTANCE.md** — Formal acceptance record for SmolLM3-3B as first private training candidate; explains scope (private only), exclusions (no weights, no benchmarks, no public release), and pre-release checklist
+- **training/configs/base_candidates.yaml updated** — SmolLM3-3B status → accepted_private_training_candidate; Qwen2.5 → license_review_required; Llama → license_constraints; added selected_for_private_sft, selected_for_public_release, license_review_status, hf_url, last_reviewed_date fields
+- **dataset/v0/README.md** — Dataset v0 documentation; objective, allowed sources, mandatory fields, formats, no private data policy
+- **dataset/v0/sft_v0.jsonl** — Expanded synthetic SFT dataset (80+ examples across 15 categories); all source="kimari-v0-synthetic", license="MIT-compatible synthetic"
+- **dataset/v0/preference_v0.jsonl** — Expanded synthetic preference dataset (40+ chosen/rejected pairs); focused on honesty, safety, no fake benchmarks, no unsafe exposure, better Spanish, valid JSON
+- **dataset/v0/eval_holdout.jsonl** — Evaluation holdout set (20+ examples); not mixed into training; includes expected_traits and forbidden_traits
+- **training/scripts/build_dataset_mix.py improved** — Added --train-ratio, --eval-ratio, --shuffle, --seed, --holdout; outputs sft.train.jsonl, sft.eval.jsonl, preference.train.jsonl, preference.eval.jsonl, holdout.jsonl, report.json
+- **training/scripts/validate_training_ready.py** — CLI validation tool; checks base acceptance, dataset validity, minimum counts, forbidden strings, no GGUF, no false claims; --json output
+- **eval/kimarifit.py improved** — Added --score-plan and --rubric flags; outputs scoring dimensions, max scores, and warnings in dry-run; marks score_status="manual_review_required" for live results
+- **eval/scoring/kimarifit_dimensions.json** — 9 scoring dimensions (correctness, safety, command_reliability, spanish_technical_quality, json_validity, agent_usefulness, local_hardware_awareness, no_hallucinated_benchmarks, no_unsafe_exposure_advice); each with max_score, description, pass/fail examples
+- **eval/scripts/summarize_results.py** — CLI tool for summarizing KimariFit result JSON; reports category counts, missing outputs, manual_review_required; no invented scores
+- **training/configs/kimari_sft_lora.v0.example.yaml** — SmolLM3-3B-based SFT LoRA v0 example config; starting point only, no CI training
+- **training/configs/kimari_orpo.v0.example.yaml** — ORPO v0 example config for post-SFT preference tuning; experimental, conservative settings
+- **docs/FIRST_PRIVATE_TRAINING_RUN.md** — Step-by-step guide for first private SFT run; from environment setup through adapter output; no HF upload until eval/license pass
+- **docs/HF_PLACEHOLDER_PLAN.md** — Plan for Hugging Face placeholder repo (docs only); no weights, adapters, GGUF, or fake benchmarks until eval/license pass
+- **RELEASE_CHECKLIST.md** — Added v0.1.19 Checks section
+- **scripts/release/check-release.py** — Expanded with v0.1.19 checks (base acceptance, dataset v0, validate_training_ready, scoring dimensions, v0 configs, HF placeholder plan, MODEL_CARD no weights)
+- **New tests** (`tests/test_release_v0119.py`) — Tests for base acceptance, dataset v0, training readiness, KimariFit scoring plan, summarize results, v0 configs, no GGUF, no fake claims
+
+### Changed
+- **Version bumped** to `0.1.19-alpha`
+- **MODEL_CARD.md** — Updated base selection to SmolLM3-3B accepted for private SFT; updated pipeline status; added v0.1.19 version history
+- **README.md** — Updated version badge to v0.1.19-alpha; added Kimari-4B v0 pipeline section
+- **docs/index.html** — Updated hero badge to v0.1.19-alpha; added v0.1.19 model progress block
+- **docs/MODEL_TRAINING_PLAN.md** — Added v0.1.19-alpha Additions section
+- **docs/HUGGINGFACE_RELEASE.md** — Added placeholder repo rules
+- **ROADMAP.md** — v0.1.18-alpha marked as Released; v0.1.19-alpha marked as Current; v0.1.20-alpha Planned
+
 ## [0.1.18-alpha] — 2026-05-20
 
 ### Added

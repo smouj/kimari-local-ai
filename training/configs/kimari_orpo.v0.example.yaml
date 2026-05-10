@@ -1,0 +1,27 @@
+# Kimari ORPO v0 Example Configuration
+# Runs after SFT adapter is trained
+# Experimental — validate with TRL ORPOTrainer first
+# No CI training
+
+base_model_or_adapter: training/adapters/kimari-smollm3-sft-v0
+preference_dataset_path: dataset/build/kimari-v0/preference.train.jsonl
+eval_preference_dataset_path: dataset/build/kimari-v0/preference.eval.jsonl
+output_dir: training/adapters/kimari-smollm3-orpo-v0
+
+# ORPO Configuration
+lambda_orpo: 0.25
+learning_rate: 5.0e-5
+num_train_epochs: 1
+max_seq_length: 4096
+gradient_accumulation_steps: 8
+warmup_ratio: 0.1
+save_steps: 500
+eval_steps: 500
+seed: 42
+
+# Notes
+# - ORPO is experimental for this project
+# - Runs AFTER SFT, never before
+# - Validate with TRL ORPOTrainer before relying on results
+# - No CI training — run manually on rented GPU
+# - Conservative learning rate for preference tuning

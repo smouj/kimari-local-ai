@@ -1,6 +1,6 @@
 # Base model candidates for Kimari-4B fine-tuning
-# Status: under_review — NO final selection made yet
-# Last updated: 2026-05-20
+# Status: SmolLM3-3B accepted for first private SFT training run
+# Last updated: 2026-05-21
 
 candidates:
   - id: smollm3-3b
@@ -14,8 +14,13 @@ candidates:
     expected_vram_q5_gb: 2.7
     risk_level: low
     notes: "Safest legal path if Apache 2.0 is confirmed. Good context length. Less community benchmarking."
-    status: under_review
+    status: accepted_private_training_candidate
     ranking: 1
+    selected_for_private_sft: true
+    selected_for_public_release: false
+    license_review_status: "apache-2.0-listed-on-hf-card"
+    hf_url: "https://huggingface.co/HuggingFaceTB/SmolLM3-3B"
+    last_reviewed_date: "2026-05-21"
 
   - id: qwen2.5-3b-instruct
     hf_repo: Qwen/Qwen2.5-3B-Instruct
@@ -28,8 +33,13 @@ candidates:
     expected_vram_q5_gb: 2.8
     risk_level: medium
     notes: "Strong coding and multilingual capabilities. License must be reviewed for derivative distribution."
-    status: under_review
+    status: license_review_required
     ranking: 2
+    selected_for_private_sft: false
+    selected_for_public_release: false
+    license_review_status: "pending-review"
+    hf_url: "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct"
+    last_reviewed_date: null
 
   - id: llama-3.2-3b-instruct
     hf_repo: meta-llama/Llama-3.2-3B-Instruct
@@ -42,8 +52,13 @@ candidates:
     expected_vram_q5_gb: 2.8
     risk_level: high
     notes: "Strong general model. Meta license has MAU thresholds and acceptable use policy. May restrict derivative distribution."
-    status: under_review
+    status: license_constraints
     ranking: 3
+    selected_for_private_sft: false
+    selected_for_public_release: false
+    license_review_status: "meta-community-license-restrictive"
+    hf_url: "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct"
+    last_reviewed_date: null
 
 scoring_criteria:
   license_clarity:
@@ -74,10 +89,10 @@ scoring_criteria:
     weight: 1
     description: "Expected GPU hours for SFT + preference tuning"
 
-selection_status: "No base model has been selected. All candidates are under review."
+selection_status: "SmolLM3-3B accepted for first private SFT training run. Public release base still subject to eval and license review."
 next_steps:
-  - "Verify SmolLM3-3B Apache 2.0 license covers derivative distribution"
-  - "Review Qwen2.5-3B-Instruct license terms for commercial and derivative use"
-  - "Evaluate Llama 3.2 Community License restrictions for Kimari use case"
-  - "Run baseline evaluation on each candidate if hardware permits"
-  - "Formal decision expected in v0.1.19-alpha"
+  - "Run first private SFT adapter training on SmolLM3-3B"
+  - "Evaluate private adapter against base SmolLM3"
+  - "Full license verification for derivative distribution before public release"
+  - "Review Qwen2.5-3B-Instruct license terms as capability alternative"
+  - "Safety review before any public weight distribution"

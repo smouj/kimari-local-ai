@@ -1,0 +1,35 @@
+# Kimari SFT LoRA v0 Example Configuration
+# Base: HuggingFaceTB/SmolLM3-3B (accepted for first private SFT candidate)
+# This is a STARTING POINT only — tune after first dry-run
+# No CI training
+
+base_model: HuggingFaceTB/SmolLM3-3B
+dataset_path: dataset/build/kimari-v0/sft.train.jsonl
+eval_dataset_path: dataset/build/kimari-v0/sft.eval.jsonl
+output_dir: training/adapters/kimari-smollm3-sft-v0
+
+# LoRA Configuration
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+
+# Training
+max_seq_length: 4096
+learning_rate: 2.0e-4
+num_train_epochs: 2
+gradient_accumulation_steps: 8
+warmup_ratio: 0.1
+save_steps: 500
+eval_steps: 500
+seed: 42
+
+# Notes
+# - Starting point only, not final config
+# - Tune after first dry-run results
+# - No CI training — run manually on rented GPU
+# - SmolLM3-3B accepted for private training only, not public release

@@ -1,7 +1,7 @@
 # Model Card: Kimari-4B
 
-> **Version:** v0.1.18-alpha (project framework)
-> **Last Updated:** 2026-05-20
+> **Version:** v0.1.19-alpha (project framework)
+> **Last Updated:** 2026-05-21
 > **Developer:** Smouj ([@smouj013](https://x.com/smouj013))
 
 ---
@@ -89,7 +89,7 @@ The final base model selection will be based on:
 
 ### Selected Base Model
 
-**TBD** — To be determined after license review and capability evaluation.
+**HuggingFaceTB/SmolLM3-3B** — Accepted for first private SFT training run. NOT yet accepted for public release. Public release base subject to evaluation results and full license review. See [docs/BASE_MODEL_ACCEPTANCE.md](docs/BASE_MODEL_ACCEPTANCE.md) for details.
 
 ---
 
@@ -111,7 +111,7 @@ The Kimari **software** (CLI, scripts, configurations) is released under the MIT
 
 | Aspect | Status |
 |--------|--------|
-| Base model selection | **Not selected** |
+| Base model selection | **Accepted for private SFT (SmolLM3-3B)** |
 | Training data curation | **Not started** |
 | Fine-tuning run | **Not started** |
 | Evaluation | **Not started** |
@@ -121,17 +121,17 @@ Training has not begun. No GPUs have been allocated, no training scripts have be
 
 ---
 
-## Pipeline Status (v0.1.18-alpha)
+## Pipeline Status (v0.1.19-alpha)
 
 | Aspect | Status |
 |--------|--------|
-| Current model work | v0.1.18 pipeline dry-run |
-| Base selection status | Under review (ADR-001 Proposed) |
-| Dataset status | Seed synthetic only (30 SFT + 20 preference samples) |
-| Training status | Not started |
-| Evaluation status | Dry-run harness only (KimariFit rubric defined) |
+| Current model work | v0.1.19 private SFT candidate accepted |
+| Base selection status | SmolLM3-3B accepted for first private SFT candidate |
+| Dataset status | v0 synthetic dataset prepared (SFT + preference + holdout) |
+| Training status | Not started (configs and validation ready) |
+| Evaluation status | KimariFit scoring plan prepared, dimensions defined |
 | GGUF export | Plan defined (Q4_K_M, Q5_K_M, IQ4_XS) |
-| HF release | Plan defined, not executed |
+| HF release | Placeholder plan defined, not executed |
 
 ---
 
@@ -244,7 +244,7 @@ The following items must be completed before Kimari-4B weights can be released:
 
 | # | Item | Status |
 |---|------|--------|
-| 1 | Base model selected and license reviewed | ❌ Not started |
+| 1 | Base model selected and license reviewed | 🟡 In Progress (SmolLM3-3B accepted for private training) |
 | 2 | License compatibility confirmed for all planned formats | ❌ Not started |
 | 3 | Training data curated and documented | ❌ Not started |
 | 4 | Fine-tuning completed | ❌ Not started |
@@ -262,7 +262,7 @@ The following items must be completed before Kimari-4B weights can be released:
 
 > This checklist will be updated as progress is made. No item has been started as of v0.1.17-alpha.
 >
-> As of v0.1.18-alpha, the pipeline has been validated in dry-run mode. No real training, evaluation, or release has occurred.
+> As of v0.1.19-alpha, SmolLM3-3B has been accepted for first private SFT training. No real training, evaluation, or public release has occurred.
 
 ---
 
@@ -270,6 +270,7 @@ The following items must be completed before Kimari-4B weights can be released:
 
 | Version | Date | Status | Changes |
 |---------|------|--------|---------|
+| 0.1.19-alpha | 2026-05-21 | Planned | SmolLM3-3B accepted for first private SFT candidate; dataset v0; training readiness validation; KimariFit scoring plan; v0 training configs; HF placeholder plan |
 | 0.1.18-alpha | 2026-05-20 | Planned | Pipeline dry-run: base decision record, seed datasets, dataset mix builder, KimariFit dry-run harness, GGUF export plan |
 | 0.1.17-alpha | 2026-05-19 | Planned | Complete model card rewrite for v0.1.17-alpha; transparent status, honest evaluation targets, expanded safety and limitation sections |
 | — | TBD | Future | Initial training design document based on selected base model |

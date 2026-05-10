@@ -209,7 +209,7 @@
 - ✅ Release-check expanded to 35 validation categories
 - ✅ New tests for v0.1.17 features
 
-## v0.1.18-alpha (Current)
+## v0.1.18-alpha (Released)
 
 - ✅ docs/MODEL_DECISION_RECORD.md — ADR-001 for base model selection with weighted scoring
 - ✅ training/configs/base_candidates.yaml — 3 candidates with metadata, risk levels, scoring criteria
@@ -227,14 +227,27 @@
 - ✅ Release-check expanded to 38 validation categories
 - ✅ New tests for v0.1.18 features
 
-## v0.1.19-alpha (Planned)
+## v0.1.19-alpha (Current)
 
-- Choose base model formally (decision record → Accepted)
-- Prepare first real SFT dataset v0
-- Run first private adapter training
-- Improve eval scoring with real model outputs
-- Create Hugging Face repo placeholder
-- Prepare adapter-only preview if license allows
+- ✅ SmolLM3-3B accepted for first private SFT candidate
+- ✅ Base model acceptance document (docs/BASE_MODEL_ACCEPTANCE.md)
+- ✅ Dataset v0 (SFT + preference + eval holdout)
+- ✅ Training readiness validation script (validate_training_ready.py)
+- ✅ KimariFit scoring plan with dimensions
+- ✅ v0 training configs (SFT LoRA + ORPO)
+- ✅ First private training run guide
+- ✅ HF placeholder plan
+- ✅ Release-check improvements
+
+## v0.1.20-alpha (Planned)
+
+- Run first private SFT adapter
+- Evaluate private adapter against base SmolLM3
+- Compare against base SmolLM3 and alternative candidates
+- Decide if adapter preview is safe for limited distribution
+- Prepare HF placeholder repository
+- Prepare GGUF export after eval passes
+- ORPO preference tuning after SFT converges
 
 ## v0.2.0-alpha
 
