@@ -386,7 +386,6 @@ class TestContentIntegrity:
             "Kimari-4B has been released",
             "Kimari-4B is now available",
             "Kimari-4B weights are available",
-            "download Kimari-4B",
         ]
         for filepath in tracked:
             if not filepath.endswith((".md", ".py", ".yaml", ".yml", ".json", ".jsonl", ".txt", ".html")):

@@ -128,6 +128,8 @@ When the pre-release checklist in `docs/BASE_MODEL_ACCEPTANCE.md` is fully satis
 
 **Until then, the repository remains docs-only.**
 
+> **Important:** The ADAPTER_PREVIEW_GATE (see `docs/ADAPTER_PREVIEW_GATE.md`) currently has a status of **BLOCKED**. No adapter, GGUF, or model weights may be uploaded to Hugging Face until the gate transitions to at least `APPROVED_FOR_PUBLIC_PREVIEW`. No fake benchmark cards are allowed at any stage.
+
 ---
 
 ## Related Documents
@@ -139,6 +141,8 @@ When the pre-release checklist in `docs/BASE_MODEL_ACCEPTANCE.md` is fully satis
 | [HUGGINGFACE_RELEASE.md](HUGGINGFACE_RELEASE.md) | Full release process for when the transition from placeholder to full release occurs |
 | [MODEL_LICENSES.md](../MODEL_LICENSES.md) | License layers documentation |
 | [MODEL_DECISION_RECORD.md](MODEL_DECISION_RECORD.md) | ADR-001 — base model candidate comparison |
+| [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Release gate — uploads remain BLOCKED until gate criteria are met |
+| [ADAPTER_ARTIFACT_POLICY.md](ADAPTER_ARTIFACT_POLICY.md) | What can/cannot be committed from training runs |
 
 ---
 

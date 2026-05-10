@@ -147,6 +147,8 @@ def main() -> None:
         "--score-plan", action="store_true", help="In dry-run, also output scoring plan with dimensions"
     )
     parser.add_argument("--rubric", type=Path, default=None, help="Path to rubric markdown file")
+    parser.add_argument("--run-id", type=str, default=None, help="Optional run identifier for this evaluation")
+    parser.add_argument("--model-label", type=str, default=None, help="Optional label for the model being evaluated")
 
     args = parser.parse_args()
 
@@ -170,7 +172,12 @@ def main() -> None:
             "category_count": len(categories),
             "mode": "dry-run",
             "endpoint": args.endpoint or "not specified",
+            "score_status": "manual_review_required",
         }
+        if args.run_id:
+            plan["run_id"] = args.run_id
+        if args.model_label:
+            plan["model_label"] = args.model_label
 
         if args.score_plan:
             # Load scoring dimensions

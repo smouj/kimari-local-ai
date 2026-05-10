@@ -1,0 +1,83 @@
+{
+  "total": 7,
+  "ok": 5,
+  "errors": 2,
+  "categories": {
+    "python": 2,
+    "bash": 2,
+    "docker": 1,
+    "spanish_technical": 2
+  },
+  "results": [
+    {
+      "id": "adapter-001",
+      "category": "python",
+      "prompt": "Write a Python function that reverses a string",
+      "response": "def reverse_string(s: str) -> str:\n    return s[::-1]",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 1.1,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "adapter-002",
+      "category": "python",
+      "prompt": "Explain list comprehension in Python",
+      "response": "List comprehension provides a syntactic shortcut for creating lists from iterables. It replaces multi-line for loops with a single expression: [expr for item in iterable if condition].",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 2.3,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "adapter-003",
+      "category": "bash",
+      "prompt": "Write a bash script to find files older than 7 days",
+      "response": "find /path/to/search -type f -mtime +7 -exec ls -l {} \\;",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 3.5,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "adapter-004",
+      "category": "bash",
+      "prompt": "Explain the difference between grep and find",
+      "response": "grep searches patterns within file contents, while find locates files and directories by name, type, or metadata in the filesystem.",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 1.6,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "adapter-005",
+      "category": "docker",
+      "prompt": "Create a Dockerfile for a Python Flask app",
+      "response": "",
+      "status": "error",
+      "error": "URL error: connection refused",
+      "elapsed_seconds": 5.0,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "adapter-006",
+      "category": "spanish_technical",
+      "prompt": "Explica la diferencia entre memoria RAM y disco duro",
+      "response": "La memoria RAM es volatil y se utiliza para el acceso rapido a datos en uso. El disco duro es un almacenamiento persistente donde se guardan los archivos y programas de forma permanente.",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 2.8,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "adapter-007",
+      "category": "spanish_technical",
+      "prompt": "Traduce al espanol: 'container orchestration platform'",
+      "response": "Plataforma de orquestacion de contenedores",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 1.9,
+      "score_status": "manual_review_required"
+    }
+  ]
+}

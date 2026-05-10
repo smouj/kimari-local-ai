@@ -272,6 +272,25 @@ twine upload dist/*
 - [ ] `default_profile` is still `"test"`
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.20 Checks
+
+- [ ] docs/BASELINE_EVAL_PLAN.md exists
+- [ ] docs/ADAPTER_ARTIFACT_POLICY.md exists
+- [ ] docs/PRIVATE_TRAINING_RUNBOOK.md exists
+- [ ] docs/ADAPTER_PREVIEW_GATE.md exists and says BLOCKED as default
+- [ ] training/configs/private_sft_run.v0.yaml exists with public_release_allowed: false
+- [ ] training/scripts/run_private_sft_dryrun.py exists and --json works
+- [ ] training/scripts/build_v0_pipeline.py exists and --dry-run --json works
+- [ ] eval/baseline/README.md exists
+- [ ] eval/scripts/compare_runs.py exists and --json works with fixtures
+- [ ] .gitignore blocks training/adapters/, training/runs/, *.safetensors, *.gguf
+- [ ] MODEL_CARD.md checklist fixed (seed dataset In Progress, full dataset Not started)
+- [ ] MODEL_CARD.md version history updated (0.1.19-alpha → Released)
+- [ ] eval/kimarifit.py supports --run-id and --model-label
+- [ ] No GGUF files tracked in git
+- [ ] No adapter/weight files tracked in git
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)
