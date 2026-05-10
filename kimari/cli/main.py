@@ -238,23 +238,52 @@ def run_perf(
         )
 
 
-def _resolve_model_path(model_rel_path: str) -> Path:
-    """Resolve a model relative path to an actual filesystem path.
+def resolve_model_path(model: str) -> Path:
+    """Resolve a model path to an actual filesystem path.
 
     Checks in order:
-    1. User models directory
-    2. Repo-root models/ (editable installs)
+    1. If *model* is an absolute path, use it directly.
+    2. If *model* exists relative to the CWD, use it.
+    3. If *model* exists in the user models directory, use it.
+    4. If *model* exists in repo-root models/ (editable installs), use it.
+    5. Otherwise, return the expected path in the user models dir
+       (for error messages and first-download guidance).
+
+    This function does **not** depend on ``PROJECT_ROOT`` as the sole
+    source of truth and works correctly when Kimari is installed from
+    a wheel (no repo root available).
     """
-    user_path = get_user_models_dir() / Path(model_rel_path).name
+    p = Path(model)
+
+    # 1. Absolute path — use as-is
+    if p.is_absolute():
+        return p
+
+    # 2. CWD-relative — if the file exists, use it
+    cwd_path = Path.cwd() / p
+    if cwd_path.exists():
+        return cwd_path.resolve()
+
+    # 3. User models directory
+    user_path = get_user_models_dir() / p.name
     if user_path.exists():
         return user_path
 
-    repo_path = PROJECT_ROOT / model_rel_path
+    # 4. Repo-root models/ (editable installs)
+    repo_path = PROJECT_ROOT / model
     if repo_path.exists():
         return repo_path
 
-    # Default: return user path (even if doesn't exist yet)
+    # 5. Default: return user models dir path (even if it doesn't exist yet)
     return user_path
+
+
+def _resolve_model_path(model_rel_path: str) -> Path:
+    """Backward-compatible alias for :func:`resolve_model_path`.
+
+    Prefer calling ``resolve_model_path()`` directly in new code.
+    """
+    return resolve_model_path(model_rel_path)
 
 
 def build_server_cmd(
@@ -441,7 +470,7 @@ def start_server(
         return
 
     # Real startup checks
-    model_path = PROJECT_ROOT / effective_model
+    model_path = resolve_model_path(effective_model)
     if not model_path.exists():
         print(f"[ERROR] Model not found: {model_path}")
         gguf_files = scan_models_dir_for_gguf()
