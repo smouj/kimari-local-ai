@@ -66,7 +66,7 @@ def main() -> None:
     print("=" * 50)
 
     # ── Version consistency ──────────────────────────────────────
-    print("\n[1/12] Version consistency")
+    print("\n[1/13] Version consistency")
     pyproject_ver = get_pyproject_version()
     init_ver = get_init_version()
     check("pyproject.toml version is set", bool(pyproject_ver), "version field is empty")
@@ -78,7 +78,7 @@ def main() -> None:
     )
 
     # ── README version badge ─────────────────────────────────────
-    print("\n[2/12] README version badge")
+    print("\n[2/13] README version badge")
     readme = PROJECT_ROOT / "README.md"
     readme_text = readme.read_text()
     check("README.md exists", readme.exists())
@@ -95,7 +95,7 @@ def main() -> None:
     )
 
     # ── CHANGELOG entry ──────────────────────────────────────────
-    print("\n[3/12] CHANGELOG entry")
+    print("\n[3/13] CHANGELOG entry")
     changelog = PROJECT_ROOT / "CHANGELOG.md"
     changelog_text = changelog.read_text()
     changelog_header = f"[{init_ver}]"
@@ -106,7 +106,7 @@ def main() -> None:
     )
 
     # ── ROADMAP entry ────────────────────────────────────────────
-    print("\n[4/12] ROADMAP entry")
+    print("\n[4/13] ROADMAP entry")
     roadmap = PROJECT_ROOT / "ROADMAP.md"
     roadmap_text = roadmap.read_text()
     check(
@@ -121,7 +121,7 @@ def main() -> None:
     )
 
     # ── Config defaults ──────────────────────────────────────────
-    print("\n[5/12] Config defaults")
+    print("\n[5/13] Config defaults")
     profiles_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
     if profiles_path.exists():
         profiles = json.loads(profiles_path.read_text())
@@ -135,12 +135,12 @@ def main() -> None:
         check("config/kimari.profiles.json exists", False, "file not found")
 
     # ── Package markers ─────────────────────────────────────────
-    print("\n[6/12] Package markers")
+    print("\n[6/13] Package markers")
     py_typed = PROJECT_ROOT / "kimari" / "py.typed"
     check("kimari/py.typed exists", py_typed.exists(), "PEP 561 marker missing")
 
     # ── GitHub Pages / SEO ──────────────────────────────────────
-    print("\n[7/12] GitHub Pages / SEO")
+    print("\n[7/13] GitHub Pages / SEO")
     index_html = PROJECT_ROOT / "docs" / "index.html"
     if index_html.exists():
         index_text = index_html.read_text()
@@ -164,11 +164,26 @@ def main() -> None:
             "og:image" in index_text,
             "Open Graph image not found in docs/index.html",
         )
+        check(
+            "docs/index.html mentions 'setup'",
+            "setup" in index_text.lower(),
+            "'setup' not found in docs/index.html",
+        )
+        check(
+            "docs/index.html mentions 'strict-flags'",
+            "strict-flags" in index_text.lower(),
+            "'strict-flags' not found in docs/index.html",
+        )
+        check(
+            "docs/index.html mentions 'token'",
+            "token" in index_text.lower(),
+            "'token' not found in docs/index.html",
+        )
     else:
         check("docs/index.html exists", False, "file not found")
 
     # ── Documentation files ─────────────────────────────────────
-    print("\n[8/12] Documentation files")
+    print("\n[8/13] Documentation files")
     check(
         "docs/INSTALL_WSL2.md exists",
         (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists(),
@@ -186,7 +201,7 @@ def main() -> None:
     )
 
     # ── No tracked GGUF / runtime artifacts ──────────────────────
-    print("\n[9/12] No unwanted tracked files")
+    print("\n[9/13] No unwanted tracked files")
     try:
         result = subprocess.run(
             ["git", "ls-files", "*.gguf"],
@@ -228,7 +243,7 @@ def main() -> None:
         warn(".kimari/ directory exists in project root", "should be in .gitignore")
 
     # ── No false claims ─────────────────────────────────────────
-    print("\n[10/12] Content integrity")
+    print("\n[10/13] Content integrity")
     readme_lower = readme_text.lower()
     changelog_lower = changelog_text.lower()
     index_lower = (PROJECT_ROOT / "docs" / "index.html").read_text().lower() if index_html.exists() else ""
@@ -275,8 +290,24 @@ def main() -> None:
         "'perf' not found in README.md",
     )
 
+    check(
+        "README mentions 'setup' command",
+        "setup" in readme_lower,
+        "'setup' not found in README.md",
+    )
+    check(
+        "README mentions 'strict-flags'",
+        "strict-flags" in readme_lower,
+        "'strict-flags' not found in README.md",
+    )
+    check(
+        "README mentions 'token create'",
+        "token create" in readme_lower,
+        "'token create' not found in README.md",
+    )
+
     # ── Integration documentation ──────────────────────────────────
-    print("\n[11/12] Integration documentation")
+    print("\n[11/13] Integration documentation")
     check(
         "docs/integrations/OPENCLAW.md exists",
         (PROJECT_ROOT / "docs" / "integrations" / "OPENCLAW.md").exists(),
@@ -309,7 +340,7 @@ def main() -> None:
     )
 
     # ── Performance module ─────────────────────────────────────────
-    print("\n[12/12] Performance module")
+    print("\n[12/13] Performance module")
     check(
         "kimari/performance/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "performance" / "__init__.py").exists(),
@@ -329,6 +360,44 @@ def main() -> None:
         "kimari/performance/gguf_metadata.py exists",
         (PROJECT_ROOT / "kimari" / "performance" / "gguf_metadata.py").exists(),
         "GGUF metadata reader missing",
+    )
+
+    # ── Runtime & Security modules ──────────────────────────────────
+    print("\n[13/13] Runtime & Security modules")
+    check(
+        "kimari/runtime/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "runtime" / "__init__.py").exists(),
+        "Runtime module init missing",
+    )
+    check(
+        "kimari/runtime/llama_flags.py exists",
+        (PROJECT_ROOT / "kimari" / "runtime" / "llama_flags.py").exists(),
+        "llama-server flag detection module missing",
+    )
+    check(
+        "kimari/security/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "security" / "__init__.py").exists(),
+        "Security module init missing",
+    )
+    check(
+        "kimari/security/tokens.py exists",
+        (PROJECT_ROOT / "kimari" / "security" / "tokens.py").exists(),
+        "Token management module missing",
+    )
+    check(
+        "scripts/windows/kimari-launcher.ps1 exists",
+        (PROJECT_ROOT / "scripts" / "windows" / "kimari-launcher.ps1").exists(),
+        "Windows launcher script missing",
+    )
+    check(
+        "scripts/windows/kimari-doctor.ps1 exists",
+        (PROJECT_ROOT / "scripts" / "windows" / "kimari-doctor.ps1").exists(),
+        "Windows doctor script missing",
+    )
+    check(
+        "scripts/windows/README.md exists",
+        (PROJECT_ROOT / "scripts" / "windows" / "README.md").exists(),
+        "Windows scripts README missing",
     )
 
     # ── Summary ──────────────────────────────────────────────────

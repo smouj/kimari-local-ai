@@ -98,7 +98,7 @@ def test_cli_info():
     """'info' command runs and shows version."""
     result = _run_cli("info")
     assert result.returncode == 0
-    assert "0.1.10-alpha" in result.stdout
+    assert "0.1.11-alpha" in result.stdout
 
 
 def test_cli_info_json():
@@ -106,7 +106,7 @@ def test_cli_info_json():
     result = _run_cli("info", "--json")
     assert result.returncode == 0
     data = json.loads(result.stdout)
-    assert data["kimari_version"] == "0.1.10-alpha"
+    assert data["kimari_version"] == "0.1.11-alpha"
 
 
 def test_cli_config_path():

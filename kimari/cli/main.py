@@ -305,6 +305,7 @@ def start_server(
     host_override: str | None = None,
     port_override: int | None = None,
     ctx_override: int | None = None,
+    strict_flags: bool = False,
 ):
     """Start llama-server with the specified profile."""
     profile = get_profile(config, profile_name)
@@ -389,6 +390,33 @@ def start_server(
         print(f"  {' '.join(cmd)}\n")
         print(f"  stdout → {LOG_FILE}")
         print(f"  state  → {STATE_FILE}")
+
+        # Runtime flag validation
+        if llama_server:
+            from kimari.runtime.llama_flags import (
+                detect_llama_server_help,
+                filter_unsupported_flags,
+                parse_supported_flags,
+            )
+
+            help_text = detect_llama_server_help(llama_server)
+            if help_text:
+                supported = parse_supported_flags(help_text)
+                _, unsupported = filter_unsupported_flags(cmd, supported)
+                if unsupported:
+                    if strict_flags:
+                        print(f"\n  {Color.RED}[ERROR]{Color.RESET} --strict-flags: unsupported flags detected:")
+                        for flag in unsupported:
+                            print(f"    ✗ {flag}")
+                        print(f"\n  Your llama-server binary does not support: {', '.join(unsupported)}")
+                        print("  Update llama-server or use a profile without these flags.")
+                        raise SystemExit(1)
+                    else:
+                        print(f"\n  {Color.YELLOW}[WARN]{Color.RESET} llama-server may not support these flags:")
+                        for flag in unsupported:
+                            print(f"    ⚠ {flag}")
+                        print("  Use --strict-flags to make this an error.")
+
         return
 
     # Real startup checks
@@ -1116,6 +1144,175 @@ def show_info(config: dict, json_output: bool = False):
     print()
 
 
+# ─── Setup ──────────────────────────────────────────────────────────────────────
+
+
+def run_setup(
+    config: dict,
+    dry_run: bool = False,
+    json_output: bool = False,
+    profile_name: str | None = None,
+    integration: str | None = None,
+):
+    """Guided setup and environment detection.
+
+    Detects OS, Python, GPU, CUDA, ROCm, llama-server, and local models,
+    then recommends a profile and next commands.
+    """
+    import platform as _platform
+    import shutil
+
+    warnings: list[str] = []
+
+    if dry_run:
+        result = {
+            "kimari_version": KIMARI_VERSION,
+            "os": "(dry-run — not detected)",
+            "python": "(dry-run — not detected)",
+            "gpu": "(dry-run — not detected)",
+            "cuda": "(dry-run — not detected)",
+            "rocm": "(dry-run — not detected)",
+            "llama_server": "(dry-run — not detected)",
+            "local_models": "(dry-run — not scanned)",
+            "recommended_profile": profile_name or config.get("default_profile", "test"),
+            "recommended_integration": integration,
+            "next_commands": ["(dry-run) kimari doctor", "(dry-run) kimari start --dry-run"],
+            "warnings": ["Dry-run mode — no detection performed"],
+        }
+        if json_output:
+            print(json.dumps(result, indent=2))
+            return
+
+        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Setup{Color.RESET} (dry-run)\n")
+        print("  No detection performed in dry-run mode.")
+        print(f"  Run {Color.CYAN}kimari setup{Color.RESET} to detect your environment.\n")
+        return
+
+    # OS
+    os_info = f"{_platform.system()} {_platform.release()}"
+    if _platform.system() in ("Linux", "Windows"):
+        os_info += f" ({_platform.machine()})"
+
+    # Python
+    python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    if sys.version_info < (3, 10):  # noqa: UP036
+        warnings.append(f"Python {python_version} is below minimum 3.10")
+
+    # GPU
+    gpu = detect_gpu()
+    if gpu:
+        gpu_info = f"{gpu['name']} ({gpu['vram_mb']} MB)"
+    else:
+        gpu_info = "No NVIDIA GPU detected"
+        warnings.append("No NVIDIA GPU detected — CPU-only mode")
+
+    # CUDA
+    cuda_ver = detect_cuda_version()
+    has_cuda = detect_cuda()
+    if cuda_ver:
+        cuda_info = f"CUDA {cuda_ver}"
+    elif has_cuda:
+        cuda_info = "Available (version unknown)"
+    else:
+        cuda_info = "Not detected"
+        if not gpu:
+            warnings.append("No CUDA detected — required for GPU acceleration")
+
+    # ROCm (experimental)
+    hipcc = shutil.which("hipcc")
+    rocm_info = f"hipcc found at {hipcc} (experimental)" if hipcc else "Not detected"
+
+    # llama-server
+    llama_server = detect_llama_server()
+    if llama_server:
+        llama_server_info = llama_server
+    else:
+        llama_server_info = "Not found"
+        warnings.append("llama-server not found — build it or set LLAMA_SERVER")
+
+    # Local GGUF models
+    models_dir = PROJECT_ROOT / "models"
+    local_models_list: list[str] = []
+    if models_dir.exists():
+        local_models_list = sorted(f.name for f in models_dir.glob("*.gguf"))
+    if not local_models_list:
+        warnings.append("No GGUF models found — run 'kimari pull test'")
+
+    # Recommended profile
+    recommended_profile = profile_name or recommend_profile(config, gpu)
+
+    # Next commands
+    next_commands: list[str] = []
+    if not llama_server:
+        next_commands.append("Build llama-server: bash scripts/linux/build-llamacpp-cuda.sh")
+    if not local_models_list:
+        next_commands.append("Download a model: kimari pull test")
+    next_commands.append(f"Start server: kimari start --profile {recommended_profile}")
+
+    # Integration-specific commands
+    if integration == "openclaw":
+        next_commands.append("Start for OpenClaw: kimari start --profile openclaw-local")
+    elif integration == "hermes":
+        next_commands.append("Start for Hermes: kimari start --profile hermes-local")
+    elif integration == "continue":
+        next_commands.append("Start for Continue.dev: kimari start --profile ide-local")
+
+    next_commands.append("Run diagnostics: kimari doctor")
+
+    result = {
+        "kimari_version": KIMARI_VERSION,
+        "os": os_info,
+        "python": python_version,
+        "gpu": gpu_info,
+        "cuda": cuda_info,
+        "rocm": rocm_info,
+        "llama_server": llama_server_info,
+        "local_models": local_models_list,
+        "recommended_profile": recommended_profile,
+        "recommended_integration": integration,
+        "next_commands": next_commands,
+        "warnings": warnings,
+    }
+
+    if json_output:
+        print(json.dumps(result, indent=2))
+        return
+
+    # Human-readable output
+    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Setup{Color.RESET}\n")
+    print(f"  Version:     {KIMARI_VERSION}")
+    print(f"  OS:          {os_info}")
+    print(f"  Python:      {python_version}")
+    print(f"  GPU:         {gpu_info}")
+    print(f"  CUDA:        {cuda_info}")
+    print(f"  ROCm:        {rocm_info}")
+    print(
+        f"  llama-server:{'  ' + llama_server_info if llama_server_info != 'Not found' else '  ' + Color.RED + llama_server_info + Color.RESET}"
+    )
+
+    print(f"\n  {Color.BOLD}Local Models:{Color.RESET}")
+    if local_models_list:
+        for m in local_models_list:
+            print(f"    📦 {m}")
+    else:
+        print("    (none)")
+
+    if integration:
+        print(f"\n  {Color.BOLD}Integration:{Color.RESET} {integration}")
+
+    print(f"\n  {Color.BOLD}Recommended Profile:{Color.RESET} {Color.GREEN}{recommended_profile}{Color.RESET}")
+
+    print(f"\n  {Color.BOLD}Next Steps:{Color.RESET}")
+    for cmd in next_commands:
+        print(f"    → {cmd}")
+
+    if warnings:
+        print(f"\n  {Color.YELLOW}Warnings:{Color.RESET}")
+        for w in warnings:
+            print(f"    ⚠ {w}")
+    print()
+
+
 # ─── Models ──────────────────────────────────────────────────────────────────
 
 
@@ -1217,6 +1414,11 @@ def main():
         default=None,
         dest="ctx",
         help="Override profile context size (tokens)",
+    )
+    start_parser.add_argument(
+        "--strict-flags",
+        action="store_true",
+        help="Fail if llama-server does not support flags required by the profile",
     )
 
     # stop
@@ -1372,6 +1574,20 @@ def main():
     config_migrate_parser = config_sub.add_parser("migrate", help="Migrate configuration to current version")
     config_migrate_parser.add_argument("--dry-run", action="store_true", help="Show changes without applying them")
 
+    # setup
+    setup_parser = subparsers.add_parser("setup", help="Guided setup and environment detection")
+    setup_parser.add_argument("--dry-run", action="store_true", help="Preview without detecting")
+    setup_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
+    setup_parser.add_argument("--profile", "-p", default=None, help="Profile to recommend")
+    setup_parser.add_argument("--integration", default=None, help="Integration target (openclaw, hermes, continue)")
+
+    # token
+    token_parser = subparsers.add_parser("token", help="Manage local auth tokens")
+    token_sub = token_parser.add_subparsers(dest="token_command", help="Token subcommands")
+    token_sub.add_parser("create", help="Create a new local auth token")
+    token_sub.add_parser("show", help="Show the current auth token")
+    token_sub.add_parser("delete", help="Delete the current auth token")
+
     args = parser.parse_args()
 
     # Ensure state directory exists
@@ -1401,6 +1617,7 @@ def main():
             host_override=args.host,
             port_override=args.port,
             ctx_override=args.ctx,
+            strict_flags=args.strict_flags,
         )
     elif args.command == "stop":
         stop_server()
@@ -1489,6 +1706,43 @@ def main():
                     print(f"    • {change}")
                 if info.get("backup_path"):
                     print(f"  Backup:       {info['backup_path']}")
+    elif args.command == "setup":
+        run_setup(
+            config,
+            dry_run=args.dry_run,
+            json_output=getattr(args, "json_output", False),
+            profile_name=getattr(args, "profile", None),
+            integration=getattr(args, "integration", None),
+        )
+    elif args.command == "token":
+        from kimari.security.tokens import create_token, delete_token, show_token
+
+        if args.token_command == "create":
+            result = create_token()
+            print(f"\n  {Color.GREEN}✓ Token created{Color.RESET}")
+            print(f"  Token:   {result['token']}")
+            print(f"  Preview: {result['preview']}")
+            print(f"  Created: {result['created_at']}")
+            print(
+                f"\n  {Color.DIM}Note: This token is prepared for future Kimari API / reverse proxy use.{Color.RESET}"
+            )
+            print(f"  {Color.DIM}llama-server does not apply auth natively.{Color.RESET}\n")
+        elif args.token_command == "show":
+            result = show_token()
+            if result:
+                print(f"\n  Token:   {result['token']}")
+                print(f"  Preview: {result['preview']}")
+                print(f"  Created: {result['created_at']}")
+                print(f"  Note:    {result.get('note', 'N/A')}\n")
+            else:
+                print("\n  No token found. Create one with: kimari token create\n")
+        elif args.token_command == "delete":
+            if delete_token():
+                print(f"\n  {Color.GREEN}✓ Token deleted{Color.RESET}\n")
+            else:
+                print("\n  No token to delete.\n")
+        else:
+            token_parser.print_help()
     else:
         parser.print_help()
 

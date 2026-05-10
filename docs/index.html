@@ -455,7 +455,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.10-alpha — Performance profiles, optimize/perf commands, OpenClaw/Hermes/Continue integration
+      v0.1.11-alpha — Guided setup, runtime validation, local auth tokens, Windows helper scripts
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -615,6 +615,26 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-title">Model Registry</div>
       <div class="feature-desc">kimari pull with resume support and SHA256 verification. Download and verify models safely.</div>
     </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔍</span>
+      <div class="feature-title">Guided Setup</div>
+      <div class="feature-desc">kimari setup detects your OS, GPU, CUDA, and llama-server, then recommends the best profile.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🛡️</span>
+      <div class="feature-title">Runtime Validation</div>
+      <div class="feature-desc">kimari start --dry-run --strict-flags checks llama-server compatibility before launch.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔑</span>
+      <div class="feature-title">Local Auth Tokens</div>
+      <div class="feature-desc">kimari token create/show/delete prepares tokens for future API or reverse proxy use.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🪟</span>
+      <div class="feature-title">Windows Helper Scripts</div>
+      <div class="feature-desc">PowerShell launcher and doctor scripts for Windows users. Full setup, diagnostics, and model pull.</div>
+    </div>
   </div>
 </section>
 
@@ -760,7 +780,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.10-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.11-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -797,7 +817,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.10-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.11-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -1199,7 +1219,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.10-alpha — Performance profiles, optimize/perf commands, OpenClaw/Hermes/Continue integration, VRAM estimation, and release validation.</p>
+    <p class="section-desc">Kimari Local AI v0.1.11-alpha — Guided setup, runtime validation, local auth tokens, Windows helper scripts, performance profiles, and OpenClaw/Hermes/Continue integration.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1219,6 +1239,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Modular package (<code>pip install -e .</code>)</td><td>✅ Implemented in v0.1.4-alpha</td></tr>
         <tr><td>Release validation (<code>check-release.py</code>)</td><td>✅ Implemented in v0.1.8-alpha</td></tr>
         <tr><td>WSL2 Installation Guide</td><td>✅ Implemented in v0.1.10-alpha</td></tr>
+        <tr><td><code>kimari setup</code> (guided detection)</td><td>✅ Implemented in v0.1.11-alpha</td></tr>
+        <tr><td>Runtime flag validation (<code>--strict-flags</code>)</td><td>✅ Implemented in v0.1.11-alpha</td></tr>
+        <tr><td>Local auth tokens (<code>kimari token</code>)</td><td>✅ Implemented in v0.1.11-alpha</td></tr>
+        <tr><td>Windows helper scripts</td><td>✅ Implemented in v0.1.11-alpha</td></tr>
         <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>

@@ -94,7 +94,7 @@
 - ✅ RELEASE_CHECKLIST.md — added SEO, WSL2, publishing, GitHub Pages checks
 - ✅ check-release.py — 10 validation categories including SEO, docs, false claim detection
 
-## v0.1.10-alpha (Current)
+## v0.1.10-alpha (Released)
 
 - ✅ Performance estimation module — VRAM/RAM estimation with confidence levels and warnings
 - ✅ GGUF metadata reader — Lightweight reader for model architecture data
@@ -108,15 +108,24 @@
 - ✅ Continue.dev integration — docs + config example
 - ✅ Generic OpenAI-compatible client guide — curl, Python, Node.js, troubleshooting
 
-## v0.1.11-alpha (Planned)
+## v0.1.11-alpha (Current)
+
+- ✅ `kimari setup` guided environment detection command
+- ✅ Runtime flag detection (`kimari/runtime/llama_flags.py`)
+- ✅ `--strict-flags` option on `kimari start`
+- ✅ Local auth tokens (`kimari token create/show/delete`)
+- ✅ Windows launcher and doctor PowerShell scripts
+- ✅ TestPyPI validation checklist in docs/PUBLISHING.md
+- ✅ Release-check improvements for new modules
+
+## v0.1.12-alpha (Planned)
 
 - TestPyPI actual upload/install verification
-- `kimari setup` interactive command
 - Real SHA256 hashes if computable reliably
-- Windows installer/launcher
-- Optional local auth token
+- Windows installer packaging
+- Optional reverse proxy auth guide
 - Responses API compatibility research
-- llama-server --help based flag detection
+- FastAPI planning for v0.2
 
 ## v0.2.0-alpha
 
