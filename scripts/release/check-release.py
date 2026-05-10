@@ -89,7 +89,7 @@ def main() -> None:
     print("=" * 50)
 
     # ── Version consistency ──────────────────────────────────────
-    print("\n[1/24] Version consistency")
+    print("\n[1/28] Version consistency")
     pyproject_ver = get_pyproject_version()
     init_ver = get_init_version()
     check("pyproject.toml version is set", bool(pyproject_ver), "version field is empty")
@@ -101,7 +101,7 @@ def main() -> None:
     )
 
     # ── README version badge ─────────────────────────────────────
-    print("\n[2/24] README version badge")
+    print("\n[2/28] README version badge")
     readme = PROJECT_ROOT / "README.md"
     readme_text = readme.read_text()
     check("README.md exists", readme.exists())
@@ -118,7 +118,7 @@ def main() -> None:
     )
 
     # ── CHANGELOG entry ──────────────────────────────────────────
-    print("\n[3/24] CHANGELOG entry")
+    print("\n[3/28] CHANGELOG entry")
     changelog = PROJECT_ROOT / "CHANGELOG.md"
     changelog_text = changelog.read_text()
     changelog_header = f"[{init_ver}]"
@@ -129,7 +129,7 @@ def main() -> None:
     )
 
     # ── ROADMAP entry ────────────────────────────────────────────
-    print("\n[4/24] ROADMAP entry")
+    print("\n[4/28] ROADMAP entry")
     roadmap = PROJECT_ROOT / "ROADMAP.md"
     roadmap_text = roadmap.read_text()
     check(
@@ -144,7 +144,7 @@ def main() -> None:
     )
 
     # ── Config defaults ──────────────────────────────────────────
-    print("\n[5/24] Config defaults")
+    print("\n[5/28] Config defaults")
     profiles_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
     if profiles_path.exists():
         profiles = json.loads(profiles_path.read_text())
@@ -158,12 +158,12 @@ def main() -> None:
         check("config/kimari.profiles.json exists", False, "file not found")
 
     # ── Package markers ─────────────────────────────────────────
-    print("\n[6/24] Package markers")
+    print("\n[6/28] Package markers")
     py_typed = PROJECT_ROOT / "kimari" / "py.typed"
     check("kimari/py.typed exists", py_typed.exists(), "PEP 561 marker missing")
 
     # ── GitHub Pages / SEO ──────────────────────────────────────
-    print("\n[7/24] GitHub Pages / SEO")
+    print("\n[7/28] GitHub Pages / SEO")
     index_html = PROJECT_ROOT / "docs" / "index.html"
     if index_html.exists():
         index_text = index_html.read_text()
@@ -206,7 +206,7 @@ def main() -> None:
         check("docs/index.html exists", False, "file not found")
 
     # ── Documentation files ─────────────────────────────────────
-    print("\n[8/24] Documentation files")
+    print("\n[8/28] Documentation files")
     check(
         "docs/INSTALL_WSL2.md exists",
         (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists(),
@@ -224,7 +224,7 @@ def main() -> None:
     )
 
     # ── No tracked GGUF / runtime artifacts ──────────────────────
-    print("\n[9/24] No unwanted tracked files")
+    print("\n[9/28] No unwanted tracked files")
     try:
         result = subprocess.run(
             ["git", "ls-files", "*.gguf"],
@@ -266,7 +266,7 @@ def main() -> None:
         warn(".kimari/ directory exists in project root", "should be in .gitignore")
 
     # ── No false claims ─────────────────────────────────────────
-    print("\n[10/24] Content integrity")
+    print("\n[10/28] Content integrity")
     readme_lower = readme_text.lower()
     changelog_lower = changelog_text.lower()
     index_lower = (PROJECT_ROOT / "docs" / "index.html").read_text().lower() if index_html.exists() else ""
@@ -330,7 +330,7 @@ def main() -> None:
     )
 
     # ── Integration documentation ──────────────────────────────────
-    print("\n[11/24] Integration documentation")
+    print("\n[11/28] Integration documentation")
     check(
         "docs/integrations/OPENCLAW.md exists",
         (PROJECT_ROOT / "docs" / "integrations" / "OPENCLAW.md").exists(),
@@ -363,7 +363,7 @@ def main() -> None:
     )
 
     # ── Performance module ─────────────────────────────────────────
-    print("\n[12/24] Performance module")
+    print("\n[12/28] Performance module")
     check(
         "kimari/performance/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "performance" / "__init__.py").exists(),
@@ -386,7 +386,7 @@ def main() -> None:
     )
 
     # ── Runtime & Security modules ──────────────────────────────────
-    print("\n[13/24] Runtime & Security modules")
+    print("\n[13/28] Runtime & Security modules")
     check(
         "kimari/runtime/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "runtime" / "__init__.py").exists(),
@@ -424,7 +424,7 @@ def main() -> None:
     )
 
     # ── Packaged defaults & paths (v0.1.12) ──────────────────────────
-    print("\n[14/24] Packaged defaults & user paths")
+    print("\n[14/28] Packaged defaults & user paths")
     check(
         "kimari/defaults/ directory exists",
         (PROJECT_ROOT / "kimari" / "defaults").is_dir(),
@@ -472,7 +472,7 @@ def main() -> None:
     )
 
     # ── Short flag support in strict-flags (v0.1.12) ──────────────────
-    print("\n[15/24] Short flag support in strict-flags")
+    print("\n[15/28] Short flag support in strict-flags")
     llama_flags_path = PROJECT_ROOT / "kimari" / "runtime" / "llama_flags.py"
     if llama_flags_path.exists():
         flags_text = llama_flags_path.read_text()
@@ -495,7 +495,7 @@ def main() -> None:
             )
 
     # ── Community & contribution files (v0.1.13) ───────────────────
-    print("\n[16/24] Community & contribution files")
+    print("\n[16/28] Community & contribution files")
     check(
         "CODE_OF_CONDUCT.md exists",
         (PROJECT_ROOT / "CODE_OF_CONDUCT.md").exists(),
@@ -567,7 +567,7 @@ def main() -> None:
         )
 
     # ── Packaging & CI (v0.1.13) ──────────────────────────────────
-    print("\n[17/24] Packaging & CI")
+    print("\n[17/28] Packaging & CI")
     # Check SPDX license format
     pyproject_text = (PROJECT_ROOT / "pyproject.toml").read_text()
     check(
@@ -598,7 +598,7 @@ def main() -> None:
         warn("CI workflow file not found", "cannot check for wheel-install-smoke job")
 
     # ── Content integrity re-check (v0.1.13) ───────────────────────
-    print("\n[18/24] Content integrity re-check")
+    print("\n[18/28] Content integrity re-check")
     # Re-verify critical rules haven't regressed
     check(
         'default_profile still "test"',
@@ -617,7 +617,7 @@ def main() -> None:
     )
 
     # ── Setup write-mode & SHA256 tooling (v0.1.14) ──────────────────
-    print("\n[19/24] Setup write-mode & SHA256 tooling")
+    print("\n[19/28] Setup write-mode & SHA256 tooling")
     check(
         "kimari/setup/__init__.py exists",
         (PROJECT_ROOT / "kimari" / "setup" / "__init__.py").exists(),
@@ -645,7 +645,7 @@ def main() -> None:
     )
 
     # ── New documentation (v0.1.14) ──────────────────────────────────
-    print("\n[20/24] New documentation files")
+    print("\n[20/28] New documentation files")
     check(
         "docs/REVERSE_PROXY_AUTH.md exists",
         (PROJECT_ROOT / "docs" / "REVERSE_PROXY_AUTH.md").exists(),
@@ -676,7 +676,7 @@ def main() -> None:
         )
 
     # ── Content integrity v0.1.14 re-check ───────────────────────────
-    print("\n[21/24] Content integrity re-check (v0.1.14)")
+    print("\n[21/28] Content integrity re-check (v0.1.14)")
     check(
         'default_profile still "test" (v0.1.14 re-check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
@@ -694,7 +694,7 @@ def main() -> None:
     )
 
     # ── Model path resolution (v0.1.15) ───────────────────────────────
-    print("\n[22/24] Model path resolution")
+    print("\n[22/28] Model path resolution")
     main_py_path = PROJECT_ROOT / "kimari" / "cli" / "main.py"
     if main_py_path.exists():
         main_py_text = main_py_path.read_text()
@@ -712,7 +712,7 @@ def main() -> None:
         check("kimari/cli/main.py exists", False, "file not found")
 
     # ── v0.1.15 new files ─────────────────────────────────────────────
-    print("\n[23/24] v0.1.15 new files")
+    print("\n[23/28] v0.1.15 new files")
     check(
         "benchmarks/RESULT_FORMAT.md exists",
         (PROJECT_ROOT / "benchmarks" / "RESULT_FORMAT.md").exists(),
@@ -745,7 +745,7 @@ def main() -> None:
     )
 
     # ── v0.1.15 content ───────────────────────────────────────────────
-    print("\n[24/24] v0.1.15 content")
+    print("\n[24/28] v0.1.15 content")
     check(
         "README mentions 'setup --write --yes'",
         "setup --write --yes" in readme_lower or "setup --write --yes" in readme_text,
@@ -775,6 +775,156 @@ def main() -> None:
         "No 'Responses API is supported' false claim (v0.1.15)",
         len(responses_false_claims) == 0,
         "Responses API false claim regression detected",
+    )
+
+    # ── v0.1.16 API experimental ───────────────────────────────────
+    print("\n[25/28] v0.1.16 API experimental")
+    check(
+        "kimari/api/app.py exists",
+        (PROJECT_ROOT / "kimari" / "api" / "app.py").exists(),
+        "API app module missing",
+    )
+    check(
+        "kimari/api/schemas.py exists",
+        (PROJECT_ROOT / "kimari" / "api" / "schemas.py").exists(),
+        "API schemas module missing",
+    )
+    check(
+        "kimari/api/server.py exists",
+        (PROJECT_ROOT / "kimari" / "api" / "server.py").exists(),
+        "API server module missing",
+    )
+    pyproject_text_v2 = (PROJECT_ROOT / "pyproject.toml").read_text()
+    check(
+        'pyproject optional dependency "api" exists',
+        '"api"' in pyproject_text_v2 or "'api'" in pyproject_text_v2 or "api" in pyproject_text_v2,
+        '"api" optional dependency group not found in pyproject.toml',
+    )
+    check(
+        "docs/API_EXPERIMENTAL.md exists",
+        (PROJECT_ROOT / "docs" / "API_EXPERIMENTAL.md").exists(),
+        "API experimental doc missing",
+    )
+    check(
+        "docs/PYPI_RELEASE_GATE.md exists",
+        (PROJECT_ROOT / "docs" / "PYPI_RELEASE_GATE.md").exists(),
+        "PyPI release gate doc missing",
+    )
+    check(
+        "docs/MODEL_HASHING.md exists",
+        (PROJECT_ROOT / "docs" / "MODEL_HASHING.md").exists(),
+        "Model hashing doc missing",
+    )
+    check(
+        "docs/BENCHMARK_SUBMISSIONS.md exists",
+        (PROJECT_ROOT / "docs" / "BENCHMARK_SUBMISSIONS.md").exists(),
+        "Benchmark submissions doc missing",
+    )
+    check(
+        "benchmarks/examples/perf-result.gtx1060.example.json exists",
+        (PROJECT_ROOT / "benchmarks" / "examples" / "perf-result.gtx1060.example.json").exists(),
+        "GTX 1060 benchmark example missing",
+    )
+    check(
+        "benchmarks/examples/perf-result.gtx1080.example.json exists",
+        (PROJECT_ROOT / "benchmarks" / "examples" / "perf-result.gtx1080.example.json").exists(),
+        "GTX 1080 benchmark example missing",
+    )
+    check(
+        'README mentions "Experimental API"',
+        "experimental api" in readme_lower or "Experimental API" in readme_text,
+        '"Experimental API" not found in README.md',
+    )
+    if index_html.exists():
+        check(
+            'docs/index.html mentions "PyPI release gate"',
+            "pypi release gate" in index_text.lower() or "release gate" in index_text.lower(),
+            '"PyPI release gate" not found in docs/index.html',
+        )
+    check(
+        'No "Responses API supported" false claim (v0.1.16)',
+        len(responses_false_claims) == 0,
+        'Responses API false claim detected — should only say "planned" or "future"',
+    )
+    check(
+        'default_profile still "test" (v0.1.16 re-check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+
+    # ── v0.1.16 Windows packaging improvements ────────────────────────
+    print("\n[26/28] v0.1.16 Windows packaging improvements")
+    check(
+        "scripts/windows/build-wheel.ps1 exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "scripts" / "windows" / "build-wheel.ps1").exists(),
+        "Windows build-wheel script missing",
+    )
+    check(
+        "scripts/windows/install-from-wheel.ps1 exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "scripts" / "windows" / "install-from-wheel.ps1").exists(),
+        "Windows install-from-wheel script missing",
+    )
+    check(
+        "scripts/windows/install-from-testpypi.ps1 exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "scripts" / "windows" / "install-from-testpypi.ps1").exists(),
+        "Windows install-from-testpypi script missing",
+    )
+    check(
+        "scripts/windows/kimari-launcher.ps1 exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "scripts" / "windows" / "kimari-launcher.ps1").exists(),
+        "Windows launcher script missing",
+    )
+    check(
+        "scripts/windows/kimari-doctor.ps1 exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "scripts" / "windows" / "kimari-doctor.ps1").exists(),
+        "Windows doctor script missing",
+    )
+
+    # ── v0.1.16 release-check improvements ─────────────────────────────
+    print("\n[27/28] v0.1.16 release-check improvements")
+    check(
+        "scripts/release/check-release.py exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "scripts" / "release" / "check-release.py").exists(),
+        "Release check script missing",
+    )
+    check(
+        "RELEASE_CHECKLIST.md exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "RELEASE_CHECKLIST.md").exists(),
+        "Release checklist missing",
+    )
+    check(
+        "docs/PUBLISHING.md exists (v0.1.16 re-check)",
+        (PROJECT_ROOT / "docs" / "PUBLISHING.md").exists(),
+        "Publishing guide missing",
+    )
+    check(
+        'README links to API_EXPERIMENTAL.md or mentions "API Experimental"',
+        "API_EXPERIMENTAL" in readme_text or "experimental api" in readme_lower,
+        'API_EXPERIMENTAL.md link or "Experimental API" not found in README.md',
+    )
+
+    # ── v0.1.16 content integrity re-check ──────────────────────────────
+    print("\n[28/28] v0.1.16 content integrity re-check")
+    check(
+        'default_profile still "test" (v0.1.16 final re-check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.16 final)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        'No "Responses API supported" false claim (v0.1.16 final)',
+        len(responses_false_claims) == 0,
+        "Responses API false claim regression detected",
+    )
+    # Check no claim of PyPI real publishing
+    check(
+        'No "published to PyPI" false claim',
+        "published to pypi" not in all_text and "uploaded to pypi" not in all_text,
+        'False claim of PyPI publishing detected — must go through release gate first',
     )
 
     # ── Summary ──────────────────────────────────────────────────

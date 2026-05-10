@@ -184,6 +184,26 @@ twine upload dist/*
 - [ ] GitHub Release created with notes from CHANGELOG
 - [ ] Git tag created: `git tag v0.1.X-alpha && git push origin v0.1.X-alpha`
 
+## v0.1.16 Checks
+
+- [ ] API experimental dry-run works (`kimari api --experimental --dry-run`)
+- [ ] api extra dependency documented in `pyproject.toml` (`[project.optional-dependencies]` includes `api`)
+- [ ] `docs/API_EXPERIMENTAL.md` exists
+- [ ] `docs/PYPI_RELEASE_GATE.md` exists
+- [ ] `docs/MODEL_HASHING.md` exists
+- [ ] `docs/BENCHMARK_SUBMISSIONS.md` exists
+- [ ] Benchmark examples exist (`benchmarks/examples/perf-result.gtx1060.example.json`, `perf-result.gtx1080.example.json`)
+- [ ] No PyPI real without release gate approved (`docs/PYPI_RELEASE_GATE.md` process followed)
+- [ ] `kimari api --dry-run` works without fastapi installed (graceful fallback)
+- [ ] `kimari/api/app.py`, `kimari/api/schemas.py`, `kimari/api/server.py` exist
+- [ ] `kimari api --experimental` command registers correctly
+- [ ] API endpoints return expected responses (health, status, config, profiles, models, optimize, perf/dry-run)
+- [ ] Server start/stop endpoints return 501 (planned, not implemented)
+- [ ] Experimental auth middleware present but not enforced by default
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+- [ ] No "Responses API supported" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

@@ -5,6 +5,32 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.16-alpha] — 2026-05-18
+
+### Added
+- **Experimental FastAPI API skeleton** (`kimari/api/`) — `app.py`, `schemas.py`, `server.py`; opt-in via `kimari api --experimental`; does NOT start a real server yet
+- **Optional `api` dependency in `pyproject.toml`** — `pip install kimari-local-ai[api]` installs FastAPI + uvicorn; core install remains lightweight
+- **`kimari api --experimental` command** — Registers the API subcommand; `--dry-run` validates configuration without requiring FastAPI installed
+- **API endpoints (experimental)** — Health (`GET /health`), status (`GET /status`), config (`GET /config`), profiles (`GET /profiles`), models (`GET /models`), optimize (`POST /optimize`), perf dry-run (`POST /perf/dry-run`)
+- **Server start/stop return 501** — `POST /server/start` and `POST /server/stop` return HTTP 501 (Not Implemented) — planned for a future release
+- **Experimental auth middleware** — Bearer token middleware present but not enforced by default; uses existing `kimari/security/tokens.py`
+- **docs/API_EXPERIMENTAL.md** — Documents the current experimental status, available endpoints, installation, and usage
+- **docs/PYPI_RELEASE_GATE.md** — Defines the process and criteria that must be satisfied before publishing to the real PyPI; prevents premature publishing
+- **docs/MODEL_HASHING.md** — Comprehensive guide for model hash verification, pinning, and registry management
+- **docs/BENCHMARK_SUBMISSIONS.md** — Guide for submitting benchmark results; documents format, validation, and community workflow
+- **Benchmark examples for GTX 1060/1080** — `benchmarks/examples/perf-result.gtx1060.example.json` and `benchmarks/examples/perf-result.gtx1080.example.json`
+- **Windows packaging improvements** — Enhanced `scripts/windows/` scripts with better error handling and venv management
+- **Release-check improvements** — `scripts/release/check-release.py` expanded from 24 to 28 validation categories; added v0.1.16 API experimental, Windows packaging, release-check improvements, and content integrity re-check sections
+- **New tests** (`tests/test_release_v0116.py`) — Tests for API module existence, optional dependency, experimental command, documentation files, benchmark examples, no false claims
+
+### Changed
+- **Version bumped** to `0.1.16-alpha`
+- **`scripts/release/check-release.py`** — Renumbered all sections from /24 to /28; added sections [25/28] v0.1.16 API experimental, [26/28] Windows packaging improvements, [27/28] release-check improvements, [28/28] content integrity re-check
+- **RELEASE_CHECKLIST.md** — Added v0.1.16 Checks section with API experimental dry-run, api extra dependency, new docs, benchmark examples, PyPI release gate, and no-false-claim checks
+- **ROADMAP.md** — v0.1.15-alpha marked as Released; v0.1.16-alpha marked as Current; v0.1.17-alpha Planned section added
+- **docs/API_PLAN.md** — Updated status note to reflect v0.1.16-alpha experimental implementation; added OpenAPI draft sync note; added security section mention
+- **docs/API_OPENAPI_DRAFT.yaml** — Synced server URL to `http://127.0.0.1:11436`; added `x-experimental: true` to BearerAuth; marked POST /server/start and POST /server/stop as returning 501; added operationId and descriptions
+
 ## [0.1.15-alpha] — 2026-05-17
 
 ### Fixed

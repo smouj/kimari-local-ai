@@ -1,6 +1,10 @@
 # Kimari API Plan — Technical Design for v0.2.0-alpha
 
-> **Status**: This is a DESIGN DOCUMENT. No implementation yet. Planned for v0.2.0-alpha.
+> **Status**: This is a DESIGN DOCUMENT. An **experimental implementation** has been added in v0.1.16-alpha (`kimari api --experimental`), but the API is **not stable** and should not be used in production. The experimental skeleton includes route handlers and schemas but does not start a real server yet. Planned for stable release in v0.2.0-alpha.
+>
+> **Note**: The OpenAPI draft (`docs/API_OPENAPI_DRAFT.yaml`) has been synced with the experimental implementation — server URL updated to `http://127.0.0.1:11436`, `x-experimental: true` flag added to security schemes, and operationId values aligned with the actual code. The draft remains marked as `x-draft: true`.
+>
+> **Security**: See the Authentication section below. The v0.1.16-alpha experimental implementation includes an auth middleware stub (not enforced by default). Refer to `docs/API_EXPERIMENTAL.md` for current limitations.
 
 ---
 

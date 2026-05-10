@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.15-alpha — Model path fix, setup --yes, hash pinning workflow, benchmark sharing, Windows wheel install
+      v0.1.16-alpha — Experimental API, PyPI release gate, model hashing, community benchmarks, Windows packaging
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -473,6 +473,23 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <!-- ═══════ ALPHA HONESTY STRIP ═══════ -->
 <div class="honesty-strip">
   <strong>Kimari</strong> is the framework. <strong>Kimari-4B</strong> is not released yet.
+</div>
+
+<!-- ═══════ v0.1.16-alpha FOCUS ═══════ -->
+<div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
+  <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.16-alpha</span>
+      <span style="font-size:1.1rem;font-weight:800;">What's New</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-flask" style="color:var(--kimari-teal);"></i> Experimental API</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-lock" style="color:var(--kimari-purple-light);"></i> PyPI release gate</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-hashtag" style="color:var(--kimari-cyan);"></i> Model hashing</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-chart-bar" style="color:var(--kimari-teal);"></i> Community benchmarks</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-brands fa-windows" style="color:var(--kimari-purple-light);"></i> Windows packaging</span>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════ OVERVIEW ═══════ -->
@@ -797,7 +814,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.15-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.16-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -834,7 +851,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.15-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.16-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -1212,6 +1229,14 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="doc-card-title">Publishing Guide</div>
       <div class="doc-card-desc">How to publish releases to PyPI and TestPyPI.</div>
     </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/API_EXPERIMENTAL.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Experimental API</div>
+      <div class="doc-card-desc">Unstable REST API on port 11436. Not the planned v0.2 FastAPI server.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/PYPI_RELEASE_GATE.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">PyPI Release Gate</div>
+      <div class="doc-card-desc">Publishing gate criteria and current status (PENDING).</div>
+    </a>
     <a href="https://github.com/smouj/kimari-local-ai/blob/main/RELEASE_CHECKLIST.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Release Checklist</div>
       <div class="doc-card-desc">Step-by-step release process and verification.</div>
@@ -1236,7 +1261,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.15-alpha — Model path resolution, setup --yes, hash pinning workflow, benchmark result sharing, Windows wheel install.</p>
+    <p class="section-desc">Kimari Local AI v0.1.16-alpha — Experimental API, PyPI release gate, model hashing, community benchmarks, Windows packaging.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1266,6 +1291,11 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Benchmark result sharing (<code>benchmarks/RESULT_FORMAT.md</code>)</td><td>✅ Documented in v0.1.15-alpha</td></tr>
         <tr><td>Windows wheel install scripts</td><td>✅ Added in v0.1.15-alpha</td></tr>
         <tr><td>API OpenAPI draft</td><td>📋 Drafted in v0.1.15-alpha</td></tr>
+        <tr><td>Experimental API (<code>kimari api --experimental</code>, port 11436)</td><td>🧪 Experimental in v0.1.16-alpha</td></tr>
+        <tr><td>PyPI release gate</td><td>📋 Status: PENDING in v0.1.16-alpha</td></tr>
+        <tr><td>Model hashing docs (<code>docs/MODEL_HASHING.md</code>)</td><td>✅ Documented in v0.1.16-alpha</td></tr>
+        <tr><td>Community benchmark submissions (<code>docs/BENCHMARK_SUBMISSIONS.md</code>)</td><td>✅ Documented in v0.1.16-alpha</td></tr>
+        <tr><td>Windows packaging (<code>scripts/windows/</code>)</td><td>✅ Packaged in v0.1.16-alpha</td></tr>
         <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>

@@ -164,7 +164,7 @@
 - ✅ check-release.py expanded to 21 validation categories
 - ✅ RELEASE_CHECKLIST.md expanded with setup write-mode and SHA256 tooling checks
 
-## v0.1.15-alpha (Current)
+## v0.1.15-alpha (Released)
 
 - ✅ **P0 fix:** `start_server()` uses `resolve_model_path()` instead of `PROJECT_ROOT / effective_model`
 - ✅ Robust `resolve_model_path()` — absolute, CWD-relative, user models dir, repo-root, fallback
@@ -178,14 +178,31 @@
 - ✅ TestPyPI validation documented
 - ✅ check-release.py and RELEASE_CHECKLIST expanded
 
-## v0.1.16-alpha (Planned)
+## v0.1.16-alpha (Current)
 
-- Actual PyPI decision if TestPyPI passes
-- Real verified SHA256 pinning for registry models
-- FastAPI prototype implementation
+- ✅ Experimental FastAPI API skeleton (`kimari/api/`) — `app.py`, `schemas.py`, `server.py`
+- ✅ Optional `api` dependency in `pyproject.toml` (`pip install kimari-local-ai[api]`)
+- ✅ `kimari api --experimental` command with `--dry-run` support
+- ✅ API endpoints: health, status, config, profiles, models, optimize, perf/dry-run
+- ✅ Server start/stop return 501 (planned, not implemented yet)
+- ✅ Experimental auth middleware (not enforced by default)
+- ✅ `docs/API_EXPERIMENTAL.md` — experimental API status and usage
+- ✅ `docs/PYPI_RELEASE_GATE.md` — PyPI publishing gate process
+- ✅ `docs/MODEL_HASHING.md` — model hash verification guide
+- ✅ `docs/BENCHMARK_SUBMISSIONS.md` — benchmark submission workflow
+- ✅ Benchmark examples for GTX 1060/1080
+- ✅ Windows packaging improvements
+- ✅ Release-check script expanded to 28 validation categories
+- ✅ New tests for v0.1.16 features
+
+## v0.1.17-alpha (Planned)
+
+- TestPyPI actual result
+- FastAPI start/stop implementation
+- API auth hardening
+- PyPI real decision
+- Verified model hashes
 - Windows installer packaging
-- Setup UX polish
-- Benchmark community submission workflow
 
 ## v0.2.0-alpha
 

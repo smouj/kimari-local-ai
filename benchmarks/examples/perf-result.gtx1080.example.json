@@ -1,0 +1,31 @@
+{
+  "kimari_version": "0.1.16-alpha",
+  "profile": "gtx1080",
+  "model_filename": "qwen3-4b-q5_k_m.gguf",
+  "model_sha256": null,
+  "quantization": "Q5_K_M",
+
+  "gpu": "NVIDIA GeForce GTX 1080 8GB",
+  "driver": "550.54.14",
+  "cuda": "12.4",
+  "os": "Linux 5.15.0-107-generic",
+  "python": "3.12.3",
+
+  "ctx": 16384,
+  "batch": 512,
+  "ubatch": 256,
+  "cache_type_k": "f16",
+  "cache_type_v": "f16",
+  "flash_attn": true,
+  "parallel": 4,
+
+  "tokens_per_second": 21.87,
+  "prompt_tokens_per_second": 485.2,
+  "ttft_ms": 542.6,
+
+  "vram_used_gb": 5.94,
+  "ram_used_gb": 2.38,
+
+  "timestamp": "2025-06-15T16:45:00Z",
+  "notes": "Stable run on idle system. Q5_K_M quantization fits within 8GB VRAM with ctx=16384. No thermal throttling."
+}
