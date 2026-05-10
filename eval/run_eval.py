@@ -29,7 +29,7 @@ RESULTS_FILE = Path(__file__).parent / "results.json"
 API_URL = "http://127.0.0.1:11435/v1/chat/completions"
 MODEL_NAME = "kimari"  # Default model name passed to the API
 TIMEOUT_SECONDS = 120  # Max wait time per request
-REQUEST_DELAY = 1.0    # Seconds between requests (rate-limit courtesy)
+REQUEST_DELAY = 1.0  # Seconds between requests (rate-limit courtesy)
 
 
 # ---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ def load_eval_dataset(path: Path) -> list[dict[str, Any]]:
         sys.exit(1)
 
     entries: list[dict[str, Any]] = []
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for line_num, line in enumerate(f, start=1):
             line = line.strip()
             if not line:
@@ -79,10 +79,13 @@ def query_model(prompt: str, api_url: str, model: str = MODEL_NAME) -> str:
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": "You are Kimari, a focused technical assistant for local LLM setup, GPU benchmarking, and developer tooling. Be concise and accurate."},
+            {
+                "role": "system",
+                "content": "You are Kimari, a focused technical assistant for local LLM setup, GPU benchmarking, and developer tooling. Be concise and accurate.",
+            },
             {"role": "user", "content": prompt},
         ],
-        "temperature": 0.2,   # Low temperature for deterministic evaluation
+        "temperature": 0.2,  # Low temperature for deterministic evaluation
         "max_tokens": 1024,
     }
 
@@ -179,9 +182,11 @@ def evaluate_single(entry: dict[str, Any], api_url: str) -> dict[str, Any]:
     score = score_response(response, entry)
 
     status = "✅ PASS" if score["passed"] else "❌ FAIL"
-    print(f"  {status} | Keywords: {len(score['keyword_hits'])}/{len(entry.get('expected_keywords', []))}"
-          f" | Length: {score['response_length']}/{score['min_length']}"
-          f" | Time: {elapsed:.2f}s")
+    print(
+        f"  {status} | Keywords: {len(score['keyword_hits'])}/{len(entry.get('expected_keywords', []))}"
+        f" | Length: {score['response_length']}/{score['min_length']}"
+        f" | Time: {elapsed:.2f}s"
+    )
 
     if score["keyword_misses"]:
         print(f"  Missing keywords: {', '.join(score['keyword_misses'])}")
@@ -296,9 +301,7 @@ def print_report(results: list[dict[str, Any]]) -> None:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Kimari Evaluation Runner — Tests model against evaluation dataset."
-    )
+    parser = argparse.ArgumentParser(description="Kimari Evaluation Runner — Tests model against evaluation dataset.")
     parser.add_argument(
         "--url",
         default=API_URL,

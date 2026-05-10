@@ -1,0 +1,83 @@
+# Base model candidates for Kimari-4B fine-tuning
+# Status: under_review — NO final selection made yet
+# Last updated: 2026-05-20
+
+candidates:
+  - id: smollm3-3b
+    hf_repo: HuggingFaceTB/SmolLM3-3B
+    params: "~3B"
+    license: Apache-2.0
+    license_verified: false
+    context_length: 16384
+    tokenizer_family: smollm
+    expected_vram_q4_gb: 2.2
+    expected_vram_q5_gb: 2.7
+    risk_level: low
+    notes: "Safest legal path if Apache 2.0 is confirmed. Good context length. Less community benchmarking."
+    status: under_review
+    ranking: 1
+
+  - id: qwen2.5-3b-instruct
+    hf_repo: Qwen/Qwen2.5-3B-Instruct
+    params: "~3B"
+    license: qwen-research
+    license_verified: false
+    context_length: 32768
+    tokenizer_family: qwen
+    expected_vram_q4_gb: 2.3
+    expected_vram_q5_gb: 2.8
+    risk_level: medium
+    notes: "Strong coding and multilingual capabilities. License must be reviewed for derivative distribution."
+    status: under_review
+    ranking: 2
+
+  - id: llama-3.2-3b-instruct
+    hf_repo: meta-llama/Llama-3.2-3B-Instruct
+    params: "~3B"
+    license: Llama-3.2-Community-License
+    license_verified: false
+    context_length: 131072
+    tokenizer_family: llama
+    expected_vram_q4_gb: 2.3
+    expected_vram_q5_gb: 2.8
+    risk_level: high
+    notes: "Strong general model. Meta license has MAU thresholds and acceptable use policy. May restrict derivative distribution."
+    status: under_review
+    ranking: 3
+
+scoring_criteria:
+  license_clarity:
+    weight: 3
+    description: "How clear and permissive is the license for derivative works"
+  redistribution_compatibility:
+    weight: 3
+    description: "Can fine-tuned weights be redistributed under compatible terms"
+  tokenizer_stability:
+    weight: 2
+    description: "Is the tokenizer well-established and unlikely to change"
+  gguf_support:
+    weight: 2
+    description: "Maturity of GGUF conversion for this architecture"
+  coding_ability:
+    weight: 2
+    description: "Baseline coding performance of the base model"
+  spanish_technical:
+    weight: 1
+    description: "Spanish technical language capability"
+  agent_json:
+    weight: 2
+    description: "JSON output and agent-like behavior quality"
+  inference_viability:
+    weight: 2
+    description: "Runs well on GTX 1060/1080 at 4-bit quantization"
+  training_cost:
+    weight: 1
+    description: "Expected GPU hours for SFT + preference tuning"
+
+selection_status: "No base model has been selected. All candidates are under review."
+next_steps:
+  - "Verify SmolLM3-3B Apache 2.0 license covers derivative distribution"
+  - "Review Qwen2.5-3B-Instruct license terms for commercial and derivative use"
+  - "Evaluate Llama 3.2 Community License restrictions for Kimari use case"
+  - "Run baseline evaluation on each candidate if hardware permits"
+  - "Formal decision expected in v0.1.19-alpha"

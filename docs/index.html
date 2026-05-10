@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.17-alpha — Kimari-4B model planning, training pipeline, base selection, dataset schemas, Hugging Face readiness
+      v0.1.18-alpha — Kimari-4B pipeline dry-run, base decision record, seed datasets, evaluation harness, GGUF export plan
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -475,19 +475,19 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <strong>Kimari</strong> is the framework. <strong>Kimari-4B</strong> is not released yet.
 </div>
 
-<!-- ═══════ v0.1.17-alpha FOCUS ═══════ -->
+<!-- ═══════ v0.1.18-alpha FOCUS ═══════ -->
 <div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.17-alpha</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.18-alpha</span>
       <span style="font-size:1.1rem;font-weight:800;">What's New</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-file-alt" style="color:var(--kimari-teal);"></i> 🧠 MODEL_CARD rewrite</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-list-check" style="color:var(--kimari-purple-light);"></i> 📋 Training plan</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-magnifying-glass" style="color:var(--kimari-cyan);"></i> 🔍 Base selection</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-database" style="color:var(--kimari-teal);"></i> 📊 Dataset schemas</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--kimari-purple-light);"></i> 🤗 HF release plan</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-magnifying-glass" style="color:var(--kimari-cyan);"></i> 🔍 Base decision record</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-database" style="color:var(--kimari-teal);"></i> 📊 Seed datasets</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-list-check" style="color:var(--kimari-purple-light);"></i> 🏗️ Dataset mix builder</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-ruler" style="color:var(--kimari-teal);"></i> 📏 KimariFit eval harness</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-box" style="color:var(--kimari-purple-light);"></i> 📦 GGUF export plan</span>
     </div>
   </div>
 </div>
@@ -501,9 +501,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.7rem;font-weight:600;color:#f87171;">PLANNED — NO WEIGHTS YET</span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;font-size:.88rem;color:var(--kimari-text-muted);">
-      <div><strong style="color:var(--kimari-text);">Status</strong><br>Planned / Training Design</div>
-      <div><strong style="color:var(--kimari-text);">Base Selection</strong><br>SmolLM3, Qwen2.5, Llama 3.2</div>
-      <div><strong style="color:var(--kimari-text);">Training Plan</strong><br>7-phase pipeline defined</div>
+      <div><strong style="color:var(--kimari-text);">Status</strong><br>Pipeline dry-run</div>
+      <div><strong style="color:var(--kimari-text);">Base Selection</strong><br>Under review (3 candidates)</div>
+      <div><strong style="color:var(--kimari-text);">Dataset</strong><br>Seed synthetic only</div>
       <div><strong style="color:var(--kimari-text);">Weights</strong><br>Not released yet</div>
     </div>
   </div>
@@ -836,7 +836,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.17-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.18-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -1295,7 +1295,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.17-alpha — Kimari-4B model planning, training pipeline, base selection, dataset schemas, Hugging Face readiness.</p>
+    <p class="section-desc">Kimari Local AI v0.1.18-alpha — Kimari-4B pipeline dry-run, base decision record, seed datasets, evaluation harness, GGUF export plan.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1335,6 +1335,11 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Base selection (<code>docs/MODEL_BASE_SELECTION.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
         <tr><td>Dataset schemas</td><td>✅ Defined in v0.1.17-alpha</td></tr>
         <tr><td>Hugging Face release plan (<code>docs/HUGGINGFACE_RELEASE.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
+        <tr><td>Base decision record (ADR-001)</td><td>✅ Proposed in v0.1.18-alpha</td></tr>
+        <tr><td>Seed datasets (30 SFT + 20 preference)</td><td>✅ Defined in v0.1.18-alpha</td></tr>
+        <tr><td>Dataset mix builder</td><td>✅ Implemented in v0.1.18-alpha</td></tr>
+        <tr><td>KimariFit eval harness (dry-run)</td><td>✅ Defined in v0.1.18-alpha</td></tr>
+        <tr><td>GGUF export plan (Q4_K_M, Q5_K_M, IQ4_XS)</td><td>✅ Planned in v0.1.18-alpha</td></tr>
         <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>

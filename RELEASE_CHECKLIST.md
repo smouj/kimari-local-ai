@@ -228,6 +228,29 @@ twine upload dist/*
 - [ ] No HF API keys or secrets in any file
 - [ ] `default_profile` is still `"test"`
 
+## v0.1.18 Checks
+
+- [ ] docs/MODEL_DECISION_RECORD.md exists and says "Proposed" (not "Accepted")
+- [ ] training/configs/base_candidates.yaml exists and lists all 3 candidates
+- [ ] training/scripts/select_base_model.py exists and `--json` works
+- [ ] dataset/samples/sft_seed.jsonl exists and each line is valid JSON with required fields
+- [ ] dataset/samples/preference_seed.jsonl exists and each line is valid JSON with required fields
+- [ ] training/scripts/build_dataset_mix.py works with sample data and tmp output
+- [ ] training/scripts/prepare_dataset.py supports `--dedupe`, `--min-chars`, `--max-chars`, `--require-tags`, `--report`
+- [ ] eval/kimarifit.py `--dry-run --json` works
+- [ ] eval/rubrics/kimarifit_rubric.md exists
+- [ ] training/scripts/export_gguf_plan.py `--dry-run` works
+- [ ] docs/FIRST_TRAINING_RUN.md exists
+- [ ] eval/results/.gitkeep exists
+- [ ] eval/results/*.json in .gitignore
+- [ ] dataset/build/ in .gitignore
+- [ ] No real evaluation results committed
+- [ ] No weights or GGUF files committed
+- [ ] MODEL_CARD.md still says no weights released
+- [ ] No fake benchmark numbers in MODEL_CARD
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

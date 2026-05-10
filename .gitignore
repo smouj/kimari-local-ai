@@ -48,6 +48,12 @@ Desktop.ini
 benchmarks/results/*.json
 benchmarks/results/*.csv
 
+# Evaluation results
+eval/results/*.json
+
+# Dataset build output
+dataset/build/
+
 # Cache
 .cache/
 .parcel-cache/
