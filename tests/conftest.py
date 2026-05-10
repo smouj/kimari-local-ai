@@ -36,24 +36,35 @@ def sample_models_registry() -> dict:
 
 
 @pytest.fixture
-def tmp_state_dir(tmp_path: Path) -> Path:
-    """Creates a temp directory for state files and patches constants."""
-    from kimari.core import state as state_module
+def tmp_state_dir(tmp_path: Path, monkeypatch) -> Path:
+    """Creates a temp directory for state files and patches the paths module.
 
-    state_dir = tmp_path / ".kimari"
+    Sets KIMARI_STATE_DIR to a temporary directory so state files
+    (state.json, PID, log) are written there instead of the real user dir.
+    """
+    state_dir = tmp_path / "state"
     state_dir.mkdir()
-    state_file = state_dir / "state.json"
-
-    original_state_dir = state_module.STATE_DIR
-    original_state_file = state_module.STATE_FILE
-
-    state_module.STATE_DIR = state_dir
-    state_module.STATE_FILE = state_file
+    monkeypatch.setenv("KIMARI_STATE_DIR", str(state_dir))
 
     yield state_dir
 
-    state_module.STATE_DIR = original_state_dir
-    state_module.STATE_FILE = original_state_file
+    # monkeypatch automatically restores env
+
+
+@pytest.fixture
+def tmp_kimari_home(tmp_path: Path, monkeypatch) -> Path:
+    """Creates a temp Kimari home directory and sets KIMARI_HOME.
+
+    This redirects ALL kimari paths (config, state, cache, models)
+    to a temporary directory for testing.
+    """
+    home_dir = tmp_path / "kimari-home"
+    home_dir.mkdir()
+    monkeypatch.setenv("KIMARI_HOME", str(home_dir))
+
+    yield home_dir
+
+    # monkeypatch automatically restores env
 
 
 @pytest.fixture

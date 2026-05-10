@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Kimari GPU Profiles Configuration",
+  "type": "object",
+  "required": ["version", "config_version", "default_profile", "server", "profiles"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version"
+    },
+    "config_version": {
+      "type": "integer",
+      "description": "Configuration migration version (current: 3)",
+      "minimum": 1
+    },
+    "default_profile": {
+      "type": "string",
+      "description": "Default GPU profile to use — must exist as a key in profiles"
+    },
+    "server": {
+      "type": "object",
+      "required": ["health_endpoint", "chat_endpoint", "models_endpoint"],
+      "additionalProperties": false,
+      "properties": {
+        "health_endpoint": { "type": "string" },
+        "chat_endpoint": { "type": "string" },
+        "models_endpoint": { "type": "string" }
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9_-]+$": {
+          "type": "object",
+          "required": ["name", "model", "ctx", "batch", "ubatch", "host", "port", "gpu_layers", "quantization"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "model": { "type": "string", "description": "Path to GGUF model file (relative, starting with 'models/')" },
+            "ctx": { "type": "integer", "minimum": 512 },
+            "batch": { "type": "integer", "minimum": 1 },
+            "ubatch": { "type": "integer", "minimum": 1 },
+            "cache_type_k": { "type": "string", "enum": ["f16", "q8_0", "q4_0", "q4_1", "q5_0", "q5_1", "iq4_nl", "fp16"] },
+            "cache_type_v": { "type": "string", "enum": ["f16", "q8_0", "q4_0", "q4_1", "q5_0", "q5_1", "iq4_nl", "fp16"] },
+            "host": { "type": "string", "description": "Bind address. Use 127.0.0.1 for local, 0.0.0.0 only for Docker" },
+            "port": { "type": "integer", "minimum": 1024, "maximum": 65535 },
+            "gpu_layers": { "type": ["string", "integer"] },
+            "threads": { "type": "integer", "minimum": 1 },
+            "vram_total_gb": { "type": "number", "minimum": 0 },
+            "vram_safe_gb": { "type": "number", "minimum": 0 },
+            "quantization": { "type": "string" },
+            "estimated_model_size_gb": { "type": "number", "description": "Estimated model file size in GiB (approximate)" },
+            "performance_mode": { "type": "string", "enum": ["safe", "balanced", "fast", "longctx", "ide", "agent"], "description": "Performance optimization mode" },
+            "flash_attn": { "type": "string", "enum": ["auto", "on", "off"], "description": "Flash attention setting" },
+            "parallel": { "type": "integer", "minimum": 1, "description": "Number of parallel sequences" },
+            "mlock": { "type": "boolean", "description": "Lock model in RAM to prevent swapping" },
+            "no_mmap": { "type": "boolean", "description": "Disable mmap for model loading" },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

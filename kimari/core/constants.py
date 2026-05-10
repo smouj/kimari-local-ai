@@ -1,15 +1,33 @@
 """
-Kimari constants — paths, version, ASCII art.
+Kimari constants — version, ASCII art.
 
-All paths are resolved relative to the project root, which is detected
-as the directory containing the config/ folder.
+Path resolution is now handled by ``kimari.core.paths``.
+The ``PROJECT_ROOT`` constant is retained for backward compatibility
+and for repo-root development (editable installs).
+
+All runtime paths (config, state, logs, PID) are resolved through
+the paths module, which supports:
+- User config directories (platform-specific)
+- KIMARI_HOME / KIMARI_CONFIG_DIR / etc. environment variable overrides
+- Packaged defaults (kimari/defaults/) as fallback
+- Repo-root config/ for editable installs
 """
 
 from pathlib import Path
 
 from kimari import __version__ as KIMARI_VERSION  # noqa: N812
+from kimari.core.paths import (
+    get_log_file_path,
+    get_pid_file_path,
+    get_state_file_path,
+    get_user_config_path,
+    get_user_models_dir,
+    get_user_models_registry_path,
+    get_user_schema_path,
+    get_user_state_dir,
+)
 
-# ─── Project Root Detection ─────────────────────────────────────────────────
+# ─── Project Root Detection (for backward compat / dev mode) ────────────────
 
 
 def _detect_project_root() -> Path:
@@ -28,16 +46,19 @@ def _detect_project_root() -> Path:
 
 PROJECT_ROOT = _detect_project_root()
 
-# ─── Paths ────────────────────────────────────────────────────────────────────
+# ─── Paths (resolved via kimari.core.paths) ─────────────────────────────────
 
-CONFIG_PATH = PROJECT_ROOT / "config" / "kimari.profiles.json"
-CONFIG_SCHEMA_PATH = PROJECT_ROOT / "config" / "kimari.profiles.schema.json"
-MODELS_REGISTRY_PATH = PROJECT_ROOT / "config" / "kimari.models.json"
-MODELS_DIR = PROJECT_ROOT / "models"
-PID_FILE = PROJECT_ROOT / ".kimari-server.pid"
-LOG_FILE = PROJECT_ROOT / "kimari-server.log"
-STATE_DIR = PROJECT_ROOT / ".kimari"
-STATE_FILE = STATE_DIR / "state.json"
+# For backward compatibility, provide module-level constants that resolve
+# through the paths module. These are evaluated at import time, so env
+# overrides set *after* import may not take effect.
+CONFIG_PATH = get_user_config_path()
+CONFIG_SCHEMA_PATH = get_user_schema_path()
+MODELS_REGISTRY_PATH = get_user_models_registry_path()
+MODELS_DIR = get_user_models_dir()
+PID_FILE = get_pid_file_path()
+LOG_FILE = get_log_file_path()
+STATE_DIR = get_user_state_dir()
+STATE_FILE = get_state_file_path()
 
 # ─── Version ──────────────────────────────────────────────────────────────────
 

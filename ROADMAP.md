@@ -108,7 +108,7 @@
 - ✅ Continue.dev integration — docs + config example
 - ✅ Generic OpenAI-compatible client guide — curl, Python, Node.js, troubleshooting
 
-## v0.1.11-alpha (Current)
+## v0.1.11-alpha (Released)
 
 - ✅ `kimari setup` guided environment detection command
 - ✅ Runtime flag detection (`kimari/runtime/llama_flags.py`)
@@ -118,13 +118,25 @@
 - ✅ TestPyPI validation checklist in docs/PUBLISHING.md
 - ✅ Release-check improvements for new modules
 
-## v0.1.12-alpha (Planned)
+## v0.1.12-alpha (Current)
 
-- TestPyPI actual upload/install verification
+- ✅ Packaged defaults (`kimari/defaults/`) ship inside wheel
+- ✅ User path management (`kimari/core/paths.py`) with platform-aware dirs
+- ✅ Config resolution chain: user → repo-root → packaged defaults
+- ✅ Short flag support in strict-flags (`-m`, `-c`, `-ngl`, `-b`, `-ub`, `-t`)
+- ✅ State/tokens in user directories (not PROJECT_ROOT)
+- ✅ `KIMARI_HOME` and per-path environment variable overrides
+- ✅ `pyproject.toml` package-data includes `defaults/*.json`
+- ✅ `kimari config path` shows active config location
+- ✅ No "run from repo root" requirement after install
+
+## v0.1.13-alpha (Planned)
+
+- Actual TestPyPI upload/install verification
+- `kimari setup` write-mode (persist detected settings)
 - Real SHA256 hashes if computable reliably
 - Windows installer packaging
 - Optional reverse proxy auth guide
-- Responses API compatibility research
 - FastAPI planning for v0.2
 
 ## v0.2.0-alpha

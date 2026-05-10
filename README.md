@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.11--alpha-9b59b6.svg" alt="v0.1.11-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.12--alpha-9b59b6.svg" alt="v0.1.12-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.11-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.12-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.11-alpha**
+> **Kimari Local AI v0.1.12-alpha**
 
 ### ✅ Works Today
 
@@ -350,6 +350,21 @@ kimari token delete                       # Remove the token
 ```
 
 > **Note:** These tokens are prepared for future Kimari API / reverse proxy use. `llama-server` does not apply auth natively.
+
+### Packaged Defaults & User Paths
+
+Kimari works when installed from PyPI — no need to run from the repo root:
+
+- **Config** lives in your user config directory (`~/.config/kimari/` on Linux/macOS, `%APPDATA%\Kimari\` on Windows)
+- **State** (PID, logs, tokens) lives in your user state directory
+- **Models** are stored in your user data directory
+- **Packaged defaults** ship inside the wheel and are copied to your user config on first use
+
+```bash
+kimari config path                         # Show where your config lives
+export KIMARI_HOME=~/.kimari               # Override all paths at once
+export KIMARI_CONFIG_DIR=/etc/kimari       # Override config dir only
+```
 
 ## 🔌 IDE & Agent Integrations
 

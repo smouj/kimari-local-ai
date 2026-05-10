@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kimari-local-ai"
-version = "0.1.11-alpha"
+version = "0.1.12-alpha"
 description = "Open-source framework for running local LLMs on consumer NVIDIA GPUs"
 readme = "README.md"
 license = {text = "MIT"}
@@ -43,7 +43,7 @@ kimari = "kimari.cli.main:main"
 include = ["kimari*"]
 
 [tool.setuptools.package-data]
-kimari = ["py.typed"]
+kimari = ["py.typed", "defaults/*.json"]
 
 [tool.ruff]
 target-version = "py310"

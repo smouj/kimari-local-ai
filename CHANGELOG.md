@@ -5,6 +5,26 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.12-alpha] — 2026-05-14
+
+### Added
+- **Packaged defaults** (`kimari/defaults/`) — Default profiles, schema, and models registry now ship inside the wheel as `package-data`; copied to user config dir on first use when no config exists
+- **User path management** (`kimari/core/paths.py`) — Platform-aware paths for config (`~/.config/kimari/`), state (`~/.local/state/kimari/`), cache (`~/.cache/kimari/`), and models (`~/.local/share/kimari/models/`); Windows support (`%APPDATA%\Kimari\`, `%LOCALAPPDATA%\Kimari\`); `KIMARI_HOME`, `KIMARI_CONFIG_DIR`, `KIMARI_STATE_DIR`, `KIMARI_CACHE_DIR`, `KIMARI_MODELS_DIR` environment variable overrides
+- **Config resolution chain** — `load_config()` now resolves: (1) user config dir → (2) repo-root `config/` → (3) packaged defaults; no longer requires "run from repo root"
+- **`kimari config path` command** — Shows the active config file path (user, repo, or packaged default)
+- **Short flag support in strict-flags** — `parse_supported_flags()` now extracts short flags (`-m`, `-c`, `-ngl`, `-b`, `-ub`, `-t`) from `llama-server --help` output; `SHORT_TO_LONG` alias mapping ensures `--strict-flags` no longer produces false positives for base command flags
+- **`pyproject.toml` package-data** — Now includes `kimari/defaults/*.json` so the wheel contains default configs
+
+### Changed
+- **Version bumped** to `0.1.12-alpha`
+- **Config loader** (`kimari/config/loader.py`) — Refactored to use `_resolve_config_path()` with 3-tier resolution; `_ensure_user_config()` copies defaults to user dir on first use
+- **Model registry** (`kimari/models/registry.py`) — Uses `_resolve_models_registry_path()` with same 3-tier resolution; `_resolve_model_target()` checks user models dir and repo-root; `scan_models_dir_for_gguf()` scans both directories
+- **State module** (`kimari/core/state.py`) — State files now live in user state dir; `KIMARI_STATE_DIR` override supported
+- **Token module** (`kimari/security/tokens.py`) — Auth tokens now stored in user state dir (not `PROJECT_ROOT/.kimari/`); `KIMARI_STATE_DIR` override supported
+- **Constants** (`kimari/core/constants.py`) — Path constants now resolve via `kimari.core.paths`; `PROJECT_ROOT` retained for backward compatibility and development
+- **CLI** (`kimari/cli/main.py`) — Model path resolution uses `_resolve_model_path()` checking user models dir then repo-root; `load_config()` called unconditionally (no longer gated on `CONFIG_PATH.exists()`)
+- **`pyproject.toml`** — `package-data` updated to include `defaults/*.json`
+
 ## [0.1.11-alpha] — 2026-05-13
 
 ### Added
