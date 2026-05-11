@@ -329,3 +329,5 @@ For the most consistent results:
 ---
 
 *Measured benchmarks are part of Kimari Local AI v0.1.26-alpha. The command interface and output format are experimental and may change before a stable release. Feedback is welcome via GitHub issues.*
+
+> **Gateway planned:** future measured benchmark runs may be triggered via the gateway's `POST /benchmark/run` endpoint.

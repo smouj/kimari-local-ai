@@ -691,6 +691,36 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-title">Model Training Plan</div>
       <div class="feature-desc">7-phase pipeline for Kimari-4B: base selection, SFT, DPO/ORPO, evaluation, GGUF export, Hugging Face release.</div>
     </div>
+    <div class="feature-card">
+      <span class="feature-icon">🩺</span>
+      <div class="feature-title">Doctor Deep</div>
+      <div class="feature-desc"><code>kimari doctor --deep</code> runs 14 diagnostic checks — Python, version, paths, config, models, CUDA/NVIDIA, and more. Returns PASS/WARN/FAIL. No GPU required, no model execution.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⏱️</span>
+      <div class="feature-title">Measured Benchmark</div>
+      <div class="feature-desc"><code>kimari benchmark --measure --endpoint URL --model NAME --yes</code> runs real benchmarks against a running server. Requires <code>--yes</code> flag. Fails cleanly on connection error. No results saved by default.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🚪</span>
+      <div class="feature-title">Gateway Plan</div>
+      <div class="feature-desc"><code>kimari gateway --dry-run</code> shows planned gateway configuration. <code>--status --json</code> and <code>--plan --json</code> for structured output. No real server yet — dry-run only. Default: 127.0.0.1:11436.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔄</span>
+      <div class="feature-title">Update Check</div>
+      <div class="feature-desc"><code>kimari update check</code> shows current version offline. <code>--online</code> checks GitHub for latest release. <code>--json</code> output. Never auto-updates.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-title">Open WebUI / OpenClaw Quick Config</div>
+      <div class="feature-desc">One-command integration setup for Open WebUI, OpenClaw, and Hermes. See <code>docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md</code> for details.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🚫</span>
+      <div class="feature-title">Kimari-4B Gate BLOCKED</div>
+      <div class="feature-desc">No weights, adapters, or GGUF files exist. Preview gate is BLOCKED. Kimari-4B is not published. Framework is ready — model is not.</div>
+    </div>
   </div>
 </section>
 

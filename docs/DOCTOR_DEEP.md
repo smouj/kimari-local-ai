@@ -16,7 +16,7 @@ All deep checks are **pure and safe** — they perform no model execution, no do
 
 ## What It Checks
 
-The deep doctor runs 9 checks in order:
+The deep doctor runs 14 checks in order:
 
 | # | Check | What It Verifies | PASS Condition | WARN Condition | FAIL Condition |
 |---|-------|-------------------|----------------|----------------|----------------|
@@ -29,6 +29,11 @@ The deep doctor runs 9 checks in order:
 | 7 | **Secret Scanner** | `scripts/security/scan_for_secrets.py` exists | File exists | File not found | — |
 | 8 | **Benchmark Prompts** | `benchmarks/prompts/local_benchmark_prompts.jsonl` exists and contains valid JSON lines | File exists with valid JSON lines | File missing, empty, or unreadable | File contains invalid JSON |
 | 9 | **Preview Gate** | Adapter preview gate is BLOCKED during alpha | Gate is BLOCKED | — | Unconditional APPROVED claim found in gate document |
+| 10 | **Kimari Version** | `__version__` is set in `kimari/__init__.py` | Version string is non-empty | Version string is empty or unset | — |
+| 11 | **CUDA/NVIDIA** | CUDA toolkit and NVIDIA GPU detected (best-effort, not required) | GPU found + CUDA available | No GPU or no CUDA (not required) | — |
+| 12 | **Packaged Defaults** | All packaged default JSON files exist in `kimari/defaults/` | All defaults found | Some defaults missing | — |
+| 13 | **Gateway Module** | `kimari/gateway/` module exists with `state.py` and `plan.py` | Module exists | Module not found | — |
+| 14 | **Integration Docs** | Integration documentation files exist (Open WebUI, OpenClaw, Hermes, etc.) | All docs found | Some docs missing | — |
 
 ### Check Details
 
@@ -54,6 +59,16 @@ The deep doctor runs 9 checks in order:
 
 **9. Preview gate** — Checks `docs/ADAPTER_PREVIEW_GATE.md` for any unconditional `APPROVED` claims. During alpha, the gate must remain BLOCKED. Conditional state names like `APPROVED_FOR_PRIVATE_TESTING` and `APPROVED_FOR_PUBLIC_PREVIEW` are allowed since they are part of the defined state machine and require explicit human decisions.
 
+**10. Kimari Version** — Checks that `kimari/__init__.py` has a non-empty `__version__` string. An empty or missing version string usually indicates a broken installation or incomplete package build. This is a WARN rather than FAIL because Kimari may still function, but version-dependent features (like update checks) will not work correctly.
+
+**11. CUDA/NVIDIA** — Best-effort detection of NVIDIA GPU and CUDA toolkit availability. This check looks for `nvidia-smi` in PATH, `nvcc` in PATH, and/or `torch.cuda.is_available()` (if torch is installed). This is a WARN-only check — CUDA is **not required** to run Kimari. CPU-only inference works fine, just slower. The check exists to help users understand their hardware acceleration status.
+
+**12. Packaged Defaults** — Verifies that all expected packaged default JSON files exist in the `kimari/defaults/` directory. These include the default profiles, models registry, and configuration templates. Missing defaults may indicate a corrupted or incomplete installation where the package data was not included in the wheel.
+
+**13. Gateway Module** — Checks that the `kimari/gateway/` module directory exists and contains the expected files (`__init__.py`, `state.py`, `plan.py`). The gateway module provides the dry-run gateway controller. If missing, `kimari gateway` commands will fail. This is a WARN because the gateway is not required for basic inference.
+
+**14. Integration Docs** — Checks that integration documentation files exist, including `docs/GATEWAY_PLAN.md`, `docs/UPDATE.md`, `docs/INSTALL_MATRIX.md`, and `docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md`. Missing docs reduce the user's ability to configure integrations but do not prevent core functionality.
+
 ---
 
 ## How to Interpret PASS/WARN/FAIL
@@ -68,10 +83,10 @@ Each check returns one of three statuses:
 
 ### Summary Output
 
-After all 9 checks, a summary is printed:
+After all 14 checks, a summary is printed:
 
 ```
-Summary: 7 PASS, 2 WARN, 0 FAIL
+Summary: 12 PASS, 2 WARN, 0 FAIL
 ```
 
 - **0 FAIL** — Your environment is ready. Any WARN items can be addressed later.
@@ -114,8 +129,8 @@ The summary entry follows the checks:
   "name": "Summary",
   "status": "INFO",
   "value": {
-    "total": 9,
-    "pass_count": 7,
+    "total": 14,
+    "pass_count": 12,
     "warn_count": 2,
     "fail_count": 0
   },
@@ -309,6 +324,6 @@ FAIL  Preview Gate: NOT BLOCKED — Unconditional APPROVED found: STATUS: APPROV
 
 ## Implementation Reference
 
-The deep doctor is implemented in `kimari/doctor/deep.py`. The orchestrator function `run_deep_checks()` runs all 9 checks sequentially and appends a summary dict. Each check function is pure — it takes no parameters (resolving paths through `kimari.core.constants` and `kimari.core.paths`) and returns a dict with keys `name`, `status`, `value`, and `detail`.
+The deep doctor is implemented in `kimari/doctor/deep.py`. The orchestrator function `run_deep_checks()` runs all 14 checks sequentially and appends a summary dict. Each check function is pure — it takes no parameters (resolving paths through `kimari.core.constants` and `kimari.core.paths`) and returns a dict with keys `name`, `status`, `value`, and `detail`.
 
 For testing, monkeypatch `kimari.core.constants.PROJECT_ROOT` or the `kimari.core.paths` functions rather than passing a custom project root.

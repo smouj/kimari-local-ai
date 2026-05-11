@@ -2471,6 +2471,130 @@ def main() -> None:
     except Exception:
         warn("Could not check tracked artifacts")
 
+    # ── [60/55] v0.1.26 Gateway module ────────────────────────────
+    print("\n[60/55] v0.1.26 Gateway module")
+    check(
+        "kimari/gateway/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "gateway" / "__init__.py").exists(),
+        "Gateway module init missing",
+    )
+    check(
+        "kimari/gateway/state.py exists",
+        (PROJECT_ROOT / "kimari" / "gateway" / "state.py").exists(),
+        "Gateway state module missing",
+    )
+    check(
+        "kimari/gateway/plan.py exists",
+        (PROJECT_ROOT / "kimari" / "gateway" / "plan.py").exists(),
+        "Gateway plan module missing",
+    )
+
+    # ── [61/55] v0.1.26 Update module ────────────────────────────
+    print("\n[61/55] v0.1.26 Update module")
+    check(
+        "kimari/update/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "update" / "__init__.py").exists(),
+        "Update module init missing",
+    )
+    check(
+        "kimari/update/check.py exists",
+        (PROJECT_ROOT / "kimari" / "update" / "check.py").exists(),
+        "Update check module missing",
+    )
+
+    # ── [62/55] v0.1.26 Gateway & Update docs ────────────────────
+    print("\n[62/55] v0.1.26 Gateway & Update docs")
+    check(
+        "docs/GATEWAY_PLAN.md exists",
+        (PROJECT_ROOT / "docs" / "GATEWAY_PLAN.md").exists(),
+        "Gateway plan doc missing",
+    )
+    check(
+        "docs/UPDATE.md exists",
+        (PROJECT_ROOT / "docs" / "UPDATE.md").exists(),
+        "Update doc missing",
+    )
+    check(
+        "docs/INSTALL_MATRIX.md exists",
+        (PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md").exists(),
+        "Install matrix doc missing",
+    )
+    check(
+        "docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md exists",
+        (PROJECT_ROOT / "docs" / "OPENWEBUI_OPENCLAW_QUICK_CONFIG.md").exists(),
+        "OpenWebUI OpenClaw quick config doc missing",
+    )
+
+    # ── [63/55] v0.1.26 Gateway & Update commands ────────────────
+    print("\n[63/55] v0.1.26 Gateway & Update commands")
+    # Check gateway --dry-run works
+    try:
+        gateway_result = subprocess.run(
+            [sys.executable, "-m", "kimari.cli.main", "gateway", "--dry-run"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=str(PROJECT_ROOT),
+        )
+        check(
+            "gateway --dry-run command works",
+            gateway_result.returncode == 0,
+            f"gateway --dry-run exited with code {gateway_result.returncode}: {gateway_result.stderr[:200]}",
+        )
+    except FileNotFoundError:
+        check("gateway --dry-run command works", False, "kimari CLI not found")
+    except subprocess.TimeoutExpired:
+        check("gateway --dry-run command works", False, "gateway --dry-run timed out after 30s")
+    except Exception as e:
+        warn("Could not run gateway --dry-run", str(e))
+
+    # Check update check works offline
+    try:
+        update_result = subprocess.run(
+            [sys.executable, "-m", "kimari.cli.main", "update", "check"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=str(PROJECT_ROOT),
+        )
+        check(
+            "update check command works offline",
+            update_result.returncode == 0,
+            f"update check exited with code {update_result.returncode}: {update_result.stderr[:200]}",
+        )
+    except FileNotFoundError:
+        check("update check command works offline", False, "kimari CLI not found")
+    except subprocess.TimeoutExpired:
+        check("update check command works offline", False, "update check timed out after 30s")
+    except Exception as e:
+        warn("Could not run update check", str(e))
+
+    # ── [64/55] v0.1.26 Security & defaults ──────────────────────
+    print("\n[64/55] v0.1.26 Security & defaults")
+    # Check gateway defaults don't include 0.0.0.0
+    gateway_init_path = PROJECT_ROOT / "kimari" / "gateway" / "__init__.py"
+    if gateway_init_path.exists():
+        gateway_init_text = gateway_init_path.read_text()
+        check(
+            "Gateway defaults do not include 0.0.0.0",
+            "0.0.0.0" not in gateway_init_text,
+            "Gateway defaults must not bind to 0.0.0.0 — security risk",
+        )
+    else:
+        check("kimari/gateway/__init__.py exists (security check)", False, "file not found")
+
+    # Check update module has auto_update = False
+    update_check_path = PROJECT_ROOT / "kimari" / "update" / "check.py"
+    if update_check_path.exists():
+        update_check_text = update_check_path.read_text()
+        check(
+            "Update module has auto_update = False",
+            '"auto_update"' in update_check_text and "False" in update_check_text,
+            "Update module must have auto_update = False — auto-updates must be opt-in",
+        )
+    else:
+        check("kimari/update/check.py exists (auto_update check)", False, "file not found")
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:

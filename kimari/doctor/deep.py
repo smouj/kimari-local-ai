@@ -16,9 +16,15 @@ import json
 import sys
 from pathlib import Path
 
+from kimari import __version__ as KIMARI_VERSION  # noqa: N812
 from kimari.config.loader import load_config, validate_config
 from kimari.core.constants import PROJECT_ROOT
-from kimari.core.detection import detect_llama_server
+from kimari.core.detection import (
+    detect_cuda,
+    detect_cuda_version,
+    detect_gpu,
+    detect_llama_server,
+)
 from kimari.core.paths import (
     get_kimari_home,
     get_user_config_dir,
@@ -311,6 +317,154 @@ def check_benchmark_prompts() -> dict:
     }
 
 
+def check_kimari_version() -> dict:
+    """Check Kimari version is set.
+
+    PASS if version is set, WARN if empty or unusual.
+    """
+    if KIMARI_VERSION and KIMARI_VERSION != "0.0.0":
+        return {
+            "name": "Kimari Version",
+            "status": "PASS",
+            "value": KIMARI_VERSION,
+            "detail": "",
+        }
+    return {
+        "name": "Kimari Version",
+        "status": "WARN",
+        "value": KIMARI_VERSION or "(unset)",
+        "detail": "Version not properly set",
+    }
+
+
+def check_cuda_nvidia() -> dict:
+    """Best-effort check for CUDA/NVIDIA GPU availability.
+
+    PASS if GPU detected with CUDA, WARN if GPU without CUDA,
+    WARN if no GPU (CPU-only mode is acceptable).
+    No FAIL state — GPU is recommended, not required.
+    """
+    gpu = detect_gpu()
+    cuda_ver = detect_cuda_version()
+    has_cuda = detect_cuda()
+
+    if gpu and cuda_ver:
+        return {
+            "name": "CUDA/NVIDIA",
+            "status": "PASS",
+            "value": f"{gpu['name']} — CUDA {cuda_ver}",
+            "detail": "",
+        }
+    if gpu and has_cuda:
+        return {
+            "name": "CUDA/NVIDIA",
+            "status": "PASS",
+            "value": f"{gpu['name']} — CUDA available (version unknown)",
+            "detail": "",
+        }
+    if gpu:
+        return {
+            "name": "CUDA/NVIDIA",
+            "status": "WARN",
+            "value": f"{gpu['name']} — CUDA not detected",
+            "detail": "GPU found but CUDA not available — check driver installation",
+        }
+    return {
+        "name": "CUDA/NVIDIA",
+        "status": "WARN",
+        "value": "No NVIDIA GPU detected",
+        "detail": "CPU-only mode — performance will be limited",
+    }
+
+
+def check_packaged_defaults() -> dict:
+    """Check if packaged defaults (models, profiles, schema) exist.
+
+    PASS if all three exist, WARN if some missing.
+    """
+    defaults_dir = PROJECT_ROOT / "kimari" / "defaults"
+    required = {
+        "models": defaults_dir / "kimari.models.json",
+        "profiles": defaults_dir / "kimari.profiles.json",
+        "schema": defaults_dir / "kimari.profiles.schema.json",
+    }
+
+    missing = {name: str(path) for name, path in required.items() if not path.exists()}
+
+    if not missing:
+        return {
+            "name": "Packaged Defaults",
+            "status": "PASS",
+            "value": "All defaults available",
+            "detail": "",
+        }
+    return {
+        "name": "Packaged Defaults",
+        "status": "WARN",
+        "value": f"Missing: {', '.join(sorted(missing.keys()))}",
+        "detail": "Some packaged defaults not found",
+    }
+
+
+def check_gateway_availability() -> dict:
+    """Check if gateway module is available (design/dry-run only).
+
+    PASS if gateway module exists, WARN if not.
+    This never starts a server — just checks module presence.
+    """
+    gateway_init = PROJECT_ROOT / "kimari" / "gateway" / "__init__.py"
+    if gateway_init.exists():
+        return {
+            "name": "Gateway Module",
+            "status": "PASS",
+            "value": "Available (dry-run only)",
+            "detail": "Gateway server is planned for a future release",
+        }
+    return {
+        "name": "Gateway Module",
+        "status": "WARN",
+        "value": "Not available",
+        "detail": "kimari/gateway/ module not found",
+    }
+
+
+def check_integration_docs() -> dict:
+    """Check if Open WebUI/OpenClaw integration docs exist.
+
+    PASS if integration docs found, WARN if missing.
+    """
+    docs = {
+        "Open WebUI/OpenClaw Quick Config": PROJECT_ROOT / "docs" / "OPENWEBUI_OPENCLAW_QUICK_CONFIG.md",
+        "OpenClaw Integration": PROJECT_ROOT / "docs" / "integrations" / "OPENCLAW.md",
+        "Hermes Integration": PROJECT_ROOT / "docs" / "integrations" / "HERMES.md",
+        "OpenAI Compatible Clients": PROJECT_ROOT / "docs" / "integrations" / "OPENAI_COMPATIBLE_CLIENTS.md",
+    }
+
+    found = {name for name, path in docs.items() if path.exists()}
+    missing = {name for name, path in docs.items() if not path.exists()}
+
+    if not missing:
+        return {
+            "name": "Integration Docs",
+            "status": "PASS",
+            "value": f"All {len(found)} docs available",
+            "detail": "",
+        }
+    if found:
+        return {
+            "name": "Integration Docs",
+            "status": "WARN",
+            "value": f"Missing: {', '.join(sorted(missing))}",
+            "detail": "",
+        }
+    return {
+        "name": "Integration Docs",
+        "status": "WARN",
+        "value": "No integration docs found",
+        "detail": "",
+    }
+
+
 def check_preview_gate_blocked() -> dict:
     """Check that the preview gate is BLOCKED during alpha.
 
@@ -418,13 +572,18 @@ def run_deep_checks(project_root: Path | None = None) -> list[dict]:
 
     checks = [
         check_python(),
+        check_kimari_version(),
         check_paths(),
         check_config(),
         check_models_dir(),
+        check_packaged_defaults(),
         check_llama_server_presence(),
+        check_cuda_nvidia(),
         check_default_profile(),
         check_secret_scanner_available(),
         check_benchmark_prompts(),
+        check_gateway_availability(),
+        check_integration_docs(),
         check_preview_gate_blocked(),
     ]
 

@@ -91,14 +91,17 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **MODEL_CARD professional rewrite** — Honest "Planned / Training Design" status with base candidates
 - **Benchmark dry-run** — `kimari benchmark --dry-run` generates benchmark plans without execution
 - **Tune dry-run** — `kimari tune --dry-run` recommends optimal settings from estimation
-- **Measured benchmark (experimental)** — `kimari benchmark --measure` runs real benchmarks against OpenAI-compatible servers
-- **Doctor deep** — `kimari doctor --deep` runs extended diagnostics (Python, paths, config, models, scanner, prompts, gate)
+- **Measured benchmark (experimental)** — `kimari benchmark --measure --endpoint URL --model NAME --yes` runs real benchmarks against OpenAI-compatible servers; requires `--yes` flag; supports `--output`; fails cleanly on connection error; no results saved by default; see docs/MEASURED_BENCHMARKS.md
+- **Doctor deep** — `kimari doctor --deep` runs 14 deep diagnostic checks (Python, Kimari version, paths, config, models, packaged defaults, llama-server, CUDA/NVIDIA, default profile, secret scanner, benchmark prompts, gateway module, integration docs, preview gate); returns PASS/WARN/FAIL; supports `--json`; no GPU required, no model execution; run before benchmark or training to verify environment
 - **Secret scanner hardening** — Security guides are now scanned line-by-line instead of being skipped entirely
+- **Gateway plan** — `kimari gateway --dry-run` shows planned gateway configuration; `--status --json` shows gateway status; `--plan --json` shows planned endpoints; no real server yet (dry-run only); default 127.0.0.1:11436; see docs/GATEWAY_PLAN.md
+- **Update check** — `kimari update check` shows current version (offline); `--online` checks GitHub for latest release; `--json` output; never auto-updates; see docs/UPDATE.md
+- **Quick config** — See docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md for Open WebUI, OpenClaw, and Hermes one-command integration setup
 - **Benchmark prompts** — Standard safe prompts in `benchmarks/prompts/local_benchmark_prompts.jsonl`
 
 ### 🔨 Planned
 
-- **Kimari-4B** — Target model under development. Training plan defined, base selection underway. Weights not yet available.
+- **Kimari-4B** — Target model under development. Training plan defined, base selection underway. **No weights, adapters, or GGUF files exist. Preview gate is BLOCKED.** Weights not yet available.
 - **Local REST API** — FastAPI-based API for programmatic access (v0.2)
 - **Web Dashboard** — Minimal status/controls UI (v0.3)
 - **VRAM reporting** — Real-time memory usage in `kimari status`
@@ -217,7 +220,8 @@ Pre-configured settings optimized for specific GPU models. No manual tuning requ
 
 ```bash
 kimari doctor                                        # System diagnostics (CUDA, GPU, llama-server)
-kimari doctor --deep                                 # Extended deep diagnostics (Python, paths, config, models, scanner, prompts, gate)
+kimari doctor --deep                                 # 14 deep diagnostic checks (Python, version, paths, config, models, packaged defaults, llama-server, CUDA/NVIDIA, default profile, secret scanner, benchmark prompts, gateway module, integration docs, preview gate)
+kimari doctor --deep --json                         # Deep diagnostics as JSON
 kimari doctor --json                                 # JSON output for automation/IDEs
 kimari info                                          # Installation info (version, paths, profiles)
 kimari info --json                                   # JSON info output
@@ -312,6 +316,26 @@ kimari token show                         # Display the current token
 kimari token delete                       # Remove the token
 ```
 
+### Gateway (Dry-Run Only)
+
+```bash
+kimari gateway --dry-run                  # Show planned gateway configuration
+kimari gateway --status --json            # Show gateway status (planned)
+kimari gateway --plan --json              # Show planned endpoints
+```
+
+> **Note:** No real server yet — dry-run only. Default: `127.0.0.1:11436` (localhost only). See [docs/GATEWAY_PLAN.md](docs/GATEWAY_PLAN.md) for the gateway design.
+
+### Update Check
+
+```bash
+kimari update check                       # Show current version (offline)
+kimari update check --online              # Check GitHub for latest release
+kimari update check --json                # JSON output
+```
+
+> **Note:** Kimari never auto-updates. `--online` checks GitHub only when explicitly requested. See [docs/UPDATE.md](docs/UPDATE.md) for details.
+
 ---
 
 ## ⚡ Performance Tuning
@@ -347,7 +371,8 @@ Generate a benchmark plan without executing models (dry-run by default):
 kimari benchmark --dry-run                        # Show estimated plan for default profile
 kimari benchmark --profile gtx1060-safe --dry-run # Plan for a specific profile
 kimari benchmark --matrix --dry-run --json        # Full parameter matrix as JSON
-kimari benchmark --measure --endpoint <url> --model <name> --yes  # Measured benchmark against local server (experimental)
+kimari benchmark --measure --endpoint <url> --model <name> --yes  # Measured benchmark against running server (--yes required)
+kimari benchmark --measure --endpoint <url> --model <name> --yes --output results.json  # Save results to file
 ```
 
 ### `kimari tune`
@@ -761,6 +786,9 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Secret Scan Policy](docs/SECRET_SCAN_POLICY.md) | Line-by-line scanning policy for security guides |
 | [Measured Benchmarks](docs/MEASURED_BENCHMARKS.md) | Real benchmark execution against OpenAI-compatible servers |
 | [Doctor Deep](docs/DOCTOR_DEEP.md) | Extended diagnostics documentation |
+| [Gateway Plan](docs/GATEWAY_PLAN.md) | Local controller design, dry-run only, 127.0.0.1:11436 |
+| [Update Check](docs/UPDATE.md) | Version checking, offline by default, never auto-updates |
+| [Open WebUI/OpenClaw Quick Config](docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md) | One-command integration setup for Open WebUI, OpenClaw, and Hermes |
 | [Showcase Plan](docs/SHOWCASE_PLAN.md) | How to present Kimari honestly and attractively |
 
 ---

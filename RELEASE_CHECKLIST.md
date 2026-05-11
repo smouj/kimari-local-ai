@@ -430,6 +430,23 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] No adapter/weights/GGUF tracked in git
 - [ ] README mentions measured benchmark, doctor --deep, secret scan policy
+- [ ] kimari gateway --dry-run works
+- [ ] kimari gateway --status --json works
+- [ ] kimari gateway --plan --json works
+- [ ] kimari update check works offline
+- [ ] kimari update check --json works
+- [ ] kimari update check --online works (or fails gracefully)
+- [ ] kimari status --json includes gateway and preview_gate fields
+- [ ] doctor --deep includes CUDA/NVIDIA, Gateway Module, Integration Docs checks
+- [ ] docs/GATEWAY_PLAN.md exists
+- [ ] docs/UPDATE.md exists
+- [ ] docs/INSTALL_MATRIX.md exists
+- [ ] docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md exists
+- [ ] kimari/gateway/ module exists with __init__.py, state.py, plan.py
+- [ ] kimari/update/ module exists with __init__.py, check.py
+- [ ] Gateway never starts a real server
+- [ ] Update never auto-installs anything
+- [ ] No 0.0.0.0 binding in gateway defaults
 
 ## Post-Release
 

@@ -413,3 +413,270 @@ class TestVersionConsistency:
         pyproject = PROJECT_ROOT / "pyproject.toml"
         content = pyproject.read_text()
         assert "0.1.26-alpha" in content, "pyproject.toml must contain '0.1.26-alpha'"
+
+
+# ─── 22. Gateway dry-run ────────────────────────────────────────────────────
+
+
+class TestGatewayDryRun:
+    """Test that kimari gateway --dry-run --json works and returns valid JSON with expected fields."""
+
+    def test_gateway_dry_run(self):
+        result = _run_kimari("gateway", "--dry-run", "--json")
+        assert result.returncode == 0, f"gateway --dry-run --json failed: {result.stderr}"
+        data = json.loads(result.stdout)
+
+        # Top-level fields
+        assert data["mode"] == "dry-run", f"Expected mode='dry-run', got '{data.get('mode')}'"
+
+        # Status sub-object
+        status = data.get("status", {})
+        assert "status" in status, "status sub-object must include 'status' key"
+        assert "planned_host" in status, "status sub-object must include 'planned_host' key"
+        assert "planned_port" in status, "status sub-object must include 'planned_port' key"
+        assert "gateway_available" in status, "status sub-object must include 'gateway_available' key"
+        assert "message" in status, "status sub-object must include 'message' key"
+
+        # Plan sub-object
+        plan = data.get("plan", {})
+        assert "planned_endpoints" in plan, "plan sub-object must include 'planned_endpoints' key"
+        assert "security" in plan, "plan sub-object must include 'security' key"
+        assert "planned_only" in plan, "plan sub-object must include 'planned_only' key"
+        assert plan["planned_only"] is True, "planned_only must be True"
+
+
+# ─── 23. Gateway status ─────────────────────────────────────────────────────
+
+
+class TestGatewayStatus:
+    """Test that kimari gateway --status --json works and returns gateway status."""
+
+    def test_gateway_status(self):
+        result = _run_kimari("gateway", "--status", "--json")
+        assert result.returncode == 0, f"gateway --status --json failed: {result.stderr}"
+        data = json.loads(result.stdout)
+
+        assert "status" in data, "Must include 'status' key"
+        assert data["status"] == "planned", f"Expected status='planned', got '{data['status']}'"
+        assert "planned_host" in data, "Must include 'planned_host'"
+        assert "planned_port" in data, "Must include 'planned_port'"
+        assert "gateway_available" in data, "Must include 'gateway_available'"
+        assert data["gateway_available"] is False, "gateway_available must be False"
+        assert "dependencies" in data, "Must include 'dependencies'"
+        assert "llama_server_available" in data, "Must include 'llama_server_available'"
+
+
+# ─── 24. Gateway plan ───────────────────────────────────────────────────────
+
+
+class TestGatewayPlan:
+    """Test that kimari gateway --plan --json works and returns planned endpoints."""
+
+    def test_gateway_plan(self):
+        result = _run_kimari("gateway", "--plan", "--json")
+        assert result.returncode == 0, f"gateway --plan --json failed: {result.stderr}"
+        data = json.loads(result.stdout)
+
+        assert "planned_endpoints" in data, "Must include 'planned_endpoints'"
+        assert isinstance(data["planned_endpoints"], list), "planned_endpoints must be a list"
+        assert len(data["planned_endpoints"]) > 0, "Should have at least one planned endpoint"
+
+        for ep in data["planned_endpoints"]:
+            assert "method" in ep, f"Endpoint missing 'method': {ep}"
+            assert "path" in ep, f"Endpoint missing 'path': {ep}"
+            assert "description" in ep, f"Endpoint missing 'description': {ep}"
+            assert "status" in ep, f"Endpoint missing 'status': {ep}"
+
+        assert "security" in data, "Must include 'security'"
+        assert data["security"]["bind_localhost_only"] is True, "Security must enforce localhost-only binding"
+        assert "relationship" in data, "Must include 'relationship'"
+        assert data["planned_only"] is True, "planned_only must be True"
+
+
+# ─── 25. Gateway never starts a real server ─────────────────────────────────
+
+
+class TestGatewayNoServer:
+    """Verify gateway module never starts a real server (status is 'planned', not 'running')."""
+
+    def test_gateway_no_server(self):
+        from kimari.gateway.state import gateway_status
+
+        status = gateway_status()
+        assert status["status"] == "planned", (
+            f"Gateway status must be 'planned', not 'running' — got '{status['status']}'"
+        )
+        assert status["gateway_available"] is False, (
+            "gateway_available must be False — no real server should exist"
+        )
+
+        from kimari.gateway.plan import gateway_plan
+
+        plan = gateway_plan()
+        assert plan["planned_only"] is True, "planned_only must be True — no server is started"
+
+
+# ─── 26. Update check offline ───────────────────────────────────────────────
+
+
+class TestUpdateCheckOffline:
+    """Test that kimari update check --json works offline and returns current version info."""
+
+    def test_update_check_offline(self):
+        result = _run_kimari("update", "check", "--json")
+        assert result.returncode == 0, f"update check --json failed: {result.stderr}"
+        data = json.loads(result.stdout)
+
+        assert "current_version" in data, "Must include 'current_version'"
+        assert data["current_version"] == "0.1.26-alpha", (
+            f"Expected current_version='0.1.26-alpha', got '{data['current_version']}'"
+        )
+        assert "online" in data, "Must include 'online'"
+        assert data["online"] is False, "Default check should be offline"
+        assert "latest_github_tag" in data, "Must include 'latest_github_tag'"
+        assert data["latest_github_tag"] is None, "Offline check should not return a GitHub tag"
+        assert "recommended_action" in data, "Must include 'recommended_action'"
+
+
+# ─── 27. Update check never auto-updates ────────────────────────────────────
+
+
+class TestUpdateCheckNeverAutoUpdates:
+    """Verify that build_update_report() returns auto_update=False."""
+
+    def test_update_check_never_auto_updates(self):
+        from kimari.update.check import build_update_report
+
+        report = build_update_report(online=False)
+        assert "auto_update" in report, "Report must include 'auto_update' key"
+        assert report["auto_update"] is False, "auto_update must always be False"
+
+        # Also check the note confirms this policy
+        assert "note" in report, "Report must include 'note' key"
+        assert "auto-update" in report["note"].lower() or "auto update" in report["note"].lower(), (
+            f"Note should mention no auto-update, got: {report['note']}"
+        )
+
+
+# ─── 28. Update parse_version ───────────────────────────────────────────────
+
+
+class TestUpdateParseVersion:
+    """Test parse_version('0.1.26-alpha') returns correct dict."""
+
+    def test_update_parse_version(self):
+        from kimari.update.check import parse_version
+
+        result = parse_version("0.1.26-alpha")
+        assert result["major"] == 0, f"Expected major=0, got {result['major']}"
+        assert result["minor"] == 1, f"Expected minor=1, got {result['minor']}"
+        assert result["patch"] == 26, f"Expected patch=26, got {result['patch']}"
+        assert result["pre"] == "alpha", f"Expected pre='alpha', got {result['pre']}"
+        assert result["full"] == "0.1.26-alpha", f"Expected full='0.1.26-alpha', got {result['full']}"
+
+        # Also test a version without pre-release suffix
+        result_stable = parse_version("1.2.3")
+        assert result_stable["major"] == 1
+        assert result_stable["minor"] == 2
+        assert result_stable["patch"] == 3
+        assert result_stable["pre"] is None, f"Expected pre=None for stable, got {result_stable['pre']}"
+
+
+# ─── 29. Status includes gateway and preview_gate ───────────────────────────
+
+
+class TestStatusIncludesGatewayAndGate:
+    """Test that kimari status --json includes 'gateway' and 'preview_gate' fields."""
+
+    def test_status_includes_gateway_and_gate(self):
+        result = _run_kimari("status", "--json")
+        assert result.returncode == 0, f"status --json failed: {result.stderr}"
+        data = json.loads(result.stdout)
+
+        assert "gateway" in data, "status --json must include 'gateway' field"
+        assert data["gateway"] == "planned", f"Expected gateway='planned', got '{data['gateway']}'"
+
+        assert "preview_gate" in data, "status --json must include 'preview_gate' field"
+        assert data["preview_gate"] == "BLOCKED", f"Expected preview_gate='BLOCKED', got '{data['preview_gate']}'"
+
+
+# ─── 30. Doctor deep new checks ─────────────────────────────────────────────
+
+
+class TestDoctorDeepNewChecks:
+    """Test that doctor --deep includes the 5 new checks."""
+
+    def test_doctor_deep_new_checks(self):
+        result = _run_kimari("doctor", "--deep", "--json")
+        assert result.returncode == 0, f"doctor --deep --json failed: {result.stderr}"
+        data = json.loads(result.stdout)
+
+        assert "checks" in data, "Must include 'checks'"
+        check_names = [c["name"] for c in data["checks"]]
+
+        required_new_checks = [
+            "Kimari Version",
+            "CUDA/NVIDIA",
+            "Packaged Defaults",
+            "Gateway Module",
+            "Integration Docs",
+        ]
+        for name in required_new_checks:
+            assert name in check_names, f"doctor --deep must include '{name}' check, got: {check_names}"
+
+
+# ─── 31. Gateway module files ───────────────────────────────────────────────
+
+
+class TestGatewayModuleFiles:
+    """Test that kimari/gateway/__init__.py, state.py, plan.py exist."""
+
+    def test_gateway_init_exists(self):
+        path = PROJECT_ROOT / "kimari" / "gateway" / "__init__.py"
+        assert path.exists(), f"Module missing: {path}"
+
+    def test_gateway_state_exists(self):
+        path = PROJECT_ROOT / "kimari" / "gateway" / "state.py"
+        assert path.exists(), f"Module missing: {path}"
+
+    def test_gateway_plan_exists(self):
+        path = PROJECT_ROOT / "kimari" / "gateway" / "plan.py"
+        assert path.exists(), f"Module missing: {path}"
+
+
+# ─── 32. Update module files ────────────────────────────────────────────────
+
+
+class TestUpdateModuleFiles:
+    """Test that kimari/update/__init__.py, check.py exist."""
+
+    def test_update_init_exists(self):
+        path = PROJECT_ROOT / "kimari" / "update" / "__init__.py"
+        assert path.exists(), f"Module missing: {path}"
+
+    def test_update_check_exists(self):
+        path = PROJECT_ROOT / "kimari" / "update" / "check.py"
+        assert path.exists(), f"Module missing: {path}"
+
+
+# ─── 33. New documentation files ────────────────────────────────────────────
+
+
+class TestDocFilesNew:
+    """Test that new v0.1.26 documentation files exist."""
+
+    def test_gateway_plan_doc_exists(self):
+        path = PROJECT_ROOT / "docs" / "GATEWAY_PLAN.md"
+        assert path.exists(), f"Doc missing: {path}"
+
+    def test_update_doc_exists(self):
+        path = PROJECT_ROOT / "docs" / "UPDATE.md"
+        assert path.exists(), f"Doc missing: {path}"
+
+    def test_install_matrix_doc_exists(self):
+        path = PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md"
+        assert path.exists(), f"Doc missing: {path}"
+
+    def test_openwebui_openclaw_quick_config_doc_exists(self):
+        path = PROJECT_ROOT / "docs" / "OPENWEBUI_OPENCLAW_QUICK_CONFIG.md"
+        assert path.exists(), f"Doc missing: {path}"

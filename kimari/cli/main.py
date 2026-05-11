@@ -690,6 +690,12 @@ def check_status(config: dict, json_output: bool = False):
         "models": [],
         "last_log_lines": [],
         "log_errors": None,
+        "kimari_version": KIMARI_VERSION,
+        "config_path": str(CONFIG_PATH),
+        "models_dir": str(get_user_models_dir()),
+        "default_profile": config.get("default_profile", "test"),
+        "gateway": "planned",
+        "preview_gate": "BLOCKED",
     }
 
     state = read_state()
@@ -810,6 +816,12 @@ def check_status(config: dict, json_output: bool = False):
         print(f"  {Color.YELLOW}Solution:{Color.RESET} {err['solution']}")
     if status_data.get("error"):
         print(f"  Error:       {Color.RED}{status_data['error']}{Color.RESET}")
+    print(f"  Version:     {KIMARI_VERSION}")
+    print(f"  Config:      {CONFIG_PATH}")
+    print(f"  Models dir:  {get_user_models_dir()}")
+    print(f"  Profile:     {config.get('default_profile', 'test')}")
+    print("  Gateway:     planned (dry-run only)")
+    print("  Preview gate: BLOCKED")
 
 
 # ─── Logs ────────────────────────────────────────────────────────────────────
@@ -1892,6 +1904,111 @@ def run_benchmark_measure(
     print()
 
 
+# ─── Gateway ─────────────────────────────────────────────────────────────────
+
+
+def run_gateway(config: dict, dry_run: bool = False, status_only: bool = False, plan_only: bool = False, json_output: bool = False):
+    """Gateway local controller (dry-run only — no real server).
+
+    Provides status, plan, and dry-run views of the planned gateway.
+    Does NOT start any server.
+    """
+    from kimari.gateway import gateway_plan, gateway_status
+
+    gw_status = gateway_status(config)
+    gw_plan = gateway_plan(config)
+
+    if dry_run:
+        result = {
+            "mode": "dry-run",
+            "status": gw_status,
+            "plan": gw_plan,
+        }
+        if json_output:
+            print(json.dumps(result, indent=2))
+            return
+        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway (dry-run){Color.RESET}\n")
+        print(f"  Status:      {gw_status['status']}")
+        print(f"  Host:        {gw_status['planned_host']}")
+        print(f"  Port:        {gw_status['planned_port']}")
+        print(f"  Available:   {gw_status['gateway_available']}")
+        print(f"  Message:     {gw_status['message']}")
+        print(f"\n  {Color.BOLD}Planned Endpoints:{Color.RESET}")
+        for ep in gw_plan["planned_endpoints"]:
+            print(f"    {ep['method']:6s} {ep['path']:25s} — {ep['status']}")
+        print(f"\n  {Color.DIM}No server is started. Gateway is planned for a future release.{Color.RESET}")
+        print(f"  {Color.DIM}See docs/GATEWAY_PLAN.md for details.{Color.RESET}\n")
+        return
+
+    if status_only:
+        if json_output:
+            print(json.dumps(gw_status, indent=2))
+            return
+        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway Status{Color.RESET}\n")
+        for key, value in gw_status.items():
+            print(f"  {key:25s}: {value}")
+        print()
+        return
+
+    if plan_only:
+        if json_output:
+            print(json.dumps(gw_plan, indent=2))
+            return
+        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway Plan{Color.RESET}\n")
+        print(f"  {Color.BOLD}Endpoints:{Color.RESET}")
+        for ep in gw_plan["planned_endpoints"]:
+            print(f"    {ep['method']:6s} {ep['path']:25s} — {ep['description']}")
+        print(f"\n  {Color.BOLD}Security:{Color.RESET}")
+        for key, value in gw_plan["security"].items():
+            print(f"    {key:25s}: {value}")
+        print(f"\n  {Color.DIM}No server is started. This is a plan only.{Color.RESET}\n")
+        return
+
+    # Default: show status
+    if json_output:
+        print(json.dumps(gw_status, indent=2))
+        return
+    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway{Color.RESET}\n")
+    for key, value in gw_status.items():
+        print(f"  {key:25s}: {value}")
+    print(f"\n  {Color.DIM}Use --dry-run, --status, or --plan for more details.{Color.RESET}\n")
+
+
+# ─── Update ──────────────────────────────────────────────────────────────────
+
+
+def run_update_check(json_output: bool = False, online: bool = False):
+    """Check for Kimari updates.
+
+    By default, runs offline and shows current version info.
+    With --online, checks GitHub for the latest release tag.
+    Never auto-updates.
+    """
+    from kimari.update import build_update_report
+
+    report = build_update_report(online=online)
+
+    if json_output:
+        print(json.dumps(report, indent=2))
+        return
+
+    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Update Check{Color.RESET}\n")
+    print(f"  Current version:   {report['current_version']}")
+    if report.get("latest_github_tag"):
+        print(f"  Latest GitHub tag: {report['latest_github_tag']}")
+    else:
+        print(f"  Latest GitHub tag: (not checked{' — use --online' if not online else ' — check failed'})")
+    print(f"  PyPI available:    {report.get('pypi_available', 'N/A')}")
+    print(f"  Update available:  {report.get('update_available', 'N/A')}")
+    print(f"  Auto-update:       {report.get('auto_update', False)}")
+    print(f"\n  {Color.BOLD}{report['recommended_action']}{Color.RESET}")
+    if report.get("note"):
+        print(f"  {Color.DIM}{report['note']}{Color.RESET}")
+    if not online:
+        print(f"\n  {Color.DIM}Use --online to check GitHub for the latest release.{Color.RESET}")
+    print()
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 
@@ -2182,6 +2299,20 @@ def main():
     tune_parser.add_argument("--apply", action="store_true", help="Apply recommended settings (BLOCKED)")
     tune_parser.add_argument("--json", action="store_true", help="JSON output")
 
+    # Gateway command
+    gateway_parser = subparsers.add_parser("gateway", help="Gateway local controller (dry-run only)")
+    gateway_parser.add_argument("--dry-run", action="store_true", help="Show gateway dry-run summary")
+    gateway_parser.add_argument("--status", action="store_true", dest="gateway_status", help="Show gateway status")
+    gateway_parser.add_argument("--plan", action="store_true", dest="gateway_plan", help="Show gateway plan")
+    gateway_parser.add_argument("--json", action="store_true", help="JSON output")
+
+    # Update command
+    update_parser = subparsers.add_parser("update", help="Check for Kimari updates")
+    update_sub = update_parser.add_subparsers(dest="update_command", help="Update subcommands")
+    update_check_parser = update_sub.add_parser("check", help="Check for available updates")
+    update_check_parser.add_argument("--json", action="store_true", help="JSON output")
+    update_check_parser.add_argument("--online", action="store_true", help="Check GitHub for latest release (requires network)")
+
     args = parser.parse_args()
 
     # Ensure state directory exists
@@ -2402,6 +2533,23 @@ def main():
             apply=args.apply,
             json_output=args.json,
         )
+    elif args.command == "gateway":
+        run_gateway(
+            config,
+            dry_run=args.dry_run if hasattr(args, "dry_run") else False,
+            status_only=args.gateway_status if hasattr(args, "gateway_status") else False,
+            plan_only=args.gateway_plan if hasattr(args, "gateway_plan") else False,
+            json_output=args.json if hasattr(args, "json") else False,
+        )
+    elif args.command == "update":
+        if args.update_command == "check":
+            run_update_check(
+                json_output=args.json if hasattr(args, "json") else False,
+                online=args.online if hasattr(args, "online") else False,
+            )
+        else:
+            # Default: show update check offline
+            run_update_check(json_output=False, online=False)
     else:
         parser.print_help()
 

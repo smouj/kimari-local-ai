@@ -1342,3 +1342,62 @@ Stage Summary:
 - No "Kimari-4B released" false claims
 - No secrets in any screenshot examples or docs
 - Ready for commit and push
+
+---
+Task ID: 2
+Agent: update-module-creator
+Task: Create kimari/update/ module with check.py
+
+Work Log:
+- Created kimari/update/__init__.py — Package init exporting get_current_version, parse_version, check_update_sources, build_update_report
+- Created kimari/update/check.py — Full implementation with:
+  - get_current_version() → reads kimari.__version__ (currently "0.1.26-alpha")
+  - parse_version("0.1.26-alpha") → {"major": 0, "minor": 1, "patch": 26, "pre": "alpha", "full": "0.1.26-alpha"}
+  - check_update_sources(online=False) → offline status with "Use --online to check for updates"; online=True queries GitHub tags API
+  - build_update_report(online=False) → full report dict with auto_update=False and pip/git pull note
+- Verified py_compile on both files
+- Verified ruff check and ruff format both pass
+- Functional tests: get_current_version, parse_version (with and without pre-release), offline check_update_sources, and build_update_report all pass
+
+Stage Summary:
+- Update check module created with 2 files
+- Offline by default, online only with explicit flag
+- Never auto-updates — auto_update always False, note recommends pip/git manually
+- GitHub API check uses requests with 10s timeout; lazy import so offline doesn't require requests
+- All lint/format checks passing
+
+---
+Task ID: 3
+Agent: docs-creator
+Task: Create GATEWAY_PLAN.md, UPDATE.md, INSTALL_MATRIX.md, OPENWEBUI_OPENCLAW_QUICK_CONFIG.md
+
+Work Log:
+- Created docs/GATEWAY_PLAN.md
+- Created docs/UPDATE.md
+- Created docs/INSTALL_MATRIX.md
+- Created docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md
+
+Stage Summary:
+- 4 new documentation files created
+- All docs follow project conventions
+
+---
+Task ID: 1
+Agent: gateway-module-creator
+Task: Create kimari/gateway/ module with state.py and plan.py
+
+Work Log:
+- Created kimari/gateway/__init__.py — Package init exporting gateway_status and gateway_plan, with docstring describing planned REST API gateway, defaults (127.0.0.1:11436), and security rules
+- Created kimari/gateway/state.py — gateway_status() function returning dict with gateway_available (False), planned_host, planned_port (11436), status ("planned"), message, dependencies, config_path, profiles_available, llama_server_available, model_loaded; imports from kimari.core.constants and kimari.core.detection
+- Created kimari/gateway/plan.py — gateway_plan() function returning dict with planned_endpoints (10 endpoints), security constraints, integration relationships, planned_only (True), future_notes; all 10 endpoints (7 GET + 3 POST) documented with method/path/description/status
+- Fixed ruff lint issues (import sorting in plan.py)
+- Verified py_compile on all 3 files
+- Verified ruff check and format pass
+- Functional test: gateway_status() with and without config, gateway_plan() all assertions passed
+- Existing test suite: no regressions (pre-existing failures unrelated)
+
+Stage Summary:
+- Gateway module created with dry-run only functionality
+- No real server started
+- gateway_status() and gateway_plan() functions available
+- 3 files created: kimari/gateway/__init__.py, kimari/gateway/state.py, kimari/gateway/plan.py

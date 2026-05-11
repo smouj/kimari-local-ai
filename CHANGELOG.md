@@ -19,6 +19,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **kimari/doctor/deep.py** — Deep diagnostic module with 9 checks (Python, Paths, Config, Models Dir, llama-server, Default Profile, Secret Scanner, Benchmark Prompts, Preview Gate); all pure/safe functions; PASS/WARN/FAIL status
 - **`kimari doctor --deep`** — CLI command for extended diagnostics; `--json` for machine-readable output; no model execution, no downloads, no GPU required
 - **docs/DOCTOR_DEEP.md** — Guide for deep diagnostics; what it checks; how to interpret PASS/WARN/FAIL; usage; common resolutions
+- **`kimari gateway` command** — Dry-run gateway controller with --dry-run, --status, --plan, --json; dry-run only, no real server started
+- **`kimari update check` command** — Version check with --online, --json; offline by default, never auto-updates or auto-installs
+- **Enhanced `kimari status`** — Now includes version, config path, models dir, default profile, gateway state, preview gate state fields
+- **Enhanced `kimari doctor --deep`** — 5 new checks: Kimari Version, CUDA/NVIDIA (best-effort, not required), Packaged Defaults, Gateway Module, Integration Docs; total 14 checks
+- **kimari/gateway/ module** — `state.py` and `plan.py` for gateway state management and dry-run planning; no real server startup
+- **kimari/update/ module** — `check.py` for offline/online version checking; never auto-installs
+- **docs/GATEWAY_PLAN.md** — Gateway local controller design and planned endpoints
+- **docs/UPDATE.md** — Update guide and version management
+- **docs/INSTALL_MATRIX.md** — Installation methods and platform support matrix
+- **docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md** — Quick configuration guide for Open WebUI, OpenClaw, Hermes
+- **Gateway planned endpoints** — GET /health, /status, /profiles, /models, /config, /logs, /integrations; POST /server/start, /server/stop, /benchmark/run
+- **Default gateway host 127.0.0.1:11436** — Localhost only, never 0.0.0.0
 - **New tests** (`tests/test_release_v0126.py`)
 
 ### Changed

@@ -324,14 +324,22 @@
 - ✅ Secret scanner hardening (line-by-line, safe placeholders)
 - ✅ Benchmark prompts (8 safe prompts in JSONL)
 - ✅ Benchmark result writer (sanitized, gitignored output)
+- ✅ Gateway dry-run module and commands (`kimari gateway --dry-run`, `--status`, `--plan`, `--json`)
+- ✅ Update check module and commands (`kimari update check`, `--online`, `--json`)
+- ✅ Enhanced status with gateway/preview gate fields
+- ✅ Enhanced doctor --deep with 5 new checks (Kimari Version, CUDA/NVIDIA, Packaged Defaults, Gateway Module, Integration Docs)
+- ✅ docs/GATEWAY_PLAN.md
+- ✅ docs/UPDATE.md
+- ✅ docs/INSTALL_MATRIX.md
+- ✅ docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md
 
 ## v0.1.27-alpha (Planned)
 
-- Auto-tuning experimental (`kimari tune --apply`)
-- `kimari doctor --deep --fix`
+- Gateway dry-run + integration config
+- First private SFT execution package
 - Open WebUI/OpenClaw one-command config
-- Real reviewed screenshots
-- First private SFT results
+- Doctor --fix experimental
+- Auto-tuning experimental
 
 ## v0.2.0-alpha
 
