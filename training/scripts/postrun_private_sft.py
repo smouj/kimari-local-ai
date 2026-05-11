@@ -226,11 +226,10 @@ def step_create_eval_summary(
         str(eval_result_path),
         "--output",
         str(output_summary),
+        "--json",
     ]
 
     result = run_subcommand(cmd, dry_run, "create_eval_summary")
-    if not dry_run:
-        result["command"] += " --json"
     return result
 
 

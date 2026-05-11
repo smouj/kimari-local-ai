@@ -1,4 +1,4 @@
-"""Release validation tests for Kimari Local AI v0.1.22-alpha.
+"""Release validation tests for Kimari Local AI v0.1.23-alpha.
 
 Tests cover:
 - Version consistency
@@ -40,18 +40,18 @@ class TestVersion:
     def test_version_is_0116(self):
         from kimari import __version__
 
-        assert __version__ == "0.1.22-alpha"
+        assert __version__ == "0.1.23-alpha"
 
     def test_pyproject_version_matches(self):
         pyproject = PROJECT_ROOT / "pyproject.toml"
         text = pyproject.read_text()
-        assert 'version = "0.1.22-alpha"' in text
+        assert 'version = "0.1.23-alpha"' in text
 
     def test_cli_info_version(self):
         result = _run_kimari("info", "--json")
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert data["kimari_version"] == "0.1.22-alpha"
+        assert data["kimari_version"] == "0.1.23-alpha"
 
 
 # ─── API Optional Dependency ────────────────────────────────────────────────
@@ -91,7 +91,7 @@ class TestAPICommand:
         assert result.returncode == 0
         data = json.loads(result.stdout)
         assert data["dry_run"] is True
-        assert data["version"] == "0.1.22-alpha"
+        assert data["version"] == "0.1.23-alpha"
 
     def test_api_without_experimental_does_not_start(self):
         """Without --experimental, should show warning, not start server."""
@@ -237,7 +237,7 @@ class TestAPISchemas:
         try:
             from kimari.api.schemas import HealthResponse
 
-            h = HealthResponse(status="ok", version="0.1.22-alpha")
+            h = HealthResponse(status="ok", version="0.1.23-alpha")
             assert h.experimental is True
             assert h.status == "ok"
         except ImportError:

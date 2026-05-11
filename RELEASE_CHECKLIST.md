@@ -330,6 +330,23 @@ twine upload dist/*
 - [ ] `default_profile` is still `"test"`
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.23 Checks
+
+- [ ] postrun_private_sft.py passes --json to create_eval_summary subprocess correctly
+- [ ] preflight_private_sft.py reads dataset_build_dir from run_config if available
+- [ ] preflight_private_sft.py falls back to default dataset/build/kimari-v0/report.json
+- [ ] docs/SCREENSHOTS.md exists
+- [ ] docs/assets/screenshots/README.md exists with naming conventions and policy
+- [ ] docs/assets/screenshots/PLACEHOLDER.md exists with planned screenshots checklist
+- [ ] No secrets in screenshot docs/placeholders
+- [ ] No benchmark claims in screenshot docs
+- [ ] README.md links to docs/SCREENSHOTS.md
+- [ ] docs/index.html mentions screenshots/CLI preview
+- [ ] No adapter/weight files tracked in git
+- [ ] Preview gate still BLOCKED
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

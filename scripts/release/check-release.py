@@ -1808,6 +1808,145 @@ def main() -> None:
         "Kimari-4B false claim regression detected",
     )
 
+    # ── [51/51] v0.1.23-alpha checks ───────────────────────────
+    print("\n── v0.1.23-alpha checks ──")
+
+    # Postrun passes --json to create_eval_summary
+    postrun_path_v0123 = PROJECT_ROOT / "training" / "scripts" / "postrun_private_sft.py"
+    if postrun_path_v0123.exists():
+        postrun_text_v0123 = postrun_path_v0123.read_text()
+        # Check that --json is in the create_eval_summary cmd construction
+        # The step_create_eval_summary function should include --json in the command list
+        check(
+            "postrun step_create_eval_summary passes --json to subprocess",
+            '"--json"' in postrun_text_v0123 and "step_create_eval_summary" in postrun_text_v0123,
+            "postrun_private_sft.py must pass --json to create_eval_summary.py subprocess",
+        )
+    else:
+        check("training/scripts/postrun_private_sft.py exists", False, "file not found")
+
+    # Preflight reads dataset_build_dir from run_config
+    preflight_path_v0123 = PROJECT_ROOT / "training" / "scripts" / "preflight_private_sft.py"
+    if preflight_path_v0123.exists():
+        preflight_text_v0123 = preflight_path_v0123.read_text()
+        check(
+            "preflight reads dataset_build_dir from run_config",
+            "dataset_build_dir" in preflight_text_v0123 and "run_config" in preflight_text_v0123,
+            "preflight_private_sft.py must read dataset_build_dir from run_config",
+        )
+        check(
+            "preflight has fallback for dataset_build_dir",
+            "fallback" in preflight_text_v0123.lower() and "DEFAULT_DATASET_REPORT" in preflight_text_v0123,
+            "preflight_private_sft.py must have a fallback for dataset_build_dir",
+        )
+    else:
+        check("training/scripts/preflight_private_sft.py exists", False, "file not found")
+
+    # Screenshots docs
+    check(
+        "docs/SCREENSHOTS.md exists",
+        (PROJECT_ROOT / "docs" / "SCREENSHOTS.md").exists(),
+        "Screenshots documentation missing",
+    )
+    check(
+        "docs/assets/screenshots/README.md exists",
+        (PROJECT_ROOT / "docs" / "assets" / "screenshots" / "README.md").exists(),
+        "Screenshots assets README missing",
+    )
+    check(
+        "docs/assets/screenshots/PLACEHOLDER.md exists",
+        (PROJECT_ROOT / "docs" / "assets" / "screenshots" / "PLACEHOLDER.md").exists(),
+        "Screenshots placeholder missing",
+    )
+
+    # No secrets in screenshot docs
+    for screenshot_doc in [
+        PROJECT_ROOT / "docs" / "SCREENSHOTS.md",
+        PROJECT_ROOT / "docs" / "assets" / "screenshots" / "README.md",
+        PROJECT_ROOT / "docs" / "assets" / "screenshots" / "PLACEHOLDER.md",
+    ]:
+        if screenshot_doc.exists():
+            doc_text = screenshot_doc.read_text().lower()
+            secret_patterns = ["api_key", "token=", "password", "secret_key", "hf_token"]
+            for pattern in secret_patterns:
+                check(
+                    f"No secrets in {screenshot_doc.name}",
+                    pattern not in doc_text,
+                    f"Potential secret pattern '{pattern}' found in {screenshot_doc.name}",
+                )
+
+    # No benchmark claims in screenshot docs
+    screenshots_md = PROJECT_ROOT / "docs" / "SCREENSHOTS.md"
+    if screenshots_md.exists():
+        screenshots_text = screenshots_md.read_text().lower()
+        check(
+            "No benchmark claims in SCREENSHOTS.md",
+            "tokens/s" not in screenshots_text or "illustrative" in screenshots_text,
+            "SCREENSHOTS.md must not contain unreviewed benchmark claims",
+        )
+
+    # README links SCREENSHOTS
+    readme_text_v0123 = (PROJECT_ROOT / "README.md").read_text()
+    check(
+        "README.md links to docs/SCREENSHOTS.md",
+        "SCREENSHOTS.md" in readme_text_v0123,
+        "README.md must link to docs/SCREENSHOTS.md",
+    )
+
+    # index.html mentions screenshots/CLI preview
+    index_text_v0123 = (PROJECT_ROOT / "docs" / "index.html").read_text()
+    check(
+        "docs/index.html mentions screenshots or CLI preview",
+        "screenshot" in index_text_v0123.lower() or "cli preview" in index_text_v0123.lower(),
+        "docs/index.html must mention screenshots or CLI preview",
+    )
+
+    # No image files above reasonable size if any exist
+    screenshots_dir = PROJECT_ROOT / "docs" / "assets" / "screenshots"
+    if screenshots_dir.exists():
+        for img_file in screenshots_dir.iterdir():
+            if img_file.suffix in (".png", ".webp", ".jpg", ".jpeg", ".gif"):
+                size_mb = img_file.stat().st_size / (1024 * 1024)
+                check(
+                    f"Screenshot {img_file.name} under 1 MB",
+                    size_mb < 1.0,
+                    f"Screenshot {img_file.name} is {size_mb:.1f} MB — optimize before committing",
+                )
+
+    # No adapter/weights/GGUF tracked (re-check)
+    try:
+        result_weights_v0123 = subprocess.run(
+            ["git", "ls-files", "*.safetensors", "*.bin", "*.pt", "*.pth", "*.ckpt", "*.gguf"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        weight_files_v0123 = [f for f in result_weights_v0123.stdout.strip().splitlines() if f]
+        check(
+            "No adapter/weights/GGUF tracked in git (v0.1.23 re-check)",
+            len(weight_files_v0123) == 0,
+            f"Weight/adapter files tracked: {weight_files_v0123}",
+        )
+    except Exception:
+        warn("Could not check git tracked weight files", "git not available or not a repo")
+
+    # Preview gate still BLOCKED (re-check)
+    gate_path_v0123 = PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md"
+    if gate_path_v0123.exists():
+        gate_text_v0123 = gate_path_v0123.read_text()
+        check(
+            "Preview gate still BLOCKED (v0.1.23 re-check)",
+            "BLOCKED" in gate_text_v0123,
+            "ADAPTER_PREVIEW_GATE must still say BLOCKED",
+        )
+
+    # No "Kimari-4B released" false claim (re-check)
+    check(
+        'No "Kimari-4B released" false claim (v0.1.23 re-check)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:
