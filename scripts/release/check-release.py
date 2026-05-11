@@ -2206,10 +2206,11 @@ def main() -> None:
         "PRIVATE_SFT_RUN_COMMANDS.md link not found in README.md",
     )
     # No HF token pattern in repo
+    _hf_token_pattern = "hf_" + "x" * 34  # Placeholder: never include real tokens
     check(
         'No real "hf_" token pattern in README/CHANGELOG (critical)',
-        "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" not in readme_text
-        and "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" not in changelog_text,
+        _hf_token_pattern not in readme_text
+        and _hf_token_pattern not in changelog_text,
         "Real HF token detected in README or CHANGELOG — revoke and remove immediately",
     )
     # No adapter/weights/GGUF tracked
