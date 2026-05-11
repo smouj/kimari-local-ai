@@ -43,7 +43,7 @@ _SECURITY: dict = {
 
 _RELATIONSHIP: dict = {
     "fastapi_experimental": "Gateway will use FastAPI (currently in kimari/api as experimental)",
-    "open_webui": "Gateway will provide OpenAI-compatible endpoints for Open WebUI integration",
+    "open_webui": "Gateway will help configure and monitor the local OpenAI-compatible llama-server endpoint used by Open WebUI",
     "openclaw": "Gateway may expose integration status and config for OpenClaw",
     "hermes": "Gateway may expose integration status and config for Hermes",
 }

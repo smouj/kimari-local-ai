@@ -2595,6 +2595,150 @@ def main() -> None:
     else:
         check("kimari/update/check.py exists (auto_update check)", False, "file not found")
 
+    # ── v0.1.27 checks ────────────────────────────────────────────
+    print("\n[53/58] v0.1.27 console & integrations modules")
+    check(
+        "kimari/console/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "console" / "__init__.py").exists(),
+        "Console module init missing",
+    )
+    check(
+        "kimari/console/render.py exists",
+        (PROJECT_ROOT / "kimari" / "console" / "render.py").exists(),
+        "Console render module missing",
+    )
+    check(
+        "kimari/integrations/__init__.py exists",
+        (PROJECT_ROOT / "kimari" / "integrations" / "__init__.py").exists(),
+        "Integrations module init missing",
+    )
+    check(
+        "kimari/integrations/config_generator.py exists",
+        (PROJECT_ROOT / "kimari" / "integrations" / "config_generator.py").exists(),
+        "Integrations config generator missing",
+    )
+    check(
+        "docs/INTEGRATION_CONFIG_GENERATOR.md exists",
+        (PROJECT_ROOT / "docs" / "INTEGRATION_CONFIG_GENERATOR.md").exists(),
+        "Integration config generator doc missing",
+    )
+    check(
+        "docs/GATEWAY_PROTOTYPE_PLAN.md exists",
+        (PROJECT_ROOT / "docs" / "GATEWAY_PROTOTYPE_PLAN.md").exists(),
+        "Gateway prototype plan doc missing",
+    )
+    check(
+        "docs/CONSOLE_UX.md exists",
+        (PROJECT_ROOT / "docs" / "CONSOLE_UX.md").exists(),
+        "Console UX doc missing",
+    )
+
+    print("\n[54/58] v0.1.27 screenshot plan script")
+    check(
+        "scripts/docs/generate_safe_cli_screenshots_plan.py exists",
+        (PROJECT_ROOT / "scripts" / "docs" / "generate_safe_cli_screenshots_plan.py").exists(),
+        "Screenshot plan script missing",
+    )
+
+    print("\n[55/58] v0.1.27 gateway wording")
+    gateway_plan_py = PROJECT_ROOT / "kimari" / "gateway" / "plan.py"
+    if gateway_plan_py.exists():
+        gp_text = gateway_plan_py.read_text()
+        check(
+            "gateway/plan.py does not claim gateway serves OpenAI-compatible endpoint",
+            "OpenAI-compatible endpoints for" not in gp_text,
+            "gateway/plan.py still claims gateway provides OpenAI-compatible endpoints — should say gateway helps configure/monitor llama-server",
+        )
+    gateway_plan_md = PROJECT_ROOT / "docs" / "GATEWAY_PLAN.md"
+    if gateway_plan_md.exists():
+        gp_md_text = gateway_plan_md.read_text()
+        check(
+            "GATEWAY_PLAN.md clarifies gateway is management layer, not OpenAI endpoint",
+            "management and diagnostic layer" in gp_md_text.lower() or "helps configure and monitor" in gp_md_text.lower(),
+            "GATEWAY_PLAN.md should clarify gateway helps configure/monitor llama-server, not serve endpoints",
+        )
+
+    print("\n[56/58] v0.1.27 integration config security")
+    config_gen_py = PROJECT_ROOT / "kimari" / "integrations" / "config_generator.py"
+    if config_gen_py.exists():
+        cg_text = config_gen_py.read_text()
+        check(
+            "config_generator.py has sanitize_config function",
+            "sanitize_config" in cg_text,
+            "sanitize_config function missing from config_generator.py",
+        )
+        check(
+            "config_generator.py has validate_local_base_url function",
+            "validate_local_base_url" in cg_text,
+            "validate_local_base_url function missing from config_generator.py",
+        )
+        # Check generated configs don't contain token/API key fields
+        try:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("config_generator", str(config_gen_py))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            for target_func in ["generate_openwebui_config", "generate_openclaw_config", "generate_hermes_config", "generate_continue_config"]:
+                func = getattr(mod, target_func, None)
+                if func:
+                    config = func()
+                    config_str = str(config).lower()
+                    has_token = any(k for k in config if any(t in k.lower() for t in ["token", "api_key", "apikey", "password", "secret"]))
+                    check(
+                        f"{target_func}() output contains no token/API key fields",
+                        not has_token,
+                        f"{target_func}() output contains sensitive fields",
+                    )
+        except Exception as e:
+            warn(f"Could not dynamically check integration configs: {e}")
+
+    print("\n[57/58] v0.1.27 content integrity")
+    check(
+        'default_profile still "test" (v0.1.27 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        "No 'Kimari-4B released' false claim (v0.1.27)",
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        "No adapter/weights/GGUF tracked in git (v0.1.27)",
+        len(gguf_files) == 0,
+        f"Found tracked adapter/weight/GGUF files: {gguf_files}",
+    )
+    check(
+        "Preview gate still BLOCKED (v0.1.27)",
+        "BLOCKED" in (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").read_text()
+        if (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").exists()
+        else True,
+        "Preview gate is not BLOCKED",
+    )
+
+    print("\n[58/58] v0.1.27 README & index.html references")
+    check(
+        "README mentions 'integrations generate' or 'integration config'",
+        "integrations generate" in readme_lower or "integration config" in readme_lower,
+        "'integrations generate' or 'integration config' not found in README.md",
+    )
+    check(
+        "README mentions 'GATEWAY_PROTOTYPE_PLAN' or 'gateway prototype'",
+        "gateway_prototype_plan" in readme_lower or "gateway prototype" in readme_lower,
+        "'gateway prototype' reference not found in README.md",
+    )
+    if index_html.exists():
+        check(
+            "docs/index.html mentions 'integration' or 'config generator'",
+            "integration" in index_text.lower() and "config" in index_text.lower(),
+            "'integration config generator' not found in docs/index.html",
+        )
+        check(
+            "docs/index.html contains current version v0.1.27",
+            "0.1.27" in index_text,
+            "Version 0.1.27 not found in docs/index.html",
+        )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:

@@ -46,6 +46,155 @@ Analyzes your GPU profile and recommends optimal settings.
 }
 ```
 
+### `kimari status`
+
+Shows the current server status — running state, profile, model, host, port, and uptime.
+
+```
+Kimari CLI v0.1.27-alpha
+
+  Status:      READY
+  Profile:     test
+  Model:       tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+  Host:        127.0.0.1
+  Port:        11435
+  PID:         12345
+  Uptime:      5m 32s
+  Gateway:     planned
+```
+
+### `kimari doctor --deep`
+
+Runs 14 extended diagnostic checks with PASS/WARN/FAIL status.
+
+```
+Kimari CLI v0.1.27-alpha — Deep Doctor
+
+  #   Check              Status   Detail
+  --  -----------------  -------  ------------------------------
+  1   Python             PASS     3.12.1
+  2   Paths              PASS     All directories exist
+  3   Config             PASS     Configuration is valid
+  4   Models Dir         PASS     2 GGUF files found
+  5   llama-server       PASS     /usr/local/bin/llama-server
+  6   Default Profile    PASS     test
+  7   Secret Scanner     PASS     Found
+  8   Benchmark Prompts  PASS     7 valid prompts
+  9   Preview Gate       PASS     BLOCKED
+  10  Kimari Version     PASS     0.1.27-alpha
+  11  CUDA/NVIDIA        WARN     No GPU detected
+  12  Packaged Defaults  PASS     All defaults found
+  13  Gateway Module     PASS     Module exists
+  14  Integration Docs   PASS     All docs found
+
+Summary: 12 PASS, 2 WARN, 0 FAIL
+```
+
+### `kimari gateway --plan`
+
+Shows the planned gateway endpoint map and security constraints.
+
+```
+Kimari Gateway Plan
+
+  Endpoints:
+    GET    /health                   — Health check
+    GET    /status                   — Server status
+    GET    /profiles                 — Available profiles
+    GET    /models                   — Available models
+    GET    /config                   — Current configuration
+    GET    /logs                     — Recent log entries
+    GET    /integrations             — Integration status
+    POST   /server/start             — Start llama-server
+    POST   /server/stop              — Stop llama-server
+    POST   /benchmark/run            — Run benchmark
+
+  Security:
+    default_host             : 127.0.0.1
+    default_port             : 11436
+    bind_localhost_only      : True
+    no_public_exposure       : True
+    no_token_storage         : True
+    no_model_upload          : True
+    no_training_execution    : True
+    no_hf_publishing         : True
+
+  No server is started. This is a plan only.
+```
+
+### `kimari integrations generate --all`
+
+Generates configuration snippets for all supported integration targets (Open WebUI, OpenClaw, Hermes, Continue.dev). No tokens, no API keys, no auto-writing.
+
+```json
+{
+  "openwebui": {
+    "type": "openai",
+    "baseUrl": "http://127.0.0.1:11435/v1",
+    "apiKey": "kimari-local",
+    "modelName": "kimari"
+  },
+  "openclaw": {
+    "baseUrl": "http://127.0.0.1:11435/v1",
+    "apiKey": "kimari-local",
+    "api": "openai-completions",
+    "timeoutSeconds": 300,
+    "model": "kimari"
+  },
+  "hermes": {
+    "endpoint": "http://127.0.0.1:11435/v1",
+    "apiKey": "kimari-local",
+    "apiType": "openai-chat-completions",
+    "timeoutSeconds": 300,
+    "model": "kimari"
+  },
+  "continue": {
+    "models": [
+      {
+        "title": "Kimari Local",
+        "provider": "openai",
+        "model": "kimari",
+        "apiBase": "http://127.0.0.1:11435/v1",
+        "apiKey": "kimari-local"
+      }
+    ]
+  }
+}
+```
+
+### `kimari benchmark --dry-run`
+
+Shows what a benchmark would measure without actually executing it.
+
+```json
+{
+  "mode": "dry-run",
+  "profile": "test",
+  "model": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+  "prompts_count": 7,
+  "estimated_duration_s": 120,
+  "categories": ["coding_python", "coding_typescript", "json_mode", "agent_prompting", "spanish_technical", "server_debugging", "long_context"],
+  "dry_run": true
+}
+```
+
+### `kimari update check`
+
+Checks for Kimari updates. Offline by default; use `--online` to check GitHub.
+
+```
+Kimari Update Check
+
+  Current version:   0.1.27-alpha
+  Latest GitHub tag: (not checked — use --online)
+  PyPI available:    N/A
+  Update available:  N/A
+  Auto-update:       False
+
+  No update check performed. Use --online to check GitHub.
+  Use --online to check GitHub for the latest release.
+```
+
 ### `preflight_private_sft.py --json`
 
 Checks SFT readiness before training. Works without torch installed (graceful degradation).
@@ -142,6 +291,12 @@ The following screenshots are planned for capture when running in a real GPU env
 
 | File | Command | Notes |
 |------|---------|-------|
+| `kimari-status.png` | `kimari status` | Server status — running state, profile, model |
+| `kimari-doctor-deep.png` | `kimari doctor --deep` | Extended diagnostics — PASS/WARN/FAIL table |
+| `kimari-gateway-plan.png` | `kimari gateway --plan` | Gateway endpoint plan and security constraints |
+| `kimari-integrations-generate.png` | `kimari integrations generate --all` | Integration config snippets (no tokens) |
+| `kimari-benchmark-dry-run.png` | `kimari benchmark --dry-run` | Benchmark dry-run plan (no real benchmarks) |
+| `kimari-update-check.png` | `kimari update check` | Update check — version info |
 | `kimari-setup-json.png` | `kimari setup --json` | Environment detection output |
 | `kimari-preflight-private-sft.png` | `preflight_private_sft.py --json` | Preflight check results |
 | `kimari-training-command-preview.png` | `run_training_command_preview.py --json` | Training command preview |
@@ -150,7 +305,7 @@ The following screenshots are planned for capture when running in a real GPU env
 | `kimari-optimize-json.png` | `kimari optimize --profile test --json` | Performance optimization |
 | `kimari-github-pages.png` | GitHub Pages landing | Landing page overview |
 
-> These screenshots will be captured from a clean terminal environment. No real training outputs will be shown. No secrets or private paths will be visible.
+> These screenshots will be captured from a clean terminal environment. No real training outputs will be shown. No secrets or private paths will be visible. Screenshots are still **planned** — they have not been reviewed or committed yet.
 
 ---
 
@@ -189,6 +344,37 @@ python scripts/docs/generate_cli_screenshot_text.py --kind setup --json
 
 ---
 
+## Screenshots Plan Script
+
+A structured plan for capturing CLI screenshots is available via the `generate_safe_cli_screenshots_plan.py` script. This script does NOT generate images — it outputs a plan listing which commands to capture, with safety notes and metadata.
+
+```bash
+# View the plan as plain text
+python scripts/docs/generate_safe_cli_screenshots_plan.py
+
+# View the plan as JSON
+python scripts/docs/generate_safe_cli_screenshots_plan.py --json
+
+# View the plan as Markdown
+python scripts/docs/generate_safe_cli_screenshots_plan.py --markdown
+
+# Save the plan to a file
+python scripts/docs/generate_safe_cli_screenshots_plan.py --json --output /tmp/screenshots-plan.json
+```
+
+The plan covers these commands:
+
+1. `kimari status` — Server status
+2. `kimari doctor --deep` — Extended diagnostics
+3. `kimari gateway --plan` — Gateway endpoint plan
+4. `kimari integrations generate --all` — Integration config snippets
+5. `kimari benchmark --dry-run` — Benchmark dry-run plan
+6. `kimari update check` — Update check
+
+Each plan entry includes: command, description, category, safety notes, and status. All entries are `status: "planned"` — no actual screenshots are generated.
+
+---
+
 ## Replacing Placeholders with Real Screenshots
 
 When real captures become available from a GPU environment:
@@ -210,6 +396,7 @@ Until real screenshots exist, use the text examples above as illustration.
 2. **No real training outputs** — Loss curves, adapter weights, and raw eval outputs stay local.
 3. **No real benchmarks** — Benchmark claims require measured, reviewed data.
 4. **Kimari-4B not released** — Screenshots must not imply the model is available.
-5. **Optimize image size** — Compress PNGs, prefer WebP for large images.
-6. **Alt text required** — Every image must have descriptive alt text.
-7. **Illustrative only** — Code blocks in this doc are examples, not actual outputs.
+5. **No real screenshots without review** — Do not commit screenshot images until they have been manually reviewed for safety (no tokens, no private paths, no unreviewed benchmarks).
+6. **Optimize image size** — Compress PNGs, prefer WebP for large images.
+7. **Alt text required** — Every image must have descriptive alt text.
+8. **Illustrative only** — Code blocks in this doc are examples, not actual outputs.

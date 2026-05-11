@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.26--alpha-9b59b6.svg" alt="v0.1.26-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.27--alpha-9b59b6.svg" alt="v0.1.27-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.26-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.27-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.26-alpha**
+> **Kimari Local AI v0.1.27-alpha**
 
 ### ✅ Works Today
 
@@ -92,12 +92,15 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Benchmark dry-run** — `kimari benchmark --dry-run` generates benchmark plans without execution
 - **Tune dry-run** — `kimari tune --dry-run` recommends optimal settings from estimation
 - **Measured benchmark (experimental)** — `kimari benchmark --measure --endpoint URL --model NAME --yes` runs real benchmarks against OpenAI-compatible servers; requires `--yes` flag; supports `--output`; fails cleanly on connection error; no results saved by default; see docs/MEASURED_BENCHMARKS.md
-- **Doctor deep** — `kimari doctor --deep` runs 14 deep diagnostic checks (Python, Kimari version, paths, config, models, packaged defaults, llama-server, CUDA/NVIDIA, default profile, secret scanner, benchmark prompts, gateway module, integration docs, preview gate); returns PASS/WARN/FAIL; supports `--json`; no GPU required, no model execution; run before benchmark or training to verify environment
+- **Doctor deep** — `kimari doctor --deep` runs 14 deep diagnostic checks with structured PASS/WARN/FAIL table and suggested next steps; supports `--json`; no GPU required, no model execution; run before benchmark or training to verify environment
 - **Secret scanner hardening** — Security guides are now scanned line-by-line instead of being skipped entirely
 - **Gateway plan** — `kimari gateway --dry-run` shows planned gateway configuration; `--status --json` shows gateway status; `--plan --json` shows planned endpoints; no real server yet (dry-run only); default 127.0.0.1:11436; see docs/GATEWAY_PLAN.md
 - **Update check** — `kimari update check` shows current version (offline); `--online` checks GitHub for latest release; `--json` output; never auto-updates; see docs/UPDATE.md
 - **Quick config** — See docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md for Open WebUI, OpenClaw, and Hermes one-command integration setup
 - **Benchmark prompts** — Standard safe prompts in `benchmarks/prompts/local_benchmark_prompts.jsonl`
+- **Cleaner console output** — `kimari status` and `kimari doctor --deep` now show structured, aligned tables with PASS/WARN/FAIL status and suggested next steps
+- **Integration config generator** — `kimari integrations generate --target openwebui --json` generates configuration snippets for Open WebUI, OpenClaw, Hermes, and Continue.dev; no tokens, localhost only by default
+- **Gateway prototype plan** — See docs/GATEWAY_PROTOTYPE_PLAN.md for the phased gateway evolution from dry-run to full local controller
 
 ### 🔨 Planned
 
@@ -336,6 +339,18 @@ kimari update check --json                # JSON output
 
 > **Note:** Kimari never auto-updates. `--online` checks GitHub only when explicitly requested. See [docs/UPDATE.md](docs/UPDATE.md) for details.
 
+### Integration Config Generator
+
+```bash
+kimari integrations generate --target openwebui --json   # Open WebUI config snippet
+kimari integrations generate --target openclaw --json    # OpenClaw config snippet
+kimari integrations generate --target hermes --json      # Hermes agent config snippet
+kimari integrations generate --target continue --json    # Continue.dev config snippet
+kimari integrations generate --all --json                # All integration configs
+```
+
+> **Note:** Configs contain no tokens or API keys. Default base_url is `http://127.0.0.1:11435/v1` (localhost only). Use `--write --output /path/to/file.json` to save to a specific path. See [docs/INTEGRATION_CONFIG_GENERATOR.md](docs/INTEGRATION_CONFIG_GENERATOR.md) for details.
+
 ---
 
 ## ⚡ Performance Tuning
@@ -560,7 +575,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.26-alpha — Measured benchmarks, doctor deep, secret scanner hardening
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.27-alpha — Console polish, integration config generator, gateway prototype plan
 
 ### What's Ready
 
@@ -643,6 +658,8 @@ Visual overview of Kimari's command-line tools. All outputs are illustrative —
 See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for the full gallery with code examples. See [docs/SAFE_SCREENSHOT_CAPTURE.md](docs/SAFE_SCREENSHOT_CAPTURE.md) for the safe screenshot capture guide.
 
 **Planned screenshots:** `kimari setup --json`, `preflight_private_sft.py --json`, `run_training_command_preview.py --json`, `postrun_private_sft.py --dry-run --json`, `kimari optimize --profile test --json`, GitHub Pages landing.
+
+**Screenshots plan:** See `generate_safe_cli_screenshots_plan.py` for the scripted CLI screenshot capture plan with safety checks.
 
 **CLI text examples** are available in [docs/assets/screenshots/examples/](docs/assets/screenshots/examples/) — safe text blocks for generating captures.
 
@@ -789,6 +806,9 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Gateway Plan](docs/GATEWAY_PLAN.md) | Local controller design, dry-run only, 127.0.0.1:11436 |
 | [Update Check](docs/UPDATE.md) | Version checking, offline by default, never auto-updates |
 | [Open WebUI/OpenClaw Quick Config](docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md) | One-command integration setup for Open WebUI, OpenClaw, and Hermes |
+| [Integration Config Generator](docs/INTEGRATION_CONFIG_GENERATOR.md) | Generate configuration snippets for local AI tools |
+| [Gateway Prototype Plan](docs/GATEWAY_PROTOTYPE_PLAN.md) | Phased gateway evolution from dry-run to local controller |
+| [Console UX](docs/CONSOLE_UX.md) | Terminal output style guide |
 | [Showcase Plan](docs/SHOWCASE_PLAN.md) | How to present Kimari honestly and attractively |
 
 ---

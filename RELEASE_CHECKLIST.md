@@ -448,6 +448,32 @@ twine upload dist/*
 - [ ] Update never auto-installs anything
 - [ ] No 0.0.0.0 binding in gateway defaults
 
+## v0.1.27 Checks
+
+- [ ] `kimari status` human output shows structured table
+- [ ] `kimari doctor --deep` human output shows PASS/WARN/FAIL table with suggested next steps
+- [ ] `kimari integrations generate --all --json` works
+- [ ] `kimari integrations generate --target openwebui --json` works
+- [ ] `kimari integrations generate --target openclaw --json` works
+- [ ] `kimari integrations generate --target hermes --json` works
+- [ ] `kimari integrations generate --target continue --json` works
+- [ ] Integration configs contain no token/API key fields
+- [ ] `kimari integrations generate --target openwebui --base-url http://example.com` shows non-local warning
+- [ ] `kimari integrations generate --target openwebui --write` without --output is rejected
+- [ ] Gateway wording does not claim gateway serves OpenAI-compatible API
+- [ ] docs/GATEWAY_PLAN.md does not claim gateway provides OpenAI-compatible endpoints
+- [ ] docs/INTEGRATION_CONFIG_GENERATOR.md exists
+- [ ] docs/GATEWAY_PROTOTYPE_PLAN.md exists
+- [ ] docs/CONSOLE_UX.md exists
+- [ ] scripts/docs/generate_safe_cli_screenshots_plan.py exists and --json works
+- [ ] kimari/console/render.py exists
+- [ ] kimari/integrations/config_generator.py exists
+- [ ] Screenshot plan generator works
+- [ ] Preview gate still BLOCKED
+- [ ] `default_profile` is still "test"
+- [ ] No "Kimari-4B released" false claim anywhere
+- [ ] No adapter/weights/GGUF tracked in git
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

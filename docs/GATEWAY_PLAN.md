@@ -157,7 +157,7 @@ The `kimari/api/` module will be refactored into `kimari/gateway/` when the gate
 
 ## Relationship with Open WebUI, OpenClaw, Hermes
 
-The gateway provides configuration and status information for these integrations. It does **not** replace their direct connections to llama-server.
+The gateway helps configure and monitor the local OpenAI-compatible llama-server endpoint used by these integrations. It does **not** serve as an OpenAI-compatible endpoint itself — that role belongs to llama-server on port `11435`. The gateway is a **management and diagnostic layer** running on port `11436`.
 
 ### Architecture
 

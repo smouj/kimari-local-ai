@@ -317,7 +317,7 @@
 - ✅ Release-check improvements
 - ✅ Tests for v0.1.25 artifacts
 
-## v0.1.26-alpha (Current)
+## v0.1.26-alpha (Released)
 
 - ✅ Measured benchmark prototype (`kimari benchmark --measure`)
 - ✅ `kimari doctor --deep` extended diagnostics
@@ -333,13 +333,26 @@
 - ✅ docs/INSTALL_MATRIX.md
 - ✅ docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md
 
-## v0.1.27-alpha (Planned)
+## v0.1.27-alpha (Current)
 
-- Gateway dry-run + integration config
-- First private SFT execution package
-- Open WebUI/OpenClaw one-command config
-- Doctor --fix experimental
-- Auto-tuning experimental
+- ✅ Console render module (kimari/console/render.py)
+- ✅ Improved `kimari status` human output
+- ✅ Improved `kimari doctor --deep` human output  
+- ✅ Integration config generator (kimari/integrations/config_generator.py)
+- ✅ `kimari integrations generate` command
+- ✅ Gateway wording corrected (gateway helps configure llama-server, not serve endpoints)
+- ✅ docs/INTEGRATION_CONFIG_GENERATOR.md
+- ✅ docs/GATEWAY_PROTOTYPE_PLAN.md
+- ✅ docs/CONSOLE_UX.md
+- ✅ Safe CLI screenshots plan script
+- ✅ Updated docs/SCREENSHOTS.md
+
+## v0.1.28-alpha (Planned)
+
+- First private SFT execution
+- Local manifest and eval summary
+- Gateway local read-only FastAPI prototype
+- Eval baseline vs adapter comparison
 
 ## v0.2.0-alpha
 

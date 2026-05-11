@@ -1401,3 +1401,31 @@ Stage Summary:
 - No real server started
 - gateway_status() and gateway_plan() functions available
 - 3 files created: kimari/gateway/__init__.py, kimari/gateway/state.py, kimari/gateway/plan.py
+
+---
+Task ID: main
+Agent: z-ai-coordinator
+Task: Implement full v0.1.26-alpha expansion (gateway, update, enhanced doctor/status, docs, tests)
+
+Work Log:
+- Reviewed current repo state: v0.1.26-alpha had core features (scanner hardening, measured benchmark, doctor --deep)
+- Created kimari/gateway/ module (__init__.py, state.py, plan.py) — dry-run only, 127.0.0.1:11436
+- Created kimari/update/ module (__init__.py, check.py) — offline by default, never auto-updates
+- Enhanced kimari/doctor/deep.py with 5 new checks: Kimari Version, CUDA/NVIDIA, Packaged Defaults, Gateway Module, Integration Docs (14 total)
+- Enhanced kimari/cli/main.py with: gateway command (--dry-run, --status, --plan), update check command (--online, --json), enhanced status (gateway, preview_gate, version, config_path fields)
+- Created docs/GATEWAY_PLAN.md, docs/UPDATE.md, docs/INSTALL_MATRIX.md, docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md
+- Updated CHANGELOG.md, ROADMAP.md, RELEASE_CHECKLIST.md, DOCTOR_DEEP.md, MEASURED_BENCHMARKS.md
+- Updated README.md with gateway, update check, enhanced doctor/status sections
+- Updated docs/index.html with 6 new feature cards
+- Updated scripts/release/check-release.py with 13 new v0.1.26 checks
+- Updated tests/test_release_v0126.py with 12 new test classes (39 total)
+- Fixed test_cli_smoke.py version references
+- All 93 tests pass, ruff clean, check-release passes, build succeeds, twine check passes
+- Pushed to GitHub: commit 42592a7
+
+Stage Summary:
+- v0.1.26-alpha fully expanded with gateway, update, enhanced doctor/status
+- Gateway is dry-run only (no real server), update never auto-updates
+- 14 doctor --deep checks, 10 gateway planned endpoints
+- Preview gate remains BLOCKED, no weights/adapters/GGUF
+- Next recommendation: v0.1.27-alpha (first private SFT execution)

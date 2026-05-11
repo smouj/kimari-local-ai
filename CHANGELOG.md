@@ -5,6 +5,29 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.27-alpha] — 2026-05-29
+
+### Added
+- **kimari/console/ module** — `render.py` with `render_status_table()`, `render_doctor_table()`, `render_gateway_summary()`, `render_next_steps()`; no external dependencies (no rich); clean ASCII/Unicode simple output; Windows compatible
+- **kimari/integrations/ module** — `config_generator.py` with `generate_openwebui_config()`, `generate_openclaw_config()`, `generate_hermes_config()`, `generate_continue_config()`, `sanitize_config()`, `validate_local_base_url()`; default base_url http://127.0.0.1:11435/v1; no tokens; no API keys; no writing by default
+- **`kimari integrations generate` command** — Generates configuration snippets for Open WebUI, OpenClaw, Hermes, and Continue.dev; `--target` for specific tool; `--all` for all; `--json` for structured output; `--write --output <path>` for explicit file writing; `--base-url` override; rejects non-local base_url with strong warning; rejects sensitive output paths without `--force`
+- **Improved `kimari status` human output** — Structured table with aligned key-value pairs; Version, Config, Models, Default profile, Server, Gateway, Preview gate fields; "Next steps" section; `--json` output unchanged
+- **Improved `kimari doctor --deep` human output** — Structured PASS/WARN/FAIL table with ✓/⚠/✗ icons; padded names; summary line (N PASS, M WARN, K FAIL); auto-generated "Suggested next steps" from WARN/FAIL items; `--json` output unchanged
+- **docs/INTEGRATION_CONFIG_GENERATOR.md** — Guide for integration config generator; supported targets; usage examples; example JSON outputs (no tokens); security (localhost only, --write requires --output); validation with doctor/status
+- **docs/GATEWAY_PROTOTYPE_PLAN.md** — Phased gateway prototype plan; 5 phases from dry-run CLI to dashboard/web UI; endpoints by phase; security per phase; gateway does NOT serve OpenAI-compatible endpoints
+- **docs/CONSOLE_UX.md** — Console output style guide; no rich dependency; JSON vs human output; PASS/WARN/FAIL format; next steps; emoji policy; Windows compatibility
+- **scripts/docs/generate_safe_cli_screenshots_plan.py** — Generates plan for CLI screenshot captures; 6 plans (status, doctor --deep, gateway --plan, integrations generate --all, benchmark --dry-run, update check); `--json` and `--markdown` output; safety notes; no actual screenshots
+- **Updated docs/SCREENSHOTS.md** — Added 6 new CLI screenshot sections; added screenshot plan script reference; added rule: no real screenshots without review
+
+### Changed
+- **Version bumped** to `0.1.27-alpha`
+- **Gateway wording corrected** — `kimari/gateway/plan.py` and `docs/GATEWAY_PLAN.md` now correctly state that the gateway helps configure and monitor the llama-server OpenAI-compatible endpoint (not that the gateway serves OpenAI-compatible endpoints itself)
+- **README.md** — Added cleaner console output, integration config generator, gateway prototype plan sections; updated version badge and references to v0.1.27-alpha
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.27-alpha; added console polish, integration config generator, gateway prototype plan, safe screenshots plan feature cards
+- **RELEASE_CHECKLIST.md** — Added v0.1.27 Checks section
+- **scripts/release/check-release.py** — Extended with v0.1.27 checks (console render.py, integrations config_generator.py, INTEGRATION_CONFIG_GENERATOR.md, GATEWAY_PROTOTYPE_PLAN.md, CONSOLE_UX.md, generate_safe_cli_screenshots_plan.py, gateway wording, integration configs contain no tokens, no weights/GGUF/adapters, gate BLOCKED)
+- **ROADMAP.md** — v0.1.26-alpha marked as Released; v0.1.27-alpha marked as Current; v0.1.28-alpha Planned
+
 ## [0.1.26-alpha] — 2026-05-28
 
 ### Added

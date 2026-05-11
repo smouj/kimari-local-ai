@@ -67,6 +67,121 @@ from kimari.models.registry import (
 from kimari.profiles.manager import list_profiles
 from kimari.utils.colors import Color, fail, info, ok, warn
 
+# Optional console render module (may not exist yet)
+try:
+    from kimari.console.render import render_doctor_table, render_next_steps, render_status_table
+except ImportError:
+    render_doctor_table = None
+    render_next_steps = None
+    render_status_table = None
+
+# Integrations config generators
+from kimari.integrations.config_generator import (
+    generate_continue_config,
+    generate_hermes_config,
+    generate_openclaw_config,
+    generate_openwebui_config,
+    sanitize_config,
+    validate_local_base_url,
+)
+
+# ─── Integrations ────────────────────────────────────────────────────────────
+
+
+def run_integrations_generate(
+    target: str | None = None,
+    generate_all: bool = False,
+    base_url: str = "http://127.0.0.1:11435/v1",
+    json_output: bool = False,
+    write: bool = False,
+    output: str | None = None,
+    force: bool = False,
+):
+    """Generate integration configuration for local AI tools.
+
+    Without --write, only prints the config. With --write, writes
+    to an explicit output path. Rejects sensitive paths unless --force.
+    No tokens or API keys are ever included.
+    """
+    # Validate base_url
+    is_local, msg = validate_local_base_url(base_url)
+    if not is_local:
+        print(f"  {Color.YELLOW}[WARNING]{Color.RESET} {msg}")
+        if not force:
+            print("  Use --force to proceed with a non-local base_url.")
+            return
+
+    # Determine which targets to generate
+    valid_targets = ["openwebui", "openclaw", "hermes", "continue"]
+    if generate_all:
+        targets = valid_targets
+    elif target:
+        if target not in valid_targets:
+            print(f"[ERROR] Unknown target: {target}")
+            print(f"  Valid targets: {', '.join(valid_targets)}")
+            return
+        targets = [target]
+    else:
+        print("[ERROR] Specify --target <name> or --all")
+        print(f"  Valid targets: {', '.join(valid_targets)}")
+        return
+
+    generators = {
+        "openwebui": generate_openwebui_config,
+        "openclaw": generate_openclaw_config,
+        "hermes": generate_hermes_config,
+        "continue": generate_continue_config,
+    }
+
+    results = {}
+    for t in targets:
+        config = generators[t](base_url=base_url)
+        config = sanitize_config(config)
+        results[t] = config
+
+    # JSON output (also write to file if requested)
+    if json_output:
+        print(json.dumps(results, indent=2))
+        if write and output:
+            output_path = Path(output)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_path, "w") as f:
+                json.dump(results, f, indent=2)
+            print(f"\n{Color.GREEN}Written to: {output_path}{Color.RESET}")
+        return
+
+    # Human-readable output
+    for t, config in results.items():
+        print(f"\n{Color.BOLD}{Color.CYAN}--- {t} ---{Color.RESET}")
+        for key, value in config.items():
+            print(f"  {key}: {value}")
+
+    # Write to file if requested
+    if write:
+        if not output:
+            print(f"\n{Color.RED}[ERROR]{Color.RESET} --write requires --output <path>")
+            return
+
+        output_path = Path(output)
+
+        # Reject sensitive paths unless --force
+        sensitive_prefixes = ["/home", "/Users", "/root", "/etc", "/usr", "/var", "~/"]
+        is_sensitive = any(str(output_path).startswith(p) for p in sensitive_prefixes)
+        if output_path.is_absolute() and is_sensitive and not force:
+            print(f"\n{Color.YELLOW}[WARNING]{Color.RESET} Output path is in a sensitive location: {output_path}")
+            print("  Use --force to write to this path.")
+            return
+
+        # Ensure parent directory exists
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(output_path, "w") as f:
+            json.dump(results, f, indent=2)
+        print(f"\n{Color.GREEN}Written to: {output_path}{Color.RESET}")
+    else:
+        print(f"\n{Color.DIM}Tip: Use --write --output <path> to save to a file.{Color.RESET}")
+
+
 # ─── Performance Commands ─────────────────────────────────────────────────────
 
 
@@ -774,54 +889,136 @@ def check_status(config: dict, json_output: bool = False):
 
     # Human-readable output
     status = status_data["status"]
+
     if status == "READY":
-        color = Color.GREEN
+        server_color = Color.GREEN
+        server_icon = "●"
     elif status == "STOPPED":
-        color = Color.RED
+        server_color = Color.RED
+        server_icon = "●"
     else:
-        color = Color.YELLOW
+        server_color = Color.YELLOW
+        server_icon = "●"
 
-    print(f"\n{color}● Kimari Server: {status}{Color.RESET}")
+    # Build status data dict for the table
+    status_dict = {
+        "Version": KIMARI_VERSION,
+        "Config": str(CONFIG_PATH),
+        "Models": str(get_user_models_dir()),
+        "Default profile": config.get("default_profile", "test"),
+        "Server": f"{server_color}{server_icon} {status}{Color.RESET}",
+        "Gateway": "planned (dry-run only)",
+        "Preview gate": "BLOCKED",
+    }
 
-    if status_data.get("pid"):
-        print(f"  PID:         {status_data['pid']}")
-    print(f"  Endpoint:    http://{host}:{port}")
-    if status_data.get("profile"):
-        print(f"  Profile:     {status_data['profile']}")
-    if status_data.get("model"):
-        print(f"  Model:       {status_data['model']}")
-    if status_data.get("uptime_s") is not None:
-        uptime = status_data["uptime_s"]
-        hours, remainder = divmod(uptime, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        if hours > 0:
-            print(f"  Uptime:      {hours}h {minutes}m {seconds}s")
-        elif minutes > 0:
-            print(f"  Uptime:      {minutes}m {seconds}s")
-        else:
-            print(f"  Uptime:      {seconds}s")
-    if status_data.get("started_at"):
-        print(f"  Started:     {status_data['started_at']}")
-    if status_data.get("models"):
-        print(f"  Loaded models: {', '.join(status_data['models'])}")
-    if status_data.get("health"):
-        health = status_data["health"]
-        if "error" in health:
-            print(f"  Health:      {Color.RED}{health['error']}{Color.RESET}")
-        else:
-            print(f"  Health:      {Color.GREEN}OK{Color.RESET}")
+    # If server is READY, add more detail
+    if status == "READY":
+        status_dict["Host"] = host
+        status_dict["Port"] = port
+        if status_data.get("pid"):
+            status_dict["PID"] = str(status_data["pid"])
+        if status_data.get("uptime_s") is not None:
+            uptime = status_data["uptime_s"]
+            hours, remainder = divmod(uptime, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            if hours > 0:
+                status_dict["Uptime"] = f"{hours}h {minutes}m {seconds}s"
+            elif minutes > 0:
+                status_dict["Uptime"] = f"{minutes}m {seconds}s"
+            else:
+                status_dict["Uptime"] = f"{seconds}s"
+        if status_data.get("model"):
+            status_dict["Model"] = status_data["model"]
+        if status_data.get("health"):
+            health = status_data["health"]
+            if "error" in health:
+                status_dict["Health"] = f"{Color.RED}{health['error']}{Color.RESET}"
+            else:
+                status_dict["Health"] = f"{Color.GREEN}OK{Color.RESET}"
+        if status_data.get("models"):
+            status_dict["Loaded models"] = ", ".join(status_data["models"])
+
+    # Error / warning details
     if status_data.get("log_errors"):
         err = status_data["log_errors"]
-        print(f"\n  {Color.RED}Log error detected:{Color.RESET} {err['pattern']}")
-        print(f"  {Color.YELLOW}Solution:{Color.RESET} {err['solution']}")
+        status_dict[f"{Color.RED}Log error{Color.RESET}"] = err["pattern"]
+        status_dict["Solution"] = f"{Color.YELLOW}{err['solution']}{Color.RESET}"
     if status_data.get("error"):
-        print(f"  Error:       {Color.RED}{status_data['error']}{Color.RESET}")
-    print(f"  Version:     {KIMARI_VERSION}")
-    print(f"  Config:      {CONFIG_PATH}")
-    print(f"  Models dir:  {get_user_models_dir()}")
-    print(f"  Profile:     {config.get('default_profile', 'test')}")
-    print("  Gateway:     planned (dry-run only)")
-    print("  Preview gate: BLOCKED")
+        status_dict["Error"] = f"{Color.RED}{status_data['error']}{Color.RESET}"
+
+    # Build next steps
+    next_steps = []
+    if status != "READY":
+        next_steps.append("Run 'kimari doctor --deep' for full diagnostics")
+        next_steps.append("Run 'kimari start' to start the server")
+    else:
+        next_steps.append("Run 'kimari chat \"Hello\"' to test the server")
+        next_steps.append("Run 'kimari doctor --deep' for full diagnostics")
+
+    if render_status_table is not None:
+        # Use console render module
+        separator = "─" * 42
+        print(f"\n{Color.BOLD}Kimari Status{Color.RESET}")
+        print(separator)
+        print(render_status_table(status_dict))
+        print(separator)
+        print(render_next_steps(next_steps))
+    else:
+        # Fallback: manual table output
+        separator = "─" * 42
+        print(f"\n{Color.BOLD}Kimari Status{Color.RESET}")
+        print(separator)
+        for key in [
+            "Version",
+            "Config",
+            "Models",
+            "Default profile",
+            "Server",
+            "Host",
+            "Port",
+            "PID",
+            "Uptime",
+            "Model",
+            "Health",
+            "Loaded models",
+            "Gateway",
+            "Preview gate",
+            f"{Color.RED}Log error{Color.RESET}",
+            "Solution",
+            "Error",
+        ]:
+            if key in status_dict:
+                value = status_dict[key]
+                label = key + ":"
+                print(f"  {label:<18}{value}")
+        # Catch any remaining keys not in the explicit order
+        for key, value in status_dict.items():
+            if key not in [
+                "Version",
+                "Config",
+                "Models",
+                "Default profile",
+                "Server",
+                "Host",
+                "Port",
+                "PID",
+                "Uptime",
+                "Model",
+                "Health",
+                "Loaded models",
+                "Gateway",
+                "Preview gate",
+                f"{Color.RED}Log error{Color.RESET}",
+                "Solution",
+                "Error",
+            ]:
+                label = key + ":"
+                print(f"  {label:<18}{value}")
+        print(separator)
+        if next_steps:
+            print("Next steps:")
+            for i, step in enumerate(next_steps, 1):
+                print(f"  {i}. {step}")
 
 
 # ─── Logs ────────────────────────────────────────────────────────────────────
@@ -1585,7 +1782,9 @@ def run_benchmark_plan(
     print(f"  {Color.BOLD}Recommended:{Color.RESET}")
     print(f"    Context:       {rec.get('recommended_ctx', 'N/A'):,} tokens")
     print(f"    Batch:         {rec.get('recommended_batch', 'N/A')} / ubatch {rec.get('recommended_ubatch', 'N/A')}")
-    print(f"    Cache K/V:     {rec.get('recommended_cache_type_k', 'N/A')} / {rec.get('recommended_cache_type_v', 'N/A')}")
+    print(
+        f"    Cache K/V:     {rec.get('recommended_cache_type_k', 'N/A')} / {rec.get('recommended_cache_type_v', 'N/A')}"
+    )
     print(f"    Est. VRAM:     {rec.get('estimated_vram_gb', 'N/A')} GiB")
     print(f"    Est. RAM:      {rec.get('estimated_ram_gb', 'N/A')} GiB")
 
@@ -1693,51 +1892,106 @@ def run_doctor_deep(json_output: bool = False):
         return
 
     # Human-readable output
-    print(f"\n{KIMARI_ASCII}")
-    print(f"  {Color.BOLD}Deep Diagnostics{Color.RESET}\n")
-
     checks = results[:-1] if results and results[-1].get("name") == "Summary" else results
+    summary = results[-1] if results and results[-1].get("name") == "Summary" else None
+
+    # Build suggested next steps from WARN/FAIL items
+    suggested_steps = []
     for check in checks:
         status = check.get("status", "INFO")
-        if status == "PASS":
-            icon = f"{Color.GREEN}✓{Color.RESET}"
-            status_str = f"{Color.GREEN}PASS{Color.RESET}"
-        elif status == "WARN":
-            icon = f"{Color.YELLOW}⚠{Color.RESET}"
-            status_str = f"{Color.YELLOW}WARN{Color.RESET}"
-        elif status == "FAIL":
-            icon = f"{Color.RED}✗{Color.RESET}"
-            status_str = f"{Color.RED}FAIL{Color.RESET}"
-        else:
-            icon = "●"
-            status_str = status
-
         name = check.get("name", "Unknown")
         value = check.get("value", "")
-        detail = check.get("detail", "")
+        if status == "WARN":
+            name_lower = name.lower()
+            if "model" in name_lower and ("gguf" in str(value).lower() or "not found" in str(value).lower()):
+                suggested_steps.append("Add GGUF models: kimari pull test")
+            elif "cuda" in name_lower or "nvidia" in name_lower:
+                suggested_steps.append("Install CUDA toolkit for GPU acceleration")
+            elif "model" in name_lower:
+                suggested_steps.append("Add GGUF models: kimari pull test")
+            else:
+                suggested_steps.append(f"Address {name} warning: {value}")
+        elif status == "FAIL":
+            suggested_steps.append(f"Fix {name}: {value}")
 
-        print(f"  {icon} {name}: {status_str} — {value}")
-        if detail:
-            print(f"    {Color.DIM}{detail}{Color.RESET}")
+    # Deduplicate suggested steps
+    seen = set()
+    unique_steps = []
+    for step in suggested_steps:
+        if step not in seen:
+            seen.add(step)
+            unique_steps.append(step)
 
-    # Summary
-    summary = results[-1] if results and results[-1].get("name") == "Summary" else None
+    # Extract summary values
+    pass_count = 0
+    warn_count = 0
+    fail_count = 0
     if summary:
         sv = summary.get("value", {})
         pass_count = sv.get("pass_count", 0)
         warn_count = sv.get("warn_count", 0)
         fail_count = sv.get("fail_count", 0)
-        total = sv.get("total", 0)
+    else:
+        for check in checks:
+            status = check.get("status", "INFO")
+            if status == "PASS":
+                pass_count += 1
+            elif status == "WARN":
+                warn_count += 1
+            elif status == "FAIL":
+                fail_count += 1
 
-        print(f"\n  {Color.BOLD}Summary: {pass_count}/{total} PASS, {warn_count} WARN, {fail_count} FAIL{Color.RESET}")
+    summary_text = f"{pass_count} PASS, {warn_count} WARN, {fail_count} FAIL"
 
-        if fail_count > 0:
-            print(f"  {Color.RED}Fix FAIL items before proceeding.{Color.RESET}")
-            raise SystemExit(1)
-        elif warn_count > 0:
-            print(f"  {Color.YELLOW}Warnings present. Kimari may work with limitations.{Color.RESET}")
-        else:
-            print(f"  {Color.GREEN}All deep checks passed!{Color.RESET}")
+    if render_status_table is not None and render_next_steps is not None:
+        # Use console render module for the doctor table
+        separator = "─" * 42
+        print(f"\n{Color.BOLD}Kimari Doctor — Deep Diagnostics{Color.RESET}")
+        print(separator)
+        print(render_doctor_table(checks))
+        print(separator)
+        print(f"Summary: {Color.BOLD}{summary_text}{Color.RESET}")
+        if unique_steps:
+            print()
+            print(render_next_steps(unique_steps))
+    else:
+        # Fallback: manual table output
+        separator = "─" * 42
+        print(f"\n{Color.BOLD}Kimari Doctor — Deep Diagnostics{Color.RESET}")
+        print(separator)
+        for check in checks:
+            status = check.get("status", "INFO")
+            if status == "PASS":
+                icon = f"{Color.GREEN}✓{Color.RESET}"
+            elif status == "WARN":
+                icon = f"{Color.YELLOW}⚠{Color.RESET}"
+            elif status == "FAIL":
+                icon = f"{Color.RED}✗{Color.RESET}"
+            else:
+                icon = "●"
+            name = check.get("name", "Unknown")
+            value = check.get("value", "")
+            detail = check.get("detail", "")
+            padded_name = f"{name:<18}"
+            print(f"  {icon} {padded_name}{value}")
+            if detail:
+                print(f"    {Color.DIM}{detail}{Color.RESET}")
+        print(separator)
+        print(f"Summary: {Color.BOLD}{summary_text}{Color.RESET}")
+
+        if unique_steps:
+            print("\nSuggested next steps:")
+            for i, step in enumerate(unique_steps, 1):
+                print(f"  {i}. {step}")
+
+    # Exit code logic
+    if fail_count > 0:
+        print(f"\n  {Color.RED}Fix FAIL items before proceeding.{Color.RESET}")
+        raise SystemExit(1)
+    elif warn_count > 0:
+        print(f"\n  {Color.YELLOW}Warnings present. Kimari may work with limitations.{Color.RESET}")
+    else:
+        print(f"\n  {Color.GREEN}All deep checks passed!{Color.RESET}")
 
     print()
 
@@ -1795,7 +2049,9 @@ def run_benchmark_measure(
             warn("Could not load benchmark prompts, using default prompt")
 
     if not prompts:
-        prompts = [{"id": "default", "prompt": "Hello, respond with a single word.", "category": "greeting", "max_tokens": 32}]
+        prompts = [
+            {"id": "default", "prompt": "Hello, respond with a single word.", "category": "greeting", "max_tokens": 32}
+        ]
 
     # Strip /v1 from endpoint if present for the base URL
     base_endpoint = endpoint.rstrip("/")
@@ -1907,7 +2163,9 @@ def run_benchmark_measure(
 # ─── Gateway ─────────────────────────────────────────────────────────────────
 
 
-def run_gateway(config: dict, dry_run: bool = False, status_only: bool = False, plan_only: bool = False, json_output: bool = False):
+def run_gateway(
+    config: dict, dry_run: bool = False, status_only: bool = False, plan_only: bool = False, json_output: bool = False
+):
     """Gateway local controller (dry-run only — no real server).
 
     Provides status, plan, and dry-run views of the planned gateway.
@@ -2283,9 +2541,18 @@ def main():
     # ─── Benchmark ──────────────────────────────────────────────────────────
     benchmark_parser = subparsers.add_parser("benchmark", help="Generate benchmark plan (dry-run by default)")
     benchmark_parser.add_argument("--profile", help="GPU profile to benchmark")
-    benchmark_parser.add_argument("--dry-run", action="store_true", default=True, help="Show plan without executing (default)")
-    benchmark_parser.add_argument("--measure", action="store_true", default=False, help="Run actual benchmark against a running server (experimental)")
-    benchmark_parser.add_argument("--endpoint", default=None, help="Server endpoint for --measure (e.g. http://127.0.0.1:11435/v1)")
+    benchmark_parser.add_argument(
+        "--dry-run", action="store_true", default=True, help="Show plan without executing (default)"
+    )
+    benchmark_parser.add_argument(
+        "--measure",
+        action="store_true",
+        default=False,
+        help="Run actual benchmark against a running server (experimental)",
+    )
+    benchmark_parser.add_argument(
+        "--endpoint", default=None, help="Server endpoint for --measure (e.g. http://127.0.0.1:11435/v1)"
+    )
     benchmark_parser.add_argument("--model", default=None, help="Model name for --measure (e.g. test)")
     benchmark_parser.add_argument("--yes", action="store_true", help="Confirm --measure execution (required)")
     benchmark_parser.add_argument("--output", default=None, help="Save measured results to JSON file")
@@ -2311,7 +2578,38 @@ def main():
     update_sub = update_parser.add_subparsers(dest="update_command", help="Update subcommands")
     update_check_parser = update_sub.add_parser("check", help="Check for available updates")
     update_check_parser.add_argument("--json", action="store_true", help="JSON output")
-    update_check_parser.add_argument("--online", action="store_true", help="Check GitHub for latest release (requires network)")
+    update_check_parser.add_argument(
+        "--online", action="store_true", help="Check GitHub for latest release (requires network)"
+    )
+
+    # Integrations command
+    integrations_parser = subparsers.add_parser("integrations", help="Generate integration configs for local AI tools")
+    integrations_sub = integrations_parser.add_subparsers(dest="integrations_command", help="Integrations subcommands")
+    integrations_gen_parser = integrations_sub.add_parser("generate", help="Generate integration configuration")
+    integrations_gen_parser.add_argument(
+        "--target",
+        default=None,
+        help="Target tool: openwebui, openclaw, hermes, continue",
+    )
+    integrations_gen_parser.add_argument(
+        "--all",
+        action="store_true",
+        dest="generate_all",
+        help="Generate configs for all supported targets",
+    )
+    integrations_gen_parser.add_argument(
+        "--base-url",
+        default="http://127.0.0.1:11435/v1",
+        help="Base URL for the llama-server endpoint (default: http://127.0.0.1:11435/v1)",
+    )
+    integrations_gen_parser.add_argument("--json", action="store_true", help="JSON output")
+    integrations_gen_parser.add_argument(
+        "--write", action="store_true", help="Write config to file (requires --output)"
+    )
+    integrations_gen_parser.add_argument("--output", default=None, help="Output file path for --write")
+    integrations_gen_parser.add_argument(
+        "--force", action="store_true", help="Allow writing to sensitive paths or non-local base_url"
+    )
 
     args = parser.parse_args()
 
@@ -2550,6 +2848,21 @@ def main():
         else:
             # Default: show update check offline
             run_update_check(json_output=False, online=False)
+    elif args.command == "integrations":
+        if getattr(args, "integrations_command", None) == "generate":
+            run_integrations_generate(
+                target=getattr(args, "target", None),
+                generate_all=getattr(args, "generate_all", False),
+                base_url=getattr(args, "base_url", "http://127.0.0.1:11435/v1"),
+                json_output=getattr(args, "json", False),
+                write=getattr(args, "write", False),
+                output=getattr(args, "output", None),
+                force=getattr(args, "force", False),
+            )
+        else:
+            print("Usage: kimari integrations generate --target <name> --json")
+            print("  Targets: openwebui, openclaw, hermes, continue")
+            print("  Use --all to generate all, --write --output <path> to save")
     else:
         parser.print_help()
 
