@@ -7,6 +7,9 @@ Reads two JSON eval result files (baseline and candidate) and compares:
 - manual_review_required count
 - missing_outputs count
 - average_score (if present in both; otherwise omitted)
+- verdict (candidate_better, candidate_worse, mixed, insufficient_data,
+  manual_review_required)
+- safety_regression_detected (if present in candidate data)
 
 If no scores exist in either file, returns comparison_status
 "manual_review_required". Never invents scores.
@@ -18,6 +21,10 @@ Usage:
     python eval/scripts/compare_runs.py \\
         --baseline eval/results/baseline.json \\
         --candidate eval/results/candidate.json --json
+    python eval/scripts/compare_runs.py \\
+        --baseline eval/results/baseline.json \\
+        --candidate eval/results/candidate.json \\
+        --summary-output eval/results/comparison-summary.json
 """
 
 from __future__ import annotations
@@ -97,11 +104,112 @@ def compute_stats(data: dict) -> dict:
     return stats
 
 
+def _compute_category_deltas(baseline: dict, candidate: dict) -> dict[str, float]:
+    """Compute per-category score deltas between baseline and candidate.
+
+    Looks at individual result entries that share a category and have
+    numeric scores. Returns a dict mapping category name to delta
+    (positive = candidate better). Categories with no scorable results
+    in either file are omitted.
+    """
+    baseline_results = baseline.get("results", [])
+    candidate_results = candidate.get("results", [])
+
+    # Group scores by category
+    baseline_cat_scores: dict[str, list[float]] = {}
+    candidate_cat_scores: dict[str, list[float]] = {}
+
+    for r in baseline_results:
+        cat = r.get("category", "unknown")
+        score = r.get("score")
+        if score is not None and isinstance(score, (int, float)):
+            baseline_cat_scores.setdefault(cat, []).append(float(score))
+
+    for r in candidate_results:
+        cat = r.get("category", "unknown")
+        score = r.get("score")
+        if score is not None and isinstance(score, (int, float)):
+            candidate_cat_scores.setdefault(cat, []).append(float(score))
+
+    deltas: dict[str, float] = {}
+    all_cats = set(baseline_cat_scores) | set(candidate_cat_scores)
+    for cat in all_cats:
+        b_scores = baseline_cat_scores.get(cat, [])
+        c_scores = candidate_cat_scores.get(cat, [])
+        if b_scores and c_scores:
+            b_avg = sum(b_scores) / len(b_scores)
+            c_avg = sum(c_scores) / len(c_scores)
+            deltas[cat] = round(c_avg - b_avg, 4)
+
+    return deltas
+
+
+def _determine_verdict(
+    baseline_stats: dict,
+    candidate_stats: dict,
+    candidate_data: dict,
+    baseline_has_score: bool,
+    candidate_has_score: bool,
+    category_deltas: dict[str, float],
+) -> str:
+    """Determine the comparison verdict.
+
+    Returns one of:
+    - "insufficient_data" — no scores in either file AND/OR missing_outputs > 0
+      in candidate
+    - "candidate_better" — candidate average_score > baseline AND no safety
+      regression
+    - "candidate_worse" — candidate average_score < baseline OR
+      safety_regression_detected=true in candidate
+    - "mixed" — some categories improved, some regressed
+    - "manual_review_required" — default when data is insufficient to
+      determine direction
+    """
+    # Check for safety regression in candidate data
+    safety_regression = candidate_data.get("safety_regression_detected", False)
+    if safety_regression:
+        return "candidate_worse"
+
+    # Check for insufficient data
+    missing_outputs = candidate_stats.get("missing_outputs", 0)
+    if (not baseline_has_score and not candidate_has_score) or missing_outputs > 0:
+        return "insufficient_data"
+
+    # Need scores in both to determine direction
+    if not (baseline_has_score and candidate_has_score):
+        return "manual_review_required"
+
+    # Check overall score direction
+    baseline_avg = baseline_stats.get("average_score", 0)
+    candidate_avg = candidate_stats.get("average_score", 0)
+
+    # Check per-category deltas for mixed verdict
+    if category_deltas:
+        improved = sum(1 for d in category_deltas.values() if d > 0)
+        regressed = sum(1 for d in category_deltas.values() if d < 0)
+        if improved > 0 and regressed > 0:
+            return "mixed"
+
+    if candidate_avg > baseline_avg:
+        return "candidate_better"
+    elif candidate_avg < baseline_avg:
+        return "candidate_worse"
+    else:
+        return "manual_review_required"
+
+
 def compare_eval_results(baseline: dict, candidate: dict) -> dict:
     """Compare two eval result dicts and return structured comparison.
 
     Never invents scores. If average_score exists in both, includes
     it with delta. Otherwise omits it entirely.
+
+    Adds a "verdict" field based on comparison logic:
+    - "insufficient_data" — no scores AND/OR missing_outputs > 0
+    - "candidate_better" — candidate > baseline, no safety regression
+    - "candidate_worse" — candidate < baseline OR safety regression
+    - "mixed" — some categories improved, some regressed
+    - "manual_review_required" — default when data is insufficient
     """
     baseline_stats = compute_stats(baseline)
     candidate_stats = compute_stats(candidate)
@@ -140,13 +248,20 @@ def compare_eval_results(baseline: dict, candidate: dict) -> dict:
     elif baseline_has_score or candidate_has_score:
         comparison["average_score_note"] = "average_score present in only one file — cannot compare"
 
-    # Determine comparison_status
-    # If no scores in either file, status is manual_review_required
+    # Safety regression detection from candidate data
+    safety_regression = candidate.get("safety_regression_detected", False)
+    comparison["safety_regression_detected"] = safety_regression
+
+    # Per-category score deltas
+    category_deltas = _compute_category_deltas(baseline, candidate)
+    if category_deltas:
+        comparison["category_score_deltas"] = category_deltas
+
+    # Determine comparison_status (legacy field)
     has_any_score = baseline_has_score or candidate_has_score
     if not has_any_score:
         comparison["comparison_status"] = "manual_review_required"
     elif baseline_has_score and candidate_has_score:
-        # Both have scores — can determine direction
         score_delta = candidate_stats["average_score"] - baseline_stats["average_score"]
         if score_delta > 0:
             comparison["comparison_status"] = "improved"
@@ -157,7 +272,48 @@ def compare_eval_results(baseline: dict, candidate: dict) -> dict:
     else:
         comparison["comparison_status"] = "manual_review_required"
 
+    # Determine verdict
+    comparison["verdict"] = _determine_verdict(
+        baseline_stats=baseline_stats,
+        candidate_stats=candidate_stats,
+        candidate_data=candidate,
+        baseline_has_score=baseline_has_score,
+        candidate_has_score=candidate_has_score,
+        category_deltas=category_deltas,
+    )
+
     return comparison
+
+
+def _build_summary_output(comparison: dict, candidate: dict) -> dict:
+    """Build a safe eval summary from comparison results.
+
+    The summary contains no raw prompts or responses — only
+    aggregate metadata safe for committing to the repository.
+    """
+    candidate_stats = comparison.get("candidate", {})
+
+    summary: dict = {
+        "run_id": candidate.get("run_id", ""),
+        "model_label": candidate.get("model_label", ""),
+        "kimari_version": candidate.get("kimari_version", ""),
+        "prompt_count": candidate_stats.get("prompt_count", 0),
+        "category_counts": {
+            cat: candidate_stats.get("category_coverage", []).count(cat)
+            for cat in candidate_stats.get("category_coverage", [])
+        },
+        "score_status": "manual_review_required"
+        if comparison.get("verdict") in ("insufficient_data", "manual_review_required")
+        else "scored",
+        "manual_review_required": comparison.get("verdict") in ("insufficient_data", "manual_review_required", "mixed"),
+        "safety_regression_detected": comparison.get("safety_regression_detected", False),
+        "false_claims_detected": candidate.get("false_claims_detected", False),
+        "verdict": comparison.get("verdict", "manual_review_required"),
+        "reviewer": candidate.get("reviewer", ""),
+        "notes": candidate.get("notes", ""),
+    }
+
+    return summary
 
 
 def main() -> None:
@@ -182,6 +338,12 @@ def main() -> None:
         action="store_true",
         dest="json_output",
         help="Output structured JSON comparison",
+    )
+    parser.add_argument(
+        "--summary-output",
+        type=Path,
+        default=None,
+        help="If provided, write a committable eval summary JSON to this path",
     )
 
     args = parser.parse_args()
@@ -257,9 +419,27 @@ def main() -> None:
             print()
 
         print(f"Comparison Status: {comparison['comparison_status']}")
+        print(f"Verdict: {comparison['verdict']}")
+
+        if comparison.get("safety_regression_detected"):
+            print("\n⚠  Safety regression detected in candidate — verdict: candidate_worse")
 
         if comparison["comparison_status"] == "manual_review_required":
             print("No scores available — manual review is required.")
+
+        if comparison["verdict"] == "insufficient_data":
+            print("Insufficient data to determine comparison direction.")
+        elif comparison["verdict"] == "mixed":
+            print("Some categories improved, some regressed — manual review required.")
+
+    # Write summary output if requested
+    if args.summary_output is not None:
+        summary = _build_summary_output(comparison, candidate)
+        args.summary_output.parent.mkdir(parents=True, exist_ok=True)
+        with open(args.summary_output, "w") as f:
+            json.dump(summary, f, indent=2)
+            f.write("\n")
+        print(f"\nSummary written to: {args.summary_output}", file=sys.stderr)
 
 
 if __name__ == "__main__":

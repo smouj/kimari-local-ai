@@ -1,7 +1,7 @@
 # Model Card: Kimari-4B
 
-> **Version:** v0.1.20-alpha (project framework)
-> **Last Updated:** 2026-05-21
+> **Version:** v0.1.21-alpha (project framework)
+> **Last Updated:** 2026-05-23
 > **Developer:** Smouj ([@smouj013](https://x.com/smouj013))
 
 ---
@@ -121,11 +121,11 @@ Training has not begun. No GPUs have been allocated, no training scripts have be
 
 ---
 
-## Pipeline Status (v0.1.20-alpha)
+## Pipeline Status (v0.1.21-alpha)
 
 | Aspect | Status |
 |--------|--------|
-| Current model work | v0.1.20 private SFT runbook and preview gate |
+| Current model work | v0.1.21 adapter manifest template, eval summary policy, SFT→ORPO decision |
 | Base selection status | SmolLM3-3B accepted for first private SFT candidate |
 | Dataset status | v0 synthetic dataset prepared (SFT + preference + holdout) |
 | Training status | Not started (configs and validation ready) |
@@ -271,7 +271,8 @@ The following items must be completed before Kimari-4B weights can be released:
 
 | Version | Date | Status | Changes |
 |---------|------|--------|---------|
-| 0.1.20-alpha | 2026-05-22 | Current | Private SFT runbook; baseline eval plan; adapter artifact policy; preview gate; compare runs tool; pipeline dry-run orchestration |
+| 0.1.21-alpha | 2026-05-23 | Current | Adapter manifest template; eval summary policy; SFT→ORPO decision framework; private SFT execution checklist; create_adapter_manifest and create_eval_summary scripts |
+| 0.1.20-alpha | 2026-05-22 | Released | Private SFT runbook; baseline eval plan; adapter artifact policy; preview gate; compare runs tool; pipeline dry-run orchestration |
 | 0.1.19-alpha | 2026-05-21 | Released | SmolLM3-3B accepted for first private SFT candidate; dataset v0; training readiness validation; KimariFit scoring plan; v0 training configs; HF placeholder plan |
 | 0.1.18-alpha | 2026-05-20 | Released | Pipeline dry-run: base decision record, seed datasets, dataset mix builder, KimariFit dry-run harness, GGUF export plan |
 | 0.1.17-alpha | 2026-05-19 | Released | Complete model card rewrite for v0.1.17-alpha; transparent status, honest evaluation targets, expanded safety and limitation sections |

@@ -286,7 +286,25 @@ Record the hashes in the adapter manifest (see `docs/ADAPTER_ARTIFACT_POLICY.md`
 
 ### 5c: Create adapter manifest
 
-Create `training/adapters/kimari-smollm3-sft-v0/MANIFEST.yaml` following the format in `docs/ADAPTER_ARTIFACT_POLICY.md`. Set `preview_gate_state: BLOCKED`.
+Use the `create_adapter_manifest.py` script to generate the manifest from the template at `training/templates/adapter_manifest.template.yaml`:
+
+```bash
+python training/scripts/create_adapter_manifest.py \
+    --run-config training/configs/private_sft_run.v0.yaml \
+    --adapter-dir training/adapters/kimari-smollm3-sft-v0 \
+    --output training/adapters/kimari-smollm3-sft-v0/MANIFEST.yaml
+```
+
+Or with `--dry-run` to preview before writing:
+
+```bash
+python training/scripts/create_adapter_manifest.py \
+    --run-config training/configs/private_sft_run.v0.yaml \
+    --adapter-dir training/adapters/kimari-smollm3-sft-v0 \
+    --dry-run
+```
+
+The script sets `preview_gate_state: BLOCKED`, `public_release_allowed: false`, and `hf_upload_allowed: false` automatically. See `docs/ADAPTER_ARTIFACT_POLICY.md` for the full manifest format and policy.
 
 ### 5d: Verify nothing is committed
 
@@ -423,11 +441,23 @@ reviewer: ""               # Name of the reviewer
 notes: ""
 ```
 
+### 7d: Sanitize eval results for commit
+
+If you need to commit eval results, use `create_eval_summary.py` to strip sensitive fields (prompts, responses) and produce a safe summary:
+
+```bash
+python eval/scripts/create_eval_summary.py \
+    --input eval/results/adapter-smollm3-sft-v0-q4km.json \
+    --output eval/results/adapter-smollm3-sft-v0-q4km-summary.json
+```
+
+See `docs/PRIVATE_EVAL_RESULTS_POLICY.md` for what eval results can and cannot be committed. The summary format follows `eval/templates/eval_summary.template.json`.
+
 ---
 
 ## Step 8: Decide if ORPO Proceeds
 
-Based on the evaluation results, make one of the following decisions:
+Based on the evaluation results, make one of the following decisions. See `docs/SFT_TO_ORPO_DECISION.md` for the full decision framework, including prerequisites, ORPO vs DPO selection criteria, and the decision flowchart.
 
 ### Decision: Proceed to ORPO
 
@@ -539,7 +569,11 @@ Use this checklist to track progress through the runbook:
 | [FIRST_PRIVATE_TRAINING_RUN.md](FIRST_PRIVATE_TRAINING_RUN.md) | Alternative training guide with additional detail |
 | [HUGGINGFACE_RELEASE.md](HUGGINGFACE_RELEASE.md) | Full release process for when public release is authorized |
 | [HF_PLACEHOLDER_PLAN.md](HF_PLACEHOLDER_PLAN.md) | Plan for Hugging Face placeholder repository |
+| [SFT_TO_ORPO_DECISION.md](SFT_TO_ORPO_DECISION.md) | Decision framework for proceeding to ORPO after SFT |
+| [PRIVATE_EVAL_RESULTS_POLICY.md](PRIVATE_EVAL_RESULTS_POLICY.md) | What eval results can and cannot be committed |
 | [training/configs/private_sft_run.v0.yaml](../training/configs/private_sft_run.v0.yaml) | Run manifest for this SFT run |
+| [training/templates/adapter_manifest.template.yaml](../training/templates/adapter_manifest.template.yaml) | Template for adapter manifest creation |
+| [eval/templates/eval_summary.template.json](../eval/templates/eval_summary.template.json) | Template for committable eval summaries |
 
 ---
 

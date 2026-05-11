@@ -193,6 +193,16 @@ python eval/scripts/summarize_results.py \
     --json > eval/results/baseline-smollm3-q4km-summary.json
 ```
 
+To produce a committable eval summary (strips prompts and responses), use `create_eval_summary.py`:
+
+```bash
+python eval/scripts/create_eval_summary.py \
+    --input eval/results/baseline-smollm3-q4km.json \
+    --output eval/results/baseline-smollm3-q4km-summary-safe.json
+```
+
+The summary follows the format defined in `eval/templates/eval_summary.template.json` and is safe to commit — it contains no raw prompts or responses. See `docs/PRIVATE_EVAL_RESULTS_POLICY.md` for what eval results can and cannot be committed.
+
 ### Step 6: Manual Review
 
 Review each response against the scoring dimensions in `eval/scoring/kimarifit_dimensions.json` and the expected behaviors in `eval/expected_behaviors.md`. Check for failure modes documented in `eval/failure_modes.md`.
@@ -255,7 +265,14 @@ with open('eval/baseline/baseline-smollm3-q4km-summary.json', 'w') as f:
 
 The baseline results serve as the reference point for:
 
-1. **SFT comparison** — After training the SFT adapter (`kimari-smollm3-sft-v0`), run the same KimariFit evaluation against the fine-tuned model and compare category-by-category using `eval/scripts/compare_runs.py`.
+1. **SFT comparison** — After training the SFT adapter (`kimari-smollm3-sft-v0`), run the same KimariFit evaluation against the fine-tuned model and compare category-by-category using `eval/scripts/compare_runs.py`. Use `--summary-output` to produce a committable comparison summary:
+
+```bash
+python eval/scripts/compare_runs.py \
+    --baseline eval/results/baseline-smollm3-q4km.json \
+    --candidate eval/results/adapter-smollm3-sft-v0-q4km.json \
+    --summary-output eval/results/comparison-sft-v0-summary.json
+```
 
 2. **ORPO decision gate** — If SFT results show meaningful improvement over baseline without safety regression, proceed to ORPO. If SFT degrades safety or shows no improvement, reassess the training approach before continuing.
 
@@ -284,6 +301,8 @@ The baseline results serve as the reference point for:
 | [FIRST_PRIVATE_TRAINING_RUN.md](FIRST_PRIVATE_TRAINING_RUN.md) | Detailed guide for the first private SFT run |
 | [eval/README.md](../eval/README.md) | Evaluation suite overview and category descriptions |
 | [eval/baseline/README.md](../eval/baseline/README.md) | Baseline eval directory documentation and file structure |
+| [PRIVATE_EVAL_RESULTS_POLICY.md](PRIVATE_EVAL_RESULTS_POLICY.md) | What eval results can and cannot be committed |
+| [eval/templates/eval_summary.template.json](../eval/templates/eval_summary.template.json) | Template for committable eval summaries |
 
 ---
 

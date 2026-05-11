@@ -291,6 +291,26 @@ twine upload dist/*
 - [ ] No adapter/weight files tracked in git
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.21 Checks
+
+- [ ] training/templates/adapter_manifest.template.yaml exists
+- [ ] training/scripts/create_adapter_manifest.py exists and --dry-run --json works
+- [ ] docs/PRIVATE_SFT_EXECUTION_CHECKLIST.md exists
+- [ ] docs/SFT_TO_ORPO_DECISION.md exists
+- [ ] docs/PRIVATE_EVAL_RESULTS_POLICY.md exists
+- [ ] eval/templates/eval_summary.template.json exists and parses as valid JSON
+- [ ] eval/scripts/create_eval_summary.py exists and --json works with fixtures
+- [ ] eval/scripts/compare_runs.py supports --summary-output and verdict logic
+- [ ] docs/ADAPTER_PREVIEW_GATE.md mentions BLOCKED as default
+- [ ] docs/ADAPTER_PREVIEW_GATE.md mentions safety_regression_detected
+- [ ] docs/ADAPTER_ARTIFACT_POLICY.md mentions adapter manifest template
+- [ ] docs/PRIVATE_TRAINING_RUNBOOK.md references create_adapter_manifest.py and SFT_TO_ORPO_DECISION
+- [ ] No adapter files (.safetensors, .bin, .pt, .pth, .ckpt, .gguf) tracked in git
+- [ ] No fake benchmark claims anywhere
+- [ ] Preview gate remains BLOCKED
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)
