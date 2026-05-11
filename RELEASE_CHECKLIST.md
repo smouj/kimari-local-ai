@@ -474,6 +474,36 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] No adapter/weights/GGUF tracked in git
 
+## v0.1.28 Checks
+
+- [ ] docs/KIMARI4B_PRIVATE_SFT_RUN.md exists
+- [ ] docs/KIMARI4B_FIRST_RUN_CHECKLIST.md exists
+- [ ] docs/KIMARI4B_EVAL_CRITERIA.md exists
+- [ ] training/configs/kimari4b_private_sft_run.v0.yaml exists and parses correctly
+- [ ] training/configs/kimari4b_private_sft_run.v0.yaml has public_release_allowed: false
+- [ ] training/configs/kimari4b_private_sft_run.v0.yaml has hf_upload_allowed: false
+- [ ] training/configs/kimari4b_private_sft_run.v0.yaml has preview_gate_state: BLOCKED
+- [ ] training/scripts/kimari4b_private_sft_command.py exists and --json works
+- [ ] training/scripts/kimari4b_private_sft_command.py --markdown works
+- [ ] eval/scripts/kimari4b_eval_plan.py exists and --json works
+- [ ] eval/scripts/kimari4b_eval_plan.py --markdown works
+- [ ] training/templates/kimari4b_private_summary.template.json exists and parses as valid JSON
+- [ ] Summary template has preview_gate_state: BLOCKED
+- [ ] Summary template has public_release_allowed: false
+- [ ] Summary template has hf_upload_allowed: false
+- [ ] Summary template has manual_review_required: true
+- [ ] docs/FIRST_PRIVATE_SFT_HANDOFF.md has Kimari-4B specific section
+- [ ] docs/ADAPTER_PREVIEW_GATE.md has Kimari-4B first private run section
+- [ ] ADAPTER_PREVIEW_GATE.md says Kimari-4B remains BLOCKED
+- [ ] README.md mentions Kimari-4B first private SFT run
+- [ ] README.md links to KIMARI4B_PRIVATE_SFT_RUN.md
+- [ ] docs/index.html mentions Kimari-4B private SFT preparation
+- [ ] MODEL_CARD.md still says no public weights
+- [ ] No GGUF/adapter/weight files tracked in git
+- [ ] No false Kimari-4B release claims anywhere
+- [ ] Preview gate still BLOCKED
+- [ ] `default_profile` is still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

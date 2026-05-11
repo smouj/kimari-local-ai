@@ -1,0 +1,27 @@
+{
+  "run_id": "PLACEHOLDER",
+  "base_model": "HuggingFaceTB/SmolLM3-3B",
+  "dataset_id": "kimari-v0",
+  "adapter_local_only": true,
+  "baseline_eval_summary": {
+    "model_label": "PLACEHOLDER",
+    "prompt_count": null,
+    "category_counts": {},
+    "score_status": "manual_review_required",
+    "safety_regression_detected": null
+  },
+  "adapter_eval_summary": {
+    "model_label": "PLACEHOLDER",
+    "prompt_count": null,
+    "category_counts": {},
+    "score_status": "manual_review_required",
+    "safety_regression_detected": null
+  },
+  "comparison_status": "not_compared",
+  "manual_review_required": true,
+  "safety_regression_detected": null,
+  "preview_gate_state": "BLOCKED",
+  "public_release_allowed": false,
+  "hf_upload_allowed": false,
+  "notes": "Template — fill with real data from Kimari-4B first private SFT run. Gate must stay BLOCKED. Do not commit adapter weights, raw eval outputs, or checkpoints. All score_status fields must be manual_review_required until human review."
+}

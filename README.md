@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.27--alpha-9b59b6.svg" alt="v0.1.27-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.28--alpha-9b59b6.svg" alt="v0.1.28-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.27-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.28-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.27-alpha**
+> **Kimari Local AI v0.1.28-alpha**
 
 ### ✅ Works Today
 
@@ -575,7 +575,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.27-alpha — Console polish, integration config generator, gateway prototype plan
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.28-alpha — First private SFT run preparation
 
 ### What's Ready
 
@@ -635,6 +635,18 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 - **[HF Token Safety](docs/HF_TOKEN_SAFETY.md)** — Guide for safe Hugging Face token handling
 - **[Private SFT Handoff](docs/FIRST_PRIVATE_SFT_HANDOFF.md)** — How to bring sanitized results from RunPod/local to repo
 - **[Private SFT Run Commands](docs/PRIVATE_SFT_RUN_COMMANDS.md)** — Expected commands for first private SFT execution
+
+### Kimari-4B First Private SFT Run
+
+- **[KIMARI4B_PRIVATE_SFT_RUN.md](docs/KIMARI4B_PRIVATE_SFT_RUN.md)** — Full execution guide for the first private SFT run
+- **[KIMARI4B_FIRST_RUN_CHECKLIST.md](docs/KIMARI4B_FIRST_RUN_CHECKLIST.md)** — Pre-flight checklist specific to Kimari-4B
+- **[KIMARI4B_EVAL_CRITERIA.md](docs/KIMARI4B_EVAL_CRITERIA.md)** — Evaluation criteria for Kimari-4B adapter assessment
+- **[Private run config](training/configs/kimari4b_private_sft_run.v0.yaml)** — Run manifest for first private SFT
+- **[Command script](training/scripts/kimari4b_private_sft_command.py)** — Generates exact training commands (`--config`, `--json`, `--markdown`)
+- **[Eval plan script](eval/scripts/kimari4b_eval_plan.py)** — Generates baseline and adapter eval plans (`--baseline-label`, `--adapter-label`, `--json`, `--markdown`)
+- **[Summary template](training/templates/kimari4b_private_summary.template.json)** — Template for sanitized training summary
+
+> **No public weights. No GGUF. Gate BLOCKED.** The first private SFT run is planned but not yet executed. Only sanitized metadata summaries may be committed after human review.
 
 > No weights released yet. No real benchmarks. SmolLM3 is accepted for private training only. Preview gate is BLOCKED.
 

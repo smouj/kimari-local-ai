@@ -2716,7 +2716,161 @@ def main() -> None:
         "Preview gate is not BLOCKED",
     )
 
-    print("\n[58/58] v0.1.27 README & index.html references")
+    print("\n[59/62] v0.1.28 Kimari-4B private SFT run docs")
+    check(
+        "docs/KIMARI4B_PRIVATE_SFT_RUN.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_PRIVATE_SFT_RUN.md").exists(),
+        "Kimari-4B private SFT run guide missing",
+    )
+    check(
+        "docs/KIMARI4B_FIRST_RUN_CHECKLIST.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_FIRST_RUN_CHECKLIST.md").exists(),
+        "Kimari-4B first run checklist missing",
+    )
+    check(
+        "docs/KIMARI4B_EVAL_CRITERIA.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_EVAL_CRITERIA.md").exists(),
+        "Kimari-4B eval criteria missing",
+    )
+
+    print("\n[60/62] v0.1.28 private SFT run config and scripts")
+    k4b_config = PROJECT_ROOT / "training" / "configs" / "kimari4b_private_sft_run.v0.yaml"
+    check(
+        "training/configs/kimari4b_private_sft_run.v0.yaml exists",
+        k4b_config.exists(),
+        "Kimari-4B private SFT run config missing",
+    )
+    if k4b_config.exists():
+        k4b_config_text = k4b_config.read_text()
+        check(
+            "kimari4b_private_sft_run.v0.yaml has public_release_allowed: false",
+            "public_release_allowed: false" in k4b_config_text,
+            "public_release_allowed must be false in Kimari-4B config",
+        )
+        check(
+            "kimari4b_private_sft_run.v0.yaml has hf_upload_allowed: false",
+            "hf_upload_allowed: false" in k4b_config_text,
+            "hf_upload_allowed must be false in Kimari-4B config",
+        )
+        check(
+            "kimari4b_private_sft_run.v0.yaml has preview_gate_state: BLOCKED",
+            "BLOCKED" in k4b_config_text,
+            "preview_gate_state must be BLOCKED in Kimari-4B config",
+        )
+    check(
+        "training/scripts/kimari4b_private_sft_command.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "kimari4b_private_sft_command.py").exists(),
+        "Kimari-4B command generator script missing",
+    )
+    check(
+        "eval/scripts/kimari4b_eval_plan.py exists",
+        (PROJECT_ROOT / "eval" / "scripts" / "kimari4b_eval_plan.py").exists(),
+        "Kimari-4B eval plan script missing",
+    )
+    k4b_summary = PROJECT_ROOT / "training" / "templates" / "kimari4b_private_summary.template.json"
+    check(
+        "training/templates/kimari4b_private_summary.template.json exists",
+        k4b_summary.exists(),
+        "Kimari-4B summary template missing",
+    )
+    if k4b_summary.exists():
+        try:
+            k4b_summary_data = json.loads(k4b_summary.read_text())
+            check(
+                "Summary template has preview_gate_state: BLOCKED",
+                k4b_summary_data.get("preview_gate_state") == "BLOCKED",
+                "preview_gate_state must be BLOCKED in summary template",
+            )
+            check(
+                "Summary template has public_release_allowed: false",
+                k4b_summary_data.get("public_release_allowed") is False,
+                "public_release_allowed must be false in summary template",
+            )
+            check(
+                "Summary template has hf_upload_allowed: false",
+                k4b_summary_data.get("hf_upload_allowed") is False,
+                "hf_upload_allowed must be false in summary template",
+            )
+            check(
+                "Summary template has manual_review_required: true",
+                k4b_summary_data.get("manual_review_required") is True,
+                "manual_review_required must be true in summary template",
+            )
+        except json.JSONDecodeError:
+            check("kimari4b_private_summary.template.json is valid JSON", False, "JSON parse error")
+
+    print("\n[61/62] v0.1.28 updated docs and references")
+    # Check FIRST_PRIVATE_SFT_HANDOFF.md has Kimari-4B section
+    handoff_path = PROJECT_ROOT / "docs" / "FIRST_PRIVATE_SFT_HANDOFF.md"
+    if handoff_path.exists():
+        handoff_text = handoff_path.read_text()
+        check(
+            "FIRST_PRIVATE_SFT_HANDOFF.md has Kimari-4B section",
+            "Kimari-4B" in handoff_text,
+            "Kimari-4B specific section missing from handoff doc",
+        )
+    # Check ADAPTER_PREVIEW_GATE.md has Kimari-4B section
+    gate_path = PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md"
+    if gate_path.exists():
+        gate_text = gate_path.read_text()
+        check(
+            "ADAPTER_PREVIEW_GATE.md has Kimari-4B first private run section",
+            "Kimari-4B" in gate_text,
+            "Kimari-4B section missing from preview gate doc",
+        )
+        check(
+            "ADAPTER_PREVIEW_GATE.md says Kimari-4B remains BLOCKED",
+            "BLOCKED" in gate_text and "kimari4b" in gate_text.lower(),
+            "Preview gate must say Kimari-4B remains BLOCKED",
+        )
+    check(
+        "README mentions Kimari-4B first private SFT run",
+        "KIMARI4B_PRIVATE_SFT_RUN" in readme_text or "kimari4b_private_sft" in readme_lower,
+        "Kimari-4B private SFT run reference missing from README.md",
+    )
+    check(
+        "README links to KIMARI4B_PRIVATE_SFT_RUN.md",
+        "KIMARI4B_PRIVATE_SFT_RUN" in readme_text,
+        "KIMARI4B_PRIVATE_SFT_RUN.md link not found in README.md",
+    )
+    if index_html.exists():
+        check(
+            "docs/index.html mentions 'private SFT' or 'Kimari-4B'",
+            "private sft" in index_text.lower() or "kimari-4b" in index_text.lower(),
+            "'private SFT' or 'Kimari-4B' not found in docs/index.html",
+        )
+    # Check MODEL_CARD still says no public weights
+    if model_card_path.exists():
+        model_card_lower = model_card_path.read_text().lower()
+        check(
+            "MODEL_CARD.md still says no public weights (v0.1.28)",
+            "not released" in model_card_lower or "no public" in model_card_lower or "not yet released" in model_card_lower or "planned" in model_card_lower or "not been trained" in model_card_lower,
+            "MODEL_CARD.md must still indicate no public weights",
+        )
+
+    print("\n[62/62] v0.1.28 content integrity")
+    check(
+        'default_profile still "test" (v0.1.28 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        "No 'Kimari-4B released' false claim (v0.1.28)",
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        "No adapter/weights/GGUF tracked in git (v0.1.28)",
+        len(gguf_files) == 0,
+        f"Found tracked adapter/weight/GGUF files: {gguf_files}",
+    )
+    check(
+        "Preview gate still BLOCKED (v0.1.28)",
+        "BLOCKED" in (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").read_text()
+        if (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").exists()
+        else True,
+        "Preview gate is not BLOCKED",
+    )
     check(
         "README mentions 'integrations generate' or 'integration config'",
         "integrations generate" in readme_lower or "integration config" in readme_lower,

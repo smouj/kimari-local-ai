@@ -333,7 +333,7 @@
 - ✅ docs/INSTALL_MATRIX.md
 - ✅ docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md
 
-## v0.1.27-alpha (Current)
+## v0.1.27-alpha (Released)
 
 - ✅ Console render module (kimari/console/render.py)
 - ✅ Improved `kimari status` human output
@@ -347,12 +347,22 @@
 - ✅ Safe CLI screenshots plan script
 - ✅ Updated docs/SCREENSHOTS.md
 
-## v0.1.28-alpha (Planned)
+## v0.1.28-alpha (Current)
 
-- First private SFT execution
-- Local manifest and eval summary
-- Gateway local read-only FastAPI prototype
-- Eval baseline vs adapter comparison
+- ✅ Kimari-4B first private SFT run guide (docs/KIMARI4B_PRIVATE_SFT_RUN.md)
+- ✅ Private SFT run config (training/configs/kimari4b_private_sft_run.v0.yaml)
+- ✅ Private SFT command generator (training/scripts/kimari4b_private_sft_command.py)
+- ✅ First run checklist (docs/KIMARI4B_FIRST_RUN_CHECKLIST.md)
+- ✅ Eval plan script (eval/scripts/kimari4b_eval_plan.py)
+- ✅ Eval criteria (docs/KIMARI4B_EVAL_CRITERIA.md)
+- ✅ Summary template (training/templates/kimari4b_private_summary.template.json)
+- ✅ Updated FIRST_PRIVATE_SFT_HANDOFF.md with Kimari-4B specific section
+- ✅ Updated ADAPTER_PREVIEW_GATE.md with Kimari-4B BLOCKED status
+
+## v0.1.29-alpha (Planned)
+
+- First private SFT result summary (if training executed)
+- OR Gateway read-only FastAPI prototype
 
 ## v0.2.0-alpha
 

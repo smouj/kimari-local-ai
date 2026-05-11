@@ -1,0 +1,335 @@
+# Kimari-4B Private SFT Run — First Training Execution Guide
+
+> **Document Type:** Execution guide for the first private SFT run of Kimari-4B  
+> **Version:** v0.1.28-alpha  
+> **Date:** 2026-05-30  
+> **Status:** Active — governs the first private SFT training execution  
+> **Gate State:** BLOCKED — no public release, no HF upload
+
+---
+
+## 1. Purpose
+
+This document describes the first private SFT (Supervised Fine-Tuning) run for **Kimari-4B**, the custom local AI model built on top of SmolLM3-3B. Its purpose is to:
+
+1. Define the exact steps for executing the first private SFT run
+2. Specify what files remain local (never committed to the repo)
+3. Specify what sanitized summaries can be committed after review
+4. Ensure the preview gate stays BLOCKED throughout
+5. Prevent any Hugging Face upload until explicit approval
+
+> **Core principle:** This is a **private** training run. No weights, no adapters, no GGUF files, and no raw eval outputs will be committed or published.
+
+---
+
+## 2. Base Model
+
+| Property | Value |
+|----------|-------|
+| **Base model** | `HuggingFaceTB/SmolLM3-3B` |
+| **License** | Apache-2.0 |
+| **Status** | Accepted for first private training candidate |
+| **Decision record** | `docs/MODEL_DECISION_RECORD.md` |
+| **Acceptance doc** | `docs/BASE_MODEL_ACCEPTANCE.md` |
+| **HF URL** | https://huggingface.co/HuggingFaceTB/SmolLM3-3B |
+
+SmolLM3-3B was selected because:
+
+- Apache-2.0 license permits derivative works and redistribution
+- 3B parameter size is viable for consumer GPUs (8–12 GB VRAM with LoRA)
+- Strong multilingual support including Spanish
+- Active community maintenance by HuggingFace
+- Good coding and reasoning baseline
+
+---
+
+## 3. Dataset
+
+| Property | Value |
+|----------|-------|
+| **Dataset ID** | `kimari-v0` |
+| **Build directory** | `dataset/build/kimari-v0` |
+| **SFT source** | `dataset/v0/sft_v0.jsonl` |
+| **Preference source** | `dataset/v0/preference_v0.jsonl` |
+| **Eval holdout** | `dataset/v0/eval_holdout.jsonl` |
+| **Builder script** | `training/scripts/build_dataset_mix.py` |
+| **Validation** | `training/scripts/validate_training_ready.py` |
+
+The dataset v0 contains synthetic examples across 15 categories focused on:
+
+- Coding (Python, bash, Docker, Linux)
+- Spanish technical communication
+- JSON validity and structured output
+- Local hardware awareness
+- Agent usefulness
+- Safety (refusing harmful requests, no fake benchmarks, no unsafe exposure advice)
+
+---
+
+## 4. Training Method
+
+| Property | Value |
+|----------|-------|
+| **Method** | LoRA / QLoRA |
+| **Config** | `training/configs/kimari_sft_lora.v0.example.yaml` |
+| **Run config** | `training/configs/kimari4b_private_sft_run.v0.yaml` |
+| **Output directory** | `training/adapters/kimari4b-smollm3-sft-v0` |
+| **Expected artifacts** | `adapter_config.json`, `adapter_model.safetensors`, `tokenizer.json`, `trainer_state.json` |
+
+LoRA is chosen for the first run because:
+
+- Reduces VRAM requirements (only adapter weights are trained)
+- Faster training iteration cycle
+- Smaller output artifacts (adapter vs. full model)
+- Easy to revert or iterate on
+
+---
+
+## 5. Recommended Hardware
+
+| Hardware | VRAM | Expected Time | Notes |
+|----------|------|---------------|-------|
+| RTX 4090 | 24 GB | ~30–60 min | Best single-GPU option |
+| RTX 3090 | 24 GB | ~45–90 min | Comparable to 4090 |
+| L40S | 48 GB | ~20–40 min | Cloud GPU (RunPod, Lambda) |
+| A100 40GB | 40 GB | ~25–50 min | Cloud GPU |
+| RTX 4080 | 16 GB | ~60–120 min | May need reduced batch size |
+| RTX 3080 | 10/12 GB | ~90–180 min | QLoRA 4-bit may be needed |
+
+> **Minimum:** 10 GB VRAM with QLoRA 4-bit quantization.  
+> **Recommended:** 16+ GB VRAM for LoRA with full precision.
+
+---
+
+## 6. Exact Commands
+
+### 6.1 Environment Setup
+
+```bash
+# Clone and enter the repository
+git clone https://github.com/smouj/kimari-local-ai.git
+cd kimari-local-ai
+
+# Install base dependencies
+pip install -e .
+
+# Install training dependencies
+pip install -r training/requirements-training.txt
+```
+
+### 6.2 Dataset Build
+
+```bash
+# Build the dataset mix
+python training/scripts/build_dataset_mix.py \
+    --sft dataset/v0/sft_v0.jsonl \
+    --preference dataset/v0/preference_v0.jsonl \
+    --output-dir dataset/build/kimari-v0 \
+    --holdout dataset/v0/eval_holdout.jsonl
+
+# Validate the dataset
+python training/scripts/validate_training_ready.py --json
+```
+
+### 6.3 Preflight Check
+
+```bash
+# Run preflight to verify everything is ready
+python training/scripts/preflight_private_sft.py \
+    --run-config training/configs/kimari4b_private_sft_run.v0.yaml \
+    --json
+```
+
+### 6.4 Training Dry-Run
+
+```bash
+# Preview the training command without executing
+python training/scripts/kimari4b_private_sft_command.py \
+    --config training/configs/kimari4b_private_sft_run.v0.yaml \
+    --json
+```
+
+### 6.5 Real Training
+
+```bash
+# Execute the actual training
+# This command is generated by the command script above
+python training/scripts/train_sft_lora.py \
+    --config training/configs/kimari_sft_lora.v0.example.yaml \
+    --dataset-path dataset/build/kimari-v0/sft.train.jsonl \
+    --eval-dataset-path dataset/build/kimari-v0/sft.eval.jsonl \
+    --output-dir training/adapters/kimari4b-smollm3-sft-v0
+```
+
+> **IMPORTANT:** Real training must NOT run in CI. Run only on a local GPU or RunPod instance.
+
+### 6.6 Baseline Evaluation
+
+```bash
+# Plan the baseline eval
+python eval/scripts/kimari4b_eval_plan.py \
+    --baseline-label smollm3-base \
+    --json
+
+# Execute baseline eval (requires running llama-server with base model)
+python eval/kimarifit.py \
+    --model-label smollm3-base \
+    --endpoint http://127.0.0.1:11435/v1 \
+    --output eval/results/baseline-smollm3-q4km.json
+```
+
+### 6.7 Adapter Evaluation
+
+```bash
+# Plan the adapter eval
+python eval/scripts/kimari4b_eval_plan.py \
+    --baseline-label smollm3-base \
+    --adapter-label kimari4b-smollm3-sft-v0 \
+    --json
+
+# Execute adapter eval (requires running llama-server with merged/quantized model)
+python eval/kimarifit.py \
+    --model-label kimari4b-smollm3-sft-v0 \
+    --endpoint http://127.0.0.1:11435/v1 \
+    --output eval/results/adapter-smollm3-sft-v0-q4km.json
+```
+
+### 6.8 Post-Training
+
+```bash
+# Run post-training orchestration (dry-run first)
+python training/scripts/postrun_private_sft.py --dry-run
+
+# Then execute for real
+python training/scripts/postrun_private_sft.py \
+    --run-config training/configs/kimari4b_private_sft_run.v0.yaml \
+    --adapter-dir training/adapters/kimari4b-smollm3-sft-v0
+```
+
+### 6.9 Manifest and Summary
+
+```bash
+# Create adapter manifest
+python training/scripts/create_adapter_manifest.py \
+    --run-config training/configs/kimari4b_private_sft_run.v0.yaml \
+    --adapter-dir training/adapters/kimari4b-smollm3-sft-v0 \
+    --dry-run
+
+# Create eval summary (strips prompts/responses)
+python eval/scripts/create_eval_summary.py \
+    --input eval/results/adapter-smollm3-sft-v0-q4km.json \
+    --output eval/results/adapter-smollm3-sft-v0-q4km-summary.json
+
+# Compare runs
+python eval/scripts/compare_runs.py \
+    --baseline eval/results/baseline-smollm3-q4km.json \
+    --adapter eval/results/adapter-smollm3-sft-v0-q4km.json \
+    --summary-output eval/results/comparison-sft-v0-vs-baseline-summary.json
+
+# Create private run record
+python training/scripts/create_private_run_record.py \
+    --run-config training/configs/kimari4b_private_sft_run.v0.yaml \
+    --manifest training/adapters/kimari4b-smollm3-sft-v0/MANIFEST.yaml \
+    --eval-summary eval/results/adapter-smollm3-sft-v0-q4km-summary.json \
+    --compare-summary eval/results/comparison-sft-v0-vs-baseline-summary.json \
+    --dry-run
+```
+
+### 6.10 Secret Scan
+
+```bash
+# Scan for secrets before any commit
+python scripts/security/scan_for_secrets.py \
+    --paths README.md docs training eval tests \
+    --json
+```
+
+---
+
+## 7. What Files Stay Local
+
+The following artifacts must **never** be committed to the repository:
+
+| Artifact | Location Pattern | Why |
+|----------|-----------------|-----|
+| Adapter weights | `training/adapters/**/*.safetensors` | Proprietary binary data |
+| Training checkpoints | `training/adapters/**/checkpoint-*/` | Intermediate training state |
+| Optimizer states | `training/adapters/**/*.pt` | Not useful, potentially revealing |
+| Merged model | `training/adapters/*-merged/` | Full model weights |
+| GGUF exports | `models/kimari-*.gguf` | Quantized model binaries |
+| Raw eval outputs | `eval/results/*-raw.json` | Contains model responses |
+| Raw comparison | `eval/results/comparison-*-raw.json` | May contain prompts |
+| TensorBoard logs | `training/adapters/**/runs/` | Binary event files |
+| WandB cache | `wandb/` | May contain API keys |
+
+> These are all gitignored. See `docs/ADAPTER_ARTIFACT_POLICY.md` for the full list.
+
+---
+
+## 8. What Summaries Can Be Committed
+
+After the training run completes and artifacts are sanitized per `docs/FIRST_PRIVATE_SFT_HANDOFF.md`, the following **sanitized metadata** may be committed:
+
+| Artifact | Condition | Sanitization |
+|----------|-----------|--------------|
+| `MANIFEST.yaml` | No absolute paths, no secrets | Manual review |
+| `eval_summary.json` | Generated by `create_eval_summary.py` | Auto-stripped |
+| `compare_summary.json` | Category-level aggregates only | Auto-stripped |
+| `private_run_record.json` | Generated by `create_private_run_record.py` | Auto-stripped |
+| `private_summary.json` | Filled from `kimari4b_private_summary.template.json` | Manual review |
+
+Every committed artifact must have:
+
+- `preview_gate_state: BLOCKED`
+- `public_release_allowed: false`
+- `hf_upload_allowed: false`
+- No absolute filesystem paths
+- No HF tokens or API keys
+- No raw prompt or response text
+
+---
+
+## 9. Gate State
+
+The preview gate stays **BLOCKED** throughout this entire process. The gate does not advance as a side effect of:
+
+- Completing the training run
+- Creating a manifest
+- Running evaluations
+- Generating summaries
+- Passing automated tests
+
+See `docs/ADAPTER_PREVIEW_GATE.md` for the full state machine and transition requirements.
+
+---
+
+## 10. No Hugging Face Upload
+
+Kimari-4B weights, adapters, and GGUF exports will **not** be uploaded to Hugging Face until:
+
+1. The adapter passes the full preview gate process
+2. A human maintainer explicitly approves `APPROVED_FOR_PUBLIC_PREVIEW`
+3. The Hugging Face release process in `docs/HUGGINGFACE_RELEASE.md` is followed
+
+No automated process will upload anything to Hugging Face.
+
+---
+
+## Cross-Reference
+
+| Document | Relationship |
+|----------|-------------|
+| [KIMARI4B_FIRST_RUN_CHECKLIST.md](KIMARI4B_FIRST_RUN_CHECKLIST.md) | Pre-flight checklist specific to this first run |
+| [KIMARI4B_EVAL_CRITERIA.md](KIMARI4B_EVAL_CRITERIA.md) | Evaluation criteria for Kimari-4B |
+| [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Gate state machine — all adapters start BLOCKED |
+| [FIRST_PRIVATE_SFT_HANDOFF.md](FIRST_PRIVATE_SFT_HANDOFF.md) | How to bring sanitized results into the repo |
+| [ADAPTER_ARTIFACT_POLICY.md](ADAPTER_ARTIFACT_POLICY.md) | What can/cannot be committed |
+| [BASE_MODEL_ACCEPTANCE.md](BASE_MODEL_ACCEPTANCE.md) | SmolLM3-3B acceptance for private training |
+| [MODEL_DECISION_RECORD.md](MODEL_DECISION_RECORD.md) | Why SmolLM3-3B was selected |
+| [PRIVATE_TRAINING_RUNBOOK.md](PRIVATE_TRAINING_RUNBOOK.md) | Step-by-step runbook |
+| [PRIVATE_RUN_ARTIFACTS.md](PRIVATE_RUN_ARTIFACTS.md) | Artifact classification |
+| [HF_TOKEN_SAFETY.md](HF_TOKEN_SAFETY.md) | Token safety procedures |
+
+---
+
+*This document governs the first private SFT run of Kimari-4B. No weights, no adapters, no GGUF, no HF upload. The preview gate stays BLOCKED. Only sanitized metadata summaries may be committed after review.*

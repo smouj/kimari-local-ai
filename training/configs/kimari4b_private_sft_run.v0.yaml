@@ -1,0 +1,33 @@
+# Kimari-4B Private SFT Run Manifest v0
+
+run_id: kimari4b-smollm3-sft-v0-private-001
+status: planned
+base_model: HuggingFaceTB/SmolLM3-3B
+base_model_license: Apache-2.0
+base_model_status: accepted_private_training_candidate
+dataset_build_dir: dataset/build/kimari-v0
+sft_config: training/configs/kimari_sft_lora.v0.example.yaml
+output_dir: training/adapters/kimari4b-smollm3-sft-v0
+eval_plan: docs/BASELINE_EVAL_PLAN.md
+artifact_policy: docs/ADAPTER_ARTIFACT_POLICY.md
+preview_gate: docs/ADAPTER_PREVIEW_GATE.md
+public_release_allowed: false
+hf_upload_allowed: false
+preview_gate_state: BLOCKED
+expected_artifacts:
+  - adapter_config.json
+  - adapter_model.safetensors
+  - tokenizer.json
+  - trainer_state.json
+  - training_args.bin
+  - MANIFEST.yaml
+forbidden_artifacts:
+  - "*.gguf"
+  - "*.safetensors"
+  - "checkpoint-*/"
+  - "*.pt"
+  - "*.pth"
+  - "*-merged/"
+  - "*-raw.json"
+notes: "First private SFT run for Kimari-4B. Base: SmolLM3-3B. Method: LoRA/QLoRA. No public release. No HF upload. See KIMARI4B_PRIVATE_SFT_RUN.md for full guide. Gate stays BLOCKED."
+created_date: "2026-05-30"

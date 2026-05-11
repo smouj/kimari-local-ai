@@ -1,8 +1,8 @@
 # Adapter Preview Gate — Release State Machine
 
 > **Document Type:** Release gate criteria  
-> **Version:** v0.1.20-alpha  
-> **Date:** 2026-05-22  
+> **Version:** v0.1.28-alpha  
+> **Date:** 2026-05-30  
 > **Status:** Active — all adapters start in BLOCKED state
 
 ---
@@ -205,6 +205,51 @@ state_history:
 | [HUGGINGFACE_RELEASE.md](HUGGINGFACE_RELEASE.md) | Full release process for when an adapter reaches APPROVED_FOR_PUBLIC_PREVIEW |
 | [HF_PLACEHOLDER_PLAN.md](HF_PLACEHOLDER_PLAN.md) | Placeholder repository rules for before any weights are distributed |
 | [MODEL_LICENSES.md](../MODEL_LICENSES.md) | License verification is a prerequisite for BLOCKED → PENDING |
+
+---
+
+## Kimari-4B First Private Run
+
+The first private SFT run for Kimari-4B (based on SmolLM3-3B) remains in the **BLOCKED** state. This is the expected and correct state.
+
+### Current Status
+
+- **Adapter:** `kimari4b-smollm3-sft-v0`
+- **Base model:** `HuggingFaceTB/SmolLM3-3B`
+- **Gate state:** BLOCKED
+- **Run config:** `training/configs/kimari4b_private_sft_run.v0.yaml`
+- **Status:** Planned — no training has been executed yet
+
+### What Would Be Required for BLOCKED → PENDING
+
+The following **minimum conditions** would need to be met before the Kimari-4B first private run could transition from BLOCKED to PENDING:
+
+| # | Condition | Current Status |
+|---|-----------|---------------|
+| 1 | License verified (Apache-2.0 permits private evaluation) | ✅ Verified |
+| 2 | No secrets or data issues in adapter directory | ⬜ Pending training |
+| 3 | Adapter size recorded in manifest | ⬜ Pending training |
+| 4 | Adapter hash recorded in manifest | ⬜ Pending training |
+
+> **Important:** Meeting these conditions does NOT automatically advance the gate. A human maintainer must explicitly approve the transition with a recorded decision and date.
+
+### No Automatic Transitions
+
+The following events do **NOT** advance the Kimari-4B gate:
+
+- Completing the training run
+- Creating a manifest with `create_adapter_manifest.py`
+- Passing automated tests
+- Positive evaluation results
+- Manual review completion
+
+Every transition requires:
+
+1. A human to verify the requirements are met
+2. A human to make the decision
+3. The decision to be recorded in the adapter manifest with date and decision-maker
+
+See the main [Transition Requirements](#transition-requirements) section above for the full criteria.
 
 ---
 

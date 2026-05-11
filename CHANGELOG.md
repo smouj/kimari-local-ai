@@ -5,7 +5,26 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.27-alpha] — 2026-05-29
+## [0.1.28-alpha] — 2026-05-30
+
+### Added
+- **docs/KIMARI4B_PRIVATE_SFT_RUN.md** — Full execution guide for the first private SFT run of Kimari-4B; base model (SmolLM3-3B), dataset (v0), method (LoRA/QLoRA), hardware recommendations, exact commands, what stays local, what summaries can be committed, gate stays BLOCKED, no HF upload
+- **training/configs/kimari4b_private_sft_run.v0.yaml** — Run manifest for first private SFT; run_id, status=planned, base_model, dataset_build_dir, sft_config, output_dir, preview_gate_state=BLOCKED, public_release_allowed=false, hf_upload_allowed=false, expected_artifacts, forbidden_artifacts
+- **training/scripts/kimari4b_private_sft_command.py** — CLI command generator for Kimari-4B first private SFT; `--config`, `--json`, `--markdown`; generates environment setup, dataset build, preflight, training dry-run, real training, baseline eval, adapter eval, manifest, summary, secret scan, forbidden actions; no actual training
+- **docs/KIMARI4B_FIRST_RUN_CHECKLIST.md** — Pre-flight checklist for first private SFT; security, license, dataset, baseline eval, hardware, output directory, adapter manifest, eval summary, no HF upload, gate BLOCKED
+- **eval/scripts/kimari4b_eval_plan.py** — CLI eval plan generator; `--baseline-label`, `--adapter-label`, `--json`, `--markdown`; generates baseline eval plan, adapter eval plan, compare command, summary command, manual review checklist; no scores unless results provided
+- **docs/KIMARI4B_EVAL_CRITERIA.md** — Evaluation criteria for Kimari-4B; coding, sysadmin, Spanish technical, JSON validity, agent usefulness, safety, local hardware awareness, no false claims, no unsafe public exposure advice, regression vs baseline
+- **training/templates/kimari4b_private_summary.template.json** — Template for sanitized training summary; run_id, base_model, dataset_id, adapter_local_only, baseline_eval_summary, adapter_eval_summary, comparison_status, manual_review_required, safety_regression_detected, preview_gate_state=BLOCKED, public_release_allowed=false, hf_upload_allowed=false
+
+### Changed
+- **Version bumped** to `0.1.28-alpha`
+- **docs/FIRST_PRIVATE_SFT_HANDOFF.md** — Added Section 9: Kimari-4B specific handoff notes (what to bring from GPU, what NOT to bring, how to clean summaries, scan_for_secrets on Kimari-4B artifacts); updated version and date
+- **docs/ADAPTER_PREVIEW_GATE.md** — Added Kimari-4B first private run section (current status: BLOCKED, minimum conditions for BLOCKED → PENDING, no automatic transitions); updated version and date
+- **README.md** — Added Kimari-4B first private SFT run section with links to all new docs, scripts, and templates; updated version badge and alpha notice to v0.1.28-alpha
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.28-alpha; added private SFT preparation, first run checklist, command generator, eval plan chips; added status table rows for v0.1.28
+- **RELEASE_CHECKLIST.md** — Added v0.1.28 Checks section
+- **scripts/release/check-release.py** — Extended with v0.1.28 checks (KIMARI4B_PRIVATE_SFT_RUN, KIMARI4B_FIRST_RUN_CHECKLIST, KIMARI4B_EVAL_CRITERIA, kimari4b_private_sft_run.v0.yaml, kimari4b_private_sft_command.py, kimari4b_eval_plan.py, kimari4b_private_summary.template.json, MODEL_CARD says no public weights, no GGUF/adapters/weights tracked, gate BLOCKED)
+- **ROADMAP.md** — v0.1.27-alpha marked as Released; v0.1.28-alpha marked as Current; v0.1.29-alpha Planned
 
 ### Added
 - **kimari/console/ module** — `render.py` with `render_status_table()`, `render_doctor_table()`, `render_gateway_summary()`, `render_next_steps()`; no external dependencies (no rich); clean ASCII/Unicode simple output; Windows compatible

@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.27-alpha — Console polish, integration config generator, gateway prototype plan
+      v0.1.28-alpha — First private SFT run preparation, eval criteria, command generator
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -475,18 +475,18 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <strong>Kimari</strong> is the framework. <strong>Kimari-4B</strong> is not released yet.
 </div>
 
-<!-- ═══════ v0.1.27-alpha FOCUS ═══════ -->
+<!-- ═══════ v0.1.28-alpha FOCUS ═══════ -->
 <div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.27-alpha</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.28-alpha</span>
       <span style="font-size:1.1rem;font-weight:800;">What's New</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-display" style="color:var(--kimari-teal);"></i> Console polish (cleaner status/doctor output)</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-plug" style="color:var(--kimari-cyan);"></i> Integration config generator</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-door-open" style="color:var(--kimari-purple-light);"></i> Gateway prototype plan</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.85rem;font-weight:600;color:#f87171;"><i class="fa-solid fa-ban" style="color:#f87171;"></i> No fake metrics</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-rocket" style="color:var(--kimari-teal);"></i> Kimari-4B private SFT run preparation</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-clipboard-check" style="color:var(--kimari-cyan);"></i> First run checklist + eval criteria</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-terminal" style="color:var(--kimari-purple-light);"></i> Command generator + eval plan scripts</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.85rem;font-weight:600;color:#f87171;"><i class="fa-solid fa-ban" style="color:#f87171;"></i> No weights, no GGUF, gate BLOCKED</span>
     </div>
   </div>
 </div>
@@ -799,7 +799,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     </div>
   </div>
   <div class="reveal" style="margin-top:32px;">
-    <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:16px;">New in v0.1.27-alpha</h3>
+    <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:16px;">New in v0.1.28-alpha</h3>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-display" style="color:var(--kimari-teal);"></i> Console Polish</div>
@@ -1390,7 +1390,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.27-alpha — Console polish, integration config generator, gateway prototype plan. No public weights released.</p>
+    <p class="section-desc">Kimari Local AI v0.1.28-alpha — First private SFT run preparation, eval criteria, command generator. No public weights released.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1455,10 +1455,14 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Doctor deep (<code>kimari doctor --deep</code>)</td><td>✅ Implemented in v0.1.26-alpha</td></tr>
         <tr><td>Secret scanner hardening (line-by-line, no file skips)</td><td>🛡️ Hardened in v0.1.26-alpha</td></tr>
         <tr><td>Benchmark prompts</td><td>✅ Added in v0.1.26-alpha</td></tr>
-        <tr><td>Console polish (structured PASS/WARN/FAIL tables)</td><td>✅ Improved in v0.1.27-alpha</td></tr>
-        <tr><td>Integration config generator (<code>kimari integrations generate</code>)</td><td>✅ Added in v0.1.27-alpha</td></tr>
+        <tr><td>Console polish (structured PASS/WARN/FAIL tables)</td><td>✅ Completed in v0.1.27-alpha</td></tr>
+        <tr><td>Integration config generator (<code>kimari integrations generate</code>)</td><td>✅ Completed in v0.1.27-alpha</td></tr>
         <tr><td>Gateway prototype plan</td><td>📄 Documented in v0.1.27-alpha</td></tr>
         <tr><td>Safe screenshots plan</td><td>📋 Planned in v0.1.27-alpha</td></tr>
+        <tr><td>Kimari-4B private SFT run preparation</td><td>✅ Added in v0.1.28-alpha</td></tr>
+        <tr><td>Kimari-4B first run checklist + eval criteria</td><td>✅ Added in v0.1.28-alpha</td></tr>
+        <tr><td>Private SFT command generator script</td><td>✅ Added in v0.1.28-alpha</td></tr>
+        <tr><td>Eval plan script (baseline + adapter)</td><td>✅ Added in v0.1.28-alpha</td></tr>
         <tr><td>Adapter preview gate</td><td>🔒 BLOCKED in v0.1.21-alpha</td></tr>
         <tr><td>Adapter manifest template</td><td>📄 Created in v0.1.21-alpha</td></tr>
         <tr><td>Eval summary policy</td><td>📋 Defined in v0.1.21-alpha</td></tr>
