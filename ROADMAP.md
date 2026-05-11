@@ -378,13 +378,24 @@
 - ✅ --sanitize-logs flag in hf_jobs_status.py
 - ✅ Version bumped to v0.1.30-alpha
 
-## v0.1.31-alpha (Current)
+## v0.1.31-alpha (Released)
 
 - ✅ HF Jobs smoke execution record doc and template
 - ✅ Smoke summary validator CLI (validate_hf_jobs_smoke_summary.py)
 - ✅ Hardened hf_jobs_status.py (stderr sanitization, --tail via HF CLI)
 - ✅ Smoke must pass before micro SFT gate
 - ✅ Version bumped to v0.1.31-alpha
+
+## v0.1.32-alpha (Current)
+
+- ✅ HF Jobs micro SFT run guide (docs/HF_JOBS_MICRO_SFT_RUN.md)
+- ✅ Micro SFT config (training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml)
+- ✅ Micro SFT wrapper CLI (training/scripts/hf_jobs_micro_sft.py)
+- ✅ Micro SFT summary template and generator
+- ✅ Micro SFT summary validator
+- ✅ Micro SFT result doc (docs/HF_JOBS_MICRO_SFT_RESULT.md)
+- ✅ Updated runbook, private SFT guide, and checklist
+- ✅ Version bumped to v0.1.32-alpha
 
 ## v0.2.0-alpha
 

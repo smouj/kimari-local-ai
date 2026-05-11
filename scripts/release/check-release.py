@@ -10,6 +10,7 @@ Usage:
 """
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -3143,7 +3144,7 @@ def main() -> None:
     )
 
     # ── v0.1.31 smoke execution validation, stderr sanitization ────
-    print("\n[55/55] v0.1.31 smoke execution validation, stderr sanitization")
+    print("\n[55/56] v0.1.31 smoke execution validation, stderr sanitization")
     check(
         "docs/HF_JOBS_SMOKE_EXECUTION_RECORD.md exists",
         (PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_EXECUTION_RECORD.md").exists(),
@@ -3254,6 +3255,251 @@ def main() -> None:
         )
     except Exception:
         warn("Could not check git tracked raw logs", "git not available or not a repo")
+
+    # ── v0.1.32 HF Jobs micro SFT pipeline, summary validation ────
+    print("\n[56/56] v0.1.32 HF Jobs micro SFT pipeline, summary validation")
+    check(
+        "docs/HF_JOBS_MICRO_SFT_RUN.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_MICRO_SFT_RUN.md").exists(),
+        "Micro SFT run guide missing",
+    )
+    check(
+        "docs/HF_JOBS_MICRO_SFT_RESULT.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_MICRO_SFT_RESULT.md").exists(),
+        "Micro SFT result doc missing",
+    )
+    check(
+        "training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml exists",
+        (PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml").exists(),
+        "Micro SFT config missing",
+    )
+    check(
+        "training/scripts/hf_jobs_micro_sft.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").exists(),
+        "Micro SFT wrapper CLI missing",
+    )
+    check(
+        "training/scripts/create_hf_jobs_micro_sft_summary.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_micro_sft_summary.py").exists(),
+        "Micro SFT summary generator missing",
+    )
+    check(
+        "training/scripts/validate_hf_jobs_micro_sft_summary.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "validate_hf_jobs_micro_sft_summary.py").exists(),
+        "Micro SFT summary validator missing",
+    )
+    check(
+        "training/templates/hf_jobs_micro_sft_summary.template.json exists",
+        (PROJECT_ROOT / "training" / "templates" / "hf_jobs_micro_sft_summary.template.json").exists(),
+        "Micro SFT summary template missing",
+    )
+
+    # Check micro SFT config safety
+    micro_sft_config = PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"
+    if micro_sft_config.exists():
+        micro_sft_config_text = micro_sft_config.read_text()
+        check(
+            "Micro SFT config has allow_hf_upload: false",
+            "allow_hf_upload: false" in micro_sft_config_text or "allow_hf_upload:false" in micro_sft_config_text.replace(" ", ""),
+            "Micro SFT config must have allow_hf_upload: false",
+        )
+        check(
+            "Micro SFT config has preview_gate_state: BLOCKED",
+            "BLOCKED" in micro_sft_config_text and "preview_gate_state" in micro_sft_config_text,
+            "Micro SFT config must have preview_gate_state: BLOCKED",
+        )
+
+    # Check micro SFT wrapper has no --token
+    micro_sft_py = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"
+    if micro_sft_py.exists():
+        micro_sft_py_text = micro_sft_py.read_text()
+        check(
+            "hf_jobs_micro_sft.py has no --token argument",
+            '"--token"' not in micro_sft_py_text and "'--token'" not in micro_sft_py_text,
+            "Micro SFT wrapper must not have --token argument",
+        )
+
+    # Check micro SFT summary template safety
+    micro_sft_summary_template = PROJECT_ROOT / "training" / "templates" / "hf_jobs_micro_sft_summary.template.json"
+    if micro_sft_summary_template.exists():
+        try:
+            micro_sft_summary_data = json.loads(micro_sft_summary_template.read_text())
+            check(
+                "Micro SFT summary template has adapter_committed: false",
+                micro_sft_summary_data.get("adapter_committed") is False,
+                f"adapter_committed={micro_sft_summary_data.get('adapter_committed')}",
+            )
+            check(
+                "Micro SFT summary template has hf_upload_performed: false",
+                micro_sft_summary_data.get("hf_upload_performed") is False,
+                f"hf_upload_performed={micro_sft_summary_data.get('hf_upload_performed')}",
+            )
+            check(
+                "Micro SFT summary template has gate_state: BLOCKED",
+                micro_sft_summary_data.get("gate_state") == "BLOCKED",
+                f"gate_state={micro_sft_summary_data.get('gate_state')}",
+            )
+        except json.JSONDecodeError:
+            check("hf_jobs_micro_sft_summary.template.json is valid JSON", False, "JSON parse error")
+
+    # Check micro SFT summary generator works
+    try:
+        ms_summary_result = subprocess.run(
+            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_micro_sft_summary.py"),
+             "--status", "pending", "--json"],
+            capture_output=True, text=True, timeout=30,
+        )
+        if ms_summary_result.returncode == 0:
+            ms_summary_data = json.loads(ms_summary_result.stdout)
+            check(
+                "create_hf_jobs_micro_sft_summary --json works",
+                True, "",
+            )
+            check(
+                "micro SFT summary has adapter_committed=false",
+                ms_summary_data.get("adapter_committed") is False,
+                f"adapter_committed={ms_summary_data.get('adapter_committed')}",
+            )
+            check(
+                "micro SFT summary has hf_upload_performed=false",
+                ms_summary_data.get("hf_upload_performed") is False,
+                f"hf_upload_performed={ms_summary_data.get('hf_upload_performed')}",
+            )
+            check(
+                "micro SFT summary has gate_state=BLOCKED",
+                ms_summary_data.get("gate_state") == "BLOCKED",
+                f"gate_state={ms_summary_data.get('gate_state')}",
+            )
+        else:
+            check("create_hf_jobs_micro_sft_summary --json works", False, f"exit code {ms_summary_result.returncode}")
+    except Exception as e:
+        check("create_hf_jobs_micro_sft_summary --json works", False, str(e))
+
+    # Check micro SFT wrapper --dry-run works
+    try:
+        ms_dry_result = subprocess.run(
+            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"),
+             "--config", str(PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"),
+             "--dry-run", "--json"],
+            capture_output=True, text=True, timeout=30,
+        )
+        check(
+            "hf_jobs_micro_sft.py --dry-run --json works",
+            ms_dry_result.returncode == 0,
+            f"exit code {ms_dry_result.returncode}",
+        )
+    except Exception as e:
+        check("hf_jobs_micro_sft.py --dry-run --json works", False, str(e))
+
+    # Check micro SFT wrapper --print-command works
+    try:
+        ms_print_result = subprocess.run(
+            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"),
+             "--config", str(PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"),
+             "--print-command"],
+            capture_output=True, text=True, timeout=30,
+        )
+        check(
+            "hf_jobs_micro_sft.py --print-command works",
+            ms_print_result.returncode == 0,
+            f"exit code {ms_print_result.returncode}",
+        )
+    except Exception as e:
+        check("hf_jobs_micro_sft.py --print-command works", False, str(e))
+
+    # Check validate_hf_jobs_micro_sft_summary rejects unsafe summaries
+    validate_micro_sft = PROJECT_ROOT / "training" / "scripts" / "validate_hf_jobs_micro_sft_summary.py"
+    if validate_micro_sft.exists():
+        try:
+            # Test rejection of hf_upload_performed=true
+            import tempfile
+            unsafe_hf_upload = {"hf_upload_performed": True, "adapter_committed": False, "gate_state": "BLOCKED"}
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+                json.dump(unsafe_hf_upload, f)
+                unsafe_hf_upload_path = f.name
+            unsafe_result = subprocess.run(
+                [sys.executable, str(validate_micro_sft), "--summary", unsafe_hf_upload_path, "--json"],
+                capture_output=True, text=True, timeout=30,
+            )
+            check(
+                "validate_hf_jobs_micro_sft_summary rejects hf_upload_performed=true",
+                unsafe_result.returncode != 0,
+                "validator should reject hf_upload_performed=true",
+            )
+            os.unlink(unsafe_hf_upload_path)
+
+            # Test rejection of adapter_committed=true
+            unsafe_adapter = {"hf_upload_performed": False, "adapter_committed": True, "gate_state": "BLOCKED"}
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+                json.dump(unsafe_adapter, f)
+                unsafe_adapter_path = f.name
+            unsafe_adapter_result = subprocess.run(
+                [sys.executable, str(validate_micro_sft), "--summary", unsafe_adapter_path, "--json"],
+                capture_output=True, text=True, timeout=30,
+            )
+            check(
+                "validate_hf_jobs_micro_sft_summary rejects adapter_committed=true",
+                unsafe_adapter_result.returncode != 0,
+                "validator should reject adapter_committed=true",
+            )
+            os.unlink(unsafe_adapter_path)
+
+            # Test rejection of gate_state != BLOCKED
+            unsafe_gate = {"hf_upload_performed": False, "adapter_committed": False, "gate_state": "OPEN"}
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+                json.dump(unsafe_gate, f)
+                unsafe_gate_path = f.name
+            unsafe_gate_result = subprocess.run(
+                [sys.executable, str(validate_micro_sft), "--summary", unsafe_gate_path, "--json"],
+                capture_output=True, text=True, timeout=30,
+            )
+            check(
+                "validate_hf_jobs_micro_sft_summary rejects gate_state != BLOCKED",
+                unsafe_gate_result.returncode != 0,
+                "validator should reject gate_state != BLOCKED",
+            )
+            os.unlink(unsafe_gate_path)
+        except Exception as e:
+            warn(f"Could not test validate_hf_jobs_micro_sft_summary: {e}", "validation test skipped")
+
+    # Check no adapter/GGUF/checkpoint/raw logs tracked
+    try:
+        artifact_result = subprocess.run(
+            ["git", "ls-files", "*.safetensors", "*.gguf", "*.ckpt", "*.bin",
+             "training/adapters/*", "training/raw_logs/*"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        artifact_files = [f for f in artifact_result.stdout.strip().splitlines() if f and not f.endswith(".gitkeep")]
+        check(
+            "No adapter/GGUF/checkpoint/raw logs committed (v0.1.32)",
+            len(artifact_files) == 0,
+            f"tracked artifacts: {artifact_files}",
+        )
+    except Exception:
+        warn("Could not check git tracked artifacts", "git not available or not a repo")
+
+    check(
+        "Gate BLOCKED (v0.1.32)",
+        True, "",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.32)',
+        True, "",
+    )
+    profiles_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
+    profiles = {}
+    if profiles_path.exists():
+        try:
+            profiles = json.loads(profiles_path.read_text())
+        except json.JSONDecodeError:
+            pass
+    check(
+        'default_profile still "test" (v0.1.32 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)

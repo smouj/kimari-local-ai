@@ -1,0 +1,66 @@
+# Kimari-4B HF Jobs Micro SFT Config v0
+#
+# This config defines a micro SFT run to validate the training pipeline
+# on HF Jobs. It performs a minimal LoRA training run with very few steps.
+#
+# IMPORTANT:
+# - Run with: python training/scripts/hf_jobs_micro_sft.py --config this_file.yaml
+# - Actual submission requires --allow-submit --yes
+# - No tokens accepted as arguments
+# - No HF upload
+# - No GGUF export
+# - No adapter commit
+# - Gate stays BLOCKED
+# - Smoke test must pass before micro SFT
+
+job_name: kimari4b-micro-sft-v0
+image: pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
+flavor: a10g-small
+max_budget_usd: 10
+max_runtime_minutes: 30
+run_type: micro_sft_private
+allow_training: true
+allow_hf_upload: false
+allow_public_release: false
+local_only: true
+commit_allowed: false
+publish_allowed: false
+preview_gate_state: BLOCKED
+
+base_model: HuggingFaceTB/SmolLM3-3B
+dataset_build_dir: dataset/build/kimari-v0
+sft_config: training/configs/kimari_sft_lora.v0.example.yaml
+output_dir: training/adapters/kimari4b-smollm3-micro-sft-v0
+
+# Micro SFT parameters (minimal)
+micro_sft_steps: 10
+micro_sft_eval_steps: 5
+micro_sft_save_steps: 50
+micro_sft_logging_steps: 2
+micro_sft_per_device_train_batch_size: 1
+micro_sft_gradient_accumulation_steps: 1
+micro_sft_learning_rate: 0.0001
+micro_sft_max_seq_length: 512
+
+commands:
+  - "nvidia-smi"
+  - "python -c 'import torch; print(f\"CUDA available: {torch.cuda.is_available()}\")'"
+  - "git clone https://github.com/smouj/kimari-local-ai.git /tmp/kimari-local-ai && cd /tmp/kimari-local-ai"
+  - "pip install -e /tmp/kimari-local-ai"
+  - "python /tmp/kimari-local-ai/training/scripts/build_dataset_mix.py --sft /tmp/kimari-local-ai/dataset/v0/sft_v0.jsonl --preference /tmp/kimari-local-ai/dataset/v0/preference_v0.jsonl --output-dir /tmp/kimari-dataset --holdout /tmp/kimari-local-ai/dataset/v0/eval_holdout.jsonl"
+  - "python /tmp/kimari-local-ai/training/scripts/train_sft_lora.py --config /tmp/kimari-local-ai/training/configs/kimari_sft_lora.v0.example.yaml --dataset-path /tmp/kimari-dataset/sft.train.jsonl --eval-dataset-path /tmp/kimari-dataset/sft.eval.jsonl --output-dir /tmp/kimari-micro-sft-output --max-steps 10 --eval-steps 5 --save-steps 50 --logging-steps 2 --per-device-train-batch-size 1 --gradient-accumulation-steps 1 --learning-rate 0.0001 --max-seq-length 512"
+
+forbidden:
+  - hf upload
+  - huggingface-cli upload
+  - git push
+  - adapter commit
+  - GGUF export
+  - checkpoint commit
+  - pip install huggingface_hub
+  - huggingface-cli login
+  - weights commit
+  - public release
+
+notes: "Micro SFT run. Validates training pipeline with minimal steps. No upload. No export. No commit of artifacts. Budget cap $10. Runtime cap 30 min. Gate BLOCKED. Smoke test must pass before micro SFT."
+created_date: "2026-06-02"

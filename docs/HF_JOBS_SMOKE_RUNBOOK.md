@@ -1,7 +1,7 @@
 # HF Jobs Smoke Test Runbook — Kimari Local AI
 
 > **Document Type:** Step-by-step runbook for executing HF Jobs smoke test  
-> **Version:** v0.1.31-alpha  
+> **Version:** v0.1.32-alpha  
 > **Date:** 2026-06-02  
 > **Status:** Active — governs HF Jobs smoke test execution  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -234,6 +234,31 @@ The smoke test validates the infrastructure. Micro SFT requires that infrastruct
 - Always use `--sanitize-logs` when viewing job output
 - The v0.1.31 update sanitizes both stdout and stderr
 - If you see tokens in output, report it and use `--sanitize-logs` to redact
+
+---
+
+## Micro SFT After Smoke Validation
+
+Once the smoke test is completed and validated, you can proceed to micro SFT:
+
+```bash
+# Verify smoke summary
+python training/scripts/validate_hf_jobs_smoke_summary.py \
+    --summary /tmp/hf_jobs_smoke_summary.json --json
+
+# Dry-run micro SFT
+python training/scripts/hf_jobs_micro_sft.py \
+    --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml \
+    --dry-run --json
+```
+
+**Do NOT continue to micro SFT if:**
+- GPU/CUDA was not detected in smoke test
+- Dataset dry-run failed in smoke test
+- SFT dry-run failed in smoke test
+- Smoke summary validation fails
+
+See [HF_JOBS_MICRO_SFT_RUN.md](HF_JOBS_MICRO_SFT_RUN.md) for the full micro SFT guide.
 
 ---
 

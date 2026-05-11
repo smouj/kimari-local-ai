@@ -1,8 +1,8 @@
 # Kimari-4B Private SFT Run — First Training Execution Guide
 
 > **Document Type:** Execution guide for the first private SFT run of Kimari-4B  
-> **Version:** v0.1.29-alpha  
-> **Date:** 2026-05-31  
+> **Version:** v0.1.32-alpha  
+> **Date:** 2026-06-02  
 > **Status:** Active — governs the first private SFT training execution  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -350,6 +350,29 @@ python training/scripts/hf_jobs_private_run.py \
 - **No training** — The smoke config has `allow_training: false`
 - **Budget: start with $10** — Don't spend more on smoke tests
 - **See `docs/HF_JOBS_PRIVATE_RUN.md`** for the full guide
+
+---
+
+## 12. Micro SFT Path
+
+Before full SFT, a micro SFT can validate the training pipeline on HF Jobs:
+
+| Aspect | Smoke Test | Micro SFT | Full SFT |
+|--------|-----------|-----------|----------|
+| Training | No | 10 steps | Full epochs |
+| Adapter | No | Maybe (temp) | Yes |
+| Budget | <$1 | <$10 | TBD |
+| Purpose | Validate env | Validate pipeline | Produce model |
+| Gate after | BLOCKED | BLOCKED | BLOCKED → review |
+
+See [HF_JOBS_MICRO_SFT_RUN.md](HF_JOBS_MICRO_SFT_RUN.md) for the full micro SFT guide.
+
+**Key differences:**
+- **Smoke test** validates the environment (GPU, torch, repo, dataset, SFT dry-run)
+- **Micro SFT** validates the training pipeline (actual 10-step LoRA run)
+- **Full SFT** produces the actual adapter for evaluation
+
+**No publication.** Micro SFT and full SFT outputs stay local. Gate remains BLOCKED.
 
 ---
 

@@ -587,6 +587,30 @@ twine upload dist/*
 - [ ] `default_profile` is still "test"
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.32 Checks
+
+- [ ] docs/HF_JOBS_MICRO_SFT_RUN.md exists
+- [ ] docs/HF_JOBS_MICRO_SFT_RESULT.md exists
+- [ ] training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml exists
+- [ ] training/scripts/hf_jobs_micro_sft.py exists
+- [ ] training/scripts/create_hf_jobs_micro_sft_summary.py exists
+- [ ] training/scripts/validate_hf_jobs_micro_sft_summary.py exists
+- [ ] training/templates/hf_jobs_micro_sft_summary.template.json exists
+- [ ] hf_jobs_micro_sft.py --dry-run --json works
+- [ ] hf_jobs_micro_sft.py --print-command works
+- [ ] Submit requires --allow-submit --yes (blocked without both)
+- [ ] hf_jobs_micro_sft.py has no --token argument
+- [ ] Micro SFT config has allow_hf_upload=false
+- [ ] Micro SFT config has preview_gate_state=BLOCKED
+- [ ] create_hf_jobs_micro_sft_summary.py generates safe summary
+- [ ] validate_hf_jobs_micro_sft_summary.py rejects hf_upload_performed=true
+- [ ] validate_hf_jobs_micro_sft_summary.py rejects adapter_committed=true
+- [ ] validate_hf_jobs_micro_sft_summary.py rejects gate_state != BLOCKED
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

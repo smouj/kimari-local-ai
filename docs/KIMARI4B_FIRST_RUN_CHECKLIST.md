@@ -1,8 +1,8 @@
 # Kimari-4B First Private SFT Run Checklist
 
 > **Document Type:** Pre-flight checklist for first private SFT run  
-> **Version:** v0.1.29-alpha  
-> **Date:** 2026-05-31  
+> **Version:** v0.1.32-alpha  
+> **Date:** 2026-06-02  
 > **Status:** Active — complete every item before training  
 > **Gate State:** BLOCKED
 
@@ -81,6 +81,15 @@ This checklist must be completed **in full** before starting the first private S
 - [ ] **public_release_allowed is false** — Confirmed in config
 - [ ] **No automatic gate transition** — Gate will NOT advance as a side effect of training
 - [ ] **ADAPTER_PREVIEW_GATE.md reviewed** — State machine and transition requirements understood
+
+## 11. Micro SFT (Optional Pre-Step)
+
+- [ ] **Smoke summary validated** — `python training/scripts/validate_hf_jobs_smoke_summary.py --summary /tmp/hf_jobs_smoke_summary.json --json` passes
+- [ ] **Budget confirmed for micro SFT** — Under $10 for 10-step run
+- [ ] **Micro SFT config reviewed** — `training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml` reviewed and understood
+- [ ] **No token in micro SFT command** — Micro SFT wrapper has no --token argument
+- [ ] **Micro SFT config has gate BLOCKED** — preview_gate_state: BLOCKED confirmed
+- [ ] **Micro SFT config has allow_hf_upload: false** — No HF upload confirmed
 
 ---
 

@@ -5,6 +5,29 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.32-alpha] - 2026-06-02
+
+### Added
+- `docs/HF_JOBS_MICRO_SFT_RUN.md` — Guide for running micro SFT on HF Jobs (pipeline validation, not release)
+- `docs/HF_JOBS_MICRO_SFT_RESULT.md` — Micro SFT result template and sanitized record (status: pending)
+- `training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml` — Config for micro SFT (10 steps, a10g-small, $10 cap, gate BLOCKED)
+- `training/scripts/hf_jobs_micro_sft.py` — CLI wrapper for micro SFT submission (--dry-run, --print-command, --allow-submit --yes, --override-smoke-gate, no --token)
+- `training/templates/hf_jobs_micro_sft_summary.template.json` — Template for sanitized micro SFT summary
+- `training/scripts/create_hf_jobs_micro_sft_summary.py` — CLI to generate sanitized micro SFT summaries
+- `training/scripts/validate_hf_jobs_micro_sft_summary.py` — CLI to validate micro SFT summary safety (adapter_committed=false, hf_upload_performed=false, gate BLOCKED)
+
+### Changed
+- `docs/HF_JOBS_SMOKE_RUNBOOK.md` updated with micro SFT after smoke validation note
+- `docs/KIMARI4B_PRIVATE_SFT_RUN.md` updated with micro SFT path section
+- `docs/KIMARI4B_FIRST_RUN_CHECKLIST.md` updated with micro SFT checklist items
+- README updated with HF Jobs micro SFT section
+- `docs/index.html` updated with micro SFT private path
+- `RELEASE_CHECKLIST.md` updated with v0.1.32 checks
+- `scripts/release/check-release.py` updated with v0.1.32 validation checks
+
+### Fixed
+- No training performed in this version. No adapters committed. No HF upload. Gate still BLOCKED. Micro SFT pipeline prepared but not executed.
+
 ## [0.1.31-alpha] - 2026-06-02
 
 ### Added
