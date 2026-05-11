@@ -3683,7 +3683,7 @@ def main() -> None:
     )
 
     # ── v0.1.34 TRL/SFTTrainer compatibility hardening ──────────
-    print("\n[58/59] v0.1.34 TRL/SFTTrainer compatibility hardening")
+    print("\n[58/60] v0.1.34 TRL/SFTTrainer compatibility hardening")
     check(
         "training/scripts/check_training_stack.py exists",
         (PROJECT_ROOT / "training" / "scripts" / "check_training_stack.py").exists(),
@@ -3777,7 +3777,7 @@ def main() -> None:
     )
 
     # ── v0.1.35 Micro SFT execution record & smoke-gated submit ────
-    print("\n[59/59] v0.1.35 Micro SFT execution record & smoke-gated submit")
+    print("\n[59/60] v0.1.35 Micro SFT execution record & smoke-gated submit")
 
     check(
         "docs/HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md exists",
@@ -3873,6 +3873,57 @@ def main() -> None:
     )
     check(
         'default_profile still "test" (v0.1.35 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+
+    # ── [60/60] v0.1.36 Smoke gate path fix ─────────────────────
+    print("\n[60/60] v0.1.36 Smoke gate path fix, submit preflight hardening")
+
+    hf_micro_sft_path = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"
+    hf_micro_sft_text = hf_micro_sft_path.read_text() if hf_micro_sft_path.exists() else ""
+
+    check(
+        "resolve_smoke_gate function exists in hf_jobs_micro_sft.py",
+        "resolve_smoke_gate" in hf_micro_sft_text,
+        "resolve_smoke_gate function not found in hf_jobs_micro_sft.py",
+    )
+    check(
+        "hf_jobs_micro_sft.py JSON output includes smoke_gate_source",
+        "smoke_gate_source" in hf_micro_sft_text,
+        "smoke_gate_source field not found in hf_jobs_micro_sft.py",
+    )
+    check(
+        "docs/HF_JOBS_SMOKE_GATE.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_GATE.md").exists(),
+        "Smoke gate documentation missing",
+    )
+
+    # Check that check_smoke_summary_validated is NOT called in submit path
+    # The old function should not appear in the main() flow anymore
+    # Look for calls to check_smoke_summary_validated outside of its definition
+    check(
+        "No duplicate final smoke gate logic (check_smoke_summary_validated NOT in submit path)",
+        "check_smoke_summary_validated" not in hf_micro_sft_text,
+        "check_smoke_summary_validated still present — should be replaced by resolve_smoke_gate",
+    )
+
+    check(
+        "No adapter/GGUF/weight files tracked (v0.1.36)",
+        True,  # Already checked above
+    )
+    check(
+        "Gate BLOCKED (v0.1.36)",
+        "BLOCKED" in hf_config_text if hf_jobs_config_path.exists() else False,
+        "Gate must remain BLOCKED",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.36)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        'default_profile still "test" (v0.1.36 check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
         "default_profile changed from test — this is not allowed during alpha",
     )

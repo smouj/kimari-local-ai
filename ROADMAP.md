@@ -421,11 +421,19 @@
 - ✅ HF Jobs config includes check_training_stack before training
 - ✅ Gate BLOCKED
 
-## v0.1.35-alpha (Current)
+## v0.1.35-alpha (Released)
 
 - ✅ Micro SFT execution record (create/validate scripts, docs)
 - ✅ hf_jobs_micro_sft.py smoke-gated submit (--require-smoke-summary)
 - ✅ HF Jobs micro SFT runbook
+- ✅ Gate BLOCKED
+
+## v0.1.36-alpha (Current)
+
+- ✅ resolve_smoke_gate() — unified smoke gate resolution (explicit path, /tmp fallback, override)
+- ✅ Critical bug fix: explicit --require-smoke-summary PATH no longer blocked by missing /tmp file
+- ✅ Submit uses single smoke gate check (no duplicate)
+- ✅ docs/HF_JOBS_SMOKE_GATE.md
 - ✅ Gate BLOCKED
 
 ## v0.2.0-alpha

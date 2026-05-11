@@ -5,6 +5,27 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.36-alpha] - 2026-06-03
+
+### Added
+- `resolve_smoke_gate()` function in `hf_jobs_micro_sft.py` — unified smoke gate resolution from explicit path, default /tmp, or override
+- `docs/HF_JOBS_SMOKE_GATE.md` — Smoke gate documentation explaining explicit path, /tmp fallback, and override
+- JSON output now includes `smoke_gate_source`, `smoke_gate_validated`, `smoke_gate_message`, `smoke_summary_path` fields
+- `tests/test_release_v0136.py` — Test suite for v0.1.36-alpha
+
+### Changed
+- `hf_jobs_micro_sft.py` — Replaced dual smoke gate checks (`check_smoke_summary_validated()` + `--require-smoke-summary`) with single `resolve_smoke_gate()` function
+- `hf_jobs_micro_sft.py` — Submit uses ONLY `resolve_smoke_gate()` result (no duplicate checks)
+- `hf_jobs_micro_sft.py` — `--print-command` and `--dry-run` are unblocked by smoke gate
+- `docs/HF_JOBS_MICRO_SFT_RUNBOOK.md` — Added section about `--require-smoke-summary` with explicit path
+- `RELEASE_CHECKLIST.md` — Added v0.1.36 checks
+- `scripts/release/check-release.py` — Added v0.1.36 validation checks
+
+### Fixed
+- Critical bug: explicit `--require-smoke-summary PATH` no longer blocked by missing `/tmp/hf_jobs_smoke_summary.json`
+- Submit path no longer checks smoke gate twice (was checking both `check_smoke_summary_validated()` and `--require-smoke-summary`)
+- No training in CI. No adapters committed. No HF upload. Gate still BLOCKED.
+
 ## [0.1.35-alpha] - 2026-06-03
 
 ### Added

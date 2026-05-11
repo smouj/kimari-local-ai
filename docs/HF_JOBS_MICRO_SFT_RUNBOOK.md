@@ -1,7 +1,7 @@
 # HF Jobs Micro SFT Runbook — Kimari Local AI
 
 > **Document Type:** Step-by-step runbook for HF Jobs micro SFT execution  
-> **Version:** v0.1.35-alpha  
+> **Version:** v0.1.36-alpha  
 > **Date:** 2026-06-03  
 > **Status:** Active — governs micro SFT execution procedure  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -38,11 +38,13 @@ huggingface-cli login
 
 ```bash
 python training/scripts/validate_hf_jobs_smoke_summary.py \
-  --summary /tmp/hf_jobs_smoke_summary.json \
+  --summary /path/to/your_smoke_summary.json \
   --json
 ```
 
 If validation fails, do NOT proceed. Fix smoke test first.
+
+> **Note:** Using `--require-smoke-summary` with an explicit path is the recommended approach for submission (see [HF_JOBS_SMOKE_GATE.md](HF_JOBS_SMOKE_GATE.md)). Avoid depending on `/tmp/hf_jobs_smoke_summary.json` when working across machines.
 
 ### Step 3: Check Training Stack
 
@@ -77,7 +79,7 @@ python training/scripts/create_micro_sft_execution_record.py \
 ```bash
 python training/scripts/hf_jobs_micro_sft.py \
   --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml \
-  --require-smoke-summary /tmp/hf_jobs_smoke_summary.json \
+  --require-smoke-summary /path/to/your_smoke_summary.json \
   --print-command
 ```
 
@@ -89,15 +91,19 @@ Review the command carefully. Verify:
 
 ### Step 7: Submit (Requires Double Confirmation)
 
+**Recommended command with explicit smoke summary path:**
+
 ```bash
 python training/scripts/hf_jobs_micro_sft.py \
   --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml \
-  --require-smoke-summary /tmp/hf_jobs_smoke_summary.json \
+  --require-smoke-summary /path/to/your_smoke_summary.json \
   --allow-submit \
   --yes
 ```
 
-The `--require-smoke-summary` flag ensures a validated smoke test exists before submission. Without it (or without `--override-smoke-gate`), submission is blocked.
+The `--require-smoke-summary` flag ensures a validated smoke test exists before submission. Using an explicit path is recommended over relying on `/tmp/hf_jobs_smoke_summary.json`, especially when working across machines (see [HF_JOBS_SMOKE_GATE.md](HF_JOBS_SMOKE_GATE.md)).
+
+Without `--require-smoke-summary` (or `--override-smoke-gate`), the gate falls back to `/tmp/hf_jobs_smoke_summary.json`, which may not exist on the current machine.
 
 ### Step 8: Check Status / Collect Sanitized Logs
 
@@ -193,6 +199,7 @@ Before committing any execution record:
 
 | Document | Relationship |
 |----------|-------------|
+| [HF_JOBS_SMOKE_GATE.md](HF_JOBS_SMOKE_GATE.md) | Smoke gate resolution reference |
 | [HF_JOBS_MICRO_SFT_RUN.md](HF_JOBS_MICRO_SFT_RUN.md) | Micro SFT guide |
 | [HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md](HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md) | Execution record format |
 | [TRAINING_STACK_COMPATIBILITY.md](TRAINING_STACK_COMPATIBILITY.md) | Training stack compatibility |

@@ -68,28 +68,6 @@ def parse_yaml_simple(path: Path) -> dict:
     return data
 
 
-def check_smoke_summary_validated(config: dict, override: bool) -> tuple[bool, str]:
-    """Check that a validated smoke summary exists before micro SFT."""
-    if override:
-        return True, "Smoke gate overridden with --override-smoke-gate"
-
-    # Check for validated smoke summary
-    smoke_summary_path = Path("/tmp/hf_jobs_smoke_summary.json")
-    if not smoke_summary_path.exists():
-        return False, "No smoke summary found at /tmp/hf_jobs_smoke_summary.json. Run smoke test first or use --override-smoke-gate."
-
-    try:
-        data = json.loads(smoke_summary_path.read_text())
-        if data.get("status") != "completed":
-            return False, f"Smoke summary status is '{data.get('status')}', not 'completed'. Complete smoke test first."
-        if data.get("gate_state") != "BLOCKED":
-            return False, f"Smoke summary gate_state is '{data.get('gate_state')}', expected 'BLOCKED'."
-    except (json.JSONDecodeError, KeyError) as e:
-        return False, f"Cannot read smoke summary: {e}"
-
-    return True, "Smoke summary validated"
-
-
 def validate_smoke_summary_file(summary_path: Path) -> tuple[bool, str]:
     """Validate a smoke summary JSON file.
 
@@ -121,6 +99,28 @@ def validate_smoke_summary_file(summary_path: Path) -> tuple[bool, str]:
         return True, f"Smoke summary validated: {summary_path}"
     except Exception as e:
         return False, f"Unexpected error validating smoke summary: {e}"
+
+
+def resolve_smoke_gate(
+    require_smoke_summary: Path | None,
+    override: bool,
+) -> tuple[bool, str, str | None]:
+    """Resolve smoke gate from explicit path, default /tmp, or override.
+
+    Returns:
+        (validated, message, source) where source is 'explicit' | 'default_tmp' | 'override' | None
+    """
+    if override:
+        return True, "Smoke gate overridden with --override-smoke-gate", "override"
+
+    if require_smoke_summary is not None:
+        validated, msg = validate_smoke_summary_file(require_smoke_summary)
+        return validated, msg, "explicit"
+
+    # Fallback to /tmp/hf_jobs_smoke_summary.json
+    default_path = Path("/tmp/hf_jobs_smoke_summary.json")
+    validated, msg = validate_smoke_summary_file(default_path)
+    return validated, msg, "default_tmp"
 
 
 def main() -> None:
@@ -214,21 +214,19 @@ def main() -> None:
             print(f"CONFIG ERROR: {e}", file=sys.stderr)
         sys.exit(1)
 
-    # Check smoke summary (only blocks actual submission)
-    smoke_ok, smoke_msg = check_smoke_summary_validated(config, args.override_smoke_gate)
-    if not smoke_ok and not args.dry_run and not args.print_command and not args.override_smoke_gate:
-        print(f"SMOKE GATE: {smoke_msg}", file=sys.stderr)
-        sys.exit(1)
+    # Resolve smoke gate using unified function
+    smoke_gate_validated, smoke_gate_message, smoke_gate_source = resolve_smoke_gate(
+        args.require_smoke_summary,
+        args.override_smoke_gate,
+    )
 
-    # Validate --require-smoke-summary if provided
-    smoke_summary_validated = False
-    if args.require_smoke_summary is not None:
-        smoke_summary_validated, smoke_summary_validation_msg = validate_smoke_summary_file(args.require_smoke_summary)
-        if not smoke_summary_validated and not args.dry_run and not args.print_command and not args.override_smoke_gate:
-            print(f"ERROR: {smoke_summary_validation_msg}", file=sys.stderr)
-            sys.exit(1)
+    # Determine smoke summary path for output
+    if args.override_smoke_gate:
+        smoke_summary_path_str = None
+    elif args.require_smoke_summary is not None:
+        smoke_summary_path_str = str(args.require_smoke_summary)
     else:
-        smoke_summary_validation_msg = "--require-smoke-summary not provided"
+        smoke_summary_path_str = "/tmp/hf_jobs_smoke_summary.json"
 
     # Build the hf jobs command
     # Use a shell script approach: all commands joined by &&
@@ -241,11 +239,17 @@ def main() -> None:
 
     # Build hf jobs run command
     hf_cmd = [
-        "hf", "jobs", "run",
-        "--flavor", flavor,
-        "--image", image,
-        "--name", job_name,
-        "--command", shell_command,
+        "hf",
+        "jobs",
+        "run",
+        "--flavor",
+        flavor,
+        "--image",
+        image,
+        "--name",
+        job_name,
+        "--command",
+        shell_command,
     ]
 
     # Build result
@@ -260,9 +264,10 @@ def main() -> None:
         "allow_training": allow_training,
         "allow_hf_upload": allow_hf_upload is False,
         "preview_gate_state": gate_state,
-        "smoke_gate": smoke_msg,
-        "smoke_summary_path": str(args.require_smoke_summary) if args.require_smoke_summary else None,
-        "smoke_summary_validated": smoke_summary_validated if args.require_smoke_summary is not None else False,
+        "smoke_gate_source": smoke_gate_source,
+        "smoke_gate_validated": smoke_gate_validated,
+        "smoke_gate_message": smoke_gate_message,
+        "smoke_summary_path": smoke_summary_path_str,
         "forbidden_actions": forbidden,
         "safety_warnings": [
             "This will run a micro SFT job on HF Jobs infrastructure.",
@@ -276,7 +281,7 @@ def main() -> None:
         "config_errors": errors,
     }
 
-    # Print command mode
+    # Print command mode (unblocked by smoke gate)
     if args.print_command:
         cmd_str = " ".join(hf_cmd)
         if args.json_output:
@@ -299,7 +304,7 @@ def main() -> None:
                 print(f"   ✗ {f}")
         return
 
-    # Dry-run mode
+    # Dry-run mode (unblocked by smoke gate)
     if args.dry_run:
         result["mode"] = "dry-run"
         result["message"] = "Dry-run only. No job submitted."
@@ -314,7 +319,7 @@ def main() -> None:
             print(f"  Budget cap:  ${max_budget}")
             print(f"  Runtime cap: {max_runtime} min")
             print(f"  Gate:        {gate_state}")
-            print(f"  Smoke gate:  {smoke_msg}")
+            print(f"  Smoke gate:  {smoke_gate_message}")
             print()
             print("  Safety warnings:")
             for w in result["safety_warnings"]:
@@ -348,19 +353,10 @@ def main() -> None:
             print(f"CONFIG ERROR: {e}", file=sys.stderr)
         sys.exit(1)
 
-    # Check smoke gate
-    if not smoke_ok:
-        print(f"SMOKE GATE: {smoke_msg}", file=sys.stderr)
+    # Check smoke gate (single check via resolve_smoke_gate)
+    if not smoke_gate_validated:
+        print(f"SMOKE GATE: {smoke_gate_message}", file=sys.stderr)
         sys.exit(1)
-
-    # Require --require-smoke-summary for submission
-    if not args.override_smoke_gate:
-        if args.require_smoke_summary is None:
-            print("ERROR: --require-smoke-summary is required for submission. Provide a validated smoke summary path or use --override-smoke-gate.", file=sys.stderr)
-            sys.exit(1)
-        if not smoke_summary_validated:
-            print(f"ERROR: {smoke_summary_validation_msg}", file=sys.stderr)
-            sys.exit(1)
 
     # Verify hf CLI exists
     try:
@@ -415,8 +411,12 @@ def main() -> None:
             print("   Next steps:")
             print("   1. Check status: python training/scripts/hf_jobs_status.py --job-id <id> --json")
             print("   2. View logs:    python training/scripts/hf_jobs_status.py --job-id <id> --logs --sanitize-logs")
-            print("   3. Create summary: python training/scripts/create_hf_jobs_micro_sft_summary.py --job-id <id> --status completed --json")
-            print("   4. Validate summary: python training/scripts/validate_hf_jobs_micro_sft_summary.py --summary /tmp/micro_sft_summary.json --json")
+            print(
+                "   3. Create summary: python training/scripts/create_hf_jobs_micro_sft_summary.py --job-id <id> --status completed --json"
+            )
+            print(
+                "   4. Validate summary: python training/scripts/validate_hf_jobs_micro_sft_summary.py --summary /tmp/micro_sft_summary.json --json"
+            )
             print()
             print("   ⚠️  Gate remains BLOCKED. No adapters committed. No HF upload.")
 

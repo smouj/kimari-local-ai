@@ -671,6 +671,25 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.36 Checks
+
+- [ ] resolve_smoke_gate function exists in hf_jobs_micro_sft.py
+- [ ] Explicit smoke summary path has priority over default /tmp
+- [ ] Default /tmp fallback is documented
+- [ ] Override documented with warning
+- [ ] Submit uses one smoke gate path (no duplicate)
+- [ ] hf_jobs_micro_sft.py JSON output includes smoke_gate_source
+- [ ] hf_jobs_micro_sft.py JSON output includes smoke_gate_validated
+- [ ] hf_jobs_micro_sft.py JSON output includes smoke_gate_message
+- [ ] hf_jobs_micro_sft.py JSON output includes smoke_summary_path
+- [ ] docs/HF_JOBS_SMOKE_GATE.md exists
+- [ ] docs/HF_JOBS_MICRO_SFT_RUNBOOK.md mentions --require-smoke-summary with explicit path
+- [ ] No duplicate final smoke gate logic in hf_jobs_micro_sft.py
+- [ ] check_smoke_summary_validated is NOT called in submit path
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)
