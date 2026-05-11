@@ -1,0 +1,31 @@
+{
+  "run_id": "PLACEHOLDER",
+  "kimari_version": "0.1.24-alpha",
+  "status": "planned",
+  "base_model": "PLACEHOLDER",
+  "dataset_id": "PLACEHOLDER",
+  "dataset_report_sha256": null,
+  "training_config_sha256": null,
+  "hardware": {
+    "gpu": "PLACEHOLDER",
+    "vram_gb": null,
+    "cuda": "PLACEHOLDER",
+    "driver": "PLACEHOLDER"
+  },
+  "runtime": {
+    "started_at": null,
+    "finished_at": null,
+    "duration_minutes": null
+  },
+  "outputs": {
+    "adapter_manifest_local_only": null,
+    "eval_summary_sanitized": null,
+    "compare_summary_sanitized": null
+  },
+  "gate": {
+    "state": "BLOCKED",
+    "public_release_allowed": false,
+    "hf_upload_allowed": false
+  },
+  "notes": "Template — fill with real data from private SFT run. Gate must stay BLOCKED. Do not commit adapter weights, raw eval outputs, or checkpoints."
+}

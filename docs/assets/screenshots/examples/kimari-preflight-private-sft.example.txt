@@ -1,0 +1,11 @@
+$ python training/scripts/preflight_private_sft.py --run-config training/configs/private_sft_run.v0.yaml --json
+{
+  "checks": {
+    "python_version": {"status": "PASS", "value": "3.12.3"},
+    "torch": {"status": "PASS", "value": "installed", "cuda_available": true},
+    "dataset_build": {"status": "PASS", "value": "dataset/build/kimari-v0/report.json", "exists": true, "source": "run_config"},
+    "preview_gate": {"status": "PASS", "value": "BLOCKED"}
+  },
+  "overall": "pass",
+  "dataset_build_dir_source": "run_config"
+}

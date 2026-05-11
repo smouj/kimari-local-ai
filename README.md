@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.23--alpha-9b59b6.svg" alt="v0.1.23-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.24--alpha-9b59b6.svg" alt="v0.1.24-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.23-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.24-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.23-alpha**
+> **Kimari Local AI v0.1.24-alpha**
 
 ### ✅ Works Today
 
@@ -504,7 +504,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. Private SFT execution package ready.
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. Private SFT execution package ready. Private run record workflow and safe screenshot capture guide available.
 
 ### What's Ready
 
@@ -558,6 +558,9 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 - **[Postrun Script](training/scripts/postrun_private_sft.py)** — Orchestrate post-training steps
 - **[Private Run Artifacts](docs/PRIVATE_RUN_ARTIFACTS.md)** — What stays local vs what can be committed
 - **[Private Run Failures](docs/PRIVATE_RUN_FAILURES.md)** — Troubleshooting guide for training failures
+- **[First Private SFT Record](docs/FIRST_PRIVATE_SFT_RECORD.md)** — How to register a private SFT run safely
+- **[Private Run Record Template](training/templates/private_sft_run_record.template.json)** — Committable run record template
+- **[Safe Screenshot Capture](docs/SAFE_SCREENSHOT_CAPTURE.md)** — Guide for capturing safe terminal screenshots
 
 > No weights released yet. No real benchmarks. SmolLM3 is accepted for private training only. Preview gate is BLOCKED.
 
@@ -578,9 +581,23 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 
 Visual overview of Kimari's command-line tools. All outputs are illustrative — no secrets, no real training outputs, no benchmarks claimed.
 
-See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for the full gallery with code examples.
+See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for the full gallery with code examples. See [docs/SAFE_SCREENSHOT_CAPTURE.md](docs/SAFE_SCREENSHOT_CAPTURE.md) for the safe screenshot capture guide.
 
 **Planned screenshots:** `kimari setup --json`, `preflight_private_sft.py --json`, `run_training_command_preview.py --json`, `postrun_private_sft.py --dry-run --json`, `kimari optimize --profile test --json`, GitHub Pages landing.
+
+**CLI text examples** are available in [docs/assets/screenshots/examples/](docs/assets/screenshots/examples/) — safe text blocks for generating captures.
+
+## 📋 First Private Run Record
+
+When the first private SFT is executed, a run record captures the essential metadata without exposing sensitive outputs:
+
+- **Run record template** — [training/templates/private_sft_run_record.template.json](training/templates/private_sft_run_record.template.json)
+- **Run record creation script** — `training/scripts/create_private_run_record.py --dry-run --json`
+- **Documentation** — [docs/FIRST_PRIVATE_SFT_RECORD.md](docs/FIRST_PRIVATE_SFT_RECORD.md)
+
+> **What can be committed:** Sanitized metadata (run_id, base_model, hardware summary, gate state).  
+> **What must remain local:** Adapter weights, checkpoints, raw eval outputs, local paths.  
+> **Preview gate stays BLOCKED** — no public release, no HF upload.
 
 ---
 
@@ -689,6 +706,8 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [First Training Run](docs/FIRST_TRAINING_RUN.md) | Step-by-step guide for first training run |
 | [API Plan (v0.2)](docs/API_PLAN.md) | FastAPI REST API design for v0.2 |
 | [Screenshots & CLI Preview](docs/SCREENSHOTS.md) | CLI output examples and screenshot gallery |
+| [Safe Screenshot Capture](docs/SAFE_SCREENSHOT_CAPTURE.md) | Guide for capturing safe terminal screenshots |
+| [First Private SFT Record](docs/FIRST_PRIVATE_SFT_RECORD.md) | How to register a private SFT run safely |
 
 ---
 

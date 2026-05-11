@@ -1947,6 +1947,181 @@ def main() -> None:
         "Kimari-4B false claim regression detected",
     )
 
+    # ── [50/50] v0.1.24 private run record & safe screenshots ──────────
+    print("\n[50/50] v0.1.24 private run record & safe screenshots")
+
+    # FIRST_PRIVATE_SFT_RECORD.md
+    check(
+        "docs/FIRST_PRIVATE_SFT_RECORD.md exists",
+        (PROJECT_ROOT / "docs" / "FIRST_PRIVATE_SFT_RECORD.md").exists(),
+        "First private SFT record doc missing",
+    )
+
+    # Private run record template
+    run_record_template = PROJECT_ROOT / "training" / "templates" / "private_sft_run_record.template.json"
+    check(
+        "training/templates/private_sft_run_record.template.json exists",
+        run_record_template.exists(),
+        "Private run record template missing",
+    )
+    if run_record_template.exists():
+        try:
+            template_data = json.loads(run_record_template.read_text())
+            check(
+                "Run record template parses as valid JSON",
+                True,
+            )
+            gate_state = template_data.get("gate", {}).get("state", "")
+            check(
+                'Run record template gate.state == "BLOCKED"',
+                gate_state == "BLOCKED",
+                f"gate.state is {gate_state!r}, expected 'BLOCKED'",
+            )
+            pub_allowed = template_data.get("gate", {}).get("public_release_allowed")
+            check(
+                "Run record template public_release_allowed == false",
+                pub_allowed is False,
+                f"public_release_allowed is {pub_allowed!r}, expected false",
+            )
+            hf_allowed = template_data.get("gate", {}).get("hf_upload_allowed")
+            check(
+                "Run record template hf_upload_allowed == false",
+                hf_allowed is False,
+                f"hf_upload_allowed is {hf_allowed!r}, expected false",
+            )
+        except json.JSONDecodeError:
+            check("Run record template parses as valid JSON", False, "JSON parse error")
+
+    # create_private_run_record.py
+    check(
+        "training/scripts/create_private_run_record.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "create_private_run_record.py").exists(),
+        "create_private_run_record script missing",
+    )
+
+    # SAFE_SCREENSHOT_CAPTURE.md
+    safe_capture_path = PROJECT_ROOT / "docs" / "SAFE_SCREENSHOT_CAPTURE.md"
+    check(
+        "docs/SAFE_SCREENSHOT_CAPTURE.md exists",
+        safe_capture_path.exists(),
+        "Safe screenshot capture guide missing",
+    )
+
+    # generate_cli_screenshot_text.py
+    check(
+        "scripts/docs/generate_cli_screenshot_text.py exists",
+        (PROJECT_ROOT / "scripts" / "docs" / "generate_cli_screenshot_text.py").exists(),
+        "CLI screenshot text generator missing",
+    )
+
+    # Screenshot example txt files
+    examples_dir = PROJECT_ROOT / "docs" / "assets" / "screenshots" / "examples"
+    example_files = [
+        "kimari-setup-json.example.txt",
+        "kimari-preflight-private-sft.example.txt",
+        "kimari-training-command-preview.example.txt",
+        "kimari-baseline-eval-plan.example.txt",
+        "kimari-postrun-dryrun.example.txt",
+    ]
+    for ef in example_files:
+        check(
+            f"docs/assets/screenshots/examples/{ef} exists",
+            (examples_dir / ef).exists(),
+            f"Screenshot example {ef} missing",
+        )
+
+    # No secrets in screenshot examples
+    secret_patterns = ["api_key=", "token=sk-", "password=", "secret_key=", "Bearer "]
+    for ef in example_files:
+        ef_path = examples_dir / ef
+        if ef_path.exists():
+            ef_text = ef_path.read_text().lower()
+            for sp in secret_patterns:
+                check(
+                    f"No secret pattern '{sp}' in {ef}",
+                    sp not in ef_text,
+                    f"Secret pattern '{sp}' found in {ef}",
+                )
+
+    # SCREENSHOTS.md references SAFE_SCREENSHOT_CAPTURE
+    screenshots_md = PROJECT_ROOT / "docs" / "SCREENSHOTS.md"
+    if screenshots_md.exists():
+        screenshots_text = screenshots_md.read_text()
+        check(
+            "docs/SCREENSHOTS.md references SAFE_SCREENSHOT_CAPTURE",
+            "SAFE_SCREENSHOT_CAPTURE" in screenshots_text,
+            "SCREENSHOTS.md should reference SAFE_SCREENSHOT_CAPTURE.md",
+        )
+        check(
+            "docs/SCREENSHOTS.md references screenshot examples",
+            "examples" in screenshots_text.lower(),
+            "SCREENSHOTS.md should reference screenshot examples",
+        )
+
+    # README links to new docs
+    check(
+        "README.md links to FIRST_PRIVATE_SFT_RECORD",
+        "FIRST_PRIVATE_SFT_RECORD" in readme_text,
+        "FIRST_PRIVATE_SFT_RECORD.md link not found in README.md",
+    )
+    check(
+        "README.md links to SAFE_SCREENSHOT_CAPTURE",
+        "SAFE_SCREENSHOT_CAPTURE" in readme_text,
+        "SAFE_SCREENSHOT_CAPTURE.md link not found in README.md",
+    )
+
+    # No oversized screenshots (if any images exist)
+    screenshots_dir = PROJECT_ROOT / "docs" / "assets" / "screenshots"
+    if screenshots_dir.exists():
+        for img_file in screenshots_dir.glob("*.png"):
+            size_mb = img_file.stat().st_size / (1024 * 1024)
+            check(
+                f"Screenshot {img_file.name} < 2MB",
+                size_mb < 2.0,
+                f"{img_file.name} is {size_mb:.1f}MB — optimize before commit",
+            )
+        for img_file in screenshots_dir.glob("*.webp"):
+            size_mb = img_file.stat().st_size / (1024 * 1024)
+            check(
+                f"Screenshot {img_file.name} < 1MB",
+                size_mb < 1.0,
+                f"{img_file.name} is {size_mb:.1f}MB — optimize before commit",
+            )
+
+    # No adapter/weights/GGUF tracked (v0.1.24 re-check)
+    try:
+        result_weights_v0124 = subprocess.run(
+            ["git", "ls-files", "*.safetensors", "*.bin", "*.pt", "*.pth", "*.ckpt", "*.gguf"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        weight_files_v0124 = [f for f in result_weights_v0124.stdout.strip().splitlines() if f]
+        check(
+            "No adapter/weights/GGUF tracked in git (v0.1.24 re-check)",
+            len(weight_files_v0124) == 0,
+            f"Weight/adapter files tracked: {weight_files_v0124}",
+        )
+    except Exception:
+        warn("Could not check git tracked weight files", "git not available or not a repo")
+
+    # Preview gate still BLOCKED (v0.1.24 re-check)
+    gate_path_v0124 = PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md"
+    if gate_path_v0124.exists():
+        gate_text_v0124 = gate_path_v0124.read_text()
+        check(
+            "Preview gate still BLOCKED (v0.1.24 re-check)",
+            "BLOCKED" in gate_text_v0124,
+            "ADAPTER_PREVIEW_GATE must still say BLOCKED",
+        )
+
+    # No "Kimari-4B released" false claim (v0.1.24 re-check)
+    check(
+        'No "Kimari-4B released" false claim (v0.1.24 re-check)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:
