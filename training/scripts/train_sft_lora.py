@@ -18,6 +18,12 @@ Dry-run mode (--dry-run):
 - Returns exit 0 even if training dependencies are not installed
 - Makes no network calls, no model downloads, no real training
 
+v0.1.34-alpha: TRL/SFTTrainer compatibility hardening.
+- max_seq_length moved from TrainingArguments to SFTTrainer
+- build_training_arguments() uses eval_strategy alias with fallback
+- build_sft_trainer() inspects SFTTrainer signature for compatibility
+- prepare_sft_dataset() handles "messages" and "text" columns
+
 No network calls. No downloads.
 """
 
@@ -529,6 +535,199 @@ def apply_cli_overrides(config: dict, args) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# SFT Training — compatibility-hardened builder functions (v0.1.34-alpha)
+# ---------------------------------------------------------------------------
+
+
+def build_training_arguments(config: dict, output_dir: str, eval_dataset_exists: bool):
+    """Build TrainingArguments without max_seq_length.
+
+    max_seq_length is NOT a valid TrainingArguments parameter in most
+    transformers versions and must be passed to SFTTrainer instead.
+
+    Uses ``eval_strategy`` as alias for ``evaluation_strategy`` with a
+    fallback for older transformers versions that only support the
+    longer name.
+
+    Returns:
+        TrainingArguments instance.
+    """
+    import inspect
+
+    from transformers import TrainingArguments
+
+    eval_strategy_value = "steps" if eval_dataset_exists else "no"
+
+    # Build base kwargs — never include max_seq_length here
+    kwargs: dict = {
+        "output_dir": output_dir,
+        "max_steps": config.get("max_steps", 10),
+        "per_device_train_batch_size": config.get("per_device_train_batch_size", 1),
+        "gradient_accumulation_steps": config.get("gradient_accumulation_steps", 1),
+        "learning_rate": config.get("learning_rate", 1e-4),
+        "logging_steps": config.get("logging_steps", 2),
+        "save_steps": config.get("save_steps", 50),
+        "report_to": "none",
+        "push_to_hub": False,
+        "fp16": config.get("fp16", False),
+        "gradient_checkpointing": config.get("gradient_checkpointing", False),
+        "seed": config.get("seed", 42),
+    }
+
+    # Add eval-related args only when an eval dataset exists
+    if eval_dataset_exists:
+        kwargs["eval_steps"] = config.get("eval_steps", 5)
+
+    # Determine whether TrainingArguments accepts eval_strategy or
+    # evaluation_strategy.  Newer transformers (>=4.39) prefer
+    # eval_strategy; older versions only accept evaluation_strategy.
+    ta_params = inspect.signature(TrainingArguments.__init__).parameters
+    if "eval_strategy" in ta_params:
+        kwargs["eval_strategy"] = eval_strategy_value
+    elif "evaluation_strategy" in ta_params:
+        kwargs["evaluation_strategy"] = eval_strategy_value
+    else:
+        # Fallback: try eval_strategy first, then evaluation_strategy
+        try:
+            kwargs["eval_strategy"] = eval_strategy_value
+        except TypeError:
+            kwargs["evaluation_strategy"] = eval_strategy_value
+
+    return TrainingArguments(**kwargs)
+
+
+def prepare_sft_dataset(dataset, tokenizer) -> object:
+    """Prepare a dataset for SFT training by ensuring it has a 'text' column.
+
+    Handles three cases:
+    1. If the dataset has a ``messages`` column, converts to text using
+       ``tokenizer.apply_chat_template`` if available, or falls back to a
+       simple format.
+    2. If the dataset has a ``text`` column, uses it directly.
+    3. If neither column exists, raises a clear error.
+
+    Returns:
+        A dataset with a ``text`` column.
+    """
+    column_names = dataset.column_names if hasattr(dataset, "column_names") else []
+
+    if "messages" in column_names:
+        # Convert messages → text
+        def _messages_to_text(example):
+            messages = example["messages"]
+            if hasattr(tokenizer, "apply_chat_template") and callable(tokenizer.apply_chat_template):
+                try:
+                    return {"text": tokenizer.apply_chat_template(messages, tokenize=False)}
+                except Exception:
+                    pass
+            # Simple fallback format
+            parts = []
+            for msg in messages:
+                role = msg.get("role", "unknown")
+                content = msg.get("content", "")
+                parts.append(f"<|{role}|>\n{content}")
+            return {"text": "\n".join(parts)}
+
+        dataset = dataset.map(_messages_to_text)
+        return dataset
+
+    if "text" in column_names:
+        # Already has a text column — use directly
+        return dataset
+
+    # Neither messages nor text — cannot proceed
+    available = list(column_names) if column_names else []
+    raise ValueError(
+        f"Dataset does not have a 'messages' or 'text' column. "
+        f"Available columns: {available}. "
+        f"SFTTrainer requires a 'text' column or a 'messages' column "
+        f"that can be converted to text."
+    )
+
+
+def build_sft_trainer(model, training_args, train_dataset, eval_dataset, tokenizer, config):
+    """Build an SFTTrainer with TRL version compatibility.
+
+    Inspects SFTTrainer's __init__ signature to determine which keyword
+    arguments it accepts, then builds the kwargs dict dynamically:
+
+    - If SFTTrainer accepts ``tokenizer``, passes ``tokenizer=tokenizer``.
+    - If it accepts ``processing_class`` instead (newer TRL), passes
+      ``processing_class=tokenizer``.
+    - If it accepts ``dataset_text_field``, passes
+      ``dataset_text_field="text"`` when the dataset has a ``text`` column.
+    - If it accepts ``max_seq_length``, passes
+      ``max_seq_length=config.get("max_seq_length", 512)``.
+
+    Falls back with a useful error message if nothing works.
+
+    Returns:
+        SFTTrainer instance.
+    """
+    import inspect
+
+    from trl import SFTTrainer
+
+    sig_params = inspect.signature(SFTTrainer.__init__).parameters
+    param_names = set(sig_params.keys())
+
+    # Core kwargs — always passed
+    kwargs: dict = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": train_dataset,
+    }
+
+    if eval_dataset is not None:
+        kwargs["eval_dataset"] = eval_dataset
+
+    # Determine tokenizer / processing_class parameter name
+    if "processing_class" in param_names:
+        kwargs["processing_class"] = tokenizer
+    elif "tokenizer" in param_names:
+        kwargs["tokenizer"] = tokenizer
+    else:
+        # Try both — let SFTTrainer raise its own error if neither works
+        try:
+            kwargs["tokenizer"] = tokenizer
+        except TypeError:
+            kwargs["processing_class"] = tokenizer
+
+    # dataset_text_field: pass "text" if dataset has a text column
+    if "dataset_text_field" in param_names:
+        ds_columns = train_dataset.column_names if hasattr(train_dataset, "column_names") else []
+        if "text" in ds_columns:
+            kwargs["dataset_text_field"] = "text"
+
+    # max_seq_length: pass to SFTTrainer, NOT TrainingArguments
+    if "max_seq_length" in param_names:
+        kwargs["max_seq_length"] = config.get("max_seq_length", 512)
+
+    try:
+        trainer = SFTTrainer(**kwargs)
+    except TypeError as e:
+        print(
+            f"ERROR: SFTTrainer API has changed or is incompatible: {e}",
+            file=sys.stderr,
+        )
+        print(
+            "This may be due to a trl version mismatch. Check your trl version and consult the trl changelog.",
+            file=sys.stderr,
+        )
+        print(
+            f"SFTTrainer.__init__ accepts: {sorted(param_names)}",
+            file=sys.stderr,
+        )
+        print(
+            f"Attempted kwargs: {sorted(kwargs.keys())}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    return trainer
+
+
+# ---------------------------------------------------------------------------
 # SFT Training
 # ---------------------------------------------------------------------------
 
@@ -537,6 +736,11 @@ def run_sft_training(config: dict, micro_run: bool = True) -> dict:
     """Run SFT LoRA training with the given configuration.
 
     Imports torch/transformers/datasets/peft/trl ONLY inside this function.
+    Uses compatibility-hardened builder functions (v0.1.34-alpha):
+    - build_training_arguments(): no max_seq_length, eval_strategy fallback
+    - prepare_sft_dataset(): handles messages/text columns
+    - build_sft_trainer(): inspects SFTTrainer signature dynamically
+
     Returns a sanitized summary dict.
     """
     # --- Lazy imports (only inside this function) ---
@@ -544,8 +748,7 @@ def run_sft_training(config: dict, micro_run: bool = True) -> dict:
         import torch  # noqa: F401
         from datasets import load_dataset
         from peft import LoraConfig, get_peft_model
-        from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
-        from trl import SFTTrainer
+        from transformers import AutoModelForCausalLM, AutoTokenizer
     except ImportError as e:
         print(
             f"ERROR: Required training dependency not installed: {e}",
@@ -620,49 +823,47 @@ def run_sft_training(config: dict, micro_run: bool = True) -> dict:
 
     model = get_peft_model(model, lora_config)
 
-    # --- Training arguments ---
+    # --- Prepare SFT dataset (messages → text conversion) ---
+    try:
+        dataset = prepare_sft_dataset(dataset, tokenizer)
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    if eval_dataset is not None:
+        try:
+            eval_dataset = prepare_sft_dataset(eval_dataset, tokenizer)
+        except ValueError as e:
+            print(f"WARNING: Could not prepare eval dataset: {e}", file=sys.stderr)
+            eval_dataset = None
+
+    # --- Training arguments (v0.1.34: no max_seq_length here) ---
     max_steps = config.get("max_steps", 10)
     if micro_run:
         max_steps = min(max_steps, 10)
+    # Override max_steps in config so build_training_arguments picks it up
+    config = dict(config)  # shallow copy to avoid mutating the original
+    config["max_steps"] = max_steps
+    # Ensure fp16 reflects CUDA availability
+    config["fp16"] = torch.cuda.is_available()
 
-    training_args = TrainingArguments(
+    training_args = build_training_arguments(
+        config=config,
         output_dir=output_dir,
-        max_steps=max_steps,
-        per_device_train_batch_size=config.get("per_device_train_batch_size", 1),
-        gradient_accumulation_steps=config.get("gradient_accumulation_steps", 1),
-        learning_rate=config.get("learning_rate", 1e-4),
-        logging_steps=config.get("logging_steps", 2),
-        eval_steps=config.get("eval_steps", 5) if eval_dataset else None,
-        save_steps=config.get("save_steps", 50),
-        evaluation_strategy="steps" if eval_dataset else "no",
-        report_to="none",
-        push_to_hub=False,
-        fp16=torch.cuda.is_available(),
-        gradient_checkpointing=config.get("gradient_checkpointing", False),
-        seed=config.get("seed", 42),
-        max_seq_length=config.get("max_seq_length", 512),
+        eval_dataset_exists=eval_dataset is not None,
+    )
+
+    # --- Build SFTTrainer (v0.1.34: inspect-based compatibility) ---
+    trainer = build_sft_trainer(
+        model=model,
+        training_args=training_args,
+        train_dataset=dataset,
+        eval_dataset=eval_dataset,
+        tokenizer=tokenizer,
+        config=config,
     )
 
     # --- Train ---
-    try:
-        trainer = SFTTrainer(
-            model=model,
-            args=training_args,
-            train_dataset=dataset,
-            eval_dataset=eval_dataset,
-            tokenizer=tokenizer,
-        )
-    except TypeError as e:
-        print(
-            f"ERROR: SFTTrainer API has changed or is incompatible: {e}",
-            file=sys.stderr,
-        )
-        print(
-            "This may be due to a trl version mismatch. Check your trl version and consult the trl changelog.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
     result = trainer.train()
 
     # --- Save adapter ---
@@ -707,7 +908,7 @@ def main() -> None:
     """CLI entry point for SFT LoRA training."""
     parser = argparse.ArgumentParser(
         description="Kimari SFT LoRA Training Script. "
-        "Experimental \u2014 v0.1.33-alpha supports micro-run mode only. "
+        "Experimental \u2014 v0.1.34-alpha supports micro-run mode only. "
         "No network calls in dry-run. No downloads in dry-run.",
     )
     parser.add_argument(
@@ -747,7 +948,7 @@ def main() -> None:
         dest="json_output",
         help="Output structured JSON (used with --show-supported-flags).",
     )
-    # --- New CLI flags for v0.1.33 ---
+    # --- CLI flags for v0.1.33+ ---
     parser.add_argument(
         "--dataset-path",
         dest="dataset_path",
@@ -829,7 +1030,7 @@ def main() -> None:
         "--micro-run",
         dest="micro_run",
         action="store_true",
-        help="Enable micro-run mode (required for v0.1.33)",
+        help="Enable micro-run mode (required for v0.1.34)",
     )
     parser.add_argument(
         "--yes",
@@ -923,7 +1124,7 @@ def main() -> None:
         print()
         print("# IMPORTANT: Real training must not run in CI.")
         print("# Run manually on a GPU machine only.")
-        print("# v0.1.33-alpha: micro-run mode required (--micro-run).")
+        print("# v0.1.34-alpha: micro-run mode required (--micro-run).")
         sys.exit(0)
 
     # --estimate-only: print step estimation and exit
@@ -991,7 +1192,7 @@ def main() -> None:
     # -------------------------------------------------------------------
 
     # -------------------------------------------------------------------
-    # v0.1.33 protections (MUST come before dependency check)
+    # v0.1.34 protections (MUST come before dependency check)
     # -------------------------------------------------------------------
 
     # CI guard: if CI=true, abort training (no deps needed for this check)
@@ -1006,10 +1207,10 @@ def main() -> None:
         )
         sys.exit(1)
 
-    # --micro-run required: v0.1.33 only supports micro-run
+    # --micro-run required: v0.1.34 only supports micro-run
     if not args.micro_run:
         print(
-            "\nERROR: --micro-run is required. v0.1.33-alpha only supports micro-run mode.",
+            "\nERROR: --micro-run is required. v0.1.34-alpha only supports micro-run mode.",
             file=sys.stderr,
         )
         print(

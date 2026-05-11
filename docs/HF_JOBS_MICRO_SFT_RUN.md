@@ -1,8 +1,8 @@
 # HF Jobs Micro SFT Run — Kimari Local AI
 
 > **Document Type:** Guide for running Kimari-4B micro SFT on Hugging Face Jobs  
-> **Version:** v0.1.33-alpha  
-> **Date:** 2026-06-02  
+> **Version:** v0.1.34-alpha  
+> **Date:** 2026-06-03  
 > **Status:** Active — governs micro SFT execution on HF Jobs  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -100,6 +100,18 @@ python training/scripts/validate_hf_jobs_smoke_summary.py \
 ```
 
 If validation fails, do NOT proceed. Fix the smoke test first.
+
+### Step 1.5: Check Training Stack Compatibility
+
+Before proceeding to the dry-run, verify that the training stack is compatible:
+
+```bash
+python training/scripts/check_training_stack.py --json
+```
+
+**Do NOT proceed to micro SFT if the training stack compatibility check reports failures. Fix missing dependencies or version mismatches first.**
+
+The checker inspects installed Python packages and their API signatures. It does NOT download models, access GPU, or run training. See [TRAINING_STACK_COMPATIBILITY.md](TRAINING_STACK_COMPATIBILITY.md) for details.
 
 ### Step 2: Dry-Run (No Execution)
 
@@ -308,6 +320,7 @@ After a successful micro SFT:
 | [HF_JOBS_MICRO_SFT_RESULT.md](HF_JOBS_MICRO_SFT_RESULT.md) | Micro SFT result template |
 | [KIMARI4B_PRIVATE_SFT_RUN.md](KIMARI4B_PRIVATE_SFT_RUN.md) | Full private SFT guide |
 | [MICRO_SFT_IMPLEMENTATION.md](MICRO_SFT_IMPLEMENTATION.md) | Micro SFT implementation details (train_sft_lora.py) |
+| [TRAINING_STACK_COMPATIBILITY.md](TRAINING_STACK_COMPATIBILITY.md) | Training dependency compatibility and TRL/SFTTrainer version differences |
 | [HF_TOKEN_SAFETY.md](HF_TOKEN_SAFETY.md) | Token safety procedures |
 | [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Gate state machine (BLOCKED) |
 

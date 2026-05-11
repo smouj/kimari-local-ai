@@ -5,6 +5,37 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.34-alpha] - 2026-06-03
+
+### Added
+- `training/scripts/check_training_stack.py` — Training stack compatibility checker (no downloads, no training, no network calls)
+  - Checks Python version, torch, transformers, datasets, peft, trl, accelerate imports and versions
+  - Inspects TrainingArguments and SFTTrainer signatures for parameter compatibility
+  - Reports whether TrainingArguments accepts max_seq_length (should be False)
+  - Reports whether SFTTrainer accepts tokenizer/processing_class/dataset_text_field/max_seq_length
+  - `--json` for structured output, `--verbose` for detailed parameter listings
+- `training/scripts/train_sft_lora.py` TRL/SFTTrainer compatibility hardening
+  - `build_training_arguments(config, output_dir, eval_dataset_exists)` — Builds TrainingArguments WITHOUT max_seq_length, with eval_strategy/evaluation_strategy fallback
+  - `build_sft_trainer(model, training_args, train_dataset, eval_dataset, tokenizer, config)` — Inspects SFTTrainer signature, supports tokenizer and processing_class, passes max_seq_length and dataset_text_field conditionally
+  - `prepare_sft_dataset(dataset, tokenizer)` — Converts messages column to text via chat template, supports text column directly, clear error if neither exists
+  - Removed max_seq_length from TrainingArguments (not a valid parameter)
+- `docs/TRAINING_STACK_COMPATIBILITY.md` — Documentation for training stack versions, compatibility issues, and check_training_stack usage
+
+### Changed
+- `training/requirements-training.txt` — Updated with reasonable version ranges for TRL/SFTTrainer compatibility
+- `docs/HF_JOBS_MICRO_SFT_RUN.md` — Added mandatory check_training_stack step before micro SFT execution
+- `training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml` — Added check_training_stack.py command before train_sft_lora.py
+- `training/scripts/validate_micro_sft_readiness.py` — Added check_training_stack and no hf upload command validation
+- `RELEASE_CHECKLIST.md` — Added v0.1.34 checks
+- `scripts/release/check-release.py` — Added v0.1.34 validation checks
+- README, docs/index.html, docs/MICRO_SFT_IMPLEMENTATION.md updated with version references
+
+### Fixed
+- TrainingArguments no longer receives max_seq_length (was incorrect, would fail at runtime)
+- SFTTrainer compatibility layer prevents TypeError on newer TRL versions (tokenizer → processing_class)
+- Dataset with "messages" column now properly converted to text for SFTTrainer
+- No training in CI. No adapters committed. No HF upload. Gate still BLOCKED. Training stack compatibility hardened before first real micro SFT.
+
 ## [0.1.33-alpha] - 2026-06-02
 
 ### Added

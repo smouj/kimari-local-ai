@@ -630,6 +630,27 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.34 Checks
+
+- [ ] training/scripts/check_training_stack.py exists and --json works without downloading models
+- [ ] train_sft_lora.py has build_training_arguments function
+- [ ] train_sft_lora.py has build_sft_trainer function
+- [ ] train_sft_lora.py has prepare_sft_dataset function
+- [ ] max_seq_length is NOT passed to TrainingArguments in train_sft_lora.py
+- [ ] max_seq_length IS passed to SFTTrainer (via build_sft_trainer) when supported
+- [ ] docs/TRAINING_STACK_COMPATIBILITY.md exists
+- [ ] HF Jobs config includes check_training_stack.py command before training
+- [ ] validate_micro_sft_readiness.py checks for check_training_stack.py in commands
+- [ ] validate_micro_sft_readiness.py checks no hf upload in commands
+- [ ] prepare_sft_dataset handles messages column
+- [ ] prepare_sft_dataset handles text column
+- [ ] build_training_arguments uses eval_strategy/evaluation_strategy fallback
+- [ ] build_sft_trainer supports tokenizer and processing_class
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

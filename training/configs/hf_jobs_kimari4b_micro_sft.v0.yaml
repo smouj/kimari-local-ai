@@ -48,6 +48,7 @@ commands:
   - "python -c 'import torch; print(f\"CUDA available: {torch.cuda.is_available()}\")'"
   - "git clone https://github.com/smouj/kimari-local-ai.git /tmp/kimari-local-ai && cd /tmp/kimari-local-ai"
   - "pip install -e /tmp/kimari-local-ai"
+  - "python /tmp/kimari-local-ai/training/scripts/check_training_stack.py --json"
   - "python /tmp/kimari-local-ai/training/scripts/build_dataset_mix.py --sft /tmp/kimari-local-ai/dataset/v0/sft_v0.jsonl --preference /tmp/kimari-local-ai/dataset/v0/preference_v0.jsonl --output-dir /tmp/kimari-dataset --holdout /tmp/kimari-local-ai/dataset/v0/eval_holdout.jsonl"
   - "python /tmp/kimari-local-ai/training/scripts/train_sft_lora.py --config /tmp/kimari-local-ai/training/configs/kimari_sft_lora.v0.example.yaml --dataset-path /tmp/kimari-dataset/sft.train.jsonl --eval-dataset-path /tmp/kimari-dataset/sft.eval.jsonl --output-dir /tmp/kimari-micro-sft-output --max-steps 10 --eval-steps 5 --save-steps 50 --logging-steps 2 --per-device-train-batch-size 1 --gradient-accumulation-steps 1 --learning-rate 0.0001 --max-seq-length 512 --micro-run --yes"
 

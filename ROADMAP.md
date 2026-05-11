@@ -397,7 +397,7 @@
 - ✅ Updated runbook, private SFT guide, and checklist
 - ✅ Version bumped to v0.1.32-alpha
 
-## v0.1.33-alpha (Current)
+## v0.1.33-alpha (Released)
 
 - ✅ train_sft_lora.py supports real micro SFT training with LoRA/QLoRA
 - ✅ New CLI flags: --dataset-path, --eval-dataset-path, --output-dir, --max-steps, --eval-steps, --save-steps, --logging-steps, --per-device-train-batch-size, --gradient-accumulation-steps, --learning-rate, --max-seq-length, --micro-run, --yes
@@ -409,6 +409,16 @@
 - ✅ validate_micro_sft_readiness.py for pre-flight config validation
 - ✅ docs/MICRO_SFT_IMPLEMENTATION.md
 - ✅ hf_jobs config includes --micro-run --yes
+- ✅ Gate BLOCKED
+
+## v0.1.34-alpha (Current)
+
+- ✅ Training stack compatibility checker (check_training_stack.py)
+- ✅ TRL/SFTTrainer compatibility hardening (build_training_arguments, build_sft_trainer, prepare_sft_dataset)
+- ✅ Removed max_seq_length from TrainingArguments (passed to SFTTrainer instead)
+- ✅ Dataset formatting: messages → text conversion, text column direct support
+- ✅ docs/TRAINING_STACK_COMPATIBILITY.md
+- ✅ HF Jobs config includes check_training_stack before training
 - ✅ Gate BLOCKED
 
 ## v0.2.0-alpha

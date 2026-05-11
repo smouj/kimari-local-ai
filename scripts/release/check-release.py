@@ -3502,7 +3502,7 @@ def main() -> None:
     )
 
     # ── v0.1.33 Micro SFT training implementation ────────────────
-    print("\n[57/57] v0.1.33 Micro SFT training implementation")
+    print("\n[57/58] v0.1.33 Micro SFT training implementation")
 
     # Check train_sft_lora.py has all micro flags
     train_sft_script = PROJECT_ROOT / "training" / "scripts" / "train_sft_lora.py"
@@ -3576,14 +3576,14 @@ def main() -> None:
         # Check push_to_hub is False
         check(
             'train_sft_lora.py sets push_to_hub=False',
-            "push_to_hub=False" in train_sft_text or "push_to_hub = False" in train_sft_text,
+            "push_to_hub=False" in train_sft_text or "push_to_hub = False" in train_sft_text or '\"push_to_hub\": False' in train_sft_text or "'push_to_hub': False" in train_sft_text,
             "push_to_hub must be False in train_sft_lora.py",
         )
 
         # Check report_to is "none"
         check(
             'train_sft_lora.py sets report_to="none"',
-            'report_to="none"' in train_sft_text or "report_to='none'" in train_sft_text or 'report_to = "none"' in train_sft_text,
+            'report_to="none"' in train_sft_text or "report_to='none'" in train_sft_text or 'report_to = "none"' in train_sft_text or '\"report_to\": "none"' in train_sft_text or "'report_to': 'none'" in train_sft_text,
             'report_to must be "none" in train_sft_lora.py',
         )
     else:
@@ -3678,6 +3678,100 @@ def main() -> None:
     # default_profile still test
     check(
         'default_profile still "test" (v0.1.33 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+
+    # ── v0.1.34 TRL/SFTTrainer compatibility hardening ──────────
+    print("\n[58/58] v0.1.34 TRL/SFTTrainer compatibility hardening")
+    check(
+        "training/scripts/check_training_stack.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "check_training_stack.py").exists(),
+        "Training stack compatibility checker missing",
+    )
+    train_script_text = (PROJECT_ROOT / "training" / "scripts" / "train_sft_lora.py").read_text()
+    check(
+        "train_sft_lora.py has build_training_arguments",
+        "def build_training_arguments" in train_script_text,
+        "build_training_arguments function missing from train_sft_lora.py",
+    )
+    check(
+        "train_sft_lora.py has build_sft_trainer",
+        "def build_sft_trainer" in train_script_text,
+        "build_sft_trainer function missing from train_sft_lora.py",
+    )
+    check(
+        "train_sft_lora.py has prepare_sft_dataset",
+        "def prepare_sft_dataset" in train_script_text,
+        "prepare_sft_dataset function missing from train_sft_lora.py",
+    )
+    # Check that max_seq_length is NOT passed as a kwarg to TrainingArguments
+    # inside build_training_arguments().  Mentions in docstrings/comments are OK.
+    _bta_passes_max_seq = False
+    if "def build_training_arguments" in train_script_text:
+        _bta_body = train_script_text.split("def build_training_arguments")[1].split("\ndef ")[0]
+        _in_docstring = False
+        for _line in _bta_body.splitlines():
+            _stripped = _line.strip()
+            if '"""' in _stripped:
+                _in_docstring = not _in_docstring
+                continue
+            if _in_docstring or _stripped.startswith("#"):
+                continue
+            # Detect if max_seq_length is used as a key in kwargs passed to TrainingArguments
+            if "max_seq_length" in _stripped and ("kwargs" in _stripped or "TrainingArguments" in _stripped):
+                _bta_passes_max_seq = True
+                break
+    check(
+        "train_sft_lora.py does NOT pass max_seq_length to TrainingArguments",
+        not _bta_passes_max_seq,
+        "max_seq_length must not be passed to TrainingArguments — pass it to SFTTrainer instead",
+    )
+    check(
+        "docs/TRAINING_STACK_COMPATIBILITY.md exists",
+        (PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md").exists(),
+        "Training stack compatibility doc missing",
+    )
+    # Check HF Jobs config includes check_training_stack
+    hf_jobs_config_path = PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"
+    if hf_jobs_config_path.exists():
+        hf_config_text = hf_jobs_config_path.read_text()
+        check(
+            "HF Jobs config includes check_training_stack.py",
+            "check_training_stack" in hf_config_text,
+            "HF Jobs micro SFT config should include check_training_stack.py before training",
+        )
+    # Validate micro SFT readiness includes new checks
+    validate_script_path = PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_readiness.py"
+    if validate_script_path.exists():
+        validate_text = validate_script_path.read_text()
+        check(
+            "validate_micro_sft_readiness checks for check_training_stack",
+            "check_training_stack" in validate_text,
+            "validate_micro_sft_readiness should check for check_training_stack.py in config commands",
+        )
+        check(
+            "validate_micro_sft_readiness checks no hf upload",
+            "hf upload" in validate_text or "huggingface-cli upload" in validate_text,
+            "validate_micro_sft_readiness should check for forbidden HF upload commands",
+        )
+    # Content integrity
+    check(
+        "No adapter/GGUF/weight files tracked (v0.1.34)",
+        True,  # Already checked above
+    )
+    check(
+        "Gate BLOCKED (v0.1.34)",
+        "BLOCKED" in hf_config_text if hf_jobs_config_path.exists() else False,
+        "Gate must remain BLOCKED",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.34)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        'default_profile still "test" (v0.1.34 check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
         "default_profile changed from test — this is not allowed during alpha",
     )

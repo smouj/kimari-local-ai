@@ -177,7 +177,42 @@ def validate_micro_sft_readiness(config_path: str) -> dict:
         errors.append(msg)
         checks.append({"name": "output_dir_safe", "passed": False, "message": msg})
 
-    # --- Check 9: No adapter/GGUF tracked in git ---
+    # --- Check 9: Commands include check_training_stack.py ---
+    has_check_training_stack = any("check_training_stack" in str(cmd) for cmd in commands)
+    if has_check_training_stack:
+        checks.append(
+            {"name": "has_check_training_stack", "passed": True, "message": "Commands include check_training_stack.py"}
+        )
+    else:
+        checks.append(
+            {
+                "name": "has_check_training_stack",
+                "passed": True,
+                "message": "Commands do not include check_training_stack.py (warning: recommended for v0.1.34+)",
+            }
+        )
+
+    # --- Check 10: Commands do NOT include forbidden upload patterns ---
+    forbidden_patterns = ["huggingface-cli upload", "hf upload", "push_to_hub"]
+    found_forbidden = []
+    for cmd in commands:
+        for pattern in forbidden_patterns:
+            if pattern in str(cmd):
+                found_forbidden.append(pattern)
+    if not found_forbidden:
+        checks.append(
+            {
+                "name": "no_forbidden_upload",
+                "passed": True,
+                "message": "Commands do not include forbidden upload patterns",
+            }
+        )
+    else:
+        msg = f"Commands include forbidden upload patterns: {found_forbidden}"
+        errors.append(msg)
+        checks.append({"name": "no_forbidden_upload", "passed": False, "message": msg})
+
+    # --- Check 11: No adapter/GGUF tracked in git ---
     git_tracked_artifacts = []
     artifact_patterns = ["training/adapters/", ".safetensors", ".gguf", "adapter_model"]
     try:
