@@ -7,14 +7,32 @@ Usage:
     python training/scripts/hf_jobs_status.py --job-id <id> --json
     python training/scripts/hf_jobs_status.py --job-id <id> --logs
     python training/scripts/hf_jobs_status.py --job-id <id> --logs --tail 100
+    python training/scripts/hf_jobs_status.py --job-id <id> --logs --sanitize-logs
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
+
+# Patterns to sanitize from logs
+SANITIZE_PATTERNS = [
+    re.compile(r"(hf_[a-zA-Z0-9]{20,})", re.IGNORECASE),
+    re.compile(r"(token[\s]*[=:][\s]*[\"']?[a-zA-Z0-9_\-]{20,}[\"']?)", re.IGNORECASE),
+    re.compile(r"(api_key[\s]*[=:][\s]*[\"']?[a-zA-Z0-9_\-]{20,}[\"']?)", re.IGNORECASE),
+    re.compile(r"(password[\s]*[=:][\s]*[\"']?[a-zA-Z0-9_\-]{8,}[\"']?)", re.IGNORECASE),
+    re.compile(r"(Authorization[\s]*[:=][\s]*[\"']?Bearer[\s]+[a-zA-Z0-9_\-\.]{20,}[\"']?)", re.IGNORECASE),
+]
+
+
+def sanitize_line(line: str) -> str:
+    """Remove sensitive patterns from a log line."""
+    for pattern in SANITIZE_PATTERNS:
+        line = pattern.sub("[REDACTED]", line)
+    return line
 
 
 def main() -> None:
@@ -44,6 +62,12 @@ def main() -> None:
         default=100,
         help="Number of log lines to show (default: 100, used with --logs)",
     )
+    parser.add_argument(
+        "--sanitize-logs",
+        action="store_true",
+        dest="sanitize_logs",
+        help="Sanitize logs by removing tokens, API keys, passwords, and auth headers",
+    )
 
     args = parser.parse_args()
 
@@ -63,15 +87,21 @@ def main() -> None:
             lines = result.stdout.splitlines()
             tailed = lines[-args.tail:] if len(lines) > args.tail else lines
 
+            # Sanitize if requested
+            if args.sanitize_logs:
+                tailed = [sanitize_line(line) for line in tailed]
+
             if args.json_output:
                 print(json.dumps({
                     "job_id": args.job_id,
                     "log_lines": len(lines),
                     "showing": len(tailed),
                     "logs": "\n".join(tailed),
+                    "sanitized": args.sanitize_logs,
                 }, indent=2))
             else:
-                print(f"Logs for job {args.job_id} (last {len(tailed)} of {len(lines)} lines):")
+                sanitized_note = " (sanitized)" if args.sanitize_logs else ""
+                print(f"Logs for job {args.job_id}{sanitized_note} (last {len(tailed)} of {len(lines)} lines):")
                 print("-" * 60)
                 for line in tailed:
                     print(line)
@@ -94,23 +124,31 @@ def main() -> None:
                 print(f"ERROR: Failed to inspect job: {result.stderr}", file=sys.stderr)
                 sys.exit(1)
 
+            # Sanitize inspect output if requested
+            inspect_output = result.stdout
+            if args.sanitize_logs:
+                inspect_output = sanitize_line(inspect_output)
+
             if args.json_output:
                 # Try to parse as JSON, fallback to raw text
                 try:
-                    data = json.loads(result.stdout)
+                    data = json.loads(inspect_output)
                     data["_job_id"] = args.job_id
                     data["_read_only"] = True
+                    data["_sanitized"] = args.sanitize_logs
                     print(json.dumps(data, indent=2))
                 except json.JSONDecodeError:
                     print(json.dumps({
                         "job_id": args.job_id,
-                        "raw_output": result.stdout,
+                        "raw_output": inspect_output,
                         "_read_only": True,
+                        "_sanitized": args.sanitize_logs,
                     }, indent=2))
             else:
-                print(f"Job status for: {args.job_id}")
+                sanitized_note = " (sanitized)" if args.sanitize_logs else ""
+                print(f"Job status for: {args.job_id}{sanitized_note}")
                 print("-" * 60)
-                print(result.stdout)
+                print(inspect_output)
                 print("-" * 60)
                 print("(Read-only — no modifications made)")
         except FileNotFoundError:

@@ -533,6 +533,30 @@ twine upload dist/*
 - [ ] `default_profile` is still "test"
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.30 Checks
+
+- [ ] docs/HF_JOBS_SMOKE_RESULT.md exists
+- [ ] docs/HF_JOBS_SMOKE_RUNBOOK.md exists
+- [ ] training/scripts/create_hf_jobs_smoke_summary.py exists
+- [ ] create_hf_jobs_smoke_summary.py --status pending --json works
+- [ ] create_hf_jobs_smoke_summary.py --status completed --json works
+- [ ] Summary has training_performed=false
+- [ ] Summary has adapter_generated=false
+- [ ] Summary has hf_upload_performed=false
+- [ ] Summary has gate_state=BLOCKED
+- [ ] hf_jobs_status.py has --sanitize-logs flag
+- [ ] hf_jobs_status.py sanitizes fake token in logs
+- [ ] HF_JOBS_PRIVATE_RUN.md mentions smoke result summary
+- [ ] HF_JOBS_PRIVATE_RUN.md mentions log sanitization
+- [ ] README mentions HF Jobs smoke test status
+- [ ] No raw logs committed
+- [ ] training_performed=false in smoke result doc
+- [ ] adapter_generated=false in smoke result doc
+- [ ] hf_upload_performed=false in smoke result doc
+- [ ] Gate still BLOCKED
+- [ ] `default_profile` is still "test"
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

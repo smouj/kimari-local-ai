@@ -5,6 +5,24 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.30-alpha] - 2026-06-01
+
+### Added
+- `docs/HF_JOBS_SMOKE_RESULT.md` — Smoke test result template and sanitized summary
+- `training/scripts/create_hf_jobs_smoke_summary.py` — CLI to generate sanitized smoke test summaries
+- `docs/HF_JOBS_SMOKE_RUNBOOK.md` — Step-by-step runbook for executing HF Jobs smoke test
+- `--sanitize-logs` flag in `hf_jobs_status.py` to strip tokens/api keys from log output
+
+### Changed
+- `docs/HF_JOBS_PRIVATE_RUN.md` updated with smoke result summary and log sanitization guidance
+- README updated with HF Jobs smoke test status section
+- `docs/index.html` updated with HF Jobs smoke test block
+- `RELEASE_CHECKLIST.md` updated with v0.1.30 checks
+- `scripts/release/check-release.py` updated with v0.1.30 validation checks
+
+### Fixed
+- No training performed. No adapters generated. No HF upload. Gate still BLOCKED.
+
 ## [0.1.29-alpha] — 2026-05-31
 
 ### Added

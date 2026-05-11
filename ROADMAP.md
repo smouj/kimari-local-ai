@@ -359,7 +359,7 @@
 - ✅ Updated FIRST_PRIVATE_SFT_HANDOFF.md with Kimari-4B specific section
 - ✅ Updated ADAPTER_PREVIEW_GATE.md with Kimari-4B BLOCKED status
 
-## v0.1.29-alpha (Current)
+## v0.1.29-alpha (Released)
 
 - ✅ HF Jobs private smoke wrapper and config
 - ✅ Command compatibility fix (unsupported flags removed)
@@ -370,7 +370,15 @@
 - ✅ HF_JOBS_PRIVATE_RUN and HF_JOBS_RESULT_HANDOFF docs
 - ✅ Artifact field naming fix (expected_local_artifacts, forbidden_commit_artifacts)
 
-## v0.1.30-alpha (Planned)
+## v0.1.30-alpha (Current)
+
+- ✅ HF Jobs smoke test result template and sanitized summary (docs/HF_JOBS_SMOKE_RESULT.md)
+- ✅ Smoke test summary generator CLI (training/scripts/create_hf_jobs_smoke_summary.py)
+- ✅ HF Jobs smoke test runbook (docs/HF_JOBS_SMOKE_RUNBOOK.md)
+- ✅ --sanitize-logs flag in hf_jobs_status.py
+- ✅ Version bumped to v0.1.30-alpha
+
+## v0.1.31-alpha (Planned)
 
 - Execute real HF Jobs smoke test
 - Validate smoke test results

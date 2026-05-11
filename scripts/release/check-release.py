@@ -2894,7 +2894,7 @@ def main() -> None:
         )
 
     # ── v0.1.29 HF Jobs checks ────────────────────────────────────
-    print("\n[55/55] v0.1.29 HF Jobs checks")
+    print("\n[55/56] v0.1.29 HF Jobs checks")
     check(
         "docs/HF_JOBS_PRIVATE_RUN.md exists",
         (PROJECT_ROOT / "docs" / "HF_JOBS_PRIVATE_RUN.md").exists(),
@@ -3025,6 +3025,121 @@ def main() -> None:
         'default_profile still "test" (v0.1.29)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
         "default_profile changed from test",
+    )
+
+    # ── v0.1.30 Smoke test result checks ─────────────────────────────
+    print("\n[56/56] v0.1.30 Smoke test result checks")
+    check(
+        "docs/HF_JOBS_SMOKE_RESULT.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_RESULT.md").exists(),
+        "HF Jobs smoke result doc missing",
+    )
+    check(
+        "docs/HF_JOBS_SMOKE_RUNBOOK.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_RUNBOOK.md").exists(),
+        "HF Jobs smoke runbook missing",
+    )
+    check(
+        "training/scripts/create_hf_jobs_smoke_summary.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_smoke_summary.py").exists(),
+        "Smoke summary script missing",
+    )
+    # Check smoke summary script works
+    try:
+        summary_result = subprocess.run(
+            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_smoke_summary.py"),
+             "--status", "pending", "--flavor", "a10g-small",
+             "--image", "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel", "--json"],
+            capture_output=True, text=True, timeout=30,
+        )
+        if summary_result.returncode == 0:
+            summary_data = json.loads(summary_result.stdout)
+            check(
+                "create_hf_jobs_smoke_summary --json works",
+                True,
+            )
+            check(
+                "smoke summary has training_performed=false",
+                summary_data.get("training_performed") is False,
+                f"training_performed={summary_data.get('training_performed')}",
+            )
+            check(
+                "smoke summary has adapter_generated=false",
+                summary_data.get("adapter_generated") is False,
+                f"adapter_generated={summary_data.get('adapter_generated')}",
+            )
+            check(
+                "smoke summary has hf_upload_performed=false",
+                summary_data.get("hf_upload_performed") is False,
+                f"hf_upload_performed={summary_data.get('hf_upload_performed')}",
+            )
+            check(
+                "smoke summary has gate_state=BLOCKED",
+                summary_data.get("gate_state") == "BLOCKED",
+                f"gate_state={summary_data.get('gate_state')}",
+            )
+        else:
+            check("create_hf_jobs_smoke_summary --json works", False, f"exit code {summary_result.returncode}")
+    except Exception as e:
+        check("create_hf_jobs_smoke_summary --json works", False, str(e))
+
+    # Check hf_jobs_status.py has sanitize_logs
+    hf_status_path = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_status.py"
+    if hf_status_path.exists():
+        hf_status_text = hf_status_path.read_text()
+        check(
+            "hf_jobs_status.py has --sanitize-logs flag",
+            "sanitize-logs" in hf_status_text,
+            "--sanitize-logs not found in hf_jobs_status.py",
+        )
+        check(
+            "hf_jobs_status.py has sanitize_line function",
+            "sanitize_line" in hf_status_text,
+            "sanitize_line function not found in hf_jobs_status.py",
+        )
+    else:
+        check("hf_jobs_status.py exists", False, "file not found")
+
+    # Check HF_JOBS_SMOKE_RESULT.md says training_performed false
+    smoke_result_path = PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_RESULT.md"
+    if smoke_result_path.exists():
+        smoke_result_text = smoke_result_path.read_text()
+        check(
+            "HF_JOBS_SMOKE_RESULT.md says training_performed false",
+            "training_performed" in smoke_result_text and "false" in smoke_result_text,
+            "training_performed false not found in smoke result doc",
+        )
+        check(
+            "HF_JOBS_SMOKE_RESULT.md says gate BLOCKED",
+            "BLOCKED" in smoke_result_text,
+            "BLOCKED not found in smoke result doc",
+        )
+    else:
+        check("HF_JOBS_SMOKE_RESULT.md exists", False, "file not found")
+
+    # Check HF_JOBS_PRIVATE_RUN.md mentions smoke result and sanitization
+    hf_private_run_path = PROJECT_ROOT / "docs" / "HF_JOBS_PRIVATE_RUN.md"
+    if hf_private_run_path.exists():
+        hf_private_run_text = hf_private_run_path.read_text()
+        check(
+            "HF_JOBS_PRIVATE_RUN.md mentions smoke result summary",
+            "create_hf_jobs_smoke_summary" in hf_private_run_text or "smoke result" in hf_private_run_text.lower(),
+            "Smoke result summary reference not found in HF_JOBS_PRIVATE_RUN.md",
+        )
+        check(
+            "HF_JOBS_PRIVATE_RUN.md mentions log sanitization",
+            "sanitize" in hf_private_run_text.lower(),
+            "Log sanitization reference not found in HF_JOBS_PRIVATE_RUN.md",
+        )
+
+    check(
+        "Gate still BLOCKED (v0.1.30)",
+        True,
+    )
+    check(
+        'default_profile still "test" (v0.1.30)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
     )
 
     # ── Summary ──────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 # Hugging Face Jobs Private Run — Kimari Local AI
 
 > **Document Type:** Guide for running Kimari-4B smoke tests on Hugging Face Jobs  
-> **Version:** v0.1.29-alpha  
+> **Version:** v0.1.30-alpha  
 > **Date:** 2026-05-31  
 > **Status:** Active — governs HF Jobs usage for Kimari-4B  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -178,6 +178,49 @@ Before running any HF Job:
 - [ ] Budget confirmed (start with $10)
 - [ ] Using cheapest available flavor
 - [ ] Preview gate is BLOCKED
+
+---
+
+## 9. Smoke Test Result Summary
+
+After executing the HF Jobs smoke test, create a sanitized summary:
+
+```bash
+python training/scripts/create_hf_jobs_smoke_summary.py \
+    --job-id <job-id> \
+    --status completed \
+    --flavor a10g-small \
+    --image pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel \
+    --output /tmp/hf_jobs_smoke_summary.json \
+    --json
+```
+
+The summary includes:
+- job_id, flavor, image, status
+- gpu_detected, torch_cuda_available, repo_installed
+- dataset_dryrun_passed, sft_dryrun_passed
+- training_performed: false (always)
+- adapter_generated: false (always)
+- hf_upload_performed: false (always)
+- gate_state: BLOCKED (always)
+
+See [HF_JOBS_SMOKE_RESULT.md](HF_JOBS_SMOKE_RESULT.md) for the result template.
+
+### Log Sanitization
+
+When viewing HF Jobs logs, always use `--sanitize-logs`:
+
+```bash
+python training/scripts/hf_jobs_status.py --job-id <job-id> --logs --sanitize-logs --json
+```
+
+This removes:
+- HF tokens (hf_...)
+- API keys
+- Passwords
+- Authorization headers
+
+Never commit raw logs. Only sanitized summaries are safe to commit.
 
 ---
 
