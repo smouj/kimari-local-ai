@@ -557,6 +557,36 @@ twine upload dist/*
 - [ ] `default_profile` is still "test"
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.31 Checks
+
+- [ ] docs/HF_JOBS_SMOKE_EXECUTION_RECORD.md exists
+- [ ] training/templates/hf_jobs_smoke_execution_record.template.json exists and parses as valid JSON
+- [ ] training/scripts/validate_hf_jobs_smoke_summary.py exists and --json works
+- [ ] validate_hf_jobs_smoke_summary accepts safe summary
+- [ ] validate_hf_jobs_smoke_summary rejects training_performed=true
+- [ ] validate_hf_jobs_smoke_summary rejects adapter_generated=true
+- [ ] validate_hf_jobs_smoke_summary rejects hf_upload_performed=true
+- [ ] validate_hf_jobs_smoke_summary rejects token-like strings
+- [ ] hf_jobs_status.py sanitizes stderr when --sanitize-logs
+- [ ] hf_jobs_status.py uses --tail flag directly in hf jobs logs
+- [ ] Smoke summary says training_performed=false
+- [ ] Smoke summary says adapter_generated=false
+- [ ] Smoke summary says hf_upload_performed=false
+- [ ] Smoke summary says gate_state=BLOCKED
+- [ ] Execution record template has gate_state=BLOCKED
+- [ ] Execution record template has training_performed=false
+- [ ] Execution record template has stderr_sanitized=true
+- [ ] No raw logs committed
+- [ ] No weights/GGUF/adapters committed
+- [ ] HF_JOBS_SMOKE_RUNBOOK.md mentions validate_hf_jobs_smoke_summary
+- [ ] HF_JOBS_SMOKE_RUNBOOK.md mentions smoke must pass before micro SFT
+- [ ] HF_JOBS_PRIVATE_RUN.md has "Smoke must pass before micro SFT" section
+- [ ] HF_JOBS_PRIVATE_RUN.md mentions stderr sanitization
+- [ ] HF_JOBS_PRIVATE_RUN.md mentions validate_hf_jobs_smoke_summary
+- [ ] Gate still BLOCKED
+- [ ] `default_profile` is still "test"
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

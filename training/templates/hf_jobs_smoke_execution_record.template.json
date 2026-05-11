@@ -1,0 +1,23 @@
+{
+  "job_id": "NOT_EXECUTED",
+  "job_name": "kimari4b-smoke-v0",
+  "status": "pending",
+  "flavor": "a10g-small",
+  "image": "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel",
+  "started_at": null,
+  "finished_at": null,
+  "gpu_detected": null,
+  "torch_cuda_available": null,
+  "repo_installed": null,
+  "dataset_dryrun_passed": null,
+  "sft_dryrun_passed": null,
+  "training_performed": false,
+  "adapter_generated": false,
+  "hf_upload_performed": false,
+  "stderr_sanitized": true,
+  "logs_sanitized": true,
+  "gate_state": "BLOCKED",
+  "raw_logs_included": false,
+  "notes": "Sanitized execution record. No tokens. No raw logs. training_performed=false. gate=BLOCKED. Smoke must pass before micro SFT.",
+  "generated_at": "TEMPLATE"
+}

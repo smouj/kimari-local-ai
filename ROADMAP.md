@@ -370,7 +370,7 @@
 - ✅ HF_JOBS_PRIVATE_RUN and HF_JOBS_RESULT_HANDOFF docs
 - ✅ Artifact field naming fix (expected_local_artifacts, forbidden_commit_artifacts)
 
-## v0.1.30-alpha (Current)
+## v0.1.30-alpha (Released)
 
 - ✅ HF Jobs smoke test result template and sanitized summary (docs/HF_JOBS_SMOKE_RESULT.md)
 - ✅ Smoke test summary generator CLI (training/scripts/create_hf_jobs_smoke_summary.py)
@@ -378,11 +378,13 @@
 - ✅ --sanitize-logs flag in hf_jobs_status.py
 - ✅ Version bumped to v0.1.30-alpha
 
-## v0.1.31-alpha (Planned)
+## v0.1.31-alpha (Current)
 
-- Execute real HF Jobs smoke test
-- Validate smoke test results
-- Micro SFT private run if smoke passes
+- ✅ HF Jobs smoke execution record doc and template
+- ✅ Smoke summary validator CLI (validate_hf_jobs_smoke_summary.py)
+- ✅ Hardened hf_jobs_status.py (stderr sanitization, --tail via HF CLI)
+- ✅ Smoke must pass before micro SFT gate
+- ✅ Version bumped to v0.1.31-alpha
 
 ## v0.2.0-alpha
 

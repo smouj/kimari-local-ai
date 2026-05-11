@@ -1,8 +1,8 @@
 # Hugging Face Jobs Private Run — Kimari Local AI
 
 > **Document Type:** Guide for running Kimari-4B smoke tests on Hugging Face Jobs  
-> **Version:** v0.1.30-alpha  
-> **Date:** 2026-05-31  
+> **Version:** v0.1.31-alpha  
+> **Date:** 2026-06-02  
 > **Status:** Active — governs HF Jobs usage for Kimari-4B  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -222,6 +222,54 @@ This removes:
 
 Never commit raw logs. Only sanitized summaries are safe to commit.
 
+### Stderr Sanitization
+
+As of v0.1.31, `--sanitize-logs` also sanitizes stderr (error messages from HF CLI). This prevents accidental token exposure in error output:
+
+```bash
+# Both stdout and stderr are sanitized
+python training/scripts/hf_jobs_status.py --job-id <job-id> --logs --sanitize-logs --json
+
+# Even inspect errors are sanitized
+python training/scripts/hf_jobs_status.py --job-id <job-id> --sanitize-logs --json
+```
+
+### Validate Summary Before Committing
+
+After creating the smoke summary, validate it:
+
+```bash
+python training/scripts/validate_hf_jobs_smoke_summary.py \
+    --summary /tmp/hf_jobs_smoke_summary.json \
+    --json
+```
+
+The validator checks: training_performed=false, adapter_generated=false, hf_upload_performed=false, gate_state=BLOCKED, logs_sanitized=true, no token-like strings, no raw logs.
+
+---
+
+## 10. Smoke Must Pass Before Micro SFT
+
+**Critical gate:** Do NOT proceed to micro SFT until the HF Jobs smoke test is completed with ALL checks passing:
+
+| Check | Required Value |
+|-------|---------------|
+| gpu_detected | `true` |
+| torch_cuda_available | `true` |
+| repo_installed | `true` |
+| dataset_dryrun_passed | `true` |
+| sft_dryrun_passed | `true` |
+
+If any check fails:
+1. Fix the issue (config, image, flavor, code)
+2. Re-run the smoke test
+3. Validate the new summary
+4. Only proceed to micro SFT when all checks pass
+
+The smoke test validates the infrastructure. Micro SFT requires that infrastructure to be proven working first.
+
+See [HF_JOBS_SMOKE_EXECUTION_RECORD.md](HF_JOBS_SMOKE_EXECUTION_RECORD.md) for the execution record template.
+
 ---
 
 ## Cross-Reference
@@ -230,6 +278,9 @@ Never commit raw logs. Only sanitized summaries are safe to commit.
 |----------|-------------|
 | [HF_TOKEN_SAFETY.md](HF_TOKEN_SAFETY.md) | Comprehensive HF token safety procedures |
 | [HF_JOBS_RESULT_HANDOFF.md](HF_JOBS_RESULT_HANDOFF.md) | How to bring sanitized results from HF Jobs |
+| [HF_JOBS_SMOKE_RESULT.md](HF_JOBS_SMOKE_RESULT.md) | Smoke test result template |
+| [HF_JOBS_SMOKE_EXECUTION_RECORD.md](HF_JOBS_SMOKE_EXECUTION_RECORD.md) | Smoke execution record |
+| [HF_JOBS_SMOKE_RUNBOOK.md](HF_JOBS_SMOKE_RUNBOOK.md) | Step-by-step runbook |
 | [KIMARI4B_PRIVATE_SFT_RUN.md](KIMARI4B_PRIVATE_SFT_RUN.md) | Full private SFT execution guide |
 | [KIMARI4B_FIRST_RUN_CHECKLIST.md](KIMARI4B_FIRST_RUN_CHECKLIST.md) | Pre-flight checklist |
 | [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Gate state machine (BLOCKED) |

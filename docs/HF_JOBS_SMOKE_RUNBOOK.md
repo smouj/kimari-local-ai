@@ -1,8 +1,8 @@
 # HF Jobs Smoke Test Runbook — Kimari Local AI
 
 > **Document Type:** Step-by-step runbook for executing HF Jobs smoke test  
-> **Version:** v0.1.30-alpha  
-> **Date:** 2026-06-01  
+> **Version:** v0.1.31-alpha  
+> **Date:** 2026-06-02  
 > **Status:** Active — governs HF Jobs smoke test execution  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -90,14 +90,16 @@ After submission, check the job status:
 # Quick status check
 python training/scripts/hf_jobs_status.py --job-id <job-id> --json
 
-# View logs (sanitized)
+# View logs (sanitized) — stderr is also sanitized
 python training/scripts/hf_jobs_status.py --job-id <job-id> --logs --sanitize-logs
 
-# View last 50 lines (sanitized)
+# View last 50 lines (sanitized, using --tail directly)
 python training/scripts/hf_jobs_status.py --job-id <job-id> --logs --tail 50 --sanitize-logs
 ```
 
-**Always use `--sanitize-logs`** when viewing logs that might be shared or committed.
+**Always use `--sanitize-logs`** when viewing logs that might be shared or committed. This sanitizes both stdout and stderr.
+
+> **v0.1.31 improvement:** `--sanitize-logs` now also sanitizes stderr (error messages). The script uses `hf jobs logs --tail N` directly when available for more efficient log retrieval.
 
 ---
 
@@ -130,7 +132,30 @@ python training/scripts/create_hf_jobs_smoke_summary.py \
 
 ---
 
-## Step 6: Scan for Secrets
+## Step 6: Validate Summary
+
+After creating the summary, validate it for safety:
+
+```bash
+python training/scripts/validate_hf_jobs_smoke_summary.py \
+    --summary /tmp/hf_jobs_smoke_summary.json \
+    --json
+```
+
+The validator checks:
+- `training_performed` = `false`
+- `adapter_generated` = `false`
+- `hf_upload_performed` = `false`
+- `gate_state` = `BLOCKED`
+- `logs_sanitized` = `true`
+- No token-like strings (hf_..., sk_..., api_key assignments)
+- No raw logs
+
+If validation fails, do NOT commit the summary. Fix the issue first.
+
+---
+
+## Step 7: Scan for Secrets
 
 Before committing anything, scan for secrets:
 
@@ -144,11 +169,12 @@ If any secrets are found, do NOT commit. Fix the issue first.
 
 ---
 
-## Step 7: What to Commit and What NOT to Commit
+## Step 8: What to Commit and What NOT to Commit
 
 ### Safe to Commit
-- Sanitized smoke summary JSON
+- Sanitized smoke summary JSON (after validation passes)
 - Updated `docs/HF_JOBS_SMOKE_RESULT.md`
+- Updated `docs/HF_JOBS_SMOKE_EXECUTION_RECORD.md`
 - Any updated documentation
 - Test files
 
@@ -157,6 +183,28 @@ If any secrets are found, do NOT commit. Fix the issue first.
 - Adapter weights, checkpoints, or GGUF files
 - Any file containing tokens or API keys
 - Complete unredacted job output
+
+---
+
+## ⚠️ Smoke Must Pass Before Micro SFT
+
+**Critical gate:** Do NOT proceed to micro SFT (v0.1.32+) until the smoke test is completed with ALL checks passing:
+
+```
+gpu_detected = true
+torch_cuda_available = true
+repo_installed = true
+dataset_dryrun_passed = true
+sft_dryrun_passed = true
+```
+
+If any check fails:
+1. Fix the issue (config, image, flavor, code)
+2. Re-run the smoke test
+3. Validate the new summary
+4. Only proceed to micro SFT when all checks pass
+
+The smoke test validates the infrastructure. Micro SFT requires that infrastructure to be proven working first.
 
 ---
 
@@ -182,6 +230,11 @@ If any secrets are found, do NOT commit. Fix the issue first.
 - This is expected if the repo is cloned but dataset isn't built yet
 - The dry-run should still work if the script handles missing files gracefully
 
+### Stderr Contains Token Patterns
+- Always use `--sanitize-logs` when viewing job output
+- The v0.1.31 update sanitizes both stdout and stderr
+- If you see tokens in output, report it and use `--sanitize-logs` to redact
+
 ---
 
 ## Cross-Reference
@@ -191,9 +244,10 @@ If any secrets are found, do NOT commit. Fix the issue first.
 | [HF_JOBS_PRIVATE_RUN.md](HF_JOBS_PRIVATE_RUN.md) | General guide for HF Jobs usage |
 | [HF_JOBS_RESULT_HANDOFF.md](HF_JOBS_RESULT_HANDOFF.md) | How to bring sanitized results |
 | [HF_JOBS_SMOKE_RESULT.md](HF_JOBS_SMOKE_RESULT.md) | Smoke test result template |
+| [HF_JOBS_SMOKE_EXECUTION_RECORD.md](HF_JOBS_SMOKE_EXECUTION_RECORD.md) | Smoke execution record |
 | [HF_TOKEN_SAFETY.md](HF_TOKEN_SAFETY.md) | Comprehensive token safety procedures |
 | [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Gate state machine (BLOCKED) |
 
 ---
 
-*Follow this runbook step by step. No shortcuts. No tokens in CLI. Always sanitize logs. Gate BLOCKED.*
+*Follow this runbook step by step. No shortcuts. No tokens in CLI. Always sanitize logs and stderr. Validate summaries before committing. Do NOT proceed to micro SFT until smoke is completed. Gate BLOCKED.*

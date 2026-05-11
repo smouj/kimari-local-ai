@@ -3142,6 +3142,119 @@ def main() -> None:
         "default_profile changed from test — this is not allowed during alpha",
     )
 
+    # ── v0.1.31 smoke execution validation, stderr sanitization ────
+    print("\n[55/55] v0.1.31 smoke execution validation, stderr sanitization")
+    check(
+        "docs/HF_JOBS_SMOKE_EXECUTION_RECORD.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_EXECUTION_RECORD.md").exists(),
+        "Smoke execution record doc missing",
+    )
+    check(
+        "training/templates/hf_jobs_smoke_execution_record.template.json exists",
+        (PROJECT_ROOT / "training" / "templates" / "hf_jobs_smoke_execution_record.template.json").exists(),
+        "Smoke execution record template missing",
+    )
+    # Validate execution record template
+    exec_record_template = PROJECT_ROOT / "training" / "templates" / "hf_jobs_smoke_execution_record.template.json"
+    if exec_record_template.exists():
+        try:
+            ert_data = json.loads(exec_record_template.read_text())
+            check(
+                "Execution record template has gate_state=BLOCKED",
+                ert_data.get("gate_state") == "BLOCKED",
+                "gate_state must be BLOCKED",
+            )
+            check(
+                "Execution record template has training_performed=false",
+                ert_data.get("training_performed") is False,
+                "training_performed must be false",
+            )
+            check(
+                "Execution record template has stderr_sanitized=true",
+                ert_data.get("stderr_sanitized") is True,
+                "stderr_sanitized must be true",
+            )
+        except json.JSONDecodeError:
+            check("Execution record template is valid JSON", False, "JSON parse error")
+    check(
+        "training/scripts/validate_hf_jobs_smoke_summary.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "validate_hf_jobs_smoke_summary.py").exists(),
+        "Smoke summary validator script missing",
+    )
+    # Check hf_jobs_status.py sanitizes stderr
+    hf_status_path = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_status.py"
+    if hf_status_path.exists():
+        hf_status_text = hf_status_path.read_text()
+        check(
+            "hf_jobs_status.py sanitizes stderr when --sanitize-logs",
+            "safe_stderr" in hf_status_text or "sanitize_line(result.stderr)" in hf_status_text,
+            "stderr sanitization not found in hf_jobs_status.py",
+        )
+        check(
+            "hf_jobs_status.py uses --tail flag in hf jobs logs command",
+            '"--tail", str(args.tail)' in hf_status_text,
+            "--tail flag not passed to hf jobs logs subprocess command",
+        )
+    # Check docs mention smoke must pass before micro SFT
+    hf_private_run = PROJECT_ROOT / "docs" / "HF_JOBS_PRIVATE_RUN.md"
+    if hf_private_run.exists():
+        hpr_text = hf_private_run.read_text().lower()
+        check(
+            "HF_JOBS_PRIVATE_RUN.md mentions smoke must pass before micro SFT",
+            "smoke must pass" in hpr_text or "before micro sft" in hpr_text,
+            "Smoke must pass before micro SFT not mentioned",
+        )
+        check(
+            "HF_JOBS_PRIVATE_RUN.md mentions stderr sanitization",
+            "stderr" in hpr_text and "sanitize" in hpr_text,
+            "stderr sanitization not mentioned in HF_JOBS_PRIVATE_RUN.md",
+        )
+        check(
+            "HF_JOBS_PRIVATE_RUN.md mentions validate_hf_jobs_smoke_summary",
+            "validate_hf_jobs_smoke_summary" in hpr_text,
+            "validate_hf_jobs_smoke_summary not mentioned",
+        )
+    # Check runbook mentions validate and smoke-must-pass
+    runbook_path = PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_RUNBOOK.md"
+    if runbook_path.exists():
+        runbook_text = runbook_path.read_text().lower()
+        check(
+            "HF_JOBS_SMOKE_RUNBOOK.md mentions validate_hf_jobs_smoke_summary",
+            "validate_hf_jobs_smoke_summary" in runbook_text,
+            "validate_hf_jobs_smoke_summary not in runbook",
+        )
+        check(
+            "HF_JOBS_SMOKE_RUNBOOK.md mentions smoke must pass before micro SFT",
+            "smoke must pass" in runbook_text or "before micro sft" in runbook_text,
+            "Smoke must pass before micro SFT not in runbook",
+        )
+    check(
+        'default_profile still "test" (v0.1.31 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.31)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    # No raw logs committed to git
+    try:
+        raw_log_result = subprocess.run(
+            ["git", "ls-files", "*.log", "training/raw_logs/*", "training/logs/*"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        raw_log_files = [f for f in raw_log_result.stdout.strip().splitlines() if f]
+        check(
+            "No raw log files tracked in git (v0.1.31)",
+            len(raw_log_files) == 0,
+            f"raw log files tracked: {raw_log_files}",
+        )
+    except Exception:
+        warn("Could not check git tracked raw logs", "git not available or not a repo")
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:

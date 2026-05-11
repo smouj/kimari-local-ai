@@ -72,19 +72,34 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.logs:
-        # Get logs
+        # Get logs — prefer native `hf jobs logs --tail N` for efficiency
         try:
+            # Try with --tail flag first (supported by newer HF CLI)
+            cmd_with_tail = ["hf", "jobs", "logs", "--tail", str(args.tail), args.job_id]
             result = subprocess.run(
-                ["hf", "jobs", "logs", args.job_id],
+                cmd_with_tail,
                 capture_output=True,
                 text=True,
                 timeout=60,
             )
+
+            # If --tail is not supported, fall back to full log retrieval
+            if result.returncode != 0 and "unrecognized arguments" in result.stderr:
+                cmd_fallback = ["hf", "jobs", "logs", args.job_id]
+                result = subprocess.run(
+                    cmd_fallback,
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
+
             if result.returncode != 0:
-                print(f"ERROR: Failed to get logs: {result.stderr}", file=sys.stderr)
+                safe_stderr = sanitize_line(result.stderr) if args.sanitize_logs else result.stderr
+                print(f"ERROR: Failed to get logs: {safe_stderr}", file=sys.stderr)
                 sys.exit(1)
 
             lines = result.stdout.splitlines()
+            # Apply Python-side tailing as safeguard (no-op if HF CLI already tailed)
             tailed = lines[-args.tail:] if len(lines) > args.tail else lines
 
             # Sanitize if requested
@@ -98,6 +113,7 @@ def main() -> None:
                     "showing": len(tailed),
                     "logs": "\n".join(tailed),
                     "sanitized": args.sanitize_logs,
+                    "tail_used": True,
                 }, indent=2))
             else:
                 sanitized_note = " (sanitized)" if args.sanitize_logs else ""
@@ -121,7 +137,8 @@ def main() -> None:
                 timeout=30,
             )
             if result.returncode != 0:
-                print(f"ERROR: Failed to inspect job: {result.stderr}", file=sys.stderr)
+                safe_stderr = sanitize_line(result.stderr) if args.sanitize_logs else result.stderr
+                print(f"ERROR: Failed to inspect job: {safe_stderr}", file=sys.stderr)
                 sys.exit(1)
 
             # Sanitize inspect output if requested

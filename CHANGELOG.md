@@ -5,6 +5,26 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.31-alpha] - 2026-06-02
+
+### Added
+- `docs/HF_JOBS_SMOKE_EXECUTION_RECORD.md` — Smoke test execution record template and result (status: pending)
+- `training/templates/hf_jobs_smoke_execution_record.template.json` — Template for sanitized smoke execution record
+- `training/scripts/validate_hf_jobs_smoke_summary.py` — CLI to validate smoke summary safety (training_performed=false, gate BLOCKED, no tokens)
+- `hf_jobs_status.py` now sanitizes stderr when `--sanitize-logs` is used
+- `hf_jobs_status.py` now uses `hf jobs logs --tail N` directly when available for more efficient log retrieval
+
+### Changed
+- `docs/HF_JOBS_SMOKE_RUNBOOK.md` updated with validate_hf_jobs_smoke_summary step and smoke-must-pass-before-micro-SFT gate
+- `docs/HF_JOBS_PRIVATE_RUN.md` updated with "Smoke must pass before micro SFT" section
+- README updated with HF Jobs smoke execution status section
+- `docs/index.html` updated with smoke execution validation block
+- `RELEASE_CHECKLIST.md` updated with v0.1.31 checks
+- `scripts/release/check-release.py` updated with v0.1.31 validation checks
+
+### Fixed
+- No training performed. No adapters generated. No HF upload. Gate still BLOCKED.
+
 ## [0.1.30-alpha] - 2026-06-01
 
 ### Added
