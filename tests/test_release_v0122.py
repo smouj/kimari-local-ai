@@ -1,4 +1,4 @@
-"""Tests for v0.1.22-alpha release: private SFT execution package, preflight/postrun, eval plans."""
+"""Tests for v0.1.23-alpha release: private SFT execution package, preflight/postrun, eval plans."""
 
 from __future__ import annotations
 
@@ -326,19 +326,19 @@ class TestVersionConsistency:
     def test_version_is_0122(self):
         from kimari import __version__
 
-        assert __version__ == "0.1.22-alpha", f"Version is {__version__}, expected 0.1.22-alpha"
+        assert __version__ == "0.1.23-alpha", f"Version is {__version__}, expected 0.1.23-alpha"
 
     def test_pyproject_version(self):
         pyproject = PROJECT_ROOT / "pyproject.toml"
         content = pyproject.read_text()
-        assert "0.1.22-alpha" in content
+        assert "0.1.23-alpha" in content
 
     def test_readme_mentions_version(self):
         readme = PROJECT_ROOT / "README.md"
         content = readme.read_text()
-        assert "0.1.22-alpha" in content
+        assert "0.1.23-alpha" in content
 
     def test_index_html_mentions_version(self):
         index = PROJECT_ROOT / "docs" / "index.html"
         content = index.read_text()
-        assert "0.1.22-alpha" in content
+        assert "0.1.23-alpha" in content

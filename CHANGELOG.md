@@ -5,6 +5,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.23-alpha] — 2026-05-25
+
+### Fixed
+- **training/scripts/postrun_private_sft.py** — `step_create_eval_summary` now passes `--json` to the `create_eval_summary.py` subprocess directly in the command list, instead of appending `--json` to the command string after execution
+
+### Changed
+- **training/scripts/preflight_private_sft.py** — Reads `dataset_build_dir` from run_config YAML when available; falls back to `dataset/build/kimari-v0/report.json` when not specified. Adds `dataset_build_dir`, `dataset_report_path`, and `dataset_build_dir_source` fields to JSON output. Reuses parsed YAML data to avoid double-parsing.
+- **Version bumped** to `0.1.23-alpha`
+- **README.md** — Added Screenshots & CLI Preview section with link to docs/SCREENSHOTS.md; updated version badge and references to v0.1.23-alpha
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.23-alpha; added CLI Preview section with code cards; updated status table with v0.1.22/v0.1.23 entries; added link to SCREENSHOTS.md
+- **RELEASE_CHECKLIST.md** — Added v0.1.23 Checks section (postrun --json, preflight dataset_build_dir, screenshots docs, no secrets, no benchmarks, README/index links)
+- **scripts/release/check-release.py** — Expanded with v0.1.23 checks (postrun --json passthrough, preflight dataset_build_dir, SCREENSHOTS.md, screenshots assets README/PLACEHOLDER, no secrets in screenshot docs, no benchmark claims, README/index.html screenshots references, no weight files, preview gate BLOCKED, no false claims)
+
+### Added
+- **docs/SCREENSHOTS.md** — Screenshots gallery and CLI preview documentation; illustrative code blocks for setup, optimize, preflight, training command preview, baseline eval plan, postrun; screenshot policy and planned screenshots table; no secrets, no real training outputs, no benchmarks, Kimari-4B not released
+- **docs/assets/screenshots/README.md** — Screenshot naming conventions (kimari-<command>.png), allowed formats (PNG/WebP), recommended dimensions, content guidelines (no secrets, no fake UI, no benchmarks), optimization policy, review checklist
+- **docs/assets/screenshots/PLACEHOLDER.md** — Checklist of 7 planned screenshots with capture guidelines; no fake data, no invented UI
+- **New tests** (`tests/test_release_v0123.py`) — Tests for postrun --json fix, preflight dataset_build_dir from run_config, preflight fallback, screenshots docs existence/content, README screenshots section, index.html screenshots section, release-check, no tracked artifacts, version consistency
+
 ## [0.1.22-alpha] — 2026-05-24
 
 ### Added

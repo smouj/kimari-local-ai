@@ -264,9 +264,17 @@ def run_preflight(run_config_path: Path, strict: bool) -> dict:
         checks: dict of check_name -> check_result
         recommendations: list of recommendation strings
         overall: "pass" | "warn" | "fail"
+        dataset_build_dir: str | None — resolved dataset build directory
+        dataset_report_path: str — path to the dataset report file checked
+        dataset_build_dir_source: "run_config" | "fallback" — how the path was resolved
     """
     checks: dict[str, dict] = {}
     recommendations: list[str] = []
+
+    # Track dataset build dir resolution
+    resolved_dataset_build_dir: str | None = None
+    resolved_dataset_report_path: str = str(DEFAULT_DATASET_REPORT)
+    dataset_build_dir_source: str = "fallback"
 
     # 1. Python version
     checks["python_version"] = check_python_version()
@@ -313,12 +321,30 @@ def run_preflight(run_config_path: Path, strict: bool) -> dict:
                 pkg_check["status"] = "FAIL"
 
     # 5. Dataset build report exists
-    dataset_report_path = DEFAULT_DATASET_REPORT
+    # Try to read dataset_build_dir from run_config if available
+    run_config_data: dict | None = None
+    if run_config_path.exists():
+        parsed = parse_simple_yaml(run_config_path)
+        if parsed and isinstance(parsed, dict):
+            run_config_data = parsed
+            config_dataset_dir = run_config_data.get("dataset_build_dir")
+            if config_dataset_dir:
+                config_dir_path = Path(config_dataset_dir)
+                if not config_dir_path.is_absolute():
+                    config_dir_path = PROJECT_ROOT / config_dir_path
+                resolved_dataset_build_dir = str(config_dir_path)
+                resolved_dataset_report_path = str(config_dir_path / "report.json")
+                dataset_build_dir_source = "run_config"
+
+    dataset_report_path = Path(resolved_dataset_report_path)
     if dataset_report_path.exists():
         checks["dataset_build"] = {
             "status": "PASS",
             "value": str(dataset_report_path),
             "exists": True,
+            "dataset_build_dir": resolved_dataset_build_dir,
+            "dataset_report_path": str(dataset_report_path),
+            "source": dataset_build_dir_source,
             "message": None,
         }
     else:
@@ -326,22 +352,33 @@ def run_preflight(run_config_path: Path, strict: bool) -> dict:
             "status": "WARN",
             "value": str(dataset_report_path),
             "exists": False,
+            "dataset_build_dir": resolved_dataset_build_dir,
+            "dataset_report_path": str(dataset_report_path),
+            "source": dataset_build_dir_source,
             "message": "Dataset build report not found — run build_dataset_mix.py first",
         }
         recommendations.append(
             "Build the dataset: python training/scripts/build_dataset_mix.py --output-dir dataset/build/kimari-v0"
         )
 
-    # 6. Load run config
+    # 6. Load run config (reuse already-parsed data if available)
     if not run_config_path.exists():
         checks["run_config"] = {
             "status": "FAIL",
             "value": str(run_config_path),
             "message": "Run config file not found",
         }
+        config: dict = {}
+    elif run_config_data is not None:
+        config = run_config_data
+        checks["run_config"] = {
+            "status": "PASS",
+            "value": str(run_config_path),
+            "message": None,
+        }
     else:
-        config = parse_simple_yaml(run_config_path)
-        if config is None or not isinstance(config, dict):
+        parsed = parse_simple_yaml(run_config_path)
+        if parsed is None or not isinstance(parsed, dict):
             checks["run_config"] = {
                 "status": "FAIL",
                 "value": str(run_config_path),
@@ -349,107 +386,108 @@ def run_preflight(run_config_path: Path, strict: bool) -> dict:
             }
             config = {}
         else:
+            config = parsed
             checks["run_config"] = {
                 "status": "PASS",
                 "value": str(run_config_path),
                 "message": None,
             }
 
-        # 7. output_dir is gitignored
-        output_dir = config.get("output_dir")
-        if not output_dir:
+    # 7. output_dir is gitignored
+    output_dir = config.get("output_dir")
+    if not output_dir:
+        checks["output_dir_gitignored"] = {
+            "status": "FAIL",
+            "value": None,
+            "message": "No output_dir in run config",
+        }
+    else:
+        od_path = Path(output_dir)
+        if not od_path.is_absolute():
+            od_path = PROJECT_ROOT / od_path
+
+        if is_gitignored(od_path):
+            checks["output_dir_gitignored"] = {
+                "status": "PASS",
+                "value": output_dir,
+                "gitignored": True,
+                "message": None,
+            }
+        else:
             checks["output_dir_gitignored"] = {
                 "status": "FAIL",
-                "value": None,
-                "message": "No output_dir in run config",
+                "value": output_dir,
+                "gitignored": False,
+                "message": "output_dir is NOT gitignored — training artifacts could be committed",
             }
-        else:
-            od_path = Path(output_dir)
-            if not od_path.is_absolute():
-                od_path = PROJECT_ROOT / od_path
+            recommendations.append(f"Add {output_dir}/ to .gitignore")
 
-            if is_gitignored(od_path):
-                checks["output_dir_gitignored"] = {
-                    "status": "PASS",
-                    "value": output_dir,
-                    "gitignored": True,
-                    "message": None,
-                }
-            else:
-                checks["output_dir_gitignored"] = {
-                    "status": "FAIL",
-                    "value": output_dir,
-                    "gitignored": False,
-                    "message": "output_dir is NOT gitignored — training artifacts could be committed",
-                }
-                recommendations.append(f"Add {output_dir}/ to .gitignore")
+    # 8. public_release_allowed=false
+    pub = config.get("public_release_allowed")
+    if pub is True:
+        checks["public_release_allowed"] = {
+            "status": "FAIL",
+            "value": True,
+            "message": "public_release_allowed must be false for private SFT",
+        }
+    elif pub is False:
+        checks["public_release_allowed"] = {
+            "status": "PASS",
+            "value": False,
+            "message": None,
+        }
+    else:
+        checks["public_release_allowed"] = {
+            "status": "WARN",
+            "value": None,
+            "message": "public_release_allowed not specified — assuming false",
+        }
 
-        # 8. public_release_allowed=false
-        pub = config.get("public_release_allowed")
-        if pub is True:
-            checks["public_release_allowed"] = {
-                "status": "FAIL",
-                "value": True,
-                "message": "public_release_allowed must be false for private SFT",
-            }
-        elif pub is False:
-            checks["public_release_allowed"] = {
-                "status": "PASS",
-                "value": False,
-                "message": None,
-            }
-        else:
-            checks["public_release_allowed"] = {
-                "status": "WARN",
-                "value": None,
-                "message": "public_release_allowed not specified — assuming false",
-            }
+    # 9. hf_upload_allowed=false
+    hf = config.get("hf_upload_allowed")
+    if hf is True:
+        checks["hf_upload_allowed"] = {
+            "status": "FAIL",
+            "value": True,
+            "message": "hf_upload_allowed must be false for private SFT",
+        }
+    elif hf is False:
+        checks["hf_upload_allowed"] = {
+            "status": "PASS",
+            "value": False,
+            "message": None,
+        }
+    else:
+        checks["hf_upload_allowed"] = {
+            "status": "WARN",
+            "value": None,
+            "message": "hf_upload_allowed not specified — assuming false",
+        }
 
-        # 9. hf_upload_allowed=false
-        hf = config.get("hf_upload_allowed")
-        if hf is True:
-            checks["hf_upload_allowed"] = {
-                "status": "FAIL",
-                "value": True,
-                "message": "hf_upload_allowed must be false for private SFT",
-            }
-        elif hf is False:
-            checks["hf_upload_allowed"] = {
-                "status": "PASS",
-                "value": False,
-                "message": None,
-            }
-        else:
-            checks["hf_upload_allowed"] = {
-                "status": "WARN",
-                "value": None,
-                "message": "hf_upload_allowed not specified — assuming false",
-            }
-
-        # 10. preview gate BLOCKED
-        preview_gate = config.get("preview_gate")
-        if preview_gate and "ADAPTER_PREVIEW_GATE.md" in str(preview_gate):
+    # 10. preview gate BLOCKED
+    preview_gate = config.get("preview_gate")
+    if preview_gate and "ADAPTER_PREVIEW_GATE.md" in str(preview_gate):
+        checks["preview_gate"] = {
+            "status": "PASS",
+            "value": "BLOCKED (per ADAPTER_PREVIEW_GATE.md)",
+            "message": None,
+        }
+    else:
+        # Check if the doc exists as a signal
+        gate_doc = PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md"
+        if gate_doc.exists():
             checks["preview_gate"] = {
                 "status": "PASS",
-                "value": "BLOCKED (per ADAPTER_PREVIEW_GATE.md)",
+                "value": "BLOCKED (ADAPTER_PREVIEW_GATE.md exists)",
                 "message": None,
             }
         else:
-            # Check if the doc exists as a signal
-            gate_doc = PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md"
-            if gate_doc.exists():
-                checks["preview_gate"] = {
-                    "status": "PASS",
-                    "value": "BLOCKED (ADAPTER_PREVIEW_GATE.md exists)",
-                    "message": None,
-                }
-            else:
-                checks["preview_gate"] = {
-                    "status": "FAIL",
-                    "value": None,
-                    "message": "Preview gate status unknown — ADAPTER_PREVIEW_GATE.md not found",
-                }
-                recommendations.append("Create docs/ADAPTER_PREVIEW_GATE.md with BLOCKED state")
+            checks["preview_gate"] = {
+                "status": "FAIL",
+                "value": None,
+                "message": "Preview gate status unknown — ADAPTER_PREVIEW_GATE.md not found",
+            }
+            recommendations.append("Create docs/ADAPTER_PREVIEW_GATE.md with BLOCKED state")
 
     # 11. No GGUF/adapters tracked in git
     gguf_tracked = git_tracked_patterns(["*.gguf"])
@@ -502,6 +540,9 @@ def run_preflight(run_config_path: Path, strict: bool) -> dict:
         "recommendations": recommendations,
         "overall": overall,
         "strict": strict,
+        "dataset_build_dir": resolved_dataset_build_dir,
+        "dataset_report_path": resolved_dataset_report_path,
+        "dataset_build_dir_source": dataset_build_dir_source,
     }
 
 

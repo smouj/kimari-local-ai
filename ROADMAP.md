@@ -264,7 +264,7 @@
 - ✅ Compare runs improvements (verdict, summary-output)
 - ✅ Release-check improvements
 
-## v0.1.22-alpha (Current)
+## v0.1.22-alpha (Released)
 
 - ✅ Remote GPU execution guide (RunPod / local GPU)
 - ✅ Training requirements (separated dependencies)
@@ -279,14 +279,24 @@
 - ✅ train_sft_lora.py improvements (--print-command, --estimate-only, --require-dataset)
 - ✅ Release-check improvements
 
-## v0.1.23-alpha (Planned)
+## v0.1.23-alpha (Current)
 
-- Execute first private SFT manually
-- Capture manifest locally
+- ✅ Postrun --json fix (passes --json to create_eval_summary subprocess)
+- ✅ Preflight dataset_build_dir from run_config with fallback
+- ✅ Screenshots documentation (docs/SCREENSHOTS.md)
+- ✅ Screenshot assets policy (naming conventions, formats, no secrets)
+- ✅ Screenshot placeholders (planned captures checklist)
+- ✅ README and GitHub Pages screenshots section
+- ✅ Release-check improvements
+
+## v0.1.24-alpha (Planned)
+
+- Execute first private SFT manually outside CI
+- Record local adapter manifest
 - Run baseline and adapter eval
-- Create sanitized eval summary
+- Produce sanitized eval summary
+- Optionally add real screenshots from safe terminal captures
 - Decide ORPO/DPO next step
-- Prepare docs-only HF placeholder if gate allows
 
 ## v0.2.0-alpha
 

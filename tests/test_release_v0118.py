@@ -1,4 +1,4 @@
-"""Release validation tests for Kimari Local AI v0.1.22-alpha.
+"""Release validation tests for Kimari Local AI v0.1.23-alpha.
 
 Tests cover:
 - Base candidates YAML and selection script
@@ -250,10 +250,10 @@ class TestVersion:
     def test_version_consistency(self):
         from kimari import __version__
 
-        assert __version__ == "0.1.22-alpha"
+        assert __version__ == "0.1.23-alpha"
         pyproject = PROJECT_ROOT / "pyproject.toml"
         text = pyproject.read_text()
-        assert 'version = "0.1.22-alpha"' in text
+        assert 'version = "0.1.23-alpha"' in text
 
 
 # ─── Release Check ─────────────────────────────────────────────────────
