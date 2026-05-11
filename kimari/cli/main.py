@@ -1528,6 +1528,132 @@ def list_models(
     print()
 
 
+def run_benchmark_plan(
+    config: dict,
+    profile_name: str | None = None,
+    dry_run: bool = True,
+    matrix: bool = False,
+    json_output: bool = False,
+):
+    """Generate a benchmark plan for a profile.
+
+    Does NOT execute benchmarks or start servers.
+    In dry-run mode (default), shows estimated parameters only.
+    """
+    from kimari.performance.benchmark_plan import generate_benchmark_plan
+
+    if not profile_name:
+        profile_name = config.get("default_profile", "test")
+
+    profile = get_profile(config, profile_name)
+    model_size_gb = profile.get("estimated_model_size_gb", 0.7)
+    vram_total_gb = profile.get("vram_total_gb", 6.0)
+
+    plan = generate_benchmark_plan(profile_name, model_size_gb, vram_total_gb)
+
+    if matrix:
+        # Show all matrix cells in output
+        pass  # Already included in plan
+
+    if json_output:
+        print(json.dumps(plan.to_dict(), indent=2))
+        return
+
+    # Human-readable output
+    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Benchmark{Color.RESET}")
+    print(f"  Profile: {Color.GREEN}{profile_name}{Color.RESET} ({profile.get('name', '')})")
+    print(f"  Model:   {profile.get('model', '')}")
+    print(f"  VRAM:    {vram_total_gb} GiB")
+    if dry_run:
+        print(f"  {Color.YELLOW}[DRY RUN]{Color.RESET} Showing estimated plan only\n")
+    else:
+        print(f"  {Color.DIM}(Requires running server for actual benchmarks){Color.RESET}\n")
+
+    rec = plan.recommended
+    print(f"  {Color.BOLD}Recommended:{Color.RESET}")
+    print(f"    Context:       {rec.get('recommended_ctx', 'N/A'):,} tokens")
+    print(f"    Batch:         {rec.get('recommended_batch', 'N/A')} / ubatch {rec.get('recommended_ubatch', 'N/A')}")
+    print(f"    Cache K/V:     {rec.get('recommended_cache_type_k', 'N/A')} / {rec.get('recommended_cache_type_v', 'N/A')}")
+    print(f"    Est. VRAM:     {rec.get('estimated_vram_gb', 'N/A')} GiB")
+    print(f"    Est. RAM:      {rec.get('estimated_ram_gb', 'N/A')} GiB")
+
+    safe_cells = sum(1 for c in plan.matrix_cells if c.safe_for_profile)
+    total_cells = len(plan.matrix_cells)
+    print(f"\n  {Color.BOLD}Matrix:{Color.RESET} {safe_cells}/{total_cells} cells safe for {profile_name}")
+
+    if plan.warnings:
+        print(f"\n  {Color.YELLOW}Warnings:{Color.RESET}")
+        for w in plan.warnings:
+            print(f"    ⚠ {w}")
+    
+    print(f"\n  {Color.DIM}Tip: Use --matrix --json to see all parameter combinations.{Color.RESET}")
+    print(f"  {Color.DIM}Tip: Use --measure (requires running server) for real benchmarks.{Color.RESET}")
+    print()
+
+
+def run_tune(
+    config: dict,
+    profile_name: str | None = None,
+    dry_run: bool = True,
+    apply: bool = False,
+    json_output: bool = False,
+):
+    """Recommend optimal settings for a profile.
+
+    Uses the performance estimator to recommend settings.
+    Does NOT execute benchmarks or apply changes.
+    """
+    from kimari.performance.benchmark_plan import generate_tune_recommendation
+
+    if apply:
+        print("[ERROR] --apply is not yet available. Use --dry-run to see recommendations.")
+        print("        Measured benchmark support is planned for v0.1.26-alpha.")
+        raise SystemExit(1)
+
+    if not profile_name:
+        profile_name = config.get("default_profile", "test")
+
+    profile = get_profile(config, profile_name)
+    model_size_gb = profile.get("estimated_model_size_gb", 0.7)
+    vram_total_gb = profile.get("vram_total_gb", 6.0)
+
+    result = generate_tune_recommendation(profile_name, model_size_gb, vram_total_gb)
+
+    if json_output:
+        print(json.dumps(result, indent=2))
+        return
+
+    # Human-readable output
+    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Tune{Color.RESET}")
+    print(f"  Profile: {Color.GREEN}{profile_name}{Color.RESET} ({profile.get('name', '')})")
+    print(f"  Model:   {profile.get('model', '')}")
+    print(f"  VRAM:    {vram_total_gb} GiB")
+    if dry_run:
+        print(f"  {Color.YELLOW}[DRY RUN]{Color.RESET} Showing recommendations only\n")
+
+    rec = result["recommended"]
+    est = result["estimates"]
+    print(f"  {Color.BOLD}Recommended Settings:{Color.RESET}")
+    print(f"    Context:       {rec['ctx']:,} tokens")
+    print(f"    Batch:         {rec['batch']} / ubatch {rec['ubatch']}")
+    print(f"    Cache K/V:     {rec['cache_type_k']} / {rec['cache_type_v']}")
+    print(f"    GPU layers:    {rec['gpu_layers']}")
+    print(f"    Flash Attn:    {rec['flash_attn']}")
+    print(f"\n  {Color.BOLD}Estimates:{Color.RESET}")
+    print(f"    VRAM:          {est['vram_gb']} GiB")
+    print(f"    RAM:           {est['ram_gb']} GiB")
+    print(f"    Confidence:    {est['confidence']}")
+
+    if result.get("warnings"):
+        print(f"\n  {Color.YELLOW}Warnings:{Color.RESET}")
+        for w in result["warnings"]:
+            print(f"    ⚠ {w}")
+
+    print(f"\n  {Color.DIM}{result['disclaimer']}{Color.RESET}")
+    print(f"  {Color.DIM}--apply is blocked. Measured benchmark support planned for v0.1.26-alpha.{Color.RESET}")
+    print()
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 
@@ -1794,6 +1920,21 @@ def main():
     token_sub.add_parser("show", help="Show the current auth token")
     token_sub.add_parser("delete", help="Delete the current auth token")
 
+    # ─── Benchmark ──────────────────────────────────────────────────────────
+    benchmark_parser = subparsers.add_parser("benchmark", help="Generate benchmark plan (dry-run by default)")
+    benchmark_parser.add_argument("--profile", help="GPU profile to benchmark")
+    benchmark_parser.add_argument("--dry-run", action="store_true", default=True, help="Show plan without executing (default)")
+    benchmark_parser.add_argument("--measure", action="store_true", default=False, help="Run actual benchmark (requires running server)")
+    benchmark_parser.add_argument("--matrix", action="store_true", help="Show full parameter matrix")
+    benchmark_parser.add_argument("--json", action="store_true", help="JSON output")
+    
+    # ─── Tune ───────────────────────────────────────────────────────────────
+    tune_parser = subparsers.add_parser("tune", help="Recommend optimal settings (dry-run by default)")
+    tune_parser.add_argument("--profile", help="GPU profile to tune")
+    tune_parser.add_argument("--dry-run", action="store_true", default=True, help="Show recommendations only (default)")
+    tune_parser.add_argument("--apply", action="store_true", help="Apply recommended settings (BLOCKED)")
+    tune_parser.add_argument("--json", action="store_true", help="JSON output")
+
     args = parser.parse_args()
 
     # Ensure state directory exists
@@ -1986,6 +2127,22 @@ def main():
                 print("\n  No token to delete.\n")
         else:
             token_parser.print_help()
+    elif args.command == "benchmark":
+        run_benchmark_plan(
+            config,
+            profile_name=args.profile,
+            dry_run=not args.measure,
+            matrix=args.matrix,
+            json_output=args.json,
+        )
+    elif args.command == "tune":
+        run_tune(
+            config,
+            profile_name=args.profile,
+            dry_run=args.dry_run,
+            apply=args.apply,
+            json_output=args.json,
+        )
     else:
         parser.print_help()
 

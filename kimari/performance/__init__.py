@@ -9,6 +9,12 @@ no model execution. Estimates are approximate and should be validated
 against actual runtime behavior.
 """
 
+from kimari.performance.benchmark_plan import (
+    BenchmarkCell,
+    BenchmarkPlan,
+    generate_benchmark_plan,
+    generate_tune_recommendation,
+)
 from kimari.performance.estimator import (
     estimate_ram_usage,
     estimate_vram_usage,
@@ -36,4 +42,9 @@ __all__ = [
     "recommend_profile_settings",
     # Metadata
     "read_gguf_metadata",
+    # Benchmark Plan
+    "BenchmarkCell",
+    "BenchmarkPlan",
+    "generate_benchmark_plan",
+    "generate_tune_recommendation",
 ]

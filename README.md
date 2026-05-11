@@ -89,6 +89,8 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Evaluation prompt seed** — 35 KimariFit prompts across 10 categories in `eval/kimarifit_prompts.jsonl`
 - **Hugging Face release plan** — Pre-upload checklist in `docs/HUGGINGFACE_RELEASE.md`
 - **MODEL_CARD professional rewrite** — Honest "Planned / Training Design" status with base candidates
+- **Benchmark dry-run** — `kimari benchmark --dry-run` generates benchmark plans without execution
+- **Tune dry-run** — `kimari tune --dry-run` recommends optimal settings from estimation
 
 ### 🔨 Planned
 
@@ -332,6 +334,29 @@ kimari perf --profile gtx1060 --matrix       # All modes compared
 kimari perf --profile test --json --dry-run  # JSON output
 ```
 
+### `kimari benchmark`
+
+Generate a benchmark plan without executing models (dry-run by default):
+
+```bash
+kimari benchmark --dry-run                        # Show estimated plan for default profile
+kimari benchmark --profile gtx1060-safe --dry-run # Plan for a specific profile
+kimari benchmark --matrix --dry-run --json        # Full parameter matrix as JSON
+```
+
+### `kimari tune`
+
+Get recommended settings based on VRAM/RAM estimation:
+
+```bash
+kimari tune --dry-run                       # Recommendations for default profile
+kimari tune --profile gtx1060-safe --json   # JSON output for automation
+```
+
+> **Note:** `kimari tune --apply` is intentionally **blocked** in v0.1.25-alpha. Measured benchmark support is planned for v0.1.26-alpha.
+>
+> See [Performance Tuning Plan](docs/PERFORMANCE_TUNING_PLAN.md) for the full measurement and tuning roadmap.
+
 ### Performance Profiles
 
 | Profile | GPU | Mode | Cache | Context | Use Case |
@@ -504,7 +529,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. Private SFT execution package ready. Secret scanner and HF token safety guide available.
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.25-alpha — Security hardening, performance foundation, showcase prep
 
 ### What's Ready
 
@@ -609,6 +634,7 @@ Before any real training execution, ensure no tokens or secrets reach the reposi
 - **[HF Token Safety Guide](docs/HF_TOKEN_SAFETY.md)** — How to handle Hugging Face tokens safely
 - **Secret scanner** — `python scripts/security/scan_for_secrets.py --paths README.md docs training eval tests --json`
 - **Private SFT handoff** — [docs/FIRST_PRIVATE_SFT_HANDOFF.md](docs/FIRST_PRIVATE_SFT_HANDOFF.md) — How to bring sanitized results to repo
+- **[Performance Tuning Plan](docs/PERFORMANCE_TUNING_PLAN.md)** — Roadmap for moving from estimation to real measured benchmarks
 
 > **Never commit tokens, API keys, or private paths.** If a token is exposed, revoke it immediately.
 
@@ -724,6 +750,8 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [HF Token Safety](docs/HF_TOKEN_SAFETY.md) | Safe Hugging Face token handling guide |
 | [Private SFT Handoff](docs/FIRST_PRIVATE_SFT_HANDOFF.md) | How to bring sanitized results to repo safely |
 | [Private SFT Run Commands](docs/PRIVATE_SFT_RUN_COMMANDS.md) | Expected commands for first private SFT execution |
+| [Performance Tuning Plan](docs/PERFORMANCE_TUNING_PLAN.md) | Roadmap for real measured benchmarks and auto-tuning |
+| [Showcase Plan](docs/SHOWCASE_PLAN.md) | How to present Kimari honestly and attractively |
 
 ---
 

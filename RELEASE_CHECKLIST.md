@@ -390,6 +390,15 @@ twine upload dist/*
 - [ ] Preview gate still BLOCKED
 - [ ] `default_profile` is still `"test"`
 - [ ] No "Kimari-4B released" false claim anywhere
+- [ ] docs/PERFORMANCE_TUNING_PLAN.md exists
+- [ ] docs/SHOWCASE_PLAN.md exists
+- [ ] kimari/performance/benchmark_plan.py exists
+- [ ] kimari benchmark --dry-run --json works and returns measured: false
+- [ ] kimari tune --dry-run --json works and returns apply_blocked: true
+- [ ] kimari tune --apply is blocked (exits with error)
+- [ ] benchmark plan output does not contain measured scores
+- [ ] README mentions 'benchmark' and 'tune' commands
+- [ ] No fake benchmark claims in PERFORMANCE_TUNING_PLAN.md
 
 ## Post-Release
 

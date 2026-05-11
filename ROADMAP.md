@@ -308,16 +308,22 @@
 - ✅ Screenshot command cleanup (SAFE_SCREENSHOT_CAPTURE.md uses real commands)
 - ✅ Private SFT handoff guide (docs/FIRST_PRIVATE_SFT_HANDOFF.md)
 - ✅ Private SFT run commands guide (docs/PRIVATE_SFT_RUN_COMMANDS.md)
+- ✅ Performance tuning plan (docs/PERFORMANCE_TUNING_PLAN.md)
+- ✅ Benchmark plan module (kimari/performance/benchmark_plan.py)
+- ✅ `kimari benchmark --dry-run` command (estimates only, no execution)
+- ✅ `kimari tune --dry-run` command (recommendations only, --apply blocked)
+- ✅ Showcase plan (docs/SHOWCASE_PLAN.md)
+- ✅ README and GitHub Pages updated with benchmark/tune/showcase sections
 - ✅ Release-check improvements
 - ✅ Tests for v0.1.25 artifacts
 
 ## v0.1.26-alpha (Planned)
 
-- Execute first private SFT manually outside CI
-- Run secret scanner on handoff artifacts
-- Create local adapter manifest
-- Produce sanitized eval summary
-- Decide ORPO/DPO next step
+- Real measured benchmarks (requires running server)
+- Auto-tuning experimental (`kimari tune --apply`)
+- `kimari doctor --deep`
+- Open WebUI/OpenClaw one-command config
+- Reviewed screenshots
 
 ## v0.2.0-alpha
 

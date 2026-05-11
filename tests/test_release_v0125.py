@@ -341,3 +341,88 @@ class TestVersionConsistency:
         index = PROJECT_ROOT / "docs" / "index.html"
         content = index.read_text()
         assert "0.1.25-alpha" in content
+
+
+class TestPerformanceTuningPlan:
+    """Tests for docs/PERFORMANCE_TUNING_PLAN.md."""
+
+    def test_doc_exists(self):
+        path = PROJECT_ROOT / "docs" / "PERFORMANCE_TUNING_PLAN.md"
+        assert path.exists(), f"Doc missing: {path}"
+
+    def test_doc_no_fake_benchmarks(self):
+        path = PROJECT_ROOT / "docs" / "PERFORMANCE_TUNING_PLAN.md"
+        content = path.read_text().lower()
+        assert "no benchmarks" in content or "no real benchmarks" in content, "Must state no real benchmarks yet"
+
+
+class TestShowcasePlan:
+    """Tests for docs/SHOWCASE_PLAN.md."""
+
+    def test_doc_exists(self):
+        path = PROJECT_ROOT / "docs" / "SHOWCASE_PLAN.md"
+        assert path.exists(), f"Doc missing: {path}"
+
+    def test_doc_no_fake_claims(self):
+        path = PROJECT_ROOT / "docs" / "SHOWCASE_PLAN.md"
+        content = path.read_text().lower()
+        assert "fake" in content or "never claim" in content, "Must warn against fake claims"
+
+
+class TestBenchmarkCommand:
+    """Tests for kimari benchmark command."""
+
+    def test_benchmark_dry_run_json(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "kimari.cli.main", "benchmark", "--dry-run", "--json"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
+        )
+        assert result.returncode == 0, f"benchmark --dry-run failed: {result.stderr}"
+        data = json.loads(result.stdout)
+        assert data.get("measured") is False, "Dry-run must not claim measured results"
+        assert data.get("tokens_per_second") is None, "Dry-run must not include tokens_per_second"
+        assert "plan" in data, "Must include plan section"
+
+    def test_benchmark_plan_no_measured_scores(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "kimari.cli.main", "benchmark", "--dry-run", "--json"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
+        )
+        data = json.loads(result.stdout)
+        assert data.get("measured") is False
+        assert data.get("tokens_per_second") is None
+        assert data.get("ttft_ms") is None
+
+
+class TestTuneCommand:
+    """Tests for kimari tune command."""
+
+    def test_tune_dry_run_json(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "kimari.cli.main", "tune", "--dry-run", "--json"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
+        )
+        assert result.returncode == 0, f"tune --dry-run failed: {result.stderr}"
+        data = json.loads(result.stdout)
+        assert "recommended" in data, "Must include recommended section"
+        assert data.get("apply_blocked") is True, "--apply must be blocked"
+
+    def test_tune_apply_blocked(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "kimari.cli.main", "tune", "--apply"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
+        )
+        assert result.returncode != 0, "--apply should be blocked"
+        assert "not yet available" in result.stderr.lower() or "not yet available" in result.stdout.lower(), "Should explain --apply is blocked"
