@@ -13,7 +13,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-
 # ─── Context sizes to test ───────────────────────────────────────────
 CONTEXT_SIZES = [2048, 4096, 8192]
 
@@ -229,7 +228,8 @@ def generate_benchmark_plan(
             f"Recommended settings may exceed VRAM budget ({best_estimated_vram:.2f} > {_vram_budget:.1f} GiB)"
         )
     warnings.append(
-        "These are estimates, not measurements. Use 'kimari benchmark --measure' for real data."
+        "Do not treat this dry-run plan as measured benchmark data. "
+        "Measured benchmark support is available in v0.1.26-alpha via 'kimari benchmark --measure'."
     )
 
     return BenchmarkPlan(
@@ -296,7 +296,7 @@ def generate_tune_recommendation(
         "warnings": settings["warnings"],
         "apply_blocked": True,
         "apply_blocked_reason": (
-            "--apply is not yet available. Use --dry-run to see recommendations. "
-            "Measured benchmark support is planned for v0.1.26-alpha."
+            "--apply is not yet available. Requires measured benchmarks and rollback safety first. "
+            "Use --dry-run to see recommendations."
         ),
     }

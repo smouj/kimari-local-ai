@@ -147,12 +147,29 @@ SKIP_DIRS = {
 
 # Files that are themselves security guides discussing token patterns
 # These files intentionally contain example token patterns for educational purposes
+# NOTE: We no longer skip these files entirely. Instead, we scan them line by
+# line and allow only safe placeholders (see SAFE_PLACEHOLDERS below).
 SECURITY_GUIDE_FILES = {
     "HF_TOKEN_SAFETY.md",
     "SECURITY.md",
     "PRIVACY.md",
     "REVERSE_PROXY_AUTH.md",
     "PRIVATE_EVAL_RESULTS_POLICY.md",
+}
+
+# Safe placeholder strings that are allowed in any file (including security guides).
+# If a line matches a secret pattern BUT the matched content is exactly one of
+# these placeholders, the finding is skipped.
+SAFE_PLACEHOLDERS = {
+    "hf_...",          # exactly hf_ followed by only dots
+    "hf_your_token_here",
+    "hf_YOUR_TOKEN_HERE",
+    "<HF_TOKEN>",
+    "your-api-key",
+    "your_api_key",
+    "sk-...",          # exactly sk- followed by only dots
+    "<token>",
+    "<API_KEY>",
 }
 
 
@@ -175,6 +192,19 @@ def _line_has_safe_marker(line: str) -> bool:
     return any(marker.lower() in lower for marker in SAFE_MARKERS)
 
 
+def _is_safe_placeholder(matched_content: str) -> bool:
+    """Check if matched content is exactly a known safe placeholder string.
+
+    Also returns True if any safe placeholder appears as a substring of the
+    matched content — this handles assignment patterns like
+    ``token = "hf_your_token_here"`` where the regex captures the full
+    assignment but the value is a safe placeholder.
+    """
+    if matched_content in SAFE_PLACEHOLDERS:
+        return True
+    return any(placeholder in matched_content for placeholder in SAFE_PLACEHOLDERS)
+
+
 def _should_skip_file(path: Path) -> bool:
     """Check if a file should be skipped based on extension or directory."""
     if path.suffix.lower() in SKIP_EXTENSIONS:
@@ -182,8 +212,9 @@ def _should_skip_file(path: Path) -> bool:
     for part in path.parts:
         if part in SKIP_DIRS or part.endswith(".egg-info"):
             return True
-    # Skip security guide files that intentionally discuss token patterns
-    return path.name in SECURITY_GUIDE_FILES
+    # Security guide files are no longer fully skipped; they are scanned
+    # line by line with safe placeholder allowances instead.
+    return False
 
 
 def scan_file(path: Path) -> list[dict]:
@@ -216,6 +247,10 @@ def scan_file(path: Path) -> list[dict]:
         for pattern, name, severity in SECRET_PATTERNS:
             match = pattern.search(line)
             if match:
+                # Check if the matched content is a known safe placeholder
+                if _is_safe_placeholder(match.group()):
+                    continue
+
                 lower_line = line.lower().strip()
                 if any(
                     marker in lower_line
@@ -295,6 +330,12 @@ def main() -> None:
         dest="json_output",
         help="Output structured JSON",
     )
+    parser.add_argument(
+        "--include-history-note",
+        action="store_true",
+        dest="include_history_note",
+        help="Print a reminder to manually check git history for secrets",
+    )
     args = parser.parse_args()
 
     resolved_paths: list[Path] = []
@@ -312,7 +353,7 @@ def main() -> None:
     if args.json_output:
         output = {
             "scanner": "scan_for_secrets.py",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "paths_scanned": [str(p) for p in resolved_paths],
             "total_findings": len(findings),
             "critical": len([f for f in findings if f["severity"] == "critical"]),
@@ -332,6 +373,14 @@ def main() -> None:
                 print(f"     Pattern: {f['pattern']}")
                 print(f"     Content: {f['content']}")
                 print()
+
+        if args.include_history_note:
+            print(
+                "\n📋 NOTE: This scanner only checks the current file state. "
+                "Secrets removed in past commits may still exist in git history. "
+                "Consider manually reviewing git log or using tools like git-secrets "
+                "or trufflehog to scan history."
+            )
 
         critical_count = len([f for f in findings if f["severity"] == "critical"])
         if critical_count > 0:

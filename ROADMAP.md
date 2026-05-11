@@ -300,7 +300,7 @@
 - ✅ Release-check improvements
 - ✅ Tests for v0.1.24 artifacts
 
-## v0.1.25-alpha (Current)
+## v0.1.25-alpha (Released)
 
 - ✅ HF token safety guide (docs/HF_TOKEN_SAFETY.md)
 - ✅ Secret scanner script (scripts/security/scan_for_secrets.py)
@@ -317,13 +317,21 @@
 - ✅ Release-check improvements
 - ✅ Tests for v0.1.25 artifacts
 
-## v0.1.26-alpha (Planned)
+## v0.1.26-alpha (Current)
 
-- Real measured benchmarks (requires running server)
+- ✅ Measured benchmark prototype (`kimari benchmark --measure`)
+- ✅ `kimari doctor --deep` extended diagnostics
+- ✅ Secret scanner hardening (line-by-line, safe placeholders)
+- ✅ Benchmark prompts (8 safe prompts in JSONL)
+- ✅ Benchmark result writer (sanitized, gitignored output)
+
+## v0.1.27-alpha (Planned)
+
 - Auto-tuning experimental (`kimari tune --apply`)
-- `kimari doctor --deep`
+- `kimari doctor --deep --fix`
 - Open WebUI/OpenClaw one-command config
-- Reviewed screenshots
+- Real reviewed screenshots
+- First private SFT results
 
 ## v0.2.0-alpha
 

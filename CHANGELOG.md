@@ -5,6 +5,34 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.26-alpha] — 2026-05-28
+
+### Added
+- **Secret scanner hardening** — `scripts/security/scan_for_secrets.py` no longer skips security guide files entirely; instead scans them line-by-line allowing safe placeholders (hf_..., hf_your_token_here, <HF_TOKEN>, your-api-key, sk-..., <token>, <API_KEY>); added `--include-history-note` flag for git history check reminder; version 1.1.0
+- **docs/SECRET_SCAN_POLICY.md** — Comprehensive policy for what the scanner detects, allowed placeholders, how to mark placeholders, how to review git history, emergency steps for real tokens
+- **kimari/performance/measured_benchmark.py** — Module for measured benchmarks against OpenAI-compatible endpoints; `build_chat_completion_payload()`, `measure_chat_completion()`, `calculate_tokens_per_second()`, `sanitize_benchmark_result()`, `validate_measured_result()`; only uses `requests`; never invents metrics; score_status="measured" only for real responses
+- **`kimari benchmark --measure`** — Experimental measured benchmark command; requires --endpoint, --model, --yes flags; sends real chat completion requests; records tokens/s, elapsed time, usage data; uses benchmarks/prompts/local_benchmark_prompts.jsonl; results sanitized; clear errors on connection failure (no stacktrace)
+- **docs/MEASURED_BENCHMARKS.md** — Guide for running measured benchmarks; supported endpoints; privacy guidelines; result sanitization; sharing via performance_report issue template
+- **benchmarks/prompts/local_benchmark_prompts.jsonl** — 8 safe benchmark prompts (greeting, structured-output, coding-python, bash, spanish-technical, docker, linux); no private data
+- **benchmarks/results/.gitkeep** — Results directory for measured benchmark output (*.json gitignored)
+- **benchmarks/examples/.gitkeep** — Example results directory (committable)
+- **kimari/doctor/deep.py** — Deep diagnostic module with 9 checks (Python, Paths, Config, Models Dir, llama-server, Default Profile, Secret Scanner, Benchmark Prompts, Preview Gate); all pure/safe functions; PASS/WARN/FAIL status
+- **`kimari doctor --deep`** — CLI command for extended diagnostics; `--json` for machine-readable output; no model execution, no downloads, no GPU required
+- **docs/DOCTOR_DEEP.md** — Guide for deep diagnostics; what it checks; how to interpret PASS/WARN/FAIL; usage; common resolutions
+- **New tests** (`tests/test_release_v0126.py`)
+
+### Changed
+- **Version bumped** to `0.1.26-alpha`
+- **scripts/security/scan_for_secrets.py** — No longer skips security guide files entirely; scans them line-by-line; allows safe placeholders; added --include-history-note; version 1.1.0
+- **kimari/performance/benchmark_plan.py** — Updated warnings to reference measured benchmark availability in v0.1.26-alpha; updated tune --apply blocked reason
+- **kimari/cli/main.py** — Added doctor --deep, benchmark --measure with --endpoint/--model/--yes/--output; tune --apply still blocked with updated message
+- **docs/PERFORMANCE_TUNING_PLAN.md** — Added three-phase separation: estimated planning, measured benchmark, future auto-tuning
+- **README.md** — Added measured benchmark experimental, doctor --deep, secret scan policy, tune apply still blocked sections
+- **docs/index.html** — Added measured benchmark, doctor deep, secret scanner hardening cards
+- **RELEASE_CHECKLIST.md** — Added v0.1.26 Checks section
+- **scripts/release/check-release.py** — Added v0.1.26 checks (SECRET_SCAN_POLICY, MEASURED_BENCHMARKS, DOCTOR_DEEP, measured_benchmark.py, doctor/deep.py, benchmark prompts, results gitignored, tune --apply blocked, gate BLOCKED)
+- **ROADMAP.md** — v0.1.25-alpha marked as Released; v0.1.26-alpha marked as Current; v0.1.27-alpha Planned
+
 ## [0.1.25-alpha] — 2026-05-27
 
 ### Added

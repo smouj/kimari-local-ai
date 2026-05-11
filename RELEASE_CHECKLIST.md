@@ -400,6 +400,37 @@ twine upload dist/*
 - [ ] README mentions 'benchmark' and 'tune' commands
 - [ ] No fake benchmark claims in PERFORMANCE_TUNING_PLAN.md
 
+## v0.1.26 Checks
+
+- [ ] Secret scanner hardened: security guide files are scanned line-by-line, not skipped
+- [ ] scan_for_secrets.py allows safe placeholders (hf_..., hf_your_token_here, <HF_TOKEN>, your-api-key, sk-..., <token>, <API_KEY>)
+- [ ] scan_for_secrets.py has --include-history-note flag
+- [ ] scan_for_secrets.py version is 1.1.0
+- [ ] docs/SECRET_SCAN_POLICY.md exists
+- [ ] docs/MEASURED_BENCHMARKS.md exists
+- [ ] docs/DOCTOR_DEEP.md exists
+- [ ] kimari/performance/measured_benchmark.py exists
+- [ ] kimari/doctor/deep.py exists
+- [ ] kimari/doctor/__init__.py exists
+- [ ] benchmark prompts exist (benchmarks/prompts/local_benchmark_prompts.jsonl)
+- [ ] benchmarks/results/.gitkeep exists
+- [ ] benchmarks/results/*.json is in .gitignore
+- [ ] No measured results committed to git
+- [ ] kimari benchmark --measure requires --yes flag
+- [ ] kimari benchmark --measure requires --endpoint flag
+- [ ] kimari benchmark --measure requires --model flag
+- [ ] kimari benchmark --measure handles endpoint failure without stacktrace
+- [ ] kimari doctor --deep --json works
+- [ ] kimari tune --apply is still blocked
+- [ ] tune --apply returns apply_blocked: true
+- [ ] No fake benchmark numbers anywhere
+- [ ] docs/PERFORMANCE_TUNING_PLAN.md has three-phase separation
+- [ ] Preview gate still BLOCKED
+- [ ] default_profile is still "test"
+- [ ] No "Kimari-4B released" false claim anywhere
+- [ ] No adapter/weights/GGUF tracked in git
+- [ ] README mentions measured benchmark, doctor --deep, secret scan policy
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

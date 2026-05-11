@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.25--alpha-9b59b6.svg" alt="v0.1.25-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.26--alpha-9b59b6.svg" alt="v0.1.26-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.25-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.26-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.25-alpha**
+> **Kimari Local AI v0.1.26-alpha**
 
 ### ✅ Works Today
 
@@ -91,6 +91,10 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **MODEL_CARD professional rewrite** — Honest "Planned / Training Design" status with base candidates
 - **Benchmark dry-run** — `kimari benchmark --dry-run` generates benchmark plans without execution
 - **Tune dry-run** — `kimari tune --dry-run` recommends optimal settings from estimation
+- **Measured benchmark (experimental)** — `kimari benchmark --measure` runs real benchmarks against OpenAI-compatible servers
+- **Doctor deep** — `kimari doctor --deep` runs extended diagnostics (Python, paths, config, models, scanner, prompts, gate)
+- **Secret scanner hardening** — Security guides are now scanned line-by-line instead of being skipped entirely
+- **Benchmark prompts** — Standard safe prompts in `benchmarks/prompts/local_benchmark_prompts.jsonl`
 
 ### 🔨 Planned
 
@@ -213,6 +217,7 @@ Pre-configured settings optimized for specific GPU models. No manual tuning requ
 
 ```bash
 kimari doctor                                        # System diagnostics (CUDA, GPU, llama-server)
+kimari doctor --deep                                 # Extended deep diagnostics (Python, paths, config, models, scanner, prompts, gate)
 kimari doctor --json                                 # JSON output for automation/IDEs
 kimari info                                          # Installation info (version, paths, profiles)
 kimari info --json                                   # JSON info output
@@ -342,6 +347,7 @@ Generate a benchmark plan without executing models (dry-run by default):
 kimari benchmark --dry-run                        # Show estimated plan for default profile
 kimari benchmark --profile gtx1060-safe --dry-run # Plan for a specific profile
 kimari benchmark --matrix --dry-run --json        # Full parameter matrix as JSON
+kimari benchmark --measure --endpoint <url> --model <name> --yes  # Measured benchmark against local server (experimental)
 ```
 
 ### `kimari tune`
@@ -353,7 +359,7 @@ kimari tune --dry-run                       # Recommendations for default profil
 kimari tune --profile gtx1060-safe --json   # JSON output for automation
 ```
 
-> **Note:** `kimari tune --apply` is intentionally **blocked** in v0.1.25-alpha. Measured benchmark support is planned for v0.1.26-alpha.
+> **Note:** `kimari tune --apply` is intentionally **blocked** in v0.1.26-alpha. Auto-apply will be enabled once measured benchmarks are validated.
 >
 > See [Performance Tuning Plan](docs/PERFORMANCE_TUNING_PLAN.md) for the full measurement and tuning roadmap.
 
@@ -529,7 +535,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.25-alpha — Security hardening, performance foundation, showcase prep
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.26-alpha — Measured benchmarks, doctor deep, secret scanner hardening
 
 ### What's Ready
 
@@ -635,6 +641,7 @@ Before any real training execution, ensure no tokens or secrets reach the reposi
 - **Secret scanner** — `python scripts/security/scan_for_secrets.py --paths README.md docs training eval tests --json`
 - **Private SFT handoff** — [docs/FIRST_PRIVATE_SFT_HANDOFF.md](docs/FIRST_PRIVATE_SFT_HANDOFF.md) — How to bring sanitized results to repo
 - **[Performance Tuning Plan](docs/PERFORMANCE_TUNING_PLAN.md)** — Roadmap for moving from estimation to real measured benchmarks
+- **[Secret Scan Policy](docs/SECRET_SCAN_POLICY.md)** — Line-by-line scanning policy for security guides
 
 > **Never commit tokens, API keys, or private paths.** If a token is exposed, revoke it immediately.
 
@@ -751,6 +758,9 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Private SFT Handoff](docs/FIRST_PRIVATE_SFT_HANDOFF.md) | How to bring sanitized results to repo safely |
 | [Private SFT Run Commands](docs/PRIVATE_SFT_RUN_COMMANDS.md) | Expected commands for first private SFT execution |
 | [Performance Tuning Plan](docs/PERFORMANCE_TUNING_PLAN.md) | Roadmap for real measured benchmarks and auto-tuning |
+| [Secret Scan Policy](docs/SECRET_SCAN_POLICY.md) | Line-by-line scanning policy for security guides |
+| [Measured Benchmarks](docs/MEASURED_BENCHMARKS.md) | Real benchmark execution against OpenAI-compatible servers |
+| [Doctor Deep](docs/DOCTOR_DEEP.md) | Extended diagnostics documentation |
 | [Showcase Plan](docs/SHOWCASE_PLAN.md) | How to present Kimari honestly and attractively |
 
 ---

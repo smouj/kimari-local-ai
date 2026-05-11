@@ -1585,7 +1585,7 @@ def run_benchmark_plan(
         print(f"\n  {Color.YELLOW}Warnings:{Color.RESET}")
         for w in plan.warnings:
             print(f"    ⚠ {w}")
-    
+
     print(f"\n  {Color.DIM}Tip: Use --matrix --json to see all parameter combinations.{Color.RESET}")
     print(f"  {Color.DIM}Tip: Use --measure (requires running server) for real benchmarks.{Color.RESET}")
     print()
@@ -1607,7 +1607,7 @@ def run_tune(
 
     if apply:
         print("[ERROR] --apply is not yet available. Use --dry-run to see recommendations.")
-        print("        Measured benchmark support is planned for v0.1.26-alpha.")
+        print("        Apply is planned, not available. Requires measured benchmarks and rollback safety first.")
         raise SystemExit(1)
 
     if not profile_name:
@@ -1650,7 +1650,245 @@ def run_tune(
             print(f"    ⚠ {w}")
 
     print(f"\n  {Color.DIM}{result['disclaimer']}{Color.RESET}")
-    print(f"  {Color.DIM}--apply is blocked. Measured benchmark support planned for v0.1.26-alpha.{Color.RESET}")
+    print(f"  {Color.DIM}--apply is blocked. Requires measured benchmarks and rollback safety first.{Color.RESET}")
+    print()
+
+
+# ─── Doctor Deep ──────────────────────────────────────────────────────────────
+
+
+def run_doctor_deep(json_output: bool = False):
+    """Run extended deep diagnostics.
+
+    Checks Python, paths, config, models, llama-server, default profile,
+    secret scanner, benchmark prompts, and preview gate status.
+    No model execution, no downloads, no GPU required.
+    """
+    from kimari.doctor.deep import run_deep_checks
+
+    results = run_deep_checks()
+
+    if json_output:
+        # Extract summary from last item
+        summary = results[-1] if results and results[-1].get("name") == "Summary" else {}
+        output = {
+            "kimari_version": KIMARI_VERSION,
+            "deep_check": True,
+            "checks": results[:-1] if len(results) > 1 and results[-1].get("name") == "Summary" else results,
+            "summary": summary.get("value", {}),
+        }
+        print(json.dumps(output, indent=2))
+        return
+
+    # Human-readable output
+    print(f"\n{KIMARI_ASCII}")
+    print(f"  {Color.BOLD}Deep Diagnostics{Color.RESET}\n")
+
+    checks = results[:-1] if results and results[-1].get("name") == "Summary" else results
+    for check in checks:
+        status = check.get("status", "INFO")
+        if status == "PASS":
+            icon = f"{Color.GREEN}✓{Color.RESET}"
+            status_str = f"{Color.GREEN}PASS{Color.RESET}"
+        elif status == "WARN":
+            icon = f"{Color.YELLOW}⚠{Color.RESET}"
+            status_str = f"{Color.YELLOW}WARN{Color.RESET}"
+        elif status == "FAIL":
+            icon = f"{Color.RED}✗{Color.RESET}"
+            status_str = f"{Color.RED}FAIL{Color.RESET}"
+        else:
+            icon = "●"
+            status_str = status
+
+        name = check.get("name", "Unknown")
+        value = check.get("value", "")
+        detail = check.get("detail", "")
+
+        print(f"  {icon} {name}: {status_str} — {value}")
+        if detail:
+            print(f"    {Color.DIM}{detail}{Color.RESET}")
+
+    # Summary
+    summary = results[-1] if results and results[-1].get("name") == "Summary" else None
+    if summary:
+        sv = summary.get("value", {})
+        pass_count = sv.get("pass_count", 0)
+        warn_count = sv.get("warn_count", 0)
+        fail_count = sv.get("fail_count", 0)
+        total = sv.get("total", 0)
+
+        print(f"\n  {Color.BOLD}Summary: {pass_count}/{total} PASS, {warn_count} WARN, {fail_count} FAIL{Color.RESET}")
+
+        if fail_count > 0:
+            print(f"  {Color.RED}Fix FAIL items before proceeding.{Color.RESET}")
+            raise SystemExit(1)
+        elif warn_count > 0:
+            print(f"  {Color.YELLOW}Warnings present. Kimari may work with limitations.{Color.RESET}")
+        else:
+            print(f"  {Color.GREEN}All deep checks passed!{Color.RESET}")
+
+    print()
+
+
+# ─── Benchmark Measure ────────────────────────────────────────────────────────
+
+
+def run_benchmark_measure(
+    endpoint: str | None = None,
+    model_name: str | None = None,
+    yes: bool = False,
+    output: str | None = None,
+    json_output: bool = False,
+):
+    """Run measured benchmark against a running server.
+
+    Requires --endpoint, --model, and --yes flags.
+    Sends real HTTP requests to the server.
+    Does NOT run in CI — use mocks for testing.
+    """
+    from datetime import datetime, timezone
+
+    from kimari.performance.measured_benchmark import (
+        measure_chat_completion,
+        sanitize_benchmark_result,
+    )
+
+    # Validate required arguments
+    if not endpoint:
+        print("[ERROR] --endpoint is required for --measure.")
+        print("  Example: kimari benchmark --measure --endpoint http://127.0.0.1:11435/v1 --model test --yes")
+        raise SystemExit(1)
+
+    if not model_name:
+        print("[ERROR] --model is required for --measure.")
+        print("  Example: kimari benchmark --measure --endpoint http://127.0.0.1:11435/v1 --model test --yes")
+        raise SystemExit(1)
+
+    if not yes:
+        print("[ERROR] --yes is required for --measure to confirm execution.")
+        print("  This sends real requests to the server endpoint.")
+        print("  Example: kimari benchmark --measure --endpoint http://127.0.0.1:11435/v1 --model test --yes")
+        raise SystemExit(1)
+
+    # Load benchmark prompts
+    from kimari.core.constants import PROJECT_ROOT
+
+    prompts_path = PROJECT_ROOT / "benchmarks" / "prompts" / "local_benchmark_prompts.jsonl"
+    prompts: list[dict] = []
+    if prompts_path.exists():
+        try:
+            for line in prompts_path.read_text(encoding="utf-8").strip().splitlines():
+                prompts.append(json.loads(line))
+        except (json.JSONDecodeError, OSError):
+            warn("Could not load benchmark prompts, using default prompt")
+
+    if not prompts:
+        prompts = [{"id": "default", "prompt": "Hello, respond with a single word.", "category": "greeting", "max_tokens": 32}]
+
+    # Strip /v1 from endpoint if present for the base URL
+    base_endpoint = endpoint.rstrip("/")
+    if base_endpoint.endswith("/v1"):
+        base_endpoint = base_endpoint[:-3]
+
+    if not json_output:
+        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Benchmark — Measured{Color.RESET}")
+        print(f"  Endpoint: {endpoint}")
+        print(f"  Model:    {model_name}")
+        print(f"  Prompts:  {len(prompts)}")
+        print(f"  {Color.YELLOW}[EXPERIMENTAL]{Color.RESET} This sends real requests to the server.\n")
+
+    # Run benchmarks
+    results: list[dict] = []
+    for i, p in enumerate(prompts):
+        prompt_text = p.get("prompt", "Hello")
+        max_tokens = p.get("max_tokens", 128)
+
+        if not json_output:
+            print(f"  [{i + 1}/{len(prompts)}] {p.get('id', '?')}: {prompt_text[:40]}...", end=" ", flush=True)
+
+        result = measure_chat_completion(
+            endpoint=base_endpoint,
+            model=model_name,
+            prompt=prompt_text,
+            max_tokens=max_tokens,
+            timeout=30.0,
+        )
+
+        # Add metadata
+        result["prompt_id"] = p.get("id", f"prompt-{i}")
+        result["category"] = p.get("category", "unknown")
+        result["timestamp"] = datetime.now(timezone.utc).isoformat()
+
+        # Sanitize before storing
+        sanitized = sanitize_benchmark_result(result)
+        sanitized["prompt_id"] = result["prompt_id"]
+        sanitized["category"] = result["category"]
+
+        results.append(sanitized)
+
+        if not json_output:
+            tps = result.get("tokens_per_second")
+            status = result.get("score_status", "unknown")
+            if status == "measured" and tps is not None:
+                print(f"{Color.GREEN}{tps:.2f} t/s{Color.RESET}")
+            elif status == "error":
+                err = result.get("error", "unknown error")
+                print(f"{Color.RED}ERROR: {err}{Color.RESET}")
+            else:
+                print(f"{Color.YELLOW}{status}{Color.RESET}")
+
+    # Build output
+    measured_count = sum(1 for r in results if r.get("score_status") == "measured")
+    error_count = sum(1 for r in results if r.get("score_status") == "error")
+
+    benchmark_output = {
+        "kimari_version": KIMARI_VERSION,
+        "measurement_type": "measured",
+        "measured": True,
+        "endpoint": base_endpoint,
+        "model": model_name,
+        "total_prompts": len(prompts),
+        "measured_count": measured_count,
+        "error_count": error_count,
+        "results": results,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+    # Save to file if --output specified
+    if output:
+        output_path = Path(output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(benchmark_output, indent=2), encoding="utf-8")
+        if not json_output:
+            ok(f"Results saved to {output_path}")
+
+    if json_output:
+        print(json.dumps(benchmark_output, indent=2))
+        return
+
+    # Human-readable summary
+    print(f"\n  {Color.BOLD}Results:{Color.RESET}")
+    print(f"    Measured: {measured_count}/{len(prompts)}")
+    if error_count:
+        print(f"    Errors:   {Color.RED}{error_count}{Color.RESET}")
+
+    if measured_count > 0:
+        tps_values = [r["tokens_per_second"] for r in results if r.get("tokens_per_second") is not None]
+        if tps_values:
+            avg_tps = sum(tps_values) / len(tps_values)
+            min_tps = min(tps_values)
+            max_tps = max(tps_values)
+            print(f"    Avg t/s:  {avg_tps:.2f}")
+            print(f"    Min t/s:  {min_tps:.2f}")
+            print(f"    Max t/s:  {max_tps:.2f}")
+
+    if error_count > 0:
+        print(f"\n  {Color.YELLOW}Some prompts failed. Check endpoint and model name.{Color.RESET}")
+        print(f"  {Color.DIM}Errors are reported clearly — no stack traces.{Color.RESET}")
+    elif measured_count == 0:
+        print(f"\n  {Color.RED}No successful measurements. Check that the server is running.{Color.RESET}")
+
+    print(f"\n  {Color.DIM}Do not treat this local measurement as a universal benchmark.{Color.RESET}")
     print()
 
 
@@ -1668,6 +1906,11 @@ def main():
 
     # doctor
     doctor_parser = subparsers.add_parser("doctor", help="Run system diagnostics")
+    doctor_parser.add_argument(
+        "--deep",
+        action="store_true",
+        help="Run extended deep diagnostics (Python, paths, config, models, scanner, prompts, gate)",
+    )
     doctor_parser.add_argument(
         "--json",
         action="store_true",
@@ -1924,10 +2167,14 @@ def main():
     benchmark_parser = subparsers.add_parser("benchmark", help="Generate benchmark plan (dry-run by default)")
     benchmark_parser.add_argument("--profile", help="GPU profile to benchmark")
     benchmark_parser.add_argument("--dry-run", action="store_true", default=True, help="Show plan without executing (default)")
-    benchmark_parser.add_argument("--measure", action="store_true", default=False, help="Run actual benchmark (requires running server)")
+    benchmark_parser.add_argument("--measure", action="store_true", default=False, help="Run actual benchmark against a running server (experimental)")
+    benchmark_parser.add_argument("--endpoint", default=None, help="Server endpoint for --measure (e.g. http://127.0.0.1:11435/v1)")
+    benchmark_parser.add_argument("--model", default=None, help="Model name for --measure (e.g. test)")
+    benchmark_parser.add_argument("--yes", action="store_true", help="Confirm --measure execution (required)")
+    benchmark_parser.add_argument("--output", default=None, help="Save measured results to JSON file")
     benchmark_parser.add_argument("--matrix", action="store_true", help="Show full parameter matrix")
     benchmark_parser.add_argument("--json", action="store_true", help="JSON output")
-    
+
     # ─── Tune ───────────────────────────────────────────────────────────────
     tune_parser = subparsers.add_parser("tune", help="Recommend optimal settings (dry-run by default)")
     tune_parser.add_argument("--profile", help="GPU profile to tune")
@@ -1953,7 +2200,10 @@ def main():
         return
 
     if args.command == "doctor":
-        run_doctor(config, json_output=getattr(args, "json_output", False))
+        if getattr(args, "deep", False):
+            run_doctor_deep(json_output=getattr(args, "json_output", False))
+        else:
+            run_doctor(config, json_output=getattr(args, "json_output", False))
     elif args.command == "info":
         show_info(config, json_output=getattr(args, "json_output", False))
     elif args.command == "start":
@@ -2128,13 +2378,22 @@ def main():
         else:
             token_parser.print_help()
     elif args.command == "benchmark":
-        run_benchmark_plan(
-            config,
-            profile_name=args.profile,
-            dry_run=not args.measure,
-            matrix=args.matrix,
-            json_output=args.json,
-        )
+        if args.measure:
+            run_benchmark_measure(
+                endpoint=args.endpoint,
+                model_name=args.model,
+                yes=args.yes,
+                output=getattr(args, "output", None),
+                json_output=args.json,
+            )
+        else:
+            run_benchmark_plan(
+                config,
+                profile_name=args.profile,
+                dry_run=True,
+                matrix=args.matrix,
+                json_output=args.json,
+            )
     elif args.command == "tune":
         run_tune(
             config,

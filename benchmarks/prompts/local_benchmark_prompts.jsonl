@@ -1,0 +1,8 @@
+{"id": "hello", "prompt": "Hello! Can you greet me and tell me what you can help with?", "category": "greeting", "max_tokens": 128}
+{"id": "json-response", "prompt": "Return a JSON object with three fields: name, age, and city. Use any example values.", "category": "structured-output", "max_tokens": 128}
+{"id": "python-function", "prompt": "Write a small Python function called reverse_string that takes a string input and returns the reversed version.", "category": "coding-python", "max_tokens": 256}
+{"id": "bash-command", "prompt": "Explain what the following bash command does: ls -la | grep .log", "category": "bash", "max_tokens": 128}
+{"id": "spanish-technical", "prompt": "¿Cuáles son las ventajas principales de ejecutar un modelo LLM localmente frente a usar una API en la nube?", "category": "spanish-technical", "max_tokens": 128}
+{"id": "json-list", "prompt": "Return a JSON array containing the names of 5 popular programming languages.", "category": "structured-output", "max_tokens": 128}
+{"id": "docker-explain", "prompt": "Explain what the command docker ps -a does and what each flag means.", "category": "docker", "max_tokens": 128}
+{"id": "safe-command", "prompt": "What is a safe Linux command to check disk usage on the current filesystem?", "category": "linux", "max_tokens": 128}

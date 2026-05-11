@@ -209,6 +209,46 @@ Error: --apply is not yet available. Use --dry-run to see recommendations.
 
 ---
 
+## Performance Tuning Phases
+
+### Phase 1: Estimated Planning (v0.1.25-alpha) — Already Implemented
+
+This phase is complete. All outputs are estimates — no real benchmarks, no model execution.
+
+- `kimari benchmark --dry-run` generates estimated benchmark plans
+- `kimari tune --dry-run` recommends settings from estimation
+- No real benchmarks, no model execution
+- `measured: false` in all outputs
+- Useful for planning which configurations to test, not for claiming performance
+
+### Phase 2: Measured Benchmark (v0.1.26-alpha) — Now Available
+
+This phase is now available. Real inference measurements against a live OpenAI-compatible server.
+
+- `kimari benchmark --measure --endpoint http://127.0.0.1:11435/v1 --model test --yes`
+- Sends real chat completion requests to OpenAI-compatible servers
+- Records `tokens_per_second`, `elapsed_s`, usage data
+- Requires `--endpoint`, `--model`, `--yes` flags
+- Does NOT run in CI
+- Results are sanitized (no private prompt/response data)
+- `measured_benchmark.py` module with pure functions for payload building, measurement, sanitization, validation
+- `benchmarks/prompts/local_benchmark_prompts.jsonl` with safe standard prompts
+- `benchmarks/results/` for saving results (gitignored)
+- `docs/MEASURED_BENCHMARKS.md` for usage guide
+
+### Phase 3: Future Auto-Tuning — Planned
+
+This phase is not yet available. Depends on validated measured benchmarks and rollback safety.
+
+- `kimari tune --apply` (still blocked)
+- Requires measured benchmarks and rollback safety first
+- Would automatically adjust profile settings based on benchmark results
+- Not available yet
+
+> **Note:** No fake metrics. No invented tokens/s. Every measured value comes from a real server response.
+
+---
+
 ## See Also
 
 - [Performance Estimation Module](../kimari/performance/) — VRAM/RAM estimation functions
