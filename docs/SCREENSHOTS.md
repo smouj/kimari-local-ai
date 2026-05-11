@@ -154,6 +154,55 @@ The following screenshots are planned for capture when running in a real GPU env
 
 ---
 
+## Safe Screenshot Capture
+
+Before capturing terminal screenshots, review the [Safe Screenshot Capture Guide](SAFE_SCREENSHOT_CAPTURE.md). It covers:
+
+- Cleaning your terminal before capture
+- Removing private paths from output
+- Avoiding tokens and secrets in screenshots
+- No raw eval outputs
+- No unreviewed benchmarks
+
+Always review screenshots before committing.
+
+---
+
+## CLI Text Examples
+
+Safe text blocks for generating captures are available in [docs/assets/screenshots/examples/](assets/screenshots/examples/). These `.txt` files contain clean CLI output without secrets, private paths, or benchmark claims.
+
+Available examples:
+
+- `kimari-setup-json.example.txt` — `kimari setup --json` output
+- `kimari-preflight-private-sft.example.txt` — preflight check output
+- `kimari-training-command-preview.example.txt` — training command preview
+- `kimari-baseline-eval-plan.example.txt` — baseline eval plan
+- `kimari-postrun-dryrun.example.txt` — postrun dry-run output
+
+Generate new text blocks with:
+
+```bash
+python scripts/docs/generate_cli_screenshot_text.py --kind setup --json
+```
+
+---
+
+## Replacing Placeholders with Real Screenshots
+
+When real captures become available from a GPU environment:
+
+1. Follow the [Safe Screenshot Capture Guide](SAFE_SCREENSHOT_CAPTURE.md)
+2. Replace placeholder references with actual image paths
+3. Add images to `docs/assets/screenshots/` following naming conventions
+4. Update this document to reference the real images
+5. Do NOT include any secrets, tokens, or unreviewed benchmarks
+6. No real training outputs should be visible in screenshots
+
+Until real screenshots exist, use the text examples above as illustration.
+
+---
+
 ## Rules
 
 1. **No secrets** — API keys, tokens, local paths, or user names must not appear.

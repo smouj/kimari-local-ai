@@ -1268,3 +1268,77 @@ Stage Summary:
 - Preview gate remains BLOCKED
 - No weights, adapters, GGUF, or checkpoints tracked
 - No false claims about Kimari-4B
+
+---
+Task ID: v0.1.23-alpha
+Agent: Main Agent
+Task: Implement v0.1.23-alpha of Kimari Local AI — private SFT pre-run hardening + screenshots/docs polish
+
+Work Log:
+- Version bumped to 0.1.23-alpha in pyproject.toml, kimari/__init__.py, README.md, docs/index.html, MODEL_CARD.md
+- Updated all version assertions in test files (test_cli_smoke.py, test_release_v0111-v0122.py) from 0.1.22-alpha to 0.1.23-alpha
+- Fixed postrun_private_sft.py P1: step_create_eval_summary now passes --json directly in the command list, removed post-hoc string append
+- Improved preflight_private_sft.py P1: reads dataset_build_dir from run_config if available, falls back to dataset/build/kimari-v0/report.json
+- Added dataset_build_dir, dataset_report_path, dataset_build_dir_source fields to preflight JSON output
+- Refactored preflight to reuse parsed YAML data (avoid double-parsing run_config)
+- Created docs/SCREENSHOTS.md with CLI preview gallery, planned screenshots table, and policy rules
+- Created docs/assets/screenshots/README.md with naming conventions, format policy, content guidelines
+- Created docs/assets/screenshots/PLACEHOLDER.md with planned screenshots checklist
+- Added Screenshots & CLI Preview section to README.md
+- Added CLI Preview section to docs/index.html with code cards
+- Updated docs/index.html hero badge, What's New section, and status table for v0.1.23-alpha
+- Added v0.1.23 Checks section to RELEASE_CHECKLIST.md
+- Expanded scripts/release/check-release.py with v0.1.23 checks (postrun --json, preflight dataset_build_dir, screenshots docs, no secrets, no benchmarks, README/index links)
+- Created tests/test_release_v0123.py with 34 tests
+- Updated CHANGELOG.md with v0.1.23-alpha entry
+- Updated ROADMAP.md (v0.1.22→Released, v0.1.23→Current, v0.1.24→Planned)
+- Updated MODEL_CARD.md version references
+- Added agent-ctx/ to .gitignore to prevent accidental commits
+- All 659 tests pass, ruff check/format pass, check-release passes with 0 warnings
+
+Stage Summary:
+- Version: 0.1.23-alpha at commit b38fe44
+- Key fixes: postrun --json passthrough, preflight config-aware dataset_build_dir
+- New docs: SCREENSHOTS.md, screenshot assets README/PLACEHOLDER
+- 29 files changed, 1112 insertions, 161 deletions
+- All release checks pass
+- Preview gate remains BLOCKED
+- No weights, adapters, GGUF, or checkpoints tracked
+- No false claims about Kimari-4B
+---
+Task ID: v0.1.24-alpha
+Agent: Main Agent
+Task: Implement v0.1.24-alpha — private run record workflow, safe screenshot capture guide, CLI screenshot text generator, release-check improvements
+
+Work Log:
+- Version bumped to 0.1.24-alpha in pyproject.toml, kimari/__init__.py, README.md badge/alpha notice, docs/index.html hero badge/focus block/status table
+- Created docs/FIRST_PRIVATE_SFT_RECORD.md — Guide for registering private SFT runs without committing sensitive outputs; documents run_id, base model, dataset hash, training config, hardware/runtime, adapter manifest (local only), eval/compare summaries, gate state BLOCKED, blocked actions, what can/cannot be committed
+- Created training/templates/private_sft_run_record.template.json — Committable template with gate.state=BLOCKED, public_release_allowed=false, hf_upload_allowed=false; all values as PLACEHOLDER or null
+- Created training/scripts/create_private_run_record.py — CLI with --run-config, --manifest, --eval-summary, --compare-summary, --output, --dry-run, --json; computes SHA256 of existing files; rejects absolute home directory paths; gate always BLOCKED; works without PyYAML
+- Created docs/SAFE_SCREENSHOT_CAPTURE.md — Guide for safe terminal screenshot capture; pre/during/post capture checklists; dimensions, formats, naming, alt text, review-before-commit
+- Created scripts/docs/generate_cli_screenshot_text.py — CLI generating safe text blocks for 6 kinds (setup, optimize, preflight, training_preview, baseline_eval, postrun); --output for file writing; --json for structured output; no private paths/tokens/benchmarks
+- Created 5 screenshot text examples in docs/assets/screenshots/examples/: kimari-setup-json, kimari-preflight-private-sft, kimari-training-command-preview, kimari-baseline-eval-plan, kimari-postrun-dryrun
+- Updated docs/SCREENSHOTS.md — Added Safe Screenshot Capture section, CLI Text Examples section, Replacing Placeholders section
+- Updated README.md — Added First Private Run Record section with links; added Safe Screenshot Capture link; added screenshot text examples reference; updated docs table
+- Updated docs/index.html — v0.1.24-alpha hero badge, What's New chips, status table rows
+- Updated RELEASE_CHECKLIST.md — Added v0.1.24 Checks section (19 items)
+- Updated scripts/release/check-release.py — Added [50/50] section with v0.1.24 checks (FIRST_PRIVATE_SFT_RECORD, run record template JSON validation, create_private_run_record, SAFE_SCREENSHOT_CAPTURE, generate_cli_screenshot_text, 5 screenshot example files, no secrets in examples, SCREENSHOTS.md references, README links, no oversized screenshots, no adapter/weights/GGUF, preview gate BLOCKED, no false claims)
+- Created tests/test_release_v0124.py — 42 tests covering: run record template JSON/gate/fields, create_private_run_record CLI, FIRST_PRIVATE_SFT_RECORD doc, SAFE_SCREENSHOT_CAPTURE doc, generate_cli_screenshot_text all 6 kinds + secrets check + file output, screenshot examples existence/secrets/paths, README links, SCREENSHOTS.md references, release check, no tracked artifacts, version consistency
+- Updated CHANGELOG.md — v0.1.24-alpha entry with all Added/Changed items
+- Updated ROADMAP.md — v0.1.23-alpha Released, v0.1.24-alpha Current, v0.1.25-alpha Planned
+
+Stage Summary:
+- Version: v0.1.24-alpha
+- 42 new tests passing
+- All ruff checks/formatting clean
+- check-release.py: All checks passed (0 warnings)
+- Build + twine: PASSED
+- kimari --version: v0.1.24-alpha
+- kimari setup --json: works correctly
+- create_private_run_record --dry-run --json: works correctly
+- generate_cli_screenshot_text --kind setup --json: works correctly
+- No adapter/weights/GGUF tracked
+- Preview gate still BLOCKED
+- No "Kimari-4B released" false claims
+- No secrets in any screenshot examples or docs
+- Ready for commit and push

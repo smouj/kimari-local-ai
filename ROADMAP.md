@@ -279,7 +279,7 @@
 - ✅ train_sft_lora.py improvements (--print-command, --estimate-only, --require-dataset)
 - ✅ Release-check improvements
 
-## v0.1.23-alpha (Current)
+## v0.1.23-alpha (Released)
 
 - ✅ Postrun --json fix (passes --json to create_eval_summary subprocess)
 - ✅ Preflight dataset_build_dir from run_config with fallback
@@ -289,14 +289,25 @@
 - ✅ README and GitHub Pages screenshots section
 - ✅ Release-check improvements
 
-## v0.1.24-alpha (Planned)
+## v0.1.24-alpha (Current)
+
+- ✅ Private SFT run record documentation (docs/FIRST_PRIVATE_SFT_RECORD.md)
+- ✅ Private run record template (training/templates/private_sft_run_record.template.json)
+- ✅ create_private_run_record script with --dry-run --json
+- ✅ Safe screenshot capture guide (docs/SAFE_SCREENSHOT_CAPTURE.md)
+- ✅ CLI screenshot text generator (scripts/docs/generate_cli_screenshot_text.py)
+- ✅ Screenshot text examples (docs/assets/screenshots/examples/)
+- ✅ Release-check improvements
+- ✅ Tests for v0.1.24 artifacts
+
+## v0.1.25-alpha (Planned)
 
 - Execute first private SFT manually outside CI
-- Record local adapter manifest
-- Run baseline and adapter eval
-- Produce sanitized eval summary
-- Optionally add real screenshots from safe terminal captures
+- Create local adapter manifest
+- Generate private run record
+- Generate sanitized eval summary
 - Decide ORPO/DPO next step
+- Optionally replace text examples with reviewed screenshots
 
 ## v0.2.0-alpha
 

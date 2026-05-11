@@ -1,0 +1,11 @@
+$ python training/scripts/postrun_private_sft.py --dry-run --json
+{
+  "steps": [
+    {"label": "create_adapter_manifest", "status": "dry_run"},
+    {"label": "create_eval_summary", "status": "dry_run", "command": "python eval/scripts/create_eval_summary.py --input eval/results/adapter-private.json --output /tmp/adapter-summary.json --json"},
+    {"label": "compare_runs", "status": "skipped"},
+    {"label": "verify_gate_blocked", "status": "dry_run", "blocked": true}
+  ],
+  "overall": "pass",
+  "dry_run": true
+}

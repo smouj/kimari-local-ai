@@ -1,0 +1,9 @@
+$ python eval/scripts/run_baseline_eval_plan.py --dry-run --json
+{
+  "model_label": "smollm3-base",
+  "prompt_count": 35,
+  "categories": ["python", "bash", "docker", "linux_troubleshooting", "spanish_technical", "json_mode", "agent_prompting"],
+  "recommended_endpoint": "http://127.0.0.1:11435/v1/chat/completions",
+  "score_status": "manual_review_required",
+  "dry_run": true
+}

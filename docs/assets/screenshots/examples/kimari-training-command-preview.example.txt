@@ -1,0 +1,8 @@
+$ python training/scripts/run_training_command_preview.py --json
+{
+  "recommended_command": "accelerate launch training/scripts/train_sft_lora.py --config training/configs/kimari_sft_lora.v0.example.yaml",
+  "recommended_environment": "RunPod RTX 4090 24GB / Local A100",
+  "expected_outputs": ["adapter_model.safetensors", "MANIFEST.yaml"],
+  "forbidden_commit_patterns": ["*.safetensors", "*.bin", "*.pt", "*.gguf"],
+  "safety_warnings": ["Do not commit adapter weights", "Preview gate must stay BLOCKED"]
+}

@@ -5,6 +5,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.24-alpha] — 2026-05-26
+
+### Added
+- **docs/FIRST_PRIVATE_SFT_RECORD.md** — Guide for registering a private SFT run without committing sensitive outputs; documents run_id, base model, dataset hash, training config, hardware/runtime summary, adapter manifest (local only), eval/compare summaries, preview gate state (BLOCKED), blocked actions, what can be committed, what must remain local
+- **training/templates/private_sft_run_record.template.json** — Committable template for private SFT run records; gate.state=BLOCKED, public_release_allowed=false, hf_upload_allowed=false; all real values replaced with PLACEHOLDER or null
+- **training/scripts/create_private_run_record.py** — CLI script to generate private SFT run records; --run-config, --manifest, --eval-summary, --compare-summary, --output, --dry-run, --json; computes SHA256 of manifest/summary files if they exist; rejects absolute home directory paths; gate always BLOCKED; works without PyYAML
+- **docs/SAFE_SCREENSHOT_CAPTURE.md** — Guide for capturing safe terminal screenshots; pre-capture checklist (clean terminal, no private paths, no tokens/secrets), during-capture guidelines (dark theme, readable font, consistent window size), post-capture review (secrets check, benchmark review, Kimari-4B status), recommended dimensions, allowed formats (PNG/WebP), naming convention, alt text requirements
+- **scripts/docs/generate_cli_screenshot_text.py** — CLI tool that generates safe text blocks for screenshot captures; supports --kind setup|optimize|preflight|training_preview|baseline_eval|postrun; --output for file writing; --json for structured output; no private paths, no tokens, no real benchmarks, no user-specific data
+- **docs/assets/screenshots/examples/** — 5 safe text example files (kimari-setup-json, kimari-preflight-private-sft, kimari-training-command-preview, kimari-baseline-eval-plan, kimari-postrun-dryrun); can be used as basis for generating real captures; no secrets, no private paths, no benchmarks
+
+### Changed
+- **Version bumped** to `0.1.24-alpha`
+- **README.md** — Added First Private Run Record section with links to template, script, and docs; added Safe Screenshot Capture link; added screenshot text examples reference; updated version badge and alpha notice
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.24-alpha; added private run record, safe screenshot capture, CLI screenshot text generator, screenshot text examples chips; added v0.1.24 status table rows; updated project status description
+- **docs/SCREENSHOTS.md** — Added Safe Screenshot Capture section with link to SAFE_SCREENSHOT_CAPTURE.md; added CLI Text Examples section with links to example files and generator command; added Replacing Placeholders section with 6-step process
+- **RELEASE_CHECKLIST.md** — Added v0.1.24 Checks section (19 items: run record docs, template, script, safe capture, text generator, examples, no secrets, no adapters, gate BLOCKED)
+- **scripts/release/check-release.py** — Expanded with v0.1.24 checks (FIRST_PRIVATE_SFT_RECORD, run record template JSON/gate/public_release/hf_upload, create_private_run_record, SAFE_SCREENSHOT_CAPTURE, generate_cli_screenshot_text, 5 screenshot example txt files, no secrets in examples, SCREENSHOTS.md references, README links, no oversized screenshots, no adapter/weights/GGUF, preview gate BLOCKED, no false claims)
+- **ROADMAP.md** — v0.1.23-alpha marked as Released; v0.1.24-alpha marked as Current; v0.1.25-alpha Planned (first private SFT execution, adapter manifest, sanitized eval summary, ORPO/DPO decision, reviewed screenshots)
+
 ## [0.1.23-alpha] — 2026-05-25
 
 ### Fixed

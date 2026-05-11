@@ -347,6 +347,28 @@ twine upload dist/*
 - [ ] `default_profile` is still `"test"`
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.24 Checks
+
+- [ ] docs/FIRST_PRIVATE_SFT_RECORD.md exists
+- [ ] training/templates/private_sft_run_record.template.json exists and parses as valid JSON
+- [ ] training/scripts/create_private_run_record.py exists and --dry-run --json works
+- [ ] Run record template has gate.state = "BLOCKED"
+- [ ] Run record template has public_release_allowed = false
+- [ ] Run record template has hf_upload_allowed = false
+- [ ] docs/SAFE_SCREENSHOT_CAPTURE.md exists
+- [ ] scripts/docs/generate_cli_screenshot_text.py exists and --kind setup --json works
+- [ ] docs/assets/screenshots/examples/*.txt exist (5 files)
+- [ ] Screenshot examples contain no token/password/api_key/private key patterns
+- [ ] docs/SCREENSHOTS.md references SAFE_SCREENSHOT_CAPTURE
+- [ ] docs/SCREENSHOTS.md references screenshot examples
+- [ ] README.md links to FIRST_PRIVATE_SFT_RECORD.md
+- [ ] README.md links to SAFE_SCREENSHOT_CAPTURE.md
+- [ ] No screenshots above reasonable size if images exist
+- [ ] No adapter/weights/GGUF tracked in git
+- [ ] Preview gate still BLOCKED
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)
