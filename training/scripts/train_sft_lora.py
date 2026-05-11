@@ -25,8 +25,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # ---------------------------------------------------------------------------
 # Dependency helpers
@@ -383,6 +386,52 @@ def estimate_steps(config: dict) -> int | None:
     return steps
 
 
+def is_gitignored(path: Path) -> bool:
+    """Check if a path is covered by .gitignore."""
+    try:
+        result = subprocess.run(
+            ["git", "check-ignore", str(path)],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=10,
+        )
+        return result.returncode == 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+
+    gitignore_path = PROJECT_ROOT / ".gitignore"
+    if not gitignore_path.exists():
+        return False
+
+    try:
+        gitignore_text = gitignore_path.read_text()
+    except OSError:
+        return False
+
+    try:
+        rel_path = path.relative_to(PROJECT_ROOT)
+    except ValueError:
+        rel_path = path
+
+    rel_str = str(rel_path)
+
+    for pattern in gitignore_text.splitlines():
+        pattern = pattern.strip()
+        if not pattern or pattern.startswith("#"):
+            continue
+        if pattern.endswith("/") and (rel_str.startswith(pattern) or rel_str.startswith(pattern.rstrip("/"))):
+            return True
+        if pattern.startswith("*."):
+            suffix = pattern[1:]
+            if rel_str.endswith(suffix):
+                return True
+        if rel_str == pattern or rel_str.startswith(pattern + "/"):
+            return True
+
+    return False
+
+
 def print_training_plan(config: dict) -> None:
     """Print a structured training plan with status for each config item."""
     items = validate_config_items(config)
@@ -471,6 +520,21 @@ def main() -> None:
         help="Validate config and show training plan without starting training. "
         "Does not require transformers/torch to be installed.",
     )
+    parser.add_argument(
+        "--print-command",
+        action="store_true",
+        help="Print the recommended training command and exit.",
+    )
+    parser.add_argument(
+        "--estimate-only",
+        action="store_true",
+        help="Print step estimation and exit (no full plan).",
+    )
+    parser.add_argument(
+        "--require-dataset",
+        action="store_true",
+        help="Fail if dataset_path does not exist on disk.",
+    )
 
     args = parser.parse_args()
 
@@ -481,9 +545,85 @@ def main() -> None:
     print(f"Loading config: {args.config}")
     config = load_config(args.config)
 
+    # --require-dataset: fail if dataset_path doesn't exist
+    if args.require_dataset:
+        dataset_path = config.get("dataset_path") or config.get("preference_dataset_path")
+        if not dataset_path or dataset_path == "TBD":
+            print(
+                "\nERROR: --require-dataset: No dataset_path specified or is TBD",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        dp = Path(dataset_path)
+        if not dp.is_absolute():
+            dp = PROJECT_ROOT / dp
+        if not dp.exists():
+            print(
+                f"\nERROR: --require-dataset: Dataset path does not exist: {dataset_path}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+    # --print-command: print the recommended training command and exit
+    if args.print_command:
+        config_path = Path(args.config).resolve()
+        cmd_parts = [
+            "python",
+            "training/scripts/train_sft_lora.py",
+            f"--config {config_path}",
+        ]
+        if config.get("output_dir"):
+            cmd_parts.append(f"# output_dir: {config['output_dir']}")
+        print("# Recommended training command:")
+        print(" \\\n  ".join(cmd_parts))
+        print()
+        print("# IMPORTANT: Real training must not run in CI.")
+        print("# Run manually on a GPU machine only.")
+        sys.exit(0)
+
+    # --estimate-only: print step estimation and exit
+    if args.estimate_only:
+        est = estimate_steps(config)
+        dataset_path = config.get("dataset_path") or config.get("preference_dataset_path")
+        num_records = count_dataset_records(dataset_path) if dataset_path and dataset_path != "TBD" else None
+        epochs = config.get("num_train_epochs")
+        batch_size = config.get("per_device_train_batch_size")
+        grad_accum = config.get("gradient_accumulation_steps")
+
+        est_info = {
+            "dataset_path": dataset_path,
+            "dataset_records": num_records,
+            "epochs": epochs,
+            "per_device_train_batch_size": batch_size,
+            "gradient_accumulation_steps": grad_accum,
+            "estimated_steps": est,
+        }
+        print(json.dumps(est_info, indent=2, default=str))
+        sys.exit(0)
+
     # Step 3: Print training plan with per-item status
     print()
     has_warnings, has_failures = print_training_plan(config)
+
+    # output_dir gitignored validation
+    output_dir = config.get("output_dir")
+    if output_dir:
+        od = Path(output_dir)
+        if not od.is_absolute():
+            od = PROJECT_ROOT / od
+        try:
+            inside_repo = PROJECT_ROOT in od.resolve().parents or od.resolve() == PROJECT_ROOT
+        except (ValueError, OSError):
+            inside_repo = False
+        if inside_repo:
+            if is_gitignored(od):
+                print(f"  \u2713 output_dir is gitignored: {output_dir}")
+            else:
+                print(
+                    f"  \u26a0 WARNING: output_dir {output_dir} is inside the repo but NOT gitignored. "
+                    "Training artifacts could be committed!",
+                    file=sys.stderr,
+                )
 
     # -------------------------------------------------------------------
     # --dry-run path: validate config, show plan, then exit 0
@@ -537,7 +677,7 @@ def main() -> None:
         file=sys.stderr,
     )
     print(
-        "   Training should NOT run in CI.",
+        "   Real training must not run in CI.",
         file=sys.stderr,
     )
     print(

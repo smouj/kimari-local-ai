@@ -252,7 +252,7 @@
 - ✅ Compare runs tool (baseline vs adapter)
 - ✅ .gitignore updated for training artifacts
 
-## v0.1.21-alpha (Current)
+## v0.1.21-alpha (Released)
 
 - ✅ Adapter manifest template (training/templates/adapter_manifest.template.yaml)
 - ✅ Adapter manifest creation script (training/scripts/create_adapter_manifest.py)
@@ -264,14 +264,29 @@
 - ✅ Compare runs improvements (verdict, summary-output)
 - ✅ Release-check improvements
 
-## v0.1.22-alpha (Planned)
+## v0.1.22-alpha (Current)
 
-- Execute first private SFT outside CI
-- Record adapter manifest locally
+- ✅ Remote GPU execution guide (RunPod / local GPU)
+- ✅ Training requirements (separated dependencies)
+- ✅ Preflight script (check SFT readiness)
+- ✅ Postrun script (orchestrate post-training steps)
+- ✅ Private execution config template
+- ✅ Private run artifacts policy (what stays local vs committed)
+- ✅ Private run failures troubleshooting
+- ✅ Training command preview script
+- ✅ Baseline eval plan script
+- ✅ Adapter eval plan script
+- ✅ train_sft_lora.py improvements (--print-command, --estimate-only, --require-dataset)
+- ✅ Release-check improvements
+
+## v0.1.23-alpha (Planned)
+
+- Execute first private SFT manually
+- Capture manifest locally
 - Run baseline and adapter eval
-- Produce private eval summary
+- Create sanitized eval summary
 - Decide ORPO/DPO next step
-- Prepare HF docs-only placeholder if gate allows
+- Prepare docs-only HF placeholder if gate allows
 
 ## v0.2.0-alpha
 

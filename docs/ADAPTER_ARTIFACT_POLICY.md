@@ -245,6 +245,27 @@ If the adapter needs to be transferred to another machine for evaluation:
 
 ---
 
+## v0.1.22-alpha Additions
+
+The following references were introduced in v0.1.22-alpha to strengthen artifact handling and post-run orchestration:
+
+- **[docs/PRIVATE_RUN_ARTIFACTS.md](PRIVATE_RUN_ARTIFACTS.md)** — Provides detailed classification of all artifacts produced by private training runs, including which artifacts are safe to commit, which must remain local, and how to handle edge cases. Refer to this document for the definitive artifact classification beyond the summary tables in this policy.
+
+- **[`training/scripts/postrun_private_sft.py`](../training/scripts/postrun_private_sft.py)** — Orchestrates post-training steps including eval execution, summary generation, manifest creation, and ORPO decision checks. This script helps enforce the artifact policy automatically after a training run completes.
+
+### Pre-commit Checklist for Summaries
+
+Before committing any eval summary or adapter metadata to the repository, verify **all** of the following:
+
+- [ ] **No raw prompts** — Summary must not contain prompt text from the evaluation suite
+- [ ] **No local paths** — No absolute paths (e.g., `/home/user/…`) or machine-specific directory references
+- [ ] **No tokens or secrets** — No API keys, auth tokens, or credentials of any kind
+- [ ] **No unreviewed benchmark claims** — All scores must be marked `manual_review_required` until a human has reviewed and approved them
+
+If any of these checks fail, do **not** commit the file. Sanitize or regenerate the summary first.
+
+---
+
 ## Related Documents
 
 | Document | Relationship |
@@ -256,6 +277,7 @@ If the adapter needs to be transferred to another machine for evaluation:
 | [MODEL_HASHING.md](MODEL_HASHING.md) | SHA-256 hash procedures for model files |
 | [HUGGINGFACE_RELEASE.md](HUGGINGFACE_RELEASE.md) | Full release process for when public release is authorized |
 | [HF_PLACEHOLDER_PLAN.md](HF_PLACEHOLDER_PLAN.md) | Plan for Hugging Face placeholder repository |
+| [PRIVATE_RUN_ARTIFACTS.md](PRIVATE_RUN_ARTIFACTS.md) | Detailed artifact classification for private training runs |
 | [training/templates/adapter_manifest.template.yaml](../training/templates/adapter_manifest.template.yaml) | Template for adapter manifest creation |
 
 ---

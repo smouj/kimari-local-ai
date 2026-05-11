@@ -1002,3 +1002,269 @@ Stage Summary:
 - tests/test_release_v0121.py created with 23 comprehensive tests
 - All 23 tests passing
 - check-release.py: 49/49 categories all passed
+
+
+---
+Task ID: 2-3-6-7-8
+Agent: Docs Agent
+Task: Create v0.1.22-alpha remote GPU training guide, training requirements, execution config, private run artifacts guide, and failure troubleshooting
+
+Work Log:
+- Read worklog.md to understand project history (v0.1.21-alpha, extensive training infrastructure docs)
+- Read existing related docs: PRIVATE_EVAL_RESULTS_POLICY.md, PRIVATE_TRAINING_RUNBOOK.md, FIRST_PRIVATE_TRAINING_RUN.md, ADAPTER_ARTIFACT_POLICY.md, ADAPTER_PREVIEW_GATE.md, SFT_TO_ORPO_DECISION.md, PRIVATE_SFT_EXECUTION_CHECKLIST.md
+- Read existing configs: training/configs/private_sft_run.v0.yaml, training/configs/kimari_sft_lora.v0.example.yaml
+- Created docs/REMOTE_GPU_RUNPOD_GUIDE.md (~300 lines):
+  - Recommended GPU types table (RTX 4090, L40S, A100, RTX 3090, RTX 4080) with costs
+  - Expected VRAM usage table for SmolLM3-3B with LoRA/QLoRA configurations
+  - Python 3.10+ setup with version verification
+  - Virtual environment creation (isolated .venv-training)
+  - PyTorch CUDA installation with index-url guidance
+  - Repo + training extras installation
+  - HF cache configuration outside repo (HF_HOME on persistent storage)
+  - Dataset v0 build procedure
+  - Dry-run validation (validate_training_ready, train_sft_lora --dry-run, preflight_private_sft)
+  - Real training execution with monitoring guidance
+  - Post-run validation (postrun_private_sft, adapter manifest, hashes)
+  - Explicit DO NOT upload to HF and DO NOT commit outputs sections
+  - Sanitized manifest/eval summary copy procedures
+  - Pre-flight and post-run scripts reference table
+  - Storage and cost estimates with tables
+  - 10 safety reminders throughout
+  - Termination checklist
+  - Full cross-references to related docs
+- Created training/requirements-training.txt (~55 lines):
+  - 10 training dependencies with pinned minimum versions
+  - Per-dependency comments explaining purpose and why separated from runtime
+  - torch, transformers, datasets, accelerate, peft, trl, safetensors, pyyaml, sentencepiece, protobuf
+  - Header comments explaining separation rationale, version pinning note, CI exclusion
+- Created training/configs/private_sft_execution.example.yaml:
+  - Provider, GPU type, VRAM configuration
+  - HF cache, output dir, dataset build dir settings
+  - Required environment variables list
+  - 6 command definitions (build_dataset, preflight, train, eval_baseline, eval_adapter, postrun)
+  - Notes with safety reminders and cross-reference
+- Created docs/PRIVATE_RUN_ARTIFACTS.md (~230 lines):
+  - Files that stay local only (NEVER commit): adapter weights, checkpoints, optimizer states, raw eval outputs, TensorBoard, WandB, merged models, GGUF exports (12 items with gitignore patterns)
+  - Files that CAN be committed with conditions: MANIFEST.yaml, eval_summary.json, compare_summary.json, adapter_config.json (with per-field conditions)
+  - Detailed sanitization procedures for each committable file type
+  - Pre-commit review checklist (13 items)
+  - Quick verification commands (git diff --cached checks)
+  - Accidental commit recovery procedure
+  - Reference to PRIVATE_EVAL_RESULTS_POLICY.md with key principles
+  - Summary table of all artifacts
+- Created docs/PRIVATE_RUN_FAILURES.md (~350 lines):
+  - 10 failure modes each with Symptom/Cause/Fix/Prevention:
+    1. OOM during training (5 causes, 5 immediate fixes, monitoring tips)
+    2. CUDA unavailable (6 causes, RunPod-specific fixes)
+    3. Tokenizer load failure (7 causes, pre-download verification)
+    4. Dataset validation failure (6 causes, rebuild procedure)
+    5. PEFT/TRL version mismatch (5 causes, fresh venv procedure)
+    6. Eval endpoint unavailable (6 causes, llama-server restart)
+    7. Adapter manifest hash mismatch (6 causes, integrity verification)
+    8. Accidental raw outputs committed (6 causes, not-yet-pushed and already-pushed recovery)
+    9. How to abort and keep gate BLOCKED (abort conditions, safe abort procedure, post-abort actions)
+    10. Recovery procedures (5 scenarios: interrupted, bad results, sensitive data, hash mismatch, instance expired)
+  - Quick reference table: Failure → Gate State → Can Resume → Must Re-run
+  - All failures keep gate BLOCKED
+
+Stage Summary:
+- 5 files created for v0.1.22-alpha
+- docs/REMOTE_GPU_RUNPOD_GUIDE.md: Complete RunPod/remote GPU guide with GPU recommendations, VRAM estimates, step-by-step setup, safety throughout
+- training/requirements-training.txt: 10 training deps separated from runtime with rationale
+- training/configs/private_sft_execution.example.yaml: Execution config template for remote/local GPU
+- docs/PRIVATE_RUN_ARTIFACTS.md: Clear local-only vs committable classification with sanitization procedures
+- docs/PRIVATE_RUN_FAILURES.md: 10 failure modes with Symptom/Cause/Fix/Prevention + 5 recovery scenarios
+- All documents cross-reference existing project docs (ADAPTER_ARTIFACT_POLICY, ADAPTER_PREVIEW_GATE, PRIVATE_EVAL_RESULTS_POLICY, etc.)
+- All safety rules followed: no weights committed, no HF upload, gate stays BLOCKED, no false claims, no private data
+
+---
+Task ID: 4-5-9-10-11-12
+Agent: Main Agent
+Task: Create 5 new Python scripts and improve train_sft_lora.py for v0.1.22-alpha
+
+Work Log:
+- Read worklog.md to understand project history (v0.1.21-alpha, private SFT pipeline)
+- Read existing scripts (train_sft_lora.py, create_adapter_manifest.py, create_eval_summary.py, compare_runs.py, run_private_sft_dryrun.py, validate_training_ready.py) to understand patterns
+- Read configs (private_sft_run.v0.yaml, kimari_sft_lora.v0.example.yaml) for integration
+- Read eval/kimarifit_prompts.jsonl to understand prompt structure (35 prompts, 10 categories)
+
+Created 5 new scripts:
+1. training/scripts/preflight_private_sft.py — CLI preflight check for private SFT readiness
+   - Checks: Python >= 3.10, torch (graceful), CUDA (if torch), transformers/peft/trl/accelerate, dataset build, output_dir gitignored, public_release_allowed=false, hf_upload_allowed=false, preview gate BLOCKED, no GGUF/adapters in git
+   - --strict flag fails if torch not installed; non-strict exits 1 only for safety-critical failures
+   - --json output with per-check status
+   - Works WITHOUT torch installed (try/except, no top-level imports)
+
+2. training/scripts/postrun_private_sft.py — CLI post-training orchestration
+   - Calls create_adapter_manifest, create_eval_summary, compare_runs (if baseline), verify gate BLOCKED
+   - Dry-run by default (--no-dry-run for real execution)
+   - Suggests next steps, never commits anything
+   - --json output with step results
+
+3. training/scripts/run_training_command_preview.py — CLI for training command preview
+   - recommended_command, recommended_environment (GPU requirements), expected_outputs
+   - forbidden_commit_patterns (*.safetensors, *.bin, *.pt, *.ckpt, *.gguf, wandb/, runs/)
+   - safety_warnings (8 warnings)
+   - Reads config, no training/downloads
+
+4. eval/scripts/run_baseline_eval_plan.py — CLI for baseline eval planning
+   - model_label, prompts_path, prompt_count, categories, recommended_endpoint, recommended_output
+   - score_status: manual_review_required
+   - 6 steps with commands, dry-run by default
+   - Recommended output: eval/results/baseline-smollm3-base-private.json
+
+5. eval/scripts/run_adapter_eval_plan.py — CLI for adapter eval planning
+   - Same structure as baseline, plus baseline_available check and compare_with_baseline step
+   - 9 steps including merge_adapter, check_safety, compare_with_baseline
+   - Recommended output: eval/results/adapter-kimari-smollm3-sft-v0-private.json
+
+Improved train_sft_lora.py with 4 new CLI flags:
+- --print-command: prints recommended training command and exits
+- --estimate-only: prints step estimation JSON and exits (no full plan)
+- --require-dataset: fails if dataset_path doesn't exist on disk
+- output_dir gitignored validation: checks if output_dir inside repo is gitignored, warns if not
+- Clear warning: "Real training must not run in CI"
+
+All scripts:
+- Use `from __future__ import annotations`
+- Use argparse for CLI
+- Support --json output
+- Never hardcode secrets
+- Work in CI without torch installed
+- Use pyyaml with simple fallback parser
+- Pass ruff check (target py310, line-length 120, select E/F/W/I/N/UP/B/SIM, ignore E501)
+- Pass ruff format --check
+- Pass py_compile
+
+Stage Summary:
+- 5 new scripts created, 1 existing script improved
+- All scripts tested with --json and human-readable output
+- ruff check + format: ALL PASSED
+- py_compile: ALL PASSED
+- No real training, no model downloads, no HF uploads
+- All safety rules followed: no weights committed, gate stays BLOCKED, no false claims
+
+---
+Task ID: 15
+Agent: Main Agent
+Task: Update RELEASE_CHECKLIST.md and scripts/release/check-release.py for v0.1.22-alpha
+
+Work Log:
+- Read worklog.md to understand project history and prior work
+- Read current RELEASE_CHECKLIST.md — identified insertion point before "## Post-Release" section
+- Read current check-release.py — identified 49 sections with [1/49] to [49/49] counters
+- Added "## v0.1.22 Checks" section to RELEASE_CHECKLIST.md with 16 checklist items:
+  - docs/REMOTE_GPU_RUNPOD_GUIDE.md exists
+  - training/requirements-training.txt exists
+  - training/scripts/preflight_private_sft.py exists and --json works without torch
+  - training/scripts/postrun_private_sft.py exists and --dry-run --json works with fake paths
+  - training/configs/private_sft_execution.example.yaml exists
+  - docs/PRIVATE_RUN_ARTIFACTS.md exists
+  - docs/PRIVATE_RUN_FAILURES.md exists
+  - training/scripts/run_training_command_preview.py exists and --json works
+  - eval/scripts/run_baseline_eval_plan.py exists and --dry-run --json works
+  - eval/scripts/run_adapter_eval_plan.py exists and --dry-run --json works
+  - train_sft_lora.py supports --print-command and --estimate-only
+  - No training outputs committed
+  - No adapter/weight files tracked in git
+  - Preview gate still BLOCKED
+  - default_profile is still "test"
+  - No "Kimari-4B released" false claim anywhere
+- Updated scripts/release/check-release.py:
+  - Replaced all /49] with /50] in print() statements (replace_all)
+  - Added new [50/50] v0.1.22 private SFT execution package section with checks for:
+    - docs/REMOTE_GPU_RUNPOD_GUIDE.md exists
+    - training/requirements-training.txt exists
+    - training/scripts/preflight_private_sft.py exists
+    - training/scripts/postrun_private_sft.py exists
+    - training/configs/private_sft_execution.example.yaml exists
+    - docs/PRIVATE_RUN_ARTIFACTS.md exists
+    - docs/PRIVATE_RUN_FAILURES.md exists
+    - training/scripts/run_training_command_preview.py exists
+    - eval/scripts/run_baseline_eval_plan.py exists
+    - eval/scripts/run_adapter_eval_plan.py exists
+    - train_sft_lora.py supports --print-command and --estimate-only
+    - No adapter/weights/GGUF tracked in git (re-check)
+    - Preview gate still BLOCKED (re-check in ADAPTER_PREVIEW_GATE.md)
+    - No "Kimari-4B released" false claim (re-check)
+- Verified no remaining /49] references in check-release.py (0 occurrences)
+- Verified all 50 section counters present ([1/50] through [50/50])
+- Verified Python syntax with py_compile — OK
+
+Stage Summary:
+- RELEASE_CHECKLIST.md: Added v0.1.22 Checks section with 16 items before Post-Release
+- scripts/release/check-release.py: Section counters updated from /49] to /50], new [50/50] section added
+- 2 files changed
+- All syntax checks passed
+
+---
+Task ID: 13
+Agent: Docs Agent
+Task: Update existing documentation files for v0.1.22-alpha — add v0.1.22-alpha Additions sections
+
+Work Log:
+- Read worklog.md to understand project history and prior agent work
+- Read all four target documentation files to understand current content and structure
+- Updated docs/PRIVATE_TRAINING_RUNBOOK.md:
+  - Added "v0.1.22-alpha Additions" section before "Related Documents" with table of 6 new scripts/guides (preflight_private_sft.py, run_training_command_preview.py, run_baseline_eval_plan.py, run_adapter_eval_plan.py, postrun_private_sft.py, REMOTE_GPU_RUNPOD_GUIDE.md)
+  - Added 3 new entries to "Related Documents" table: REMOTE_GPU_RUNPOD_GUIDE.md, PRIVATE_RUN_ARTIFACTS.md, PRIVATE_RUN_FAILURES.md
+- Updated docs/ADAPTER_ARTIFACT_POLICY.md:
+  - Added "v0.1.22-alpha Additions" section before "Related Documents" with references to PRIVATE_RUN_ARTIFACTS.md and postrun_private_sft.py
+  - Added "Pre-commit Checklist for Summaries" subsection with 4 checklist items (no raw prompts, no local paths, no tokens, no unreviewed benchmark claims)
+  - Added 1 new entry to "Related Documents" table: PRIVATE_RUN_ARTIFACTS.md
+- Updated docs/BASELINE_EVAL_PLAN.md:
+  - Added "v0.1.22-alpha Additions" section before "Related Documents" with table of 2 new CLI tools (run_baseline_eval_plan.py, run_adapter_eval_plan.py)
+  - Documented --dry-run and --json flags for both scripts
+  - Added "Post-evaluation Comparison" subsection with compare_runs.py --summary-output example
+- Updated docs/SFT_TO_ORPO_DECISION.md:
+  - Added "v0.1.22-alpha Additions" section before "Related Documents" with 4 safeguard items
+  - Documented ORPO decision deferred until postrun summary reviewed
+  - Documented manual_review_required=true blocks automatic ORPO proceed
+  - Documented safety_regression_detected=true blocks ORPO
+  - Referenced postrun_private_sft.py for post-training evaluation orchestration
+
+Stage Summary:
+- 4 documentation files updated with v0.1.22-alpha Additions sections
+- All additions properly formatted Markdown integrating smoothly with existing content
+- Related Documents tables updated with new cross-references
+- No code changes, no test changes — documentation only
+
+---
+Task ID: v0.1.22-alpha-implementation
+Agent: Main Agent
+Task: Implement v0.1.22-alpha of Kimari Local AI — Private SFT execution package
+
+Work Log:
+- Version bumped to 0.1.22-alpha in pyproject.toml, kimari/__init__.py, README.md, docs/index.html, MODEL_CARD.md, CHANGELOG.md, ROADMAP.md, docs/PUBLISHING.md
+- Created docs/REMOTE_GPU_RUNPOD_GUIDE.md — RunPod/GPU execution guide with GPU recommendations, VRAM estimates, step-by-step setup, safety reminders
+- Created training/requirements-training.txt — Separated training dependencies (torch, transformers, peft, trl, accelerate, datasets, etc.)
+- Created training/scripts/preflight_private_sft.py — CLI preflight check for SFT readiness, works without torch, --strict mode, --json
+- Created training/scripts/postrun_private_sft.py — CLI post-training orchestration, dry-run by default, --json
+- Created training/configs/private_sft_execution.example.yaml — Execution config template for remote/local GPU
+- Created docs/PRIVATE_RUN_ARTIFACTS.md — Classification of what stays local vs what can be committed
+- Created docs/PRIVATE_RUN_FAILURES.md — Troubleshooting guide for 10 failure modes
+- Created training/scripts/run_training_command_preview.py — CLI for training command preview, --json
+- Created eval/scripts/run_baseline_eval_plan.py — CLI for baseline eval planning, --dry-run, --json
+- Created eval/scripts/run_adapter_eval_plan.py — CLI for adapter eval planning, --dry-run, --json
+- Improved training/scripts/train_sft_lora.py — Added --print-command, --estimate-only, --require-dataset, output_dir gitignored validation
+- Updated docs/PRIVATE_TRAINING_RUNBOOK.md — Added v0.1.22 references to preflight, postrun, eval plans, remote GPU guide
+- Updated docs/ADAPTER_ARTIFACT_POLICY.md — Added PRIVATE_RUN_ARTIFACTS.md, postrun script, pre-commit checklist
+- Updated docs/BASELINE_EVAL_PLAN.md — Added baseline/adapter eval plan scripts, compare_runs comparison
+- Updated docs/SFT_TO_ORPO_DECISION.md — Added ORPO decision deferred until postrun, manual_review_required blocks ORPO, safety_regression blocks ORPO
+- Updated RELEASE_CHECKLIST.md — Added v0.1.22 Checks section
+- Updated scripts/release/check-release.py — Added v0.1.22 section (50/50) with all new file checks
+- Created tests/test_release_v0122.py — Comprehensive tests for all v0.1.22 artifacts
+- Fixed version assertions in older test files (0111-0120) to match current 0.1.22-alpha
+- Fixed false claim self-detection in test_release_v0119.py
+- All validations passed: pytest (all tests), ruff check, ruff format, check-release.py (50/50 checks OK)
+
+Stage Summary:
+- Version: 0.1.22-alpha
+- 11 new files created, 12+ files updated
+- All 50 release checks pass
+- All tests pass
+- Ruff lint and format pass
+- All new CLIs tested and working
+- Preview gate remains BLOCKED
+- No weights, adapters, GGUF, or checkpoints tracked
+- No false claims about Kimari-4B

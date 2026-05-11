@@ -137,6 +137,20 @@ Preference tuning (ORPO or DPO) is not a solution for:
 
 ---
 
+## v0.1.22-alpha Additions
+
+The following safeguards were introduced in v0.1.22-alpha to prevent premature or unsafe ORPO transitions:
+
+- **ORPO decision is deferred until postrun summary is reviewed.** The post-training orchestration script (`training/scripts/postrun_private_sft.py`) produces a structured summary that must be reviewed by a human before any ORPO proceed decision is made. There is no automatic transition from SFT completion to ORPO launch.
+
+- **If `manual_review_required=true` in the eval summary, no automatic ORPO proceed.** When the evaluation summary indicates that manual review has not been completed, the ORPO decision is held regardless of how favorable the numeric scores appear. A human must explicitly review and clear the flag before ORPO can be considered.
+
+- **If `safety_regression_detected=true` in the eval summary, ORPO is blocked.** Any detected safety regression is a hard block on proceeding to ORPO. The SFT data, config, and training pipeline must be investigated and the regression resolved before the ORPO decision can be revisited.
+
+- **`postrun_private_sft.py` can orchestrate post-training evaluation.** This script automates the sequence of post-SFT steps (eval execution, summary generation, manifest creation, ORPO decision check) and enforces the gates described above. It does **not** bypass any decision — it surfaces the data needed for a human decision.
+
+---
+
 ## Related Documents
 
 | Document | Relationship |
