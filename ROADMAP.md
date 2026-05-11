@@ -289,7 +289,7 @@
 - ✅ README and GitHub Pages screenshots section
 - ✅ Release-check improvements
 
-## v0.1.24-alpha (Current)
+## v0.1.24-alpha (Released)
 
 - ✅ Private SFT run record documentation (docs/FIRST_PRIVATE_SFT_RECORD.md)
 - ✅ Private run record template (training/templates/private_sft_run_record.template.json)
@@ -300,14 +300,24 @@
 - ✅ Release-check improvements
 - ✅ Tests for v0.1.24 artifacts
 
-## v0.1.25-alpha (Planned)
+## v0.1.25-alpha (Current)
+
+- ✅ HF token safety guide (docs/HF_TOKEN_SAFETY.md)
+- ✅ Secret scanner script (scripts/security/scan_for_secrets.py)
+- ✅ Private run record hardening (more path rejection, suspicious string detection, security_scan_status)
+- ✅ Screenshot command cleanup (SAFE_SCREENSHOT_CAPTURE.md uses real commands)
+- ✅ Private SFT handoff guide (docs/FIRST_PRIVATE_SFT_HANDOFF.md)
+- ✅ Private SFT run commands guide (docs/PRIVATE_SFT_RUN_COMMANDS.md)
+- ✅ Release-check improvements
+- ✅ Tests for v0.1.25 artifacts
+
+## v0.1.26-alpha (Planned)
 
 - Execute first private SFT manually outside CI
+- Run secret scanner on handoff artifacts
 - Create local adapter manifest
-- Generate private run record
-- Generate sanitized eval summary
+- Produce sanitized eval summary
 - Decide ORPO/DPO next step
-- Optionally replace text examples with reviewed screenshots
 
 ## v0.2.0-alpha
 

@@ -46,6 +46,19 @@ DEFAULT_OUTPUT = Path("/tmp/private_run_record.json")
 
 # Pattern for absolute home directory paths like /home/username/...
 _HOME_DIR_PATTERN = re.compile(r"^/home/[^/]+/")
+# Pattern for macOS home directory paths like /Users/username/...
+_MACOS_HOME_PATTERN = re.compile(r"^/Users/[^/]+/")
+# Pattern for Windows user paths like C:\Users\username\
+_WINDOWS_USER_PATTERN = re.compile(r"^[Cc]:[\\/]Users[\\/][^\\/]+[\\/]")
+
+# Suspicious strings that should never appear in summaries
+_SUSPICIOUS_PATTERNS = [
+    (re.compile(r"hf_[a-zA-Z0-9]{20,}", re.IGNORECASE), "HF token pattern (hf_...)"),
+    (re.compile(r"api_key", re.IGNORECASE), "api_key string"),
+    (re.compile(r"password", re.IGNORECASE), "password string"),
+    (re.compile(r"token\s*=\s*['\"]", re.IGNORECASE), "token assignment"),
+    (re.compile(r"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"), "Private key (PEM)"),
+]
 
 
 # ---------------------------------------------------------------------------
@@ -173,13 +186,31 @@ def is_rejectable_home_path(path: Path | None) -> bool:
     """Reject paths that look like absolute home directory paths.
 
     E.g. /home/username/something is rejected.
+    /Users/username/something is rejected (macOS).
+    C:\\Users\\username\\something is rejected (Windows).
     /tmp/output.json is fine.
     Relative paths are fine.
     """
     if path is None:
         return False
     path_str = str(path)
-    return bool(_HOME_DIR_PATTERN.match(path_str))
+    if _HOME_DIR_PATTERN.match(path_str):
+        return True
+    if _MACOS_HOME_PATTERN.match(path_str):
+        return True
+    return bool(_WINDOWS_USER_PATTERN.match(path_str))
+
+
+def scan_text_for_suspicious(text: str) -> list[str]:
+    """Scan text content for suspicious patterns like tokens, API keys, passwords.
+
+    Returns a list of warning messages for any detected patterns.
+    """
+    warnings: list[str] = []
+    for pattern, name in _SUSPICIOUS_PATTERNS:
+        if pattern.search(text):
+            warnings.append(f"Suspicious pattern detected: {name}")
+    return warnings
 
 
 def validate_paths(**paths: Path | None) -> list[str]:
@@ -218,11 +249,10 @@ def build_run_record(
 
     # Load run config
     config: dict = {}
-    if run_config_path.exists() or dry_run:
-        if run_config_path.exists():
-            parsed = parse_simple_yaml(run_config_path)
-            if parsed and isinstance(parsed, dict):
-                config = parsed
+    if run_config_path.exists():
+        parsed = parse_simple_yaml(run_config_path)
+        if parsed and isinstance(parsed, dict):
+            config = parsed
 
     # Compute SHA-256 of manifest / eval-summary / compare-summary if they exist
     manifest_info = sha256_if_exists(manifest_path, dry_run)
@@ -251,6 +281,15 @@ def build_run_record(
         dataset_build_dir = config.get("dataset_build_dir", "")
         if dataset_build_dir:
             dataset_id = Path(dataset_build_dir).name
+
+    # Scan summaries for suspicious patterns
+    security_warnings: list[str] = []
+    if eval_data is not None:
+        eval_text = json.dumps(eval_data)
+        security_warnings.extend(scan_text_for_suspicious(eval_text))
+    if compare_data is not None:
+        compare_text = json.dumps(compare_data)
+        security_warnings.extend(scan_text_for_suspicious(compare_text))
 
     # Build the run record
     record: dict = {
@@ -282,6 +321,9 @@ def build_run_record(
         "preview_gate_state": "BLOCKED",
         "public_release_allowed": False,
         "hf_upload_allowed": False,
+        # Security scan
+        "security_scan_status": "clean" if not security_warnings else "suspicious_patterns_detected",
+        "security_scan_warnings": security_warnings if security_warnings else [],
         # Metadata
         "eval_plan": config.get("eval_plan", ""),
         "artifact_policy": config.get("artifact_policy", ""),
@@ -383,6 +425,15 @@ def main() -> None:
 
     # Format as JSON
     record_json = json.dumps(record, indent=2, default=str)
+
+    # Print security warnings if any
+    if record.get("security_scan_warnings"):
+        for w in record["security_scan_warnings"]:
+            print(f"WARNING: {w}", file=sys.stderr)
+        if not args.dry_run:
+            print("ERROR: Suspicious patterns detected in summaries — review before writing.", file=sys.stderr)
+            if not args.json_output:
+                sys.exit(1)
 
     if args.dry_run and not args.json_output:
         print("=== DRY-RUN: would generate the following run record ===")

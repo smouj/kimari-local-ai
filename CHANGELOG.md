@@ -5,7 +5,24 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.24-alpha] — 2026-05-26
+## [0.1.25-alpha] — 2026-05-27
+
+### Added
+- **docs/HF_TOKEN_SAFETY.md** — Comprehensive guide for safe Hugging Face token handling; never paste tokens in chat/issues/commits/logs/screenshots; use environment variables; tokens of minimum privilege; revoke exposed tokens immediately; use `huggingface-cli login` only in secure local environment; don't save tokens in the repo; don't include tokens in screenshots; don't upload anything to HF until preview gate allows; detecting committed tokens via scan_for_secrets.py; what to do if a token is accidentally committed
+- **scripts/security/scan_for_secrets.py** — CLI secret scanner that searches for HF tokens (hf_...), OpenAI API keys (sk-...), api_key assignments, password assignments, token assignments, private keys (PEM), AWS access keys, Bearer tokens in headers, and sensitive paths (/home/username/, /Users/username/, C:\Users\username\); --paths for file/directory scanning; --json for structured output; supports documented false positives via inline markers; no external dependencies
+- **docs/FIRST_PRIVATE_SFT_HANDOFF.md** — Guide for bringing sanitized results from RunPod/local GPU to the repo; what can be committed (reviewed manifest, eval summary, compare summary, private run record, screenshots); what must remain local (adapters, checkpoints, GGUF, raw outputs); handoff process with security checklist; secret scanning before commit; review checklist; emergency procedures for accidental commits
+- **docs/PRIVATE_SFT_RUN_COMMANDS.md** — Guide listing all expected commands for first private SFT execution; setup env, build dataset, preflight, training command preview, real training command, baseline eval, adapter eval, create manifest, create eval summary, create private run record, scan secrets; each command with safe placeholders, description, and safety notes
+
+### Changed
+- **Version bumped** to `0.1.25-alpha`
+- **training/scripts/create_private_run_record.py** — Hardened with expanded path rejection (Linux /home/username/, macOS /Users/username/, Windows C:\Users\username\); added suspicious string detection in summaries (hf_ tokens, api_key, password, token assignments, private keys); added `security_scan_status` field to output record (clean/suspicious_patterns_detected); added `security_scan_warnings` list; rejects writes when suspicious patterns detected (dry-run still outputs JSON)
+- **docs/SAFE_SCREENSHOT_CAPTURE.md** — Updated naming examples to use real Kimari commands (kimari setup --json, kimari optimize --profile test --json, kimari start --dry-run, kimari api --dry-run, preflight/postrun scripts) instead of non-existent ones; added HF_TOKEN_SAFETY reference in rules summary
+- **docs/SCREENSHOTS.md** — Added HF_TOKEN_SAFETY reference in safe screenshot capture section
+- **README.md** — Added HF Token Safety Guide link; added Private SFT Handoff link; added Private SFT Run Commands link; added Secret Hygiene section with scan command; updated version to v0.1.25-alpha
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.25-alpha; added HF token safety, secret scanner, private run record hardening, secure local result handoff chips; updated status table with v0.1.25 entries
+- **RELEASE_CHECKLIST.md** — Added v0.1.25 Checks section (19 items: HF_TOKEN_SAFETY, scan_for_secrets, FIRST_PRIVATE_SFT_HANDOFF, PRIVATE_SFT_RUN_COMMANDS, path rejection for Linux/macOS/Windows, suspicious pattern detection, security_scan_status, real commands in screenshots, HF_TOKEN_SAFETY references, README links, no HF tokens in repo, no weights, gate BLOCKED)
+- **scripts/release/check-release.py** — Added section [51/51] v0.1.25 secret hygiene & secure handoff checks; HF_TOKEN_SAFETY.md exists; scan_for_secrets.py exists; FIRST_PRIVATE_SFT_HANDOFF.md exists; PRIVATE_SFT_RUN_COMMANDS.md exists; create_private_run_record.py has security_scan_status and suspicious pattern detection; SAFE_SCREENSHOT_CAPTURE.md references HF_TOKEN_SAFETY; SCREENSHOTS.md references HF_TOKEN_SAFETY; README links to new docs; no real HF token in README/CHANGELOG; no adapter/weights/GGUF tracked; default_profile=test; gate BLOCKED
+- **ROADMAP.md** — v0.1.24-alpha marked as Released; v0.1.25-alpha marked as Current; v0.1.26-alpha Planned (execute first private SFT manually, run secret scanner on handoff, create local adapter manifest, produce sanitized eval summary, decide ORPO/DPO next step)
 
 ### Added
 - **docs/FIRST_PRIVATE_SFT_RECORD.md** — Guide for registering a private SFT run without committing sensitive outputs; documents run_id, base model, dataset hash, training config, hardware/runtime summary, adapter manifest (local only), eval/compare summaries, preview gate state (BLOCKED), blocked actions, what can be committed, what must remain local

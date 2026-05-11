@@ -90,9 +90,11 @@ kimari-<command>.png
 Examples:
 
 - `kimari-setup-json.png` — output of `kimari setup --json`
-- `kimari-run-inference.png` — output of `kimari run`
-- `kimari-profile-list.png` — output of `kimari profile list`
-- `kimari-serve-health.png` — output of `kimari serve` health check
+- `kimari-optimize-json.png` — output of `kimari optimize --profile test --json`
+- `kimari-start-dryrun.png` — output of `kimari start --dry-run`
+- `kimari-api-dryrun.png` — output of `kimari api --dry-run`
+- `kimari-preflight-json.png` — output of `python training/scripts/preflight_private_sft.py --json`
+- `kimari-postrun-dryrun.png` — output of `python training/scripts/postrun_private_sft.py --dry-run --json`
 
 Use lowercase, hyphen-separated words. The command segment should match the CLI command being demonstrated.
 
@@ -135,3 +137,4 @@ Once an image is in git history, even deleted in a future commit, the data persi
 | No unreviewed benchmark claims | Any score or metric is a claim; review first |
 | Kimari-4B not released | Do not present Kimari-4B as published or available |
 | No fake UI | Only capture real, working interfaces — no mockups presented as real |
+| No HF tokens | See [HF Token Safety](HF_TOKEN_SAFETY.md) for token handling guidelines |

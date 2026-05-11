@@ -163,6 +163,7 @@ Before capturing terminal screenshots, review the [Safe Screenshot Capture Guide
 - Avoiding tokens and secrets in screenshots
 - No raw eval outputs
 - No unreviewed benchmarks
+- No HF tokens (see [HF Token Safety](HF_TOKEN_SAFETY.md))
 
 Always review screenshots before committing.
 

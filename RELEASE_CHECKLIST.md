@@ -369,6 +369,28 @@ twine upload dist/*
 - [ ] `default_profile` is still `"test"`
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.25 Checks
+
+- [ ] docs/HF_TOKEN_SAFETY.md exists
+- [ ] scripts/security/scan_for_secrets.py exists and --paths README.md docs --json works
+- [ ] scan_for_secrets.py reports no critical findings on scanned paths
+- [ ] docs/FIRST_PRIVATE_SFT_HANDOFF.md exists
+- [ ] docs/PRIVATE_SFT_RUN_COMMANDS.md exists
+- [ ] create_private_run_record.py rejects /home/user/ paths
+- [ ] create_private_run_record.py rejects /Users/user/ paths (macOS)
+- [ ] create_private_run_record.py rejects C:\Users\user\ paths (Windows)
+- [ ] create_private_run_record.py detects suspicious patterns in summaries
+- [ ] create_private_run_record.py includes security_scan_status field
+- [ ] SAFE_SCREENSHOT_CAPTURE.md uses real commands (not nonexistent ones)
+- [ ] docs/SCREENSHOTS.md references HF_TOKEN_SAFETY
+- [ ] README.md links to HF_TOKEN_SAFETY.md
+- [ ] README.md links to FIRST_PRIVATE_SFT_HANDOFF.md
+- [ ] No HF token pattern (hf_...) in any tracked file
+- [ ] No adapter/weights/GGUF tracked in git
+- [ ] Preview gate still BLOCKED
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)
