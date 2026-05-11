@@ -275,7 +275,7 @@ def test_version_is_0112():
     """kimari/__init__.py version is '0.1.13-alpha'."""
     from kimari import __version__
 
-    assert __version__ == "0.1.15-alpha"
+    assert __version__ == "0.1.22-alpha"
 
 
 def test_pyproject_version_matches():
@@ -298,7 +298,7 @@ def test_cli_info_version():
     result = _run_kimari("info", "--json")
     assert result.returncode == 0
     data = json.loads(result.stdout)
-    assert data["kimari_version"] == "0.1.15-alpha"
+    assert data["kimari_version"] == "0.1.22-alpha"
 
 
 # ─── File existence tests ─────────────────────────────────────────────────────

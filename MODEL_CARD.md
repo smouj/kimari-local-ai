@@ -1,6 +1,6 @@
 # Model Card: Kimari-4B
 
-> **Version:** v0.1.21-alpha (project framework)
+> **Version:** v0.1.22-alpha (project framework)
 > **Last Updated:** 2026-05-23
 > **Developer:** Smouj ([@smouj013](https://x.com/smouj013))
 
@@ -121,7 +121,7 @@ Training has not begun. No GPUs have been allocated, no training scripts have be
 
 ---
 
-## Pipeline Status (v0.1.21-alpha)
+## Pipeline Status (v0.1.22-alpha)
 
 | Aspect | Status |
 |--------|--------|
@@ -271,7 +271,8 @@ The following items must be completed before Kimari-4B weights can be released:
 
 | Version | Date | Status | Changes |
 |---------|------|--------|---------|
-| 0.1.21-alpha | 2026-05-23 | Current | Adapter manifest template; eval summary policy; SFT→ORPO decision framework; private SFT execution checklist; create_adapter_manifest and create_eval_summary scripts |
+| 0.1.22-alpha | 2026-05-24 | Current | Private SFT execution package; remote GPU guide; preflight/postrun scripts; training requirements; private run artifacts/failures policy; baseline/adapter eval plan scripts |
+| 0.1.21-alpha | 2026-05-23 | Released | Adapter manifest template; eval summary policy; SFT→ORPO decision framework; private SFT execution checklist; create_adapter_manifest and create_eval_summary scripts |
 | 0.1.20-alpha | 2026-05-22 | Released | Private SFT runbook; baseline eval plan; adapter artifact policy; preview gate; compare runs tool; pipeline dry-run orchestration |
 | 0.1.19-alpha | 2026-05-21 | Released | SmolLM3-3B accepted for first private SFT candidate; dataset v0; training readiness validation; KimariFit scoring plan; v0 training configs; HF placeholder plan |
 | 0.1.18-alpha | 2026-05-20 | Released | Pipeline dry-run: base decision record, seed datasets, dataset mix builder, KimariFit dry-run harness, GGUF export plan |

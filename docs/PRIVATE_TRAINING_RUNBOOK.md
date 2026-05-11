@@ -558,6 +558,21 @@ Use this checklist to track progress through the runbook:
 
 ---
 
+## v0.1.22-alpha Additions
+
+The following scripts and guides were introduced in v0.1.22-alpha to support the private training workflow:
+
+| Script / Document | Purpose |
+|-------------------|---------|
+| [`training/scripts/preflight_private_sft.py`](../training/scripts/preflight_private_sft.py) | Run preflight checks before training — validates environment, dataset, config, and GPU availability |
+| [`training/scripts/run_training_command_preview.py`](../training/scripts/run_training_command_preview.py) | Preview the training command that will be executed, without launching training |
+| [`eval/scripts/run_baseline_eval_plan.py`](../eval/scripts/run_baseline_eval_plan.py) | CLI for planning and executing baseline evaluation runs |
+| [`eval/scripts/run_adapter_eval_plan.py`](../eval/scripts/run_adapter_eval_plan.py) | CLI for planning and executing adapter evaluation runs |
+| [`training/scripts/postrun_private_sft.py`](../training/scripts/postrun_private_sft.py) | Orchestrate post-training steps: eval, summary, manifest creation, and ORPO decision check |
+| [`docs/REMOTE_GPU_RUNPOD_GUIDE.md`](REMOTE_GPU_RUNPOD_GUIDE.md) | Guide for running training on RunPod or other remote GPU providers |
+
+---
+
 ## Related Documents
 
 | Document | Relationship |
@@ -571,6 +586,9 @@ Use this checklist to track progress through the runbook:
 | [HF_PLACEHOLDER_PLAN.md](HF_PLACEHOLDER_PLAN.md) | Plan for Hugging Face placeholder repository |
 | [SFT_TO_ORPO_DECISION.md](SFT_TO_ORPO_DECISION.md) | Decision framework for proceeding to ORPO after SFT |
 | [PRIVATE_EVAL_RESULTS_POLICY.md](PRIVATE_EVAL_RESULTS_POLICY.md) | What eval results can and cannot be committed |
+| [REMOTE_GPU_RUNPOD_GUIDE.md](REMOTE_GPU_RUNPOD_GUIDE.md) | Guide for running on RunPod/remote GPU |
+| [PRIVATE_RUN_ARTIFACTS.md](PRIVATE_RUN_ARTIFACTS.md) | Classification of artifacts produced by private training runs |
+| [PRIVATE_RUN_FAILURES.md](PRIVATE_RUN_FAILURES.md) | Failure modes and troubleshooting for private training runs |
 | [training/configs/private_sft_run.v0.yaml](../training/configs/private_sft_run.v0.yaml) | Run manifest for this SFT run |
 | [training/templates/adapter_manifest.template.yaml](../training/templates/adapter_manifest.template.yaml) | Template for adapter manifest creation |
 | [eval/templates/eval_summary.template.json](../eval/templates/eval_summary.template.json) | Template for committable eval summaries |

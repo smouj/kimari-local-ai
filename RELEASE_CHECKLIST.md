@@ -311,6 +311,25 @@ twine upload dist/*
 - [ ] `default_profile` is still `"test"`
 - [ ] No "Kimari-4B released" false claim anywhere
 
+## v0.1.22 Checks
+
+- [ ] docs/REMOTE_GPU_RUNPOD_GUIDE.md exists
+- [ ] training/requirements-training.txt exists
+- [ ] training/scripts/preflight_private_sft.py exists and --json works without torch
+- [ ] training/scripts/postrun_private_sft.py exists and --dry-run --json works with fake paths
+- [ ] training/configs/private_sft_execution.example.yaml exists
+- [ ] docs/PRIVATE_RUN_ARTIFACTS.md exists
+- [ ] docs/PRIVATE_RUN_FAILURES.md exists
+- [ ] training/scripts/run_training_command_preview.py exists and --json works
+- [ ] eval/scripts/run_baseline_eval_plan.py exists and --dry-run --json works
+- [ ] eval/scripts/run_adapter_eval_plan.py exists and --dry-run --json works
+- [ ] train_sft_lora.py supports --print-command and --estimate-only
+- [ ] No training outputs committed
+- [ ] No adapter/weight files tracked in git
+- [ ] Preview gate still BLOCKED
+- [ ] `default_profile` is still `"test"`
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

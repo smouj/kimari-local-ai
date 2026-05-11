@@ -1,4 +1,4 @@
-"""Release validation tests for Kimari Local AI v0.1.15-alpha.
+"""Release validation tests for Kimari Local AI v0.1.22-alpha.
 
 Tests cover:
 - resolve_model_path() with various path types
@@ -36,18 +36,18 @@ class TestVersion:
     def test_version_is_0115(self):
         from kimari import __version__
 
-        assert __version__ == "0.1.15-alpha"
+        assert __version__ == "0.1.22-alpha"
 
     def test_pyproject_version_matches(self):
         pyproject = PROJECT_ROOT / "pyproject.toml"
         text = pyproject.read_text()
-        assert 'version = "0.1.15-alpha"' in text
+        assert 'version = "0.1.22-alpha"' in text
 
     def test_cli_info_version(self):
         result = _run_kimari("info", "--json")
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert data["kimari_version"] == "0.1.15-alpha"
+        assert data["kimari_version"] == "0.1.22-alpha"
 
 
 # ─── resolve_model_path Tests ───────────────────────────────────────────────
@@ -441,7 +441,7 @@ class TestDocumentation:
         path = PROJECT_ROOT / "docs" / "PUBLISHING.md"
         if path.exists():
             content = path.read_text()
-            assert "0.1.15" in content
+            assert "0.1.22" in content
 
     def test_readme_mentions_setup_yes(self):
         path = PROJECT_ROOT / "README.md"

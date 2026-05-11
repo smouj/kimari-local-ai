@@ -1,0 +1,29 @@
+# Private SFT Execution Configuration
+# This config describes the execution environment and commands
+# for running the first private SFT on a remote/local GPU.
+# Copy and customize for your environment.
+
+provider: runpod  # runpod / local / manual
+gpu_type: TBD     # e.g., RTX 4090, L40S, A100
+expected_vram_gb: 24
+
+hf_cache_dir: ~/.cache/huggingface
+output_dir: training/adapters/kimari-smollm3-sft-v0
+dataset_build_dir: dataset/build/kimari-v0
+
+env_vars_required:
+  - CUDA_HOME
+  - HF_HOME
+
+commands:
+  build_dataset: python training/scripts/build_dataset_mix.py --sft dataset/v0/sft_v0.jsonl --preference dataset/v0/preference_v0.jsonl --holdout dataset/v0/eval_holdout.jsonl --output-dir dataset/build/kimari-v0 --shuffle --seed 42 --report
+  preflight: python training/scripts/preflight_private_sft.py --run-config training/configs/private_sft_run.v0.yaml --json
+  train: python training/scripts/train_sft_lora.py --config training/configs/kimari_sft_lora.v0.example.yaml
+  eval_baseline: python eval/scripts/run_baseline_eval_plan.py --model-label smollm3-base --prompts eval/kimarifit_prompts.jsonl --dry-run --json
+  eval_adapter: python eval/scripts/run_adapter_eval_plan.py --model-label kimari-smollm3-sft-v0 --prompts eval/kimarifit_prompts.jsonl --dry-run --json
+  postrun: python training/scripts/postrun_private_sft.py --run-config training/configs/private_sft_run.v0.yaml --adapter-dir training/adapters/kimari-smollm3-sft-v0 --dry-run --json
+
+notes: |
+  This is a template. Copy and customize for your execution environment.
+  Never commit real outputs. Preview gate stays BLOCKED.
+  See docs/REMOTE_GPU_RUNPOD_GUIDE.md for detailed setup.

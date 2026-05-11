@@ -290,6 +290,35 @@ python eval/scripts/compare_runs.py \
 
 ---
 
+## v0.1.22-alpha Additions
+
+The following CLI tools were introduced in v0.1.22-alpha to streamline evaluation planning and execution:
+
+| Script | Purpose |
+|--------|---------|
+| [`eval/scripts/run_baseline_eval_plan.py`](../eval/scripts/run_baseline_eval_plan.py) | CLI for baseline evaluation planning — validates the eval environment, checks model availability, and produces an execution plan |
+| [`eval/scripts/run_adapter_eval_plan.py`](../eval/scripts/run_adapter_eval_plan.py) | CLI for adapter evaluation planning — same functionality as the baseline planner but tailored for adapter eval runs |
+
+Both scripts support the following flags:
+
+- `--dry-run` — Preview the evaluation plan without executing any eval runs
+- `--json` — Output the plan as structured JSON for programmatic consumption
+
+### Post-evaluation Comparison
+
+After completing both the baseline and adapter evaluations, use `compare_runs.py` with `--summary-output` to produce a committable comparison summary:
+
+```bash
+python eval/scripts/compare_runs.py \
+    --baseline eval/results/baseline-smollm3-q4km.json \
+    --adapter eval/results/adapter-smollm3-sft-v0-q4km.json \
+    --summary-output eval/results/comparison-sft-v0-summary.json
+```
+
+The `--summary-output` flag ensures the comparison file contains only category-level score differences and pass/fail counts — no raw prompts, no full responses.
+
+---
+
 ## Related Documents
 
 | Document | Relationship |

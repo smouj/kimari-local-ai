@@ -1,0 +1,64 @@
+# Training dependencies for Kimari Local AI private SFT
+# Install separately from core: pip install -r training/requirements-training.txt
+# Versions should be pinned after first real run
+# Do NOT install in CI by default
+
+# ─── Core ML Framework ───────────────────────────────────────────────
+# PyTorch: Required for all GPU training operations. Install with CUDA
+# support using --index-url (see docs/REMOTE_GPU_RUNPOD_GUIDE.md).
+# Separated because: ~2 GB install, CUDA-specific, not needed for CLI runtime.
+torch>=2.1.0
+
+# ─── Model Loading & Inference ───────────────────────────────────────
+# HuggingFace Transformers: Loads base models (SmolLM3-3B), handles
+# tokenization, model serialization, and training integration.
+# Separated because: heavy dependency, only needed during training.
+transformers>=4.36.0
+
+# ─── Dataset Handling ────────────────────────────────────────────────
+# Datasets: HuggingFace datasets library for loading and processing
+# training data (SFT, preference, holdout splits).
+# Separated because: training-only data pipeline, not needed for CLI.
+datasets>=2.14.0
+
+# ─── Distributed & Accelerated Training ──────────────────────────────
+# Accelerate: Handles mixed precision, gradient accumulation, and
+# multi-GPU setup for training scripts.
+# Separated because: only needed during training, not inference serving.
+accelerate>=0.25.0
+
+# ─── Parameter-Efficient Fine-Tuning ────────────────────────────────
+# PEFT: Provides LoRA, QLoRA, and other parameter-efficient methods.
+# This is the core library for adapter-based training.
+# Separated because: adapter training only, not needed for GGUF inference.
+peft>=0.7.0
+
+# ─── Training Loop & SFT/DPO/ORPO ──────────────────────────────────
+# TRL: Transformer Reinforcement Learning — provides SFTTrainer,
+# DPOTrainer, and ORPOTrainer for supervised and preference training.
+# Separated because: training loop library, not needed for serving.
+trl>=0.7.0
+
+# ─── Safe Tensor Serialization ──────────────────────────────────────
+# Safetensors: Fast and secure tensor serialization format used for
+# saving adapter weights (adapter_model.safetensors).
+# Separated because: only adapter output uses safetensors; GGUF uses
+# different format at inference time.
+safetensors>=0.4.0
+
+# ─── Configuration & Utilities ──────────────────────────────────────
+# PyYAML: Parsing training configuration YAML files
+# (kimari_sft_lora.v0.example.yaml, private_sft_run.v0.yaml, etc.)
+# Separated because: training configs are YAML; runtime uses JSON.
+pyyaml>=6.0
+
+# ─── Tokenizer Support ──────────────────────────────────────────────
+# SentencePiece: Tokenizer backend required by some base models
+# (SmolLM3 uses BPE, but included for compatibility with candidates
+# like Qwen or Llama which may require SentencePiece).
+# Separated because: only needed when loading base model tokenizers.
+sentencepiece>=0.1.99
+
+# Protobuf: Required by SentencePiece and some Transformers internals.
+# Separated because: dependency of tokenizer loading, not CLI runtime.
+protobuf>=4.24.0

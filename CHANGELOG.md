@@ -5,6 +5,34 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.22-alpha] — 2026-05-24
+
+### Added
+- **docs/REMOTE_GPU_RUNPOD_GUIDE.md** — Guide for running first private SFT on RunPod or similar GPU cloud; GPU recommendations (RTX 4090, L40S, A100), VRAM estimates, step-by-step setup, safety reminders, cost/storage estimates
+- **training/requirements-training.txt** — Separated training dependencies (torch, transformers, datasets, accelerate, peft, trl, safetensors, pyyaml, sentencepiece, protobuf); not installed in CI by default
+- **training/scripts/preflight_private_sft.py** — CLI preflight check for private SFT readiness; checks Python version, torch/CUDA availability, training deps, dataset build, gitignore, gate BLOCKED; --strict mode; --json output; works without torch installed
+- **training/scripts/postrun_private_sft.py** — CLI post-training orchestration; calls create_adapter_manifest, create_eval_summary, compare_runs; verifies gate BLOCKED; suggests next steps; dry-run by default; --json output
+- **training/configs/private_sft_execution.example.yaml** — Execution config template for remote/local GPU; provider, GPU type, VRAM, HF cache, commands (build_dataset, preflight, train, eval, postrun)
+- **docs/PRIVATE_RUN_ARTIFACTS.md** — Classification of training artifacts: what stays local (adapter weights, checkpoints, optimizer states, raw eval outputs, TensorBoard, WandB) vs what can be committed if sanitized (MANIFEST.yaml, eval_summary.json, compare_summary.json); pre-commit review checklist
+- **docs/PRIVATE_RUN_FAILURES.md** — Troubleshooting guide for 10 failure modes (OOM, CUDA unavailable, tokenizer failure, dataset validation, PEFT/TRL mismatch, eval endpoint, hash mismatch, accidental raw outputs, abort procedure, recovery)
+- **training/scripts/run_training_command_preview.py** — CLI for training command preview; recommended_command, recommended_environment, expected_outputs, forbidden_commit_patterns, safety_warnings; --json output
+- **eval/scripts/run_baseline_eval_plan.py** — CLI for baseline eval planning; model_label, prompts, categories, recommended_endpoint, score_status manual_review_required; --dry-run; --json output
+- **eval/scripts/run_adapter_eval_plan.py** — CLI for adapter eval planning; same structure as baseline; baseline_available check, compare_with_baseline step; --dry-run; --json output
+- **RELEASE_CHECKLIST.md** — Added v0.1.22 Checks section
+- **scripts/release/check-release.py** — Expanded with v0.1.22 checks (REMOTE_GPU_RUNPOD_GUIDE, requirements-training, preflight script, postrun script, private execution config, private run artifacts/failures docs, training command preview, baseline/adapter eval plan scripts, no adapter/weights/GGUF tracked, preview gate BLOCKED)
+- **New tests** (`tests/test_release_v0122.py`) — Tests for preflight, postrun, training command preview, baseline/adapter eval plans, private execution config, private artifacts/failures docs, requirements-training, train_sft_lora improvements, release-check
+
+### Changed
+- **Version bumped** to `0.1.22-alpha`
+- **training/scripts/train_sft_lora.py** — Added --print-command (print recommended training command), --estimate-only (print step estimation JSON), --require-dataset (fail if dataset missing), output_dir gitignored validation, warning: "Real training must not run in CI"
+- **docs/PRIVATE_TRAINING_RUNBOOK.md** — Added preflight_private_sft, run_training_command_preview, baseline/adapter eval plan, postrun_private_sft, remote GPU guide references
+- **docs/ADAPTER_ARTIFACT_POLICY.md** — Added PRIVATE_RUN_ARTIFACTS.md, postrun_private_sft.py, checklist before committing summaries
+- **docs/BASELINE_EVAL_PLAN.md** — Added run_baseline_eval_plan.py, run_adapter_eval_plan.py, compare_runs.py comparison
+- **docs/SFT_TO_ORPO_DECISION.md** — Added ORPO decision deferred until postrun summary, manual_review_required blocks ORPO, safety_regression_detected blocks ORPO
+- **README.md** — Added remote GPU guide, training requirements, preflight/postrun scripts, private run artifacts/failures references; updated version to v0.1.22-alpha
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.22-alpha; remote GPU execution, preflight/postrun, training requirements, private run artifacts, no public weights, preview gate BLOCKED
+- **ROADMAP.md** — v0.1.21-alpha marked as Released; v0.1.22-alpha marked as Current; v0.1.23-alpha Planned
+
 ## [0.1.21-alpha] — 2026-05-23
 
 ### Added

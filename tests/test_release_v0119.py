@@ -1,7 +1,7 @@
-"""Release validation tests for Kimari Local AI v0.1.19-alpha.
+"""Release validation tests for Kimari Local AI v0.1.22-alpha.
 
 Tests cover:
-- Version consistency (0.1.19-alpha)
+- Version consistency (0.1.22-alpha)
 - Base model acceptance (SmolLM3-3B as private training candidate)
 - Dataset v0 (SFT, preference, eval holdout)
 - Training readiness validation
@@ -44,11 +44,11 @@ class TestVersion:
     def test_version_in_init(self):
         from kimari import __version__
 
-        assert __version__ == "0.1.19-alpha"
+        assert __version__ == "0.1.22-alpha"
 
     def test_version_in_pyproject(self):
         text = (PROJECT_ROOT / "pyproject.toml").read_text()
-        assert 'version = "0.1.19-alpha"' in text
+        assert 'version = "0.1.22-alpha"' in text
 
 
 # ─── Base Model Acceptance ─────────────────────────────────────────────
@@ -388,6 +388,8 @@ class TestContentIntegrity:
             "Kimari-4B weights are available",
         ]
         for filepath in tracked:
+            if filepath == "tests/test_release_v0119.py":
+                continue
             if not filepath.endswith((".md", ".py", ".yaml", ".yml", ".json", ".jsonl", ".txt", ".html")):
                 continue
             try:
@@ -438,11 +440,11 @@ class TestContentIntegrity:
 class TestChangelogAndRoadmap:
     def test_changelog_has_v0119(self):
         content = (PROJECT_ROOT / "CHANGELOG.md").read_text()
-        assert "0.1.19-alpha" in content
+        assert "0.1.22-alpha" in content
 
     def test_roadmap_has_v0119(self):
         content = (PROJECT_ROOT / "ROADMAP.md").read_text()
-        assert "0.1.19" in content
+        assert "0.1.22" in content
 
 
 # ─── Release Check ──────────────────────────────────────────────────────

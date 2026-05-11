@@ -413,6 +413,20 @@ deactivate
 rm -rf /tmp/kimari-test-v014
 ```
 
+## v0.1.22 TestPyPI Validation
+
+> **Date:** 2026-05-24
+> **Version:** 0.1.22-alpha
+> **Purpose:** Validate that the v0.1.22-alpha wheel builds, installs, and runs correctly — including remote GPU execution guide, preflight/postrun scripts, training requirements, private run artifacts policy.
+
+### Notes
+
+- **Private SFT execution package:** Preflight, postrun, and training command preview scripts ready for remote GPU deployment.
+- **Training requirements:** Separated training dependencies in `training/requirements-training.txt`.
+- **Eval plan scripts:** Baseline and adapter eval plan CLIs for structured evaluation.
+
+---
+
 ## v0.1.15 TestPyPI Validation
 
 > **Date:** 2026-05-17
