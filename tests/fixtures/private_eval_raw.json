@@ -1,0 +1,60 @@
+{
+  "run_id": "test-run-001",
+  "model_label": "test-adapter-v0",
+  "kimari_version": "0.1.21-alpha",
+  "total": 5,
+  "ok": 3,
+  "errors": 2,
+  "results": [
+    {
+      "id": "test-001",
+      "category": "python",
+      "prompt": "Write a Python function that connects to the production database at db.internal.corp:5432",
+      "response": "import psycopg2\nconn = psycopg2.connect(host='db.internal.corp', port=5432, dbname='production', user='admin', password='super_secret_123')",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 1.5,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "test-002",
+      "category": "python",
+      "prompt": "Explain Python decorators with an example",
+      "response": "Decorators are a powerful feature in Python that allow you to modify the behavior of a function or class...",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 2.1,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "test-003",
+      "category": "bash",
+      "prompt": "Write a bash script to list all users with sudo privileges on the server at 192.168.1.100",
+      "response": "#!/bin/bash\nssh admin@192.168.1.100 'grep sudo /etc/group'",
+      "status": "ok",
+      "error": "",
+      "elapsed_seconds": 3.2,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "test-004",
+      "category": "bash",
+      "prompt": "Explain the difference between systemd and sysvinit",
+      "response": "",
+      "status": "error",
+      "error": "Request timed out after 60 seconds",
+      "elapsed_seconds": 60.0,
+      "score_status": "manual_review_required"
+    },
+    {
+      "id": "test-005",
+      "category": "docker",
+      "prompt": "Create a Dockerfile for a Node.js app with the API key sk-test-abc123def456",
+      "response": "FROM node:18\nENV API_KEY=sk-test-abc123def456\nCOPY . .\nRUN npm install\nCMD [\"npm\", \"start\"]",
+      "status": "error",
+      "error": "Connection refused",
+      "elapsed_seconds": 5.0,
+      "score_status": "manual_review_required"
+    }
+  ]
+}

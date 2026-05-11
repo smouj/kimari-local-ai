@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.20-alpha — Private SFT runbook, baseline eval plan, adapter artifact policy, preview gate, pipeline dry-run orchestration
+      v0.1.21-alpha — Adapter manifest template, eval summary policy, SFT→ORPO decision, private SFT execution checklist
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -475,20 +475,20 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <strong>Kimari</strong> is the framework. <strong>Kimari-4B</strong> is not released yet.
 </div>
 
-<!-- ═══════ v0.1.20-alpha FOCUS ═══════ -->
+<!-- ═══════ v0.1.21-alpha FOCUS ═══════ -->
 <div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.20-alpha</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.21-alpha</span>
       <span style="font-size:1.1rem;font-weight:800;">What's New</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-check-circle" style="color:var(--kimari-teal);"></i> ✅ SmolLM3-3B accepted for private SFT</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-database" style="color:var(--kimari-cyan);"></i> 📊 Dataset v0 (SFT + preference + holdout)</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-clipboard-check" style="color:var(--kimari-purple-light);"></i> 🏗️ Training readiness validation</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-ruler" style="color:var(--kimari-teal);"></i> 📏 KimariFit scoring dimensions</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-cogs" style="color:var(--kimari-purple-light);"></i> ⚙️ v0 training configs</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-cloud" style="color:var(--kimari-teal);"></i> ☁️ HF placeholder plan</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-file-contract" style="color:var(--kimari-teal);"></i> Adapter manifest template</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-clipboard-check" style="color:var(--kimari-cyan);"></i> Private SFT execution checklist</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-code-branch" style="color:var(--kimari-purple-light);"></i> SFT→ORPO decision framework</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-shield-halved" style="color:var(--kimari-teal);"></i> Private eval results policy</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-lock" style="color:var(--kimari-purple-light);"></i> Preview gate remains BLOCKED</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-file-shield" style="color:var(--kimari-teal);"></i> Eval summary template</span>
     </div>
   </div>
 </div>
@@ -837,7 +837,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.20-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.21-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -1296,7 +1296,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.20-alpha — Private SFT runbook, baseline eval plan, adapter artifact policy, preview gate, pipeline dry-run orchestration. No public weights released.</p>
+    <p class="section-desc">Kimari Local AI v0.1.21-alpha — Adapter manifest template, eval summary policy, SFT→ORPO decision, private SFT execution checklist. No public weights released.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1346,7 +1346,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Baseline eval plan</td><td>✅ Documented in v0.1.20-alpha</td></tr>
         <tr><td>Adapter artifact policy</td><td>✅ Defined in v0.1.20-alpha</td></tr>
         <tr><td>Private training runbook</td><td>✅ Created in v0.1.20-alpha</td></tr>
-        <tr><td>Adapter preview gate</td><td>🔒 BLOCKED in v0.1.20-alpha</td></tr>
+        <tr><td>Adapter preview gate</td><td>🔒 BLOCKED in v0.1.21-alpha</td></tr>
+        <tr><td>Adapter manifest template</td><td>📄 Created in v0.1.21-alpha</td></tr>
+        <tr><td>Eval summary policy</td><td>📋 Defined in v0.1.21-alpha</td></tr>
+        <tr><td>SFT→ORPO decision</td><td>🔀 Framework in v0.1.21-alpha</td></tr>
         <tr><td>First private SFT</td><td>❌ Not started</td></tr>
         <tr><td>Real benchmarks</td><td>❌ Not measured</td></tr>
         <tr><td>Public weights</td><td>❌ Not released</td></tr>

@@ -1,0 +1,13 @@
+{
+  "run_id": "",
+  "model_label": "",
+  "kimari_version": "",
+  "prompt_count": 0,
+  "category_counts": {},
+  "score_status": "manual_review_required",
+  "manual_review_required": true,
+  "safety_regression_detected": false,
+  "false_claims_detected": false,
+  "reviewer": "",
+  "notes": ""
+}

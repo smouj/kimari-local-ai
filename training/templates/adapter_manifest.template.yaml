@@ -1,0 +1,53 @@
+# Adapter Manifest Template — Kimari Local AI
+# Version: v0.1.21-alpha
+#
+# This is a TEMPLATE. Fill with actual values after training completes.
+# Do NOT commit adapter weights — only this metadata manifest.
+# See docs/ADAPTER_ARTIFACT_POLICY.md for what can and cannot be committed.
+# All adapters start in BLOCKED state. See docs/ADAPTER_PREVIEW_GATE.md.
+
+adapter_name: "kimari-smollm3-sft-v0"
+run_id: "kimari-smollm3-sft-v0-private-001"
+base_model: "HuggingFaceTB/SmolLM3-3B"
+base_model_revision: ""
+dataset_id: "kimari-v0"
+dataset_hash: ""
+training_config: "training/configs/kimari_sft_lora.v0.example.yaml"
+training_started_at: ""
+training_finished_at: ""
+trainer: ""
+
+# LoRA hyperparameters
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+
+# Training hyperparameters
+learning_rate: 2.0e-4
+epochs: 2
+max_seq_length: 4096
+
+# Adapter artifacts — populated by create_adapter_manifest.py
+adapter_files: []
+adapter_sha256: ""
+adapter_size_bytes: 0
+
+# Evaluation — populated post-training
+eval_results: null
+baseline_results: null
+
+# Preview gate — MUST start as BLOCKED
+preview_gate_state: BLOCKED
+
+# State history — first entry is always the initial BLOCKED state
+state_history:
+  - state: BLOCKED
+    date: ""
+    actor: ""
+    reason: "Initial state after manifest creation"
+
+# Release flags — MUST be false for private training
+public_release_allowed: false
+hf_upload_allowed: false
+
+notes: "Template manifest. Fill with actual values after training."

@@ -239,7 +239,7 @@
 - ✅ HF placeholder plan
 - ✅ Release-check improvements
 
-## v0.1.20-alpha (Current)
+## v0.1.20-alpha (Released)
 
 - ✅ MODEL_CARD checklist and version history fixes
 - ✅ Baseline eval plan for SmolLM3-3B without fine-tuning
@@ -252,13 +252,26 @@
 - ✅ Compare runs tool (baseline vs adapter)
 - ✅ .gitignore updated for training artifacts
 
-## v0.1.21-alpha (Planned)
+## v0.1.21-alpha (Current)
+
+- ✅ Adapter manifest template (training/templates/adapter_manifest.template.yaml)
+- ✅ Adapter manifest creation script (training/scripts/create_adapter_manifest.py)
+- ✅ Private SFT execution checklist
+- ✅ SFT→ORPO decision framework
+- ✅ Private eval results policy
+- ✅ Eval summary template (eval/templates/eval_summary.template.json)
+- ✅ Eval summary creation script (eval/scripts/create_eval_summary.py)
+- ✅ Compare runs improvements (verdict, summary-output)
+- ✅ Release-check improvements
+
+## v0.1.22-alpha (Planned)
 
 - Execute first private SFT outside CI
-- Evaluate baseline vs adapter with KimariFit
-- Decide ORPO/DPO next step based on SFT results
-- Create HF placeholder if gate allows docs-only
-- Prepare adapter manifest if private run succeeds
+- Record adapter manifest locally
+- Run baseline and adapter eval
+- Produce private eval summary
+- Decide ORPO/DPO next step
+- Prepare HF docs-only placeholder if gate allows
 
 ## v0.2.0-alpha
 

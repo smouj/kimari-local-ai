@@ -83,6 +83,8 @@ The following lightweight, non-weight artifacts **may** be committed to the repo
 | **Training config** | Must reference the YAML config used, not duplicate training data | Links the adapter to the configuration that produced it |
 | **Run manifest** | Must be a YAML file with metadata only (see `training/configs/private_sft_run.v0.yaml`) | Tracks the run status, dates, and references |
 
+**Important:** A manifest CAN be committed if it doesn't contain sensitive paths or weights. Adapter files (weights, optimizer states, checkpoints) must NEVER be committed — see the "What NOT to Commit" section above.
+
 ---
 
 ## Adapter Naming Convention
@@ -112,7 +114,34 @@ Adapters follow a strict naming convention:
 
 ## Adapter Manifest Format
 
-When committing an adapter manifest (without weights), use this structure:
+When creating an adapter manifest, use the template at `training/templates/adapter_manifest.template.yaml` and the `create_adapter_manifest.py` script:
+
+```bash
+python training/scripts/create_adapter_manifest.py \
+    --run-config training/configs/private_sft_run.v0.yaml \
+    --adapter-dir training/adapters/kimari-smollm3-sft-v0 \
+    --output training/adapters/kimari-smollm3-sft-v0/MANIFEST.yaml
+```
+
+The script:
+- Reads the template from `training/templates/adapter_manifest.template.yaml`
+- Fills in values from the run config and adapter directory
+- Computes SHA-256 hashes of allowed files (skips `.safetensors`, `.bin`, `.pt`, etc.)
+- Sets `preview_gate_state: BLOCKED`, `public_release_allowed: false`, `hf_upload_allowed: false`
+- Lists suspicious files (weights) but does NOT include their content
+
+Preview with `--dry-run` before writing:
+
+```bash
+python training/scripts/create_adapter_manifest.py \
+    --run-config training/configs/private_sft_run.v0.yaml \
+    --adapter-dir training/adapters/kimari-smollm3-sft-v0 \
+    --dry-run
+```
+
+The manifest CAN be committed to the repository if it doesn't contain sensitive paths or weights. Adapter files themselves must NEVER be committed.
+
+Manual manifest format (if not using the script):
 
 ```yaml
 # training/adapters/kimari-smollm3-sft-v0/MANIFEST.yaml
@@ -227,6 +256,7 @@ If the adapter needs to be transferred to another machine for evaluation:
 | [MODEL_HASHING.md](MODEL_HASHING.md) | SHA-256 hash procedures for model files |
 | [HUGGINGFACE_RELEASE.md](HUGGINGFACE_RELEASE.md) | Full release process for when public release is authorized |
 | [HF_PLACEHOLDER_PLAN.md](HF_PLACEHOLDER_PLAN.md) | Plan for Hugging Face placeholder repository |
+| [training/templates/adapter_manifest.template.yaml](../training/templates/adapter_manifest.template.yaml) | Template for adapter manifest creation |
 
 ---
 

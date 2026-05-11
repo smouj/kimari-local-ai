@@ -5,6 +5,32 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.21-alpha] — 2026-05-23
+
+### Added
+- **training/templates/adapter_manifest.template.yaml** — Template for adapter manifest files; includes adapter_name, run_id, base_model, dataset_id, training_config, LoRA parameters, training timestamps, adapter files/hashes, eval_results, baseline_results, preview_gate_state (BLOCKED), public_release_allowed (false), hf_upload_allowed (false), state_history, notes
+- **training/scripts/create_adapter_manifest.py** — CLI script to generate adapter manifests from template; --run-config, --adapter-dir, --output, --dry-run, --json; rejects suspicious files (.safetensors/.bin/.pt/.pth/.ckpt/.gguf); enforces preview_gate_state=BLOCKED, public_release_allowed=false, hf_upload_allowed=false; works without PyYAML
+- **docs/PRIVATE_SFT_EXECUTION_CHECKLIST.md** — Practical pre-flight checklist for first private SFT; GPU environment, license review, dataset validation, baseline eval plan, run config review, output_dir gitignored, storage, no WandB public, no HF upload, manifest creation, KimariFit eval, preview gate stays BLOCKED
+- **docs/SFT_TO_ORPO_DECISION.md** — Decision framework for whether ORPO/DPO proceeds after SFT; safety regression → no ORPO; coding/sysadmin improvement without safety regression → consider ORPO; overfitting → expand dataset; baseline surpasses adapter → review dataset/config; ORPO only if preference_v0 has sufficient quality; DPO/ORPO never runs in CI
+- **docs/PRIVATE_EVAL_RESULTS_POLICY.md** — What eval results can be committed; anonymous summaries, category counts, manual review status, hashes OK; no private prompts, no local paths, no tokens, no sensitive outputs, no unreviewed benchmark claims
+- **eval/templates/eval_summary.template.json** — Committable eval summary template; run_id, model_label, kimari_version, prompt_count, category_counts, score_status, manual_review_required, safety_regression_detected, false_claims_detected, reviewer, notes; no raw private prompts
+- **eval/scripts/create_eval_summary.py** — CLI script for sanitizing raw eval results into committable summaries; --input, --output, --json; strips raw prompt/response fields; marks manual_review_required if no scores; never invents scores
+- **tests/fixtures/private_eval_raw.json** — Synthetic fixture with raw outputs for testing eval result sanitization
+- **RELEASE_CHECKLIST.md** — Added v0.1.21 Checks section
+- **scripts/release/check-release.py** — Expanded with v0.1.21 checks (adapter manifest template, create_adapter_manifest, PRIVATE_SFT_EXECUTION_CHECKLIST, SFT_TO_ORPO_DECISION, PRIVATE_EVAL_RESULTS_POLICY, eval summary template, create_eval_summary, compare_runs summary-output, preview gate BLOCKED, no adapter/weight files tracked)
+- **New tests** (`tests/test_release_v0121.py`) — Tests for adapter manifest template, create_adapter_manifest, eval summary template, create_eval_summary, compare_runs verdicts, preview gate BLOCKED, no adapter/weights/GGUF tracked
+
+### Changed
+- **Version bumped** to `0.1.21-alpha`
+- **eval/scripts/compare_runs.py** — Added --summary-output for committable eval summaries; added comparison verdict (insufficient_data, candidate_better, candidate_worse, mixed, manual_review_required); safety_regression_detected in candidate → verdict=candidate_worse; never invents scores
+- **docs/PRIVATE_TRAINING_RUNBOOK.md** — Added references to create_adapter_manifest.py, create_eval_summary.py, SFT_TO_ORPO_DECISION, PRIVATE_EVAL_RESULTS_POLICY, adapter manifest template
+- **docs/ADAPTER_ARTIFACT_POLICY.md** — Added manifest template path, create_adapter_manifest.py usage, manifest committable if no sensitive paths/weights, adapter files never committed
+- **docs/ADAPTER_PREVIEW_GATE.md** — Added manifest template and eval summary template references; safety_regression_detected field; creating manifest does NOT advance the gate
+- **docs/BASELINE_EVAL_PLAN.md** — Added create_eval_summary.py usage, compare_runs --summary-output, eval summary template references
+- **README.md** — Added adapter manifest template, private SFT execution checklist, SFT→ORPO decision, private eval results policy, eval summary template references; updated version to v0.1.21-alpha
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.21-alpha; added adapter manifest, execution checklist, SFT→ORPO decision, eval summary policy, preview gate BLOCKED chips
+- **ROADMAP.md** — v0.1.20-alpha marked as Released; v0.1.21-alpha marked as Current; v0.1.22-alpha Planned
+
 ## [0.1.20-alpha] — 2026-05-22
 
 ### Added

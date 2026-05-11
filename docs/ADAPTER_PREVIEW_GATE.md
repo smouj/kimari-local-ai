@@ -101,7 +101,7 @@ An adapter may transition from PENDING to APPROVED_FOR_PRIVATE_TESTING when **al
 |---|-------------|---------------|-------------|
 | 1 | **Baseline comparison done** | The adapter has been evaluated using KimariFit (`eval/kimarifit.py`) and the results have been compared against the baseline evaluation (`eval/results/baseline-smollm3-*.json`). The comparison shows measurable improvement in at least one category with no unexplained regressions. | Maintainer + Reviewer |
 | 2 | **KimariFit manual review done** | All 35 prompts from `eval/kimarifit_prompts.jsonl` have been manually reviewed against the scoring dimensions in `eval/scoring/kimarifit_dimensions.json`. Each response has been assessed for correctness, safety, and quality. | Reviewer |
-| 3 | **No regression in safety** | The safety-related categories (`local_security`, `no_hallucinated_benchmarks`, `no_unsafe_exposure_advice`) show no regression compared to baseline. The adapter must refuse harmful requests (kf-033) and warn about destructive commands (kf-034) at least as well as the base model. | Reviewer |
+| 3 | **No regression in safety** | The safety-related categories (`local_security`, `no_hallucinated_benchmarks`, `no_unsafe_exposure_advice`) show no regression compared to baseline. The adapter must refuse harmful requests (kf-033) and warn about destructive commands (kf-034) at least as well as the base model. The `safety_regression_detected` field in eval results must be `false`. | Reviewer |
 | 4 | **No false claims** | The adapter does not fabricate benchmark scores, package names, CLI flags, or error messages. Verified through manual review of all responses against `eval/failure_modes.md`. | Reviewer |
 
 **Decision**: A human maintainer and at least one reviewer must explicitly approve the transition. Both decisions and dates are recorded.
@@ -128,6 +128,7 @@ An adapter may transition from APPROVED_FOR_PRIVATE_TESTING to APPROVED_FOR_PUBL
 Specifically:
 
 - Completing a training run does NOT automatically move the adapter out of BLOCKED
+- Creating a manifest with `create_adapter_manifest.py` does NOT advance the gate — it records metadata but the adapter remains BLOCKED
 - Passing automated tests does NOT automatically move the adapter to PENDING
 - Positive evaluation results do NOT automatically move the adapter to APPROVED_FOR_PRIVATE_TESTING
 - Private tester feedback does NOT automatically move the adapter to APPROVED_FOR_PUBLIC_PREVIEW
@@ -204,6 +205,19 @@ state_history:
 | [HUGGINGFACE_RELEASE.md](HUGGINGFACE_RELEASE.md) | Full release process for when an adapter reaches APPROVED_FOR_PUBLIC_PREVIEW |
 | [HF_PLACEHOLDER_PLAN.md](HF_PLACEHOLDER_PLAN.md) | Placeholder repository rules for before any weights are distributed |
 | [MODEL_LICENSES.md](../MODEL_LICENSES.md) | License verification is a prerequisite for BLOCKED → PENDING |
+
+---
+
+## Template References
+
+The following templates are used in the gate process:
+
+| Template | Path | Usage |
+|----------|------|-------|
+| Adapter manifest | `training/templates/adapter_manifest.template.yaml` | Used by `create_adapter_manifest.py` to generate adapter manifests with correct BLOCKED state |
+| Eval summary | `eval/templates/eval_summary.template.json` | Used by `create_eval_summary.py` to produce committable eval summaries without sensitive data |
+
+Creating a manifest or eval summary does NOT advance the gate. These are documentation tools only — all state transitions require explicit human decisions.
 
 ---
 

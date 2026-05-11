@@ -867,3 +867,138 @@ Stage Summary:
 - ROADMAP.md updated: v0.1.16-alpha Released, v0.1.17-alpha Current, v0.1.18-alpha Planned
 - Bug fix in check-release.py: case-insensitive TBD check in MODEL_CARD.md
 - All validations pass
+
+---
+Task ID: 2-8
+Agent: Sub Agent
+Task: Create adapter manifest template, create_adapter_manifest.py, eval summary template, create_eval_summary.py, private SFT checklist, SFT-to-ORPO decision framework, private eval results policy, and test fixture
+
+Work Log:
+- Read worklog.md to understand project history and prior work (v0.1.21-alpha, training infrastructure, eval scripts, adapter artifact policy, adapter preview gate)
+- Read existing reference files for style consistency: eval/scripts/compare_runs.py, eval/scripts/summarize_results.py, training/scripts/validate_training_ready.py, training/configs/private_sft_run.v0.yaml, training/configs/kimari_sft_lora.v0.example.yaml, docs/ADAPTER_ARTIFACT_POLICY.md, docs/ADAPTER_PREVIEW_GATE.md, tests/fixtures/baseline_eval_result.json
+- Created training/templates/adapter_manifest.template.yaml — full template with all 22 required fields (adapter_name, run_id, base_model, base_model_revision, dataset_id, dataset_hash, training_config, training_started_at, training_finished_at, trainer, lora_r, lora_alpha, lora_dropout, learning_rate, epochs, max_seq_length, adapter_files, adapter_sha256, adapter_size_bytes, eval_results, baseline_results, preview_gate_state=BLOCKED, state_history with initial BLOCKED entry, public_release_allowed=false, hf_upload_allowed=false, notes)
+- Created training/scripts/create_adapter_manifest.py — CLI script with --run-config, --adapter-dir, --output, --dry-run, --json flags; reads template, merges run config and SFT config values; scans adapter dir computing sizes/hashes for allowed files; rejects suspicious files (.safetensors, .bin, .pt, .pth, .ckpt, .gguf) by listing but NOT including; enforces preview_gate_state=BLOCKED, public_release_allowed=false, hf_upload_allowed=false; works without PyYAML (simple text substitution fallback with parse_simple_yaml and render_yaml_from_dict)
+- Created docs/PRIVATE_SFT_EXECUTION_CHECKLIST.md — 12-section checklist covering GPU environment, license review, dataset validation, baseline eval plan, run config review, output directory safety, experiment tracking, HF restrictions, training command, post-run manifest creation, post-run evaluation, and preview gate; includes quick reference table with 10 must-check items
+- Created docs/SFT_TO_ORPO_DECISION.md — decision framework with 6-row decision table (safety regression → no ORPO, coding improvement + no safety regression → consider ORPO, overfitting → expand dataset first, baseline surpasses adapter → review, no improvement → review, mixed → selective review); prerequisites for ORPO (7 items); ORPO vs DPO selection criteria; decision flowchart; "what ORPO cannot fix" section; pre-ORPO checklist; explicit statement that DPO/ORPO does not run in CI
+- Created docs/PRIVATE_EVAL_RESULTS_POLICY.md — policy governing what eval results can be committed; CAN commit table (anonymous summaries, category counts, manual review status, hashes, score status, run metadata, config references, error counts); CANNOT commit table (private prompts, local paths, tokens/credentials, sensitive outputs, benchmark claims without review, full model responses, prompt text); committable eval summary format example; how to create safe eval summary; benchmark claims policy; review process; enforcement section
+- Created eval/templates/eval_summary.template.json — committable eval summary template with run_id, model_label, kimari_version, prompt_count=0, category_counts={}, score_status="manual_review_required", manual_review_required=true, safety_regression_detected=false, false_claims_detected=false, reviewer="", notes=""; NO raw private prompts
+- Created eval/scripts/create_eval_summary.py — CLI with --input, --output, --json flags; reads raw eval result JSON; strips "prompt" and "response" fields from results; produces safe summary with category counts; marks manual_review_required=true if no scores exist; does NOT invent scores; uses template if available; works with test fixtures
+- Created tests/fixtures/private_eval_raw.json — synthetic fixture with 5 results across 3 categories (python, bash, docker); contains fake prompts with sensitive data (production DB credentials, internal server IPs, API keys) and fake responses with matching sensitive data; some results have empty responses (errors); all have score_status="manual_review_required"; designed for testing create_eval_summary.py sanitization
+- Verified all Python scripts compile with py_compile
+- Tested create_adapter_manifest.py: dry-run produces correct YAML, dry-run --json produces correct JSON, adapter dir scanning correctly includes allowed files and rejects suspicious files (.safetensors), preview_gate_state always BLOCKED, public_release_allowed always false
+- Tested create_eval_summary.py: correctly strips prompt/response, computes category counts, marks manual_review_required, does not invent scores
+- Tested both scripts with tmp_path-style operations (tempfile.TemporaryDirectory) — all pass
+
+Stage Summary:
+- 8 files created:
+  1. training/templates/adapter_manifest.template.yaml — full adapter manifest template with BLOCKED state
+  2. training/scripts/create_adapter_manifest.py — CLI for creating adapter manifests from template + run config + adapter dir
+  3. docs/PRIVATE_SFT_EXECUTION_CHECKLIST.md — 12-section pre-flight checklist for first private SFT
+  4. docs/SFT_TO_ORPO_DECISION.md — decision framework for proceeding to preference tuning after SFT
+  5. docs/PRIVATE_EVAL_RESULTS_POLICY.md — policy governing committable eval results
+  6. eval/templates/eval_summary.template.json — committable eval summary template
+  7. eval/scripts/create_eval_summary.py — CLI for creating safe eval summaries from raw results
+  8. tests/fixtures/private_eval_raw.json — synthetic test fixture for sanitization testing
+- All scripts follow project style (from __future__ import annotations, argparse CLI, proper error handling, no network calls)
+- All safety constraints enforced: preview_gate_state=BLOCKED, public_release_allowed=false, hf_upload_allowed=false, no invented scores
+- Works without PyYAML dependency (simple text substitution fallback)
+- No real training, no model downloads, no HF uploads, no weights, no adapters, no GGUF, no fake benchmarks
+
+---
+Task ID: 9-11
+Agent: Main Agent
+Task: Improve compare_runs.py with verdict/summary-output, update 4 docs with cross-references
+
+Work Log:
+- Read worklog.md and all 6 target files to understand prior work and current content
+- Read supporting files: create_adapter_manifest.py, create_eval_summary.py, SFT_TO_ORPO_DECISION.md, PRIVATE_EVAL_RESULTS_POLICY.md, adapter_manifest.template.yaml, eval_summary.template.json
+
+**Task 1: Improved eval/scripts/compare_runs.py**
+- Added `--summary-output` CLI argument (optional Path) — writes a committable eval summary JSON
+- Added `_determine_verdict()` function with 5 verdict levels:
+  - `insufficient_data` — no scores in either file AND/OR missing_outputs > 0 in candidate
+  - `candidate_better` — candidate average_score > baseline AND no safety regression
+  - `candidate_worse` — candidate average_score < baseline OR safety_regression_detected=true
+  - `mixed` — some categories improved, some regressed (needs manual review)
+  - `manual_review_required` — default when data is insufficient to determine direction
+- Added `_compute_category_deltas()` for per-category score delta comparison (enables mixed verdict)
+- Added `safety_regression_detected` field check from candidate data — if true, verdict = candidate_worse
+- Added `_build_summary_output()` for safe summary JSON (no raw prompts/responses)
+- Summary output fields: run_id, model_label, kimari_version, prompt_count, category_counts, score_status, manual_review_required, safety_regression_detected, false_claims_detected, verdict, reviewer, notes
+- Does NOT invent scores if missing
+- Updated text output to display verdict and safety regression warnings
+- Verified py_compile passes
+
+**Task 2: Updated docs/PRIVATE_TRAINING_RUNBOOK.md**
+- Step 5c: Replaced manual manifest creation with create_adapter_manifest.py usage (commands for --run-config, --adapter-dir, --output, --dry-run)
+- Step 7: Added new 7d "Sanitize eval results for commit" section with create_eval_summary.py command and reference to PRIVATE_EVAL_RESULTS_POLICY.md and eval/templates/eval_summary.template.json
+- Step 8: Added SFT_TO_ORPO_DECISION.md reference for the full decision framework
+- Related Documents: Added SFT_TO_ORPO_DECISION.md, PRIVATE_EVAL_RESULTS_POLICY.md, training/templates/adapter_manifest.template.yaml, eval/templates/eval_summary.template.json
+
+**Task 3: Updated docs/ADAPTER_ARTIFACT_POLICY.md**
+- "What CAN Be Committed" section: Added important note that manifest CAN be committed if no sensitive paths/weights, adapter files must NEVER be committed
+- "Adapter Manifest Format" section: Added template-based creation instructions with create_adapter_manifest.py commands, --dry-run preview, script behavior description; existing manual YAML format preserved as fallback
+- Related Documents: Added training/templates/adapter_manifest.template.yaml reference
+
+**Task 4: Updated docs/ADAPTER_PREVIEW_GATE.md**
+- PENDING → APPROVED_FOR_PRIVATE_TESTING requirement #3: Added `safety_regression_detected` field check requirement
+- "No Automatic Transitions" section: Added bullet that creating a manifest with create_adapter_manifest.py does NOT advance the gate
+- Added new "Template References" section with table for adapter manifest template (training/templates/adapter_manifest.template.yaml) and eval summary template (eval/templates/eval_summary.template.json)
+- Added note that creating a manifest or eval summary does NOT advance the gate
+
+**Task 5: Updated docs/BASELINE_EVAL_PLAN.md**
+- Step 5: Added create_eval_summary.py usage for producing committable summaries, with command and reference to eval/templates/eval_summary.template.json and PRIVATE_EVAL_RESULTS_POLICY.md
+- "How Baseline Results Are Used" #1: Added compare_runs.py --summary-output command example for producing committable comparison summaries
+- Related Documents: Added PRIVATE_EVAL_RESULTS_POLICY.md and eval/templates/eval_summary.template.json
+
+Stage Summary:
+- 5 files modified with minimal, targeted additions
+- eval/scripts/compare_runs.py: 3 new functions (_determine_verdict, _compute_category_deltas, _build_summary_output), 1 new CLI arg (--summary-output), verdict logic, safety regression check
+- 4 docs updated with cross-references to scripts, templates, and policies
+- All changes preserve existing content and style
+- No real training, no model downloads, no HF uploads, no weights, no adapters, no GGUF, no fake benchmarks
+
+---
+Task ID: 13-14
+Agent: Release Validation Agent
+Task: Update check-release.py for v0.1.21 and create tests/test_release_v0121.py
+
+Work Log:
+- Read worklog.md to understand project history and prior work (v0.1.20-alpha, v0.1.21-alpha changes)
+- Read current check-release.py (48 sections, ~1622 lines) to understand structure
+- Read existing test_release_v0120.py for reference style
+- Verified all v0.1.21 files exist: training/templates/adapter_manifest.template.yaml, training/scripts/create_adapter_manifest.py, docs/PRIVATE_SFT_EXECUTION_CHECKLIST.md, docs/SFT_TO_ORPO_DECISION.md, docs/PRIVATE_EVAL_RESULTS_POLICY.md, eval/templates/eval_summary.template.json, eval/scripts/create_eval_summary.py
+- Read create_adapter_manifest.py, create_eval_summary.py, compare_runs.py to understand CLI interfaces for test assertions
+- Read test fixtures (private_eval_raw.json, baseline_eval_result.json, adapter_eval_result.json) to verify test data compatibility
+- Updated check-release.py: changed all section numbering from /48 to /49 (48 occurrences)
+- Added [49/49] v0.1.21 section to check-release.py with 12 checks:
+  1. training/templates/adapter_manifest.template.yaml exists
+  2. training/scripts/create_adapter_manifest.py exists
+  3. docs/PRIVATE_SFT_EXECUTION_CHECKLIST.md exists
+  4. docs/SFT_TO_ORPO_DECISION.md exists
+  5. docs/PRIVATE_EVAL_RESULTS_POLICY.md exists
+  6. eval/templates/eval_summary.template.json exists
+  7. eval/scripts/create_eval_summary.py exists
+  8. ADAPTER_PREVIEW_GATE.md mentions BLOCKED
+  9. ADAPTER_ARTIFACT_POLICY.md mentions adapter_manifest.template or manifest template
+  10. No .safetensors files tracked in git
+  11. No .bin/.pt/.pth/.ckpt files tracked in git
+  12. No .gguf files tracked in git
+- Created tests/test_release_v0121.py with 23 tests in 9 test classes:
+  - TestAdapterManifestTemplate (3 tests): template exists, required fields, BLOCKED by default
+  - TestCreateAdapterManifest (2 tests): script exists, dry-run JSON with safety constraints
+  - TestNewDocs (3 tests): PRIVATE_SFT_EXECUTION_CHECKLIST, SFT_TO_ORPO_DECISION, PRIVATE_EVAL_RESULTS_POLICY
+  - TestEvalSummaryTemplate (3 tests): template exists, parses with required fields, no raw prompts
+  - TestCreateEvalSummary (2 tests): script exists, strips raw outputs
+  - TestCompareRunsVerdict (3 tests): script exists, compare with fixtures, summary output written
+  - TestPreviewGate (2 tests): ADAPTER_PREVIEW_GATE says BLOCKED, manifest template has BLOCKED
+  - TestNoTrackedArtifacts (3 tests): no safetensors/GGUF/weight files tracked
+  - TestVersionConsistency (2 tests): version is 0.1.21-alpha in __init__.py and pyproject.toml
+- Ran python -m pytest tests/test_release_v0121.py -q: 23 passed in 0.35s
+- Ran check-release.py: All checks passed! 49/49 categories, 0 warnings
+
+Stage Summary:
+- scripts/release/check-release.py updated: section numbering /48→/49, new [49/49] v0.1.21 section added
+- tests/test_release_v0121.py created with 23 comprehensive tests
+- All 23 tests passing
+- check-release.py: 49/49 categories all passed
