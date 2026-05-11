@@ -1,7 +1,7 @@
 # Training Stack Compatibility — Kimari Local AI
 
 > **Document Type:** Reference guide for training dependency compatibility and TRL/SFTTrainer version differences  
-> **Version:** v0.1.34-alpha  
+> **Version:** v0.1.35-alpha  
 > **Date:** 2026-06-03  
 > **Gate State:** BLOCKED — no public release, no HF upload
 

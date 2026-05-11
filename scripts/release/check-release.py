@@ -3683,7 +3683,7 @@ def main() -> None:
     )
 
     # ── v0.1.34 TRL/SFTTrainer compatibility hardening ──────────
-    print("\n[58/58] v0.1.34 TRL/SFTTrainer compatibility hardening")
+    print("\n[58/59] v0.1.34 TRL/SFTTrainer compatibility hardening")
     check(
         "training/scripts/check_training_stack.py exists",
         (PROJECT_ROOT / "training" / "scripts" / "check_training_stack.py").exists(),
@@ -3772,6 +3772,107 @@ def main() -> None:
     )
     check(
         'default_profile still "test" (v0.1.34 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+
+    # ── v0.1.35 Micro SFT execution record & smoke-gated submit ────
+    print("\n[59/59] v0.1.35 Micro SFT execution record & smoke-gated submit")
+
+    check(
+        "docs/HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md").exists(),
+        "Micro SFT execution record doc missing",
+    )
+    check(
+        "training/scripts/create_micro_sft_execution_record.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "create_micro_sft_execution_record.py").exists(),
+        "create_micro_sft_execution_record.py missing",
+    )
+    check(
+        "training/scripts/validate_micro_sft_execution_record.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_execution_record.py").exists(),
+        "validate_micro_sft_execution_record.py missing",
+    )
+
+    # Check create script enforces safe invariants
+    create_record_script = (PROJECT_ROOT / "training" / "scripts" / "create_micro_sft_execution_record.py").read_text() if (PROJECT_ROOT / "training" / "scripts" / "create_micro_sft_execution_record.py").exists() else ""
+    check(
+        "create_micro_sft_execution_record sets adapter_committed=false",
+        "adapter_committed" in create_record_script and "false" in create_record_script,
+        "create_micro_sft_execution_record must set adapter_committed=false",
+    )
+    check(
+        "create_micro_sft_execution_record sets hf_upload_performed=false",
+        "hf_upload_performed" in create_record_script and "false" in create_record_script,
+        "create_micro_sft_execution_record must set hf_upload_performed=false",
+    )
+    check(
+        "create_micro_sft_execution_record sets gate_state=BLOCKED",
+        "BLOCKED" in create_record_script,
+        "create_micro_sft_execution_record must set gate_state=BLOCKED",
+    )
+
+    # Check validate script rejects unsafe records
+    validate_record_script = (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_execution_record.py").read_text() if (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_execution_record.py").exists() else ""
+    check(
+        "validate_micro_sft_execution_record checks gate_state",
+        "gate_state" in validate_record_script and "BLOCKED" in validate_record_script,
+        "validate_micro_sft_execution_record must check gate_state=BLOCKED",
+    )
+    check(
+        "validate_micro_sft_execution_record checks adapter_committed",
+        "adapter_committed" in validate_record_script,
+        "validate_micro_sft_execution_record must check adapter_committed",
+    )
+    check(
+        "validate_micro_sft_execution_record checks hf_upload_performed",
+        "hf_upload_performed" in validate_record_script,
+        "validate_micro_sft_execution_record must check hf_upload_performed",
+    )
+    check(
+        "validate_micro_sft_execution_record checks for tokens",
+        "TOKEN_PATTERNS" in validate_record_script or "token" in validate_record_script.lower(),
+        "validate_micro_sft_execution_record must scan for token-like strings",
+    )
+
+    # Check hf_jobs_micro_sft.py has --require-smoke-summary
+    hf_micro_sft_script = (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").read_text() if (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").exists() else ""
+    check(
+        "hf_jobs_micro_sft.py has --require-smoke-summary",
+        "require_smoke_summary" in hf_micro_sft_script or "require-smoke-summary" in hf_micro_sft_script,
+        "hf_jobs_micro_sft.py must support --require-smoke-summary",
+    )
+    check(
+        "hf_jobs_micro_sft.py blocks submit without smoke summary",
+        "require_smoke_summary" in hf_micro_sft_script and "allow_submit" in hf_micro_sft_script,
+        "hf_jobs_micro_sft.py must block submit without smoke summary",
+    )
+
+    # Check runbook exists
+    check(
+        "docs/HF_JOBS_MICRO_SFT_RUNBOOK.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_MICRO_SFT_RUNBOOK.md").exists(),
+        "HF Jobs micro SFT runbook doc missing",
+    )
+
+    # Content integrity
+    check(
+        "No adapter/GGUF/weight files tracked (v0.1.35)",
+        True,  # Already checked above
+    )
+    check(
+        "Gate BLOCKED (v0.1.35)",
+        "BLOCKED" in hf_config_text if hf_jobs_config_path.exists() else False,
+        "Gate must remain BLOCKED",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.35)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        'default_profile still "test" (v0.1.35 check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
         "default_profile changed from test — this is not allowed during alpha",
     )

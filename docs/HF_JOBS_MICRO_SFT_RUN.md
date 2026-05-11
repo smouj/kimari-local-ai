@@ -1,7 +1,7 @@
 # HF Jobs Micro SFT Run — Kimari Local AI
 
 > **Document Type:** Guide for running Kimari-4B micro SFT on Hugging Face Jobs  
-> **Version:** v0.1.34-alpha  
+> **Version:** v0.1.35-alpha
 > **Date:** 2026-06-03  
 > **Status:** Active — governs micro SFT execution on HF Jobs  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -113,6 +113,20 @@ python training/scripts/check_training_stack.py --json
 
 The checker inspects installed Python packages and their API signatures. It does NOT download models, access GPU, or run training. See [TRAINING_STACK_COMPATIBILITY.md](TRAINING_STACK_COMPATIBILITY.md) for details.
 
+### Step 1.6: Create Pending Execution Record
+
+Before submitting, create a pending execution record:
+
+```bash
+python training/scripts/create_micro_sft_execution_record.py \
+  --status pending \
+  --adapter-generated unknown \
+  --output /tmp/micro_sft_execution_record.json \
+  --json
+```
+
+This record will be updated after the job completes. See [HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md](HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md) for details.
+
 ### Step 2: Dry-Run (No Execution)
 
 ```bash
@@ -158,6 +172,8 @@ python training/scripts/hf_jobs_micro_sft.py \
 ```
 
 **If either `--allow-submit` or `--yes` is missing, the job will NOT be submitted.**
+
+Note: v0.1.35+ requires --require-smoke-summary for submission. See [HF_JOBS_MICRO_SFT_RUNBOOK.md](HF_JOBS_MICRO_SFT_RUNBOOK.md) for the full procedure.
 
 ### Step 5: Check Job Status
 
@@ -321,6 +337,8 @@ After a successful micro SFT:
 | [KIMARI4B_PRIVATE_SFT_RUN.md](KIMARI4B_PRIVATE_SFT_RUN.md) | Full private SFT guide |
 | [MICRO_SFT_IMPLEMENTATION.md](MICRO_SFT_IMPLEMENTATION.md) | Micro SFT implementation details (train_sft_lora.py) |
 | [TRAINING_STACK_COMPATIBILITY.md](TRAINING_STACK_COMPATIBILITY.md) | Training dependency compatibility and TRL/SFTTrainer version differences |
+| [HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md](HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md) | Execution record format and validation |
+| [HF_JOBS_MICRO_SFT_RUNBOOK.md](HF_JOBS_MICRO_SFT_RUNBOOK.md) | Step-by-step runbook for HF Jobs micro SFT |
 | [HF_TOKEN_SAFETY.md](HF_TOKEN_SAFETY.md) | Token safety procedures |
 | [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Gate state machine (BLOCKED) |
 

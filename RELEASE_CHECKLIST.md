@@ -651,6 +651,26 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.35 Checks
+
+- [ ] docs/HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md exists
+- [ ] training/scripts/create_micro_sft_execution_record.py works with --json
+- [ ] training/scripts/validate_micro_sft_execution_record.py works with --json
+- [ ] hf_jobs_micro_sft.py has --require-smoke-summary flag
+- [ ] Submit blocked without --require-smoke-summary (unless --override-smoke-gate)
+- [ ] docs/HF_JOBS_MICRO_SFT_RUNBOOK.md exists
+- [ ] create_micro_sft_execution_record always sets adapter_committed=false
+- [ ] create_micro_sft_execution_record always sets hf_upload_performed=false
+- [ ] create_micro_sft_execution_record always sets gate_state=BLOCKED
+- [ ] validate_micro_sft_execution_record rejects gate != BLOCKED
+- [ ] validate_micro_sft_execution_record rejects adapter_committed=true
+- [ ] validate_micro_sft_execution_record rejects hf_upload_performed=true
+- [ ] validate_micro_sft_execution_record rejects raw_logs_committed=true
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

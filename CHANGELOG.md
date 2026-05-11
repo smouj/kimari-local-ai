@@ -5,6 +5,21 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.35-alpha] - 2026-06-03
+
+### Added
+- `training/scripts/create_micro_sft_execution_record.py` — Generates sanitized micro SFT execution records
+- `training/scripts/validate_micro_sft_execution_record.py` — Validates execution records for safety (gate BLOCKED, no adapter committed, no HF upload, no raw logs, no tokens)
+- `docs/HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md` — Execution record template and documentation
+- `docs/HF_JOBS_MICRO_SFT_RUNBOOK.md` — Step-by-step runbook for HF Jobs micro SFT execution
+
+### Changed
+- `hf_jobs_micro_sft.py` — Added --require-smoke-summary flag, submit blocked without validated smoke summary unless --override-smoke-gate
+- README, docs/index.html, docs/HF_JOBS_MICRO_SFT_RUN.md, docs/KIMARI4B_PRIVATE_SFT_RUN.md updated with version references
+
+### Fixed
+- No training in CI. No adapters committed. No HF upload. No raw logs. Gate still BLOCKED. Execution record ensures safe capture of micro SFT results.
+
 ## [0.1.34-alpha] - 2026-06-03
 
 ### Added

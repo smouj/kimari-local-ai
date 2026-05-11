@@ -6,11 +6,12 @@ Micro SFT validates the training pipeline with minimal steps.
 
 By default does NOT submit. Requires --allow-submit --yes for actual submission.
 No --token argument. No token printing. No file uploads.
+--require-smoke-summary is required for submission unless --override-smoke-gate is used.
 
 Usage:
     python training/scripts/hf_jobs_micro_sft.py --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml --dry-run --json
     python training/scripts/hf_jobs_micro_sft.py --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml --print-command
-    python training/scripts/hf_jobs_micro_sft.py --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml --allow-submit --yes
+    python training/scripts/hf_jobs_micro_sft.py --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml --require-smoke-summary /tmp/smoke_summary.json --allow-submit --yes
 """
 
 from __future__ import annotations
@@ -89,6 +90,39 @@ def check_smoke_summary_validated(config: dict, override: bool) -> tuple[bool, s
     return True, "Smoke summary validated"
 
 
+def validate_smoke_summary_file(summary_path: Path) -> tuple[bool, str]:
+    """Validate a smoke summary JSON file.
+
+    Checks that the file exists, contains valid JSON, has status == "completed",
+    and gate_state == "BLOCKED".
+
+    Never raises — always returns a (bool, str) tuple.
+    """
+    try:
+        if not summary_path.exists():
+            return False, f"Smoke summary file not found: {summary_path}"
+
+        try:
+            data = json.loads(summary_path.read_text())
+        except json.JSONDecodeError as e:
+            return False, f"Smoke summary file is not valid JSON: {e}"
+
+        if not isinstance(data, dict):
+            return False, f"Smoke summary file is not a JSON object, got: {type(data).__name__}"
+
+        status = data.get("status")
+        if status != "completed":
+            return False, f"Smoke summary status is '{status}', expected 'completed'"
+
+        gate_state = data.get("gate_state")
+        if gate_state != "BLOCKED":
+            return False, f"Smoke summary gate_state is '{gate_state}', expected 'BLOCKED'"
+
+        return True, f"Smoke summary validated: {summary_path}"
+    except Exception as e:
+        return False, f"Unexpected error validating smoke summary: {e}"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="HF Jobs micro SFT wrapper for Kimari-4B. "
@@ -137,6 +171,13 @@ def main() -> None:
         dest="override_smoke_gate",
         help="Override smoke test gate (not recommended)",
     )
+    parser.add_argument(
+        "--require-smoke-summary",
+        type=Path,
+        dest="require_smoke_summary",
+        default=None,
+        help="Path to validated smoke summary JSON. Required for submission unless --override-smoke-gate is used.",
+    )
 
     args = parser.parse_args()
 
@@ -179,6 +220,16 @@ def main() -> None:
         print(f"SMOKE GATE: {smoke_msg}", file=sys.stderr)
         sys.exit(1)
 
+    # Validate --require-smoke-summary if provided
+    smoke_summary_validated = False
+    if args.require_smoke_summary is not None:
+        smoke_summary_validated, smoke_summary_validation_msg = validate_smoke_summary_file(args.require_smoke_summary)
+        if not smoke_summary_validated and not args.dry_run and not args.print_command and not args.override_smoke_gate:
+            print(f"ERROR: {smoke_summary_validation_msg}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        smoke_summary_validation_msg = "--require-smoke-summary not provided"
+
     # Build the hf jobs command
     # Use a shell script approach: all commands joined by &&
     commands = config.get("commands", [])
@@ -210,6 +261,8 @@ def main() -> None:
         "allow_hf_upload": allow_hf_upload is False,
         "preview_gate_state": gate_state,
         "smoke_gate": smoke_msg,
+        "smoke_summary_path": str(args.require_smoke_summary) if args.require_smoke_summary else None,
+        "smoke_summary_validated": smoke_summary_validated if args.require_smoke_summary is not None else False,
         "forbidden_actions": forbidden,
         "safety_warnings": [
             "This will run a micro SFT job on HF Jobs infrastructure.",
@@ -299,6 +352,15 @@ def main() -> None:
     if not smoke_ok:
         print(f"SMOKE GATE: {smoke_msg}", file=sys.stderr)
         sys.exit(1)
+
+    # Require --require-smoke-summary for submission
+    if not args.override_smoke_gate:
+        if args.require_smoke_summary is None:
+            print("ERROR: --require-smoke-summary is required for submission. Provide a validated smoke summary path or use --override-smoke-gate.", file=sys.stderr)
+            sys.exit(1)
+        if not smoke_summary_validated:
+            print(f"ERROR: {smoke_summary_validation_msg}", file=sys.stderr)
+            sys.exit(1)
 
     # Verify hf CLI exists
     try:

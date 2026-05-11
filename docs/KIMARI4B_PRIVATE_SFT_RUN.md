@@ -1,8 +1,8 @@
 # Kimari-4B Private SFT Run — First Training Execution Guide
 
 > **Document Type:** Execution guide for the first private SFT run of Kimari-4B  
-> **Version:** v0.1.32-alpha  
-> **Date:** 2026-06-02  
+> **Version:** v0.1.35-alpha  
+> **Date:** 2026-06-03  
 > **Status:** Active — governs the first private SFT training execution  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -374,6 +374,33 @@ See [HF_JOBS_MICRO_SFT_RUN.md](HF_JOBS_MICRO_SFT_RUN.md) for the full micro SFT 
 
 **No publication.** Micro SFT and full SFT outputs stay local. Gate remains BLOCKED.
 
+### Micro SFT Execution Record
+
+As of v0.1.35-alpha, every micro SFT execution produces a sanitized execution record:
+
+```bash
+# Create record
+python training/scripts/create_micro_sft_execution_record.py \
+  --status completed \
+  --adapter-generated true \
+  --output /tmp/micro_sft_execution_record.json \
+  --json
+
+# Validate record
+python training/scripts/validate_micro_sft_execution_record.py \
+  --record /tmp/micro_sft_execution_record.json \
+  --json
+```
+
+The record ensures:
+- No adapter committed
+- No HF upload performed
+- No GGUF generated
+- No raw logs committed
+- Gate remains BLOCKED
+
+See [HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md](HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md) for format details.
+
 ---
 
 ## Cross-Reference
@@ -390,6 +417,8 @@ See [HF_JOBS_MICRO_SFT_RUN.md](HF_JOBS_MICRO_SFT_RUN.md) for the full micro SFT 
 | [PRIVATE_TRAINING_RUNBOOK.md](PRIVATE_TRAINING_RUNBOOK.md) | Step-by-step runbook |
 | [PRIVATE_RUN_ARTIFACTS.md](PRIVATE_RUN_ARTIFACTS.md) | Artifact classification |
 | [HF_TOKEN_SAFETY.md](HF_TOKEN_SAFETY.md) | Token safety procedures |
+| [HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md](HF_JOBS_MICRO_SFT_EXECUTION_RECORD.md) | Micro SFT execution record format |
+| [HF_JOBS_MICRO_SFT_RUNBOOK.md](HF_JOBS_MICRO_SFT_RUNBOOK.md) | Step-by-step runbook |
 
 ---
 

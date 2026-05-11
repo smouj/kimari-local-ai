@@ -411,7 +411,7 @@
 - ✅ hf_jobs config includes --micro-run --yes
 - ✅ Gate BLOCKED
 
-## v0.1.34-alpha (Current)
+## v0.1.34-alpha (Released)
 
 - ✅ Training stack compatibility checker (check_training_stack.py)
 - ✅ TRL/SFTTrainer compatibility hardening (build_training_arguments, build_sft_trainer, prepare_sft_dataset)
@@ -419,6 +419,13 @@
 - ✅ Dataset formatting: messages → text conversion, text column direct support
 - ✅ docs/TRAINING_STACK_COMPATIBILITY.md
 - ✅ HF Jobs config includes check_training_stack before training
+- ✅ Gate BLOCKED
+
+## v0.1.35-alpha (Current)
+
+- ✅ Micro SFT execution record (create/validate scripts, docs)
+- ✅ hf_jobs_micro_sft.py smoke-gated submit (--require-smoke-summary)
+- ✅ HF Jobs micro SFT runbook
 - ✅ Gate BLOCKED
 
 ## v0.2.0-alpha
