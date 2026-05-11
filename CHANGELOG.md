@@ -5,6 +5,34 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.29-alpha] — 2026-05-31
+
+### Added
+- **docs/HF_JOBS_PRIVATE_RUN.md** — Guide for running Kimari-4B smoke tests on Hugging Face Jobs; HF login requirements, budget guidance ($10), recommended flavors (A10G/L4 for smoke, A100 for training only), forbidden actions, security checklist; no training, no upload, no export, gate BLOCKED
+- **docs/HF_JOBS_RESULT_HANDOFF.md** — Guide for bringing sanitized results from HF Jobs to the repo; what to bring (job ID, smoke summary, sanitized logs), what NOT to bring (adapters, checkpoints, GGUF, raw logs, tokens), sanitization process, emergency token response
+- **training/configs/hf_jobs_kimari4b_smoke.v0.yaml** — Config for HF Jobs smoke test; job_name, image (pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel), flavor (a10g-small), max_budget_usd: 10, allow_training: false, allow_hf_upload: false, commands (nvidia-smi, torch cuda check, git clone, pip install, dataset dry-run, SFT dry-run), forbidden actions list
+- **training/scripts/hf_jobs_private_run.py** — CLI wrapper for HF Jobs smoke test submission; --config, --print-command, --dry-run, --json, --allow-submit, --yes; by default does NOT submit; requires --allow-submit AND --yes for submission; no --token flag; verifies hf CLI and auth; captures job ID; no file uploads
+- **training/scripts/hf_jobs_status.py** — Read-only CLI for checking HF Jobs status; --job-id, --json, --logs, --tail; uses hf jobs inspect/logs; does not modify or cancel jobs; no tokens as arguments
+- **training/templates/hf_jobs_smoke_summary.template.json** — Template for sanitized HF Jobs smoke test summary; job_id, flavor, image, status, gpu_detected, torch_cuda_available, repo_installed, dataset_dryrun_passed, sft_dryrun_passed, training_performed: false, adapter_generated: false, hf_upload_performed: false, gate_state: BLOCKED
+- **training/scripts/validate_private_sft_commands.py** — CLI to validate generated private SFT commands against train_sft_lora.py supported flags; --command-json, --training-script, --json; detects unsupported flags; verifies gate BLOCKED, public_release_allowed=false, hf_upload_allowed=false; checks no HF upload commands
+
+### Changed
+- **Version bumped** to `0.1.29-alpha`
+- **training/configs/kimari4b_private_sft_run.v0.yaml** — Renamed `expected_artifacts` to `expected_local_artifacts`; renamed `forbidden_artifacts` to `forbidden_commit_artifacts`; added `local_only: true`, `commit_allowed: false`, `publish_allowed: false`, `artifact_policy_note`
+- **training/scripts/kimari4b_private_sft_command.py** — Removed unsupported flags (--dataset-path, --eval-dataset-path, --output-dir) from training_real command; training_real now only uses --config; added command_compatibility_note, command_compatibility_status, unsupported_flags_removed fields to output
+- **training/scripts/train_sft_lora.py** — Added --show-supported-flags and --json flags; --show-supported-flags lists all supported CLI flags without importing torch/transformers; works before PyYAML check
+- **docs/KIMARI4B_PRIVATE_SFT_RUN.md** — Added Section 11: HF Jobs smoke test path; updated version to v0.1.29-alpha
+- **docs/KIMARI4B_FIRST_RUN_CHECKLIST.md** — Added HF Jobs login, smoke test before training, budget confirmed, no --token in CLI, validate_private_sft_commands.py items; updated version to v0.1.29-alpha
+- **docs/HF_TOKEN_SAFETY.md** — Added Section 9: HF Jobs token usage (no --token in saved commands, prefer local login, review logs before sharing, sanitize outputs); renumbered sections 9→10 and 10→11; updated version to v0.1.29-alpha
+- **README.md** — Added Hugging Face Jobs private smoke test section; updated version badge and references to v0.1.29-alpha
+- **docs/index.html** — Updated hero badge and What's New section for v0.1.29-alpha; added HF Jobs smoke test block
+- **RELEASE_CHECKLIST.md** — Added v0.1.29 Checks section
+- **scripts/release/check-release.py** — Extended with v0.1.29 checks (HF_JOBS_PRIVATE_RUN, HF_JOBS_RESULT_HANDOFF, hf_jobs config, hf_jobs_private_run.py, hf_jobs_status.py, smoke summary template, no --token flag, allow-submit + yes required, allow_training false, allow_hf_upload false, gate BLOCKED, command compatibility, validate_private_sft_commands)
+- **ROADMAP.md** — v0.1.28-alpha marked as Released; v0.1.29-alpha marked as Current; v0.1.30-alpha Planned
+
+### Added
+- **tests/test_release_v0129.py** — Comprehensive tests for v0.1.29 artifacts
+
 ## [0.1.28-alpha] — 2026-05-30
 
 ### Added

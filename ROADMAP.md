@@ -347,7 +347,7 @@
 - ✅ Safe CLI screenshots plan script
 - ✅ Updated docs/SCREENSHOTS.md
 
-## v0.1.28-alpha (Current)
+## v0.1.28-alpha (Released)
 
 - ✅ Kimari-4B first private SFT run guide (docs/KIMARI4B_PRIVATE_SFT_RUN.md)
 - ✅ Private SFT run config (training/configs/kimari4b_private_sft_run.v0.yaml)
@@ -359,10 +359,22 @@
 - ✅ Updated FIRST_PRIVATE_SFT_HANDOFF.md with Kimari-4B specific section
 - ✅ Updated ADAPTER_PREVIEW_GATE.md with Kimari-4B BLOCKED status
 
-## v0.1.29-alpha (Planned)
+## v0.1.29-alpha (Current)
 
-- First private SFT result summary (if training executed)
-- OR Gateway read-only FastAPI prototype
+- ✅ HF Jobs private smoke wrapper and config
+- ✅ Command compatibility fix (unsupported flags removed)
+- ✅ train_sft_lora --show-supported-flags
+- ✅ validate_private_sft_commands script
+- ✅ hf_jobs_private_run and hf_jobs_status scripts
+- ✅ HF Jobs smoke summary template
+- ✅ HF_JOBS_PRIVATE_RUN and HF_JOBS_RESULT_HANDOFF docs
+- ✅ Artifact field naming fix (expected_local_artifacts, forbidden_commit_artifacts)
+
+## v0.1.30-alpha (Planned)
+
+- Execute real HF Jobs smoke test
+- Validate smoke test results
+- Micro SFT private run if smoke passes
 
 ## v0.2.0-alpha
 

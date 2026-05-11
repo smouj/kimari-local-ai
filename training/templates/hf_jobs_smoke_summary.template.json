@@ -1,0 +1,20 @@
+{
+  "job_id": "PLACEHOLDER",
+  "job_name": "PLACEHOLDER",
+  "flavor": "PLACEHOLDER",
+  "image": "PLACEHOLDER",
+  "started_at": null,
+  "finished_at": null,
+  "status": "PLACEHOLDER",
+  "gpu_detected": null,
+  "torch_cuda_available": null,
+  "repo_installed": null,
+  "dataset_dryrun_passed": null,
+  "sft_dryrun_passed": null,
+  "training_performed": false,
+  "adapter_generated": false,
+  "hf_upload_performed": false,
+  "logs_sanitized": true,
+  "gate_state": "BLOCKED",
+  "notes": "Template — fill with real data from HF Jobs smoke test. Gate must stay BLOCKED. No training performed. No adapter generated. No HF upload. Logs must be sanitized before committing."
+}

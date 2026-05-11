@@ -504,6 +504,35 @@ twine upload dist/*
 - [ ] Preview gate still BLOCKED
 - [ ] `default_profile` is still "test"
 
+## v0.1.29 Checks
+
+- [ ] docs/HF_JOBS_PRIVATE_RUN.md exists
+- [ ] docs/HF_JOBS_RESULT_HANDOFF.md exists
+- [ ] training/configs/hf_jobs_kimari4b_smoke.v0.yaml exists
+- [ ] training/scripts/hf_jobs_private_run.py exists
+- [ ] training/scripts/hf_jobs_status.py exists
+- [ ] training/templates/hf_jobs_smoke_summary.template.json exists
+- [ ] training/scripts/validate_private_sft_commands.py exists
+- [ ] hf_jobs_private_run.py does not accept --token
+- [ ] hf_jobs_private_run.py requires --allow-submit and --yes for submission
+- [ ] hf_jobs_private_run.py --dry-run does not submit
+- [ ] hf_jobs_private_run.py --print-command works
+- [ ] Smoke config has allow_training: false
+- [ ] Smoke config has allow_hf_upload: false
+- [ ] train_sft_lora.py --show-supported-flags --json works
+- [ ] kimari4b_private_sft_run.v0.yaml has expected_local_artifacts (not expected_artifacts)
+- [ ] kimari4b_private_sft_run.v0.yaml has forbidden_commit_artifacts (not forbidden_artifacts)
+- [ ] kimari4b_private_sft_run.v0.yaml has local_only: true
+- [ ] Command generator training_real has no --dataset-path, --eval-dataset-path, --output-dir
+- [ ] validate_private_sft_commands validates generated JSON
+- [ ] hf_jobs_status.py is read-only
+- [ ] HF_TOKEN_SAFETY.md has HF Jobs section
+- [ ] KIMARI4B_PRIVATE_SFT_RUN.md has HF Jobs smoke test section
+- [ ] KIMARI4B_FIRST_RUN_CHECKLIST.md has HF Jobs items
+- [ ] Gate still BLOCKED
+- [ ] `default_profile` is still "test"
+- [ ] No "Kimari-4B released" false claim anywhere
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

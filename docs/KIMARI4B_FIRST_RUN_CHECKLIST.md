@@ -1,8 +1,8 @@
 # Kimari-4B First Private SFT Run Checklist
 
 > **Document Type:** Pre-flight checklist for first private SFT run  
-> **Version:** v0.1.28-alpha  
-> **Date:** 2026-05-30  
+> **Version:** v0.1.29-alpha  
+> **Date:** 2026-05-31  
 > **Status:** Active — complete every item before training  
 > **Gate State:** BLOCKED
 
@@ -19,7 +19,7 @@ This checklist must be completed **in full** before starting the first private S
 - [ ] **HF token not exposed** — No `hf_` strings in any output file, config, or environment variable that could be committed
 - [ ] **No API keys in configs** — Run `python scripts/security/scan_for_secrets.py --paths training eval --json`
 - [ ] **No .env files with real secrets** — `.env` is gitignored; no real tokens in any tracked file
-- [ ] **Token handling reviewed** — See `docs/HF_TOKEN_SAFETY.md`
+- [ ] **HF Jobs login secure** — If using HF Jobs, login via `hf auth login` locally only; no `--token` flags in any command
 
 ## 2. License
 
@@ -47,7 +47,8 @@ This checklist must be completed **in full** before starting the first private S
 - [ ] **RunPod/local GPU prepared** — GPU with 10+ GB VRAM available; 16+ GB recommended
 - [ ] **Training dependencies installed** — `pip install -r training/requirements-training.txt` succeeds
 - [ ] **Preflight passes** — `python training/scripts/preflight_private_sft.py --run-config training/configs/kimari4b_private_sft_run.v0.yaml --json` passes
-- [ ] **CUDA available** — `torch.cuda.is_available()` returns True on training machine
+- [ ] **Smoke test before training** — Run HF Jobs smoke test or local GPU smoke test before attempting real training
+- [ ] **Budget confirmed** — If using HF Jobs, budget approved and under $10 for smoke tests
 
 ## 6. Output Directory
 
@@ -71,7 +72,8 @@ This checklist must be completed **in full** before starting the first private S
 
 - [ ] **hf_upload_allowed is false** — Confirmed in `training/configs/kimari4b_private_sft_run.v0.yaml`
 - [ ] **No automated HF upload** — No script or CI job will upload to Hugging Face
-- [ ] **HF release process documented** — `docs/HUGGINGFACE_RELEASE.md` reviewed; not followed yet
+- [ ] **No HF Jobs token in CLI** — Never pass `--token` to hf commands; use local login only
+- [ ] **validate_private_sft_commands.py passes** — `python training/scripts/validate_private_sft_commands.py --command-json /tmp/kimari4b_commands.json --training-script training/scripts/train_sft_lora.py --json`
 
 ## 10. Gate BLOCKED
 

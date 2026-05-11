@@ -14,14 +14,14 @@ preview_gate: docs/ADAPTER_PREVIEW_GATE.md
 public_release_allowed: false
 hf_upload_allowed: false
 preview_gate_state: BLOCKED
-expected_artifacts:
+expected_local_artifacts:
   - adapter_config.json
   - adapter_model.safetensors
   - tokenizer.json
   - trainer_state.json
   - training_args.bin
   - MANIFEST.yaml
-forbidden_artifacts:
+forbidden_commit_artifacts:
   - "*.gguf"
   - "*.safetensors"
   - "checkpoint-*/"
@@ -29,5 +29,9 @@ forbidden_artifacts:
   - "*.pth"
   - "*-merged/"
   - "*-raw.json"
+local_only: true
+commit_allowed: false
+publish_allowed: false
+artifact_policy_note: "Expected local artifacts must never be committed. Only sanitized summaries/manifests may be committed after review."
 notes: "First private SFT run for Kimari-4B. Base: SmolLM3-3B. Method: LoRA/QLoRA. No public release. No HF upload. See KIMARI4B_PRIVATE_SFT_RUN.md for full guide. Gate stays BLOCKED."
 created_date: "2026-05-30"

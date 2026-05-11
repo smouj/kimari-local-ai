@@ -157,10 +157,7 @@ def generate_commands(config: dict, config_path: Path) -> dict:
 
     training_real = [
         f"python training/scripts/train_sft_lora.py "
-        f"--config {sft_config} "
-        f"--dataset-path {dataset_build_dir}/sft.train.jsonl "
-        f"--eval-dataset-path {dataset_build_dir}/sft.eval.jsonl "
-        f"--output-dir {output_dir}",
+        f"--config {sft_config}",
     ]
 
     baseline_eval = [
@@ -237,6 +234,13 @@ def generate_commands(config: dict, config_path: Path) -> dict:
         "summary": summary,
         "secret_scan": secret_scan,
         "forbidden_actions": forbidden_actions,
+        "command_compatibility_note": "Dataset/output_dir are defined in the SFT config YAML.",
+        "command_compatibility_status": "compatible_with_current_training_skeleton",
+        "unsupported_flags_removed": [
+            "--dataset-path",
+            "--eval-dataset-path",
+            "--output-dir",
+        ],
         "gate_state": config.get("preview_gate_state", "BLOCKED"),
         "public_release_allowed": bool(config.get("public_release_allowed", False)),
         "hf_upload_allowed": bool(config.get("hf_upload_allowed", False)),

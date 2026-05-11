@@ -1,8 +1,8 @@
 # Kimari-4B Private SFT Run — First Training Execution Guide
 
 > **Document Type:** Execution guide for the first private SFT run of Kimari-4B  
-> **Version:** v0.1.28-alpha  
-> **Date:** 2026-05-30  
+> **Version:** v0.1.29-alpha  
+> **Date:** 2026-05-31  
 > **Status:** Active — governs the first private SFT training execution  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -312,6 +312,44 @@ Kimari-4B weights, adapters, and GGUF exports will **not** be uploaded to Huggin
 3. The Hugging Face release process in `docs/HUGGINGFACE_RELEASE.md` is followed
 
 No automated process will upload anything to Hugging Face.
+
+---
+
+## 11. HF Jobs Smoke Test Path
+
+Before running any real training, validate the environment with a smoke test on Hugging Face Jobs.
+
+### Sequence
+
+1. **First: Smoke test** — Validate GPU, torch, repo install, dataset dry-run, SFT dry-run
+2. **Then: Micro-run** (optional) — Ultra-short training run if budget allows and smoke test passes
+3. **Never: Long training on first attempt** — Don't use the entire budget in one try
+
+### Smoke Test
+
+```bash
+# Dry-run (no submission)
+python training/scripts/hf_jobs_private_run.py \
+    --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \
+    --dry-run --json
+
+# Print command
+python training/scripts/hf_jobs_private_run.py \
+    --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \
+    --print-command
+
+# Submit (requires double confirmation)
+python training/scripts/hf_jobs_private_run.py \
+    --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \
+    --allow-submit --yes
+```
+
+### Key Rules
+
+- **No HF upload** — The smoke config forbids uploads
+- **No training** — The smoke config has `allow_training: false`
+- **Budget: start with $10** — Don't spend more on smoke tests
+- **See `docs/HF_JOBS_PRIVATE_RUN.md`** for the full guide
 
 ---
 

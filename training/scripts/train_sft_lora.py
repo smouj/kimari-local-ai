@@ -511,8 +511,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--config",
-        required=True,
-        help="Path to YAML configuration file",
+        required=False,
+        help="Path to YAML configuration file (required unless --show-supported-flags)",
     )
     parser.add_argument(
         "--dry-run",
@@ -535,8 +535,47 @@ def main() -> None:
         action="store_true",
         help="Fail if dataset_path does not exist on disk.",
     )
+    parser.add_argument(
+        "--show-supported-flags",
+        action="store_true",
+        help="Print all supported CLI flags and exit. Does not require torch/transformers.",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Output structured JSON (used with --show-supported-flags).",
+    )
 
     args = parser.parse_args()
+
+    # --show-supported-flags: print supported flags and exit (no imports needed)
+    if args.show_supported_flags:
+        supported = {
+            "script": "training/scripts/train_sft_lora.py",
+            "supported_flags": [
+                "--config",
+                "--dry-run",
+                "--print-command",
+                "--estimate-only",
+                "--require-dataset",
+                "--show-supported-flags",
+                "--json",
+            ],
+            "note": "No training is performed by this script. --show-supported-flags does not import torch/transformers.",
+        }
+        if args.json_output:
+            print(json.dumps(supported, indent=2))
+        else:
+            print("Supported flags for train_sft_lora.py:")
+            for flag in supported["supported_flags"]:
+                print(f"  {flag}")
+        sys.exit(0)
+
+    # Config is required for all other operations
+    if not args.config:
+        print("ERROR: --config is required", file=sys.stderr)
+        sys.exit(1)
 
     # Step 1: Check PyYAML first (needed to load config — even for dry-run)
     check_yaml()

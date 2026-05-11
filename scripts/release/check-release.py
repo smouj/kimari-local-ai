@@ -2893,6 +2893,140 @@ def main() -> None:
             "Version 0.1.27 not found in docs/index.html",
         )
 
+    # ── v0.1.29 HF Jobs checks ────────────────────────────────────
+    print("\n[55/55] v0.1.29 HF Jobs checks")
+    check(
+        "docs/HF_JOBS_PRIVATE_RUN.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_PRIVATE_RUN.md").exists(),
+        "HF Jobs private run guide missing",
+    )
+    check(
+        "docs/HF_JOBS_RESULT_HANDOFF.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_RESULT_HANDOFF.md").exists(),
+        "HF Jobs result handoff guide missing",
+    )
+    check(
+        "training/configs/hf_jobs_kimari4b_smoke.v0.yaml exists",
+        (PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_smoke.v0.yaml").exists(),
+        "HF Jobs smoke config missing",
+    )
+    check(
+        "training/scripts/hf_jobs_private_run.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_private_run.py").exists(),
+        "HF Jobs private run script missing",
+    )
+    check(
+        "training/scripts/hf_jobs_status.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_status.py").exists(),
+        "HF Jobs status script missing",
+    )
+    check(
+        "training/templates/hf_jobs_smoke_summary.template.json exists",
+        (PROJECT_ROOT / "training" / "templates" / "hf_jobs_smoke_summary.template.json").exists(),
+        "HF Jobs smoke summary template missing",
+    )
+    check(
+        "training/scripts/validate_private_sft_commands.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "validate_private_sft_commands.py").exists(),
+        "validate_private_sft_commands.py missing",
+    )
+
+    # Check hf_jobs_private_run.py does not accept --token
+    hf_run_script = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_private_run.py"
+    if hf_run_script.exists():
+        hf_run_text = hf_run_script.read_text()
+        check(
+            "hf_jobs_private_run.py does not accept --token",
+            '"--token"' not in hf_run_text and "'--token'" not in hf_run_text,
+            "--token flag found in hf_jobs_private_run.py — must not accept tokens as arguments",
+        )
+        check(
+            "hf_jobs_private_run.py requires --allow-submit",
+            "--allow-submit" in hf_run_text,
+            "--allow-submit flag missing from hf_jobs_private_run.py",
+        )
+        check(
+            "hf_jobs_private_run.py requires --yes",
+            '"--yes"' in hf_run_text or "'--yes'" in hf_run_text,
+            "--yes flag missing from hf_jobs_private_run.py",
+        )
+    else:
+        check("hf_jobs_private_run.py exists", False, "file not found")
+
+    # Check smoke config safety
+    smoke_config_path = PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_smoke.v0.yaml"
+    if smoke_config_path.exists():
+        smoke_config = None
+        try:
+            import yaml
+            with open(smoke_config_path) as f:
+                smoke_config = yaml.safe_load(f)
+        except ImportError:
+            # Simple parser
+            smoke_config = {}
+            for line in smoke_config_path.read_text().splitlines():
+                stripped = line.strip()
+                if stripped.startswith("allow_training:"):
+                    val = stripped.split(":", 1)[1].strip()
+                    smoke_config["allow_training"] = val.lower() == "true"
+                elif stripped.startswith("allow_hf_upload:"):
+                    val = stripped.split(":", 1)[1].strip()
+                    smoke_config["allow_hf_upload"] = val.lower() == "true"
+
+        if smoke_config:
+            check(
+                "smoke config has allow_training: false",
+                smoke_config.get("allow_training") is False,
+                "Smoke config must have allow_training: false",
+            )
+            check(
+                "smoke config has allow_hf_upload: false",
+                smoke_config.get("allow_hf_upload") is False,
+                "Smoke config must have allow_hf_upload: false",
+            )
+
+    # Check command compatibility
+    run_config_path = PROJECT_ROOT / "training" / "configs" / "kimari4b_private_sft_run.v0.yaml"
+    if run_config_path.exists():
+        run_config_text = run_config_path.read_text()
+        check(
+            "kimari4b config has expected_local_artifacts",
+            "expected_local_artifacts" in run_config_text,
+            "expected_local_artifacts field missing — should replace expected_artifacts",
+        )
+        check(
+            "kimari4b config has forbidden_commit_artifacts",
+            "forbidden_commit_artifacts" in run_config_text,
+            "forbidden_commit_artifacts field missing — should replace forbidden_artifacts",
+        )
+        check(
+            "kimari4b config no old expected_artifacts field",
+            "expected_artifacts:" not in run_config_text,
+            "Old 'expected_artifacts:' field found — should be 'expected_local_artifacts'",
+        )
+
+    # Check hf_jobs_status is read-only
+    hf_status_script = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_status.py"
+    if hf_status_script.exists():
+        hf_status_text = hf_status_script.read_text().lower()
+        check(
+            "hf_jobs_status.py is read-only (mentions read-only)",
+            "read-only" in hf_status_text or "read only" in hf_status_text,
+            "hf_jobs_status.py should clearly state it is read-only",
+        )
+
+    # Gate still BLOCKED
+    check(
+        "Gate still BLOCKED (v0.1.29 final)",
+        "BLOCKED" in (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").read_text() if (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").exists() else False,
+        "Preview gate must be BLOCKED",
+    )
+    check(
+        'default_profile still "test" (v0.1.29)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:

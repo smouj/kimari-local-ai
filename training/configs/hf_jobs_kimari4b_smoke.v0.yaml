@@ -1,0 +1,44 @@
+# Kimari-4B HF Jobs Smoke Test Config v0
+#
+# This config defines a smoke test to validate the HF Jobs environment
+# before any real training. It does NOT train, upload, or export.
+#
+# IMPORTANT:
+# - Run with: python training/scripts/hf_jobs_private_run.py --config this_file.yaml
+# - Actual submission requires --allow-submit --yes
+# - No tokens accepted as arguments
+# - No HF upload
+# - No training
+# - Gate stays BLOCKED
+
+job_name: kimari4b-smoke-v0
+image: pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
+flavor: a10g-small
+max_budget_usd: 10
+run_type: smoke_test
+allow_training: false
+allow_hf_upload: false
+local_only: true
+commit_allowed: false
+publish_allowed: false
+preview_gate_state: BLOCKED
+
+commands:
+  - "nvidia-smi"
+  - "python -c 'import torch; print(torch.cuda.is_available())'"
+  - "git clone https://github.com/smouj/kimari-local-ai.git /tmp/kimari-local-ai && cd /tmp/kimari-local-ai"
+  - "pip install -e /tmp/kimari-local-ai"
+  - "python /tmp/kimari-local-ai/training/scripts/build_dataset_mix.py --sft /tmp/kimari-local-ai/dataset/v0/sft_v0.jsonl --preference /tmp/kimari-local-ai/dataset/v0/preference_v0.jsonl --output-dir /tmp/kimari-dataset --holdout /tmp/kimari-local-ai/dataset/v0/eval_holdout.jsonl"
+  - "python /tmp/kimari-local-ai/training/scripts/train_sft_lora.py --config /tmp/kimari-local-ai/training/configs/kimari_sft_lora.v0.example.yaml --dry-run"
+
+forbidden:
+  - hf upload
+  - huggingface-cli upload
+  - git push
+  - adapter commit
+  - GGUF export
+  - pip install huggingface_hub
+  - huggingface-cli login
+
+notes: "Smoke test only. Validates GPU, torch, repo install, dataset build dry-run, and SFT dry-run. No training. No upload. No export. Budget cap $10. Gate BLOCKED."
+created_date: "2026-05-31"

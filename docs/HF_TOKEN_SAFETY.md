@@ -1,8 +1,8 @@
 # Hugging Face Token Safety Guide — Kimari Local AI
 
 > **Document Type:** Security guide for HF credential handling  
-> **Version:** v0.1.25-alpha  
-> **Date:** 2026-03-04  
+> **Version:** v0.1.29-alpha  
+> **Date:** 2026-05-31  
 > **Status:** Active — applies to all contributors and maintainers
 
 ---
@@ -29,8 +29,9 @@ This document defines the rules and best practices for handling Hugging Face (HF
 6. [Don't Save Tokens in the Repository](#6-dont-save-tokens-in-the-repository)
 7. [Don't Include Tokens in Screenshots](#7-dont-include-tokens-in-screenshots)
 8. [Don't Upload Anything to HF Until the Preview Gate Allows It](#8-dont-upload-anything-to-hf-until-the-preview-gate-allows-it)
-9. [Detecting Committed Tokens](#9-detecting-committed-tokens)
-10. [What to Do If a Token Is Accidentally Committed](#10-what-to-do-if-a-token-is-accidentally-committed)
+9. [HF Jobs Token Usage](#9-hf-jobs-token-usage)
+10. [Detecting Committed Tokens](#10-detecting-committed-tokens)
+11. [What to Do If a Token Is Accidentally Committed](#11-what-to-do-if-a-token-is-accidentally-committed)
 
 ---
 
@@ -303,7 +304,39 @@ For the private SFT handoff process — where trained adapter artifacts are tran
 
 ---
 
-## 9. Detecting Committed Tokens
+## 9. HF Jobs Token Usage
+
+Hugging Face Jobs requires authentication to submit workloads. The same token safety rules apply with additional considerations:
+
+### Rules for HF Jobs
+
+- **Never pass `--token` in any saved command** — Commands may be committed, logged, or shared
+- **Prefer local login** — Use `hf auth login` or `huggingface-cli login` on your local machine
+- **Review HF Jobs logs before sharing** — Job logs may contain environment variables or paths that reveal tokens
+- **Sanitize job outputs** — Before committing any smoke test summary, run `scan_for_secrets.py`
+
+### HF Jobs Does Not Require Tokens in Commands
+
+The `hf jobs` CLI reads authentication from your local credential store. You never need to pass a token:
+
+```bash
+# CORRECT: Use local auth
+hf auth login
+hf jobs run --flavor a10g-small pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel bash -lc 'nvidia-smi'
+
+# WRONG: Never pass tokens in commands
+hf jobs run --token hf_xxx ...  # NEVER DO THIS
+```
+
+### When Using Cloud GPU for HF Jobs
+
+- **Do not login on the cloud instance** if possible
+- **If you must login, logout before terminating** — `hf auth logout`
+- **Delete the token file** — `rm ~/.cache/huggingface/token`
+
+---
+
+## 10. Detecting Committed Tokens
 
 If a token is accidentally committed, early detection is critical. The sooner you discover a leak, the less time an attacker has to exploit it.
 
@@ -366,7 +399,7 @@ If you see any string starting with `hf_` in your diff, **stop and investigate**
 
 ---
 
-## 10. What to Do If a Token Is Accidentally Committed
+## 11. What to Do If a Token Is Accidentally Committed
 
 This is a security incident. Treat it with urgency.
 

@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.28-alpha — First private SFT run preparation, eval criteria, command generator
+      v0.1.29-alpha — HF Jobs private smoke wrapper, command compatibility fix
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -475,17 +475,17 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <strong>Kimari</strong> is the framework. <strong>Kimari-4B</strong> is not released yet.
 </div>
 
-<!-- ═══════ v0.1.28-alpha FOCUS ═══════ -->
+<!-- ═══════ v0.1.29-alpha FOCUS ═══════ -->
 <div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.28-alpha</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.29-alpha</span>
       <span style="font-size:1.1rem;font-weight:800;">What's New</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-rocket" style="color:var(--kimari-teal);"></i> Kimari-4B private SFT run preparation</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-clipboard-check" style="color:var(--kimari-cyan);"></i> First run checklist + eval criteria</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-terminal" style="color:var(--kimari-purple-light);"></i> Command generator + eval plan scripts</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-cloud" style="color:var(--kimari-teal);"></i> Hugging Face Jobs private smoke wrapper</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-clipboard-check" style="color:var(--kimari-cyan);"></i> Command compatibility fix + validate commands</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-terminal" style="color:var(--kimari-purple-light);"></i> --show-supported-flags + HF Jobs status CLI</span>
       <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.85rem;font-weight:600;color:#f87171;"><i class="fa-solid fa-ban" style="color:#f87171;"></i> No weights, no GGUF, gate BLOCKED</span>
     </div>
   </div>
@@ -504,7 +504,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div><strong style="color:var(--kimari-text);">Base Selection</strong><br>SmolLM3-3B accepted (private only)</div>
       <div><strong style="color:var(--kimari-text);">Dataset</strong><br>v0 synthetic (SFT + preference + holdout)</div>
       <div><strong style="color:var(--kimari-text);">Weights</strong><br>Not released yet</div>
-      <div><strong style="color:var(--kimari-text);">CLI</strong><br>Benchmark dry-run, tune dry-run, integrations config generator available</div>
+      <div><strong style="color:var(--kimari-text);">HF Jobs</strong><br>Private smoke wrapper (no training, no upload, gate BLOCKED)</div>
     </div>
   </div>
 </div>
