@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.32--alpha-9b59b6.svg" alt="v0.1.32-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.33--alpha-9b59b6.svg" alt="v0.1.33-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.32-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.33-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.32-alpha**
+> **Kimari Local AI v0.1.33-alpha**
 
 ### ✅ Works Today
 
@@ -575,7 +575,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.32-alpha — HF Jobs micro SFT pipeline, summary validation
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.33-alpha — train_sft_lora.py supports real micro SFT training with LoRA/QLoRA
 
 ### What's Ready
 
@@ -673,13 +673,15 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 
 - **[HF_JOBS_MICRO_SFT_RUN.md](docs/HF_JOBS_MICRO_SFT_RUN.md)** — Guide for running micro SFT on HF Jobs
 - **[HF_JOBS_MICRO_SFT_RESULT.md](docs/HF_JOBS_MICRO_SFT_RESULT.md)** — Micro SFT result template (status: pending)
+- **[MICRO_SFT_IMPLEMENTATION.md](docs/MICRO_SFT_IMPLEMENTATION.md)** — Micro SFT training implementation docs
 - **[Micro SFT config](training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml)** — Config for micro SFT (10 steps, gate BLOCKED)
 - **[hf_jobs_micro_sft.py](training/scripts/hf_jobs_micro_sft.py)** — CLI wrapper for micro SFT submission
 - **[Micro SFT summary template](training/templates/hf_jobs_micro_sft_summary.template.json)** — Template for sanitized summary
 - **[create_hf_jobs_micro_sft_summary.py](training/scripts/create_hf_jobs_micro_sft_summary.py)** — Generate sanitized summaries
 - **[validate_hf_jobs_micro_sft_summary.py](training/scripts/validate_hf_jobs_micro_sft_summary.py)** — Validate summary safety
+- **[validate_micro_sft_readiness.py](training/scripts/validate_micro_sft_readiness.py)** — Pre-flight config validation
 
-> **Micro SFT pipeline prepared.** Not yet executed. No public weights. No GGUF. Gate BLOCKED. Micro SFT validates pipeline only — not a release.
+> **Micro SFT training now supported.** `train_sft_lora.py` supports real micro-run training with `--micro-run --yes`. New flags: `--dataset-path`, `--eval-dataset-path`, `--output-dir`, `--max-steps`, `--eval-steps`, `--save-steps`, `--logging-steps`, `--per-device-train-batch-size`, `--gradient-accumulation-steps`, `--learning-rate`, `--max-seq-length`. Training requires `--micro-run --yes`. CI blocks training. No HF upload. No `--token`. `push_to_hub=false`. `report_to="none"`. No public weights. No GGUF. Gate BLOCKED.
 
 > No weights released yet. No real benchmarks. SmolLM3 is accepted for private training only. Preview gate is BLOCKED.
 

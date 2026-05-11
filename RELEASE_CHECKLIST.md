@@ -611,6 +611,25 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.33 Checks
+
+- [ ] train_sft_lora.py supports --dataset-path, --eval-dataset-path, --output-dir, --max-steps, --eval-steps, --save-steps, --logging-steps, --per-device-train-batch-size, --gradient-accumulation-steps, --learning-rate, --max-seq-length, --micro-run, --yes
+- [ ] `python training/scripts/train_sft_lora.py --show-supported-flags --json` lists all micro SFT flags
+- [ ] Real training requires --micro-run --yes (blocked without both)
+- [ ] Training blocked when CI=true
+- [ ] `python training/scripts/validate_micro_sft_readiness.py --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml --json` works and returns ready: true
+- [ ] train_sft_lora.py has no --token argument
+- [ ] run_sft_training exists in train_sft_lora.py
+- [ ] apply_cli_overrides exists in train_sft_lora.py
+- [ ] push_to_hub is never true (always false in training args)
+- [ ] report_to is "none" in training args
+- [ ] docs/MICRO_SFT_IMPLEMENTATION.md exists
+- [ ] training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml command includes --micro-run --yes
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

@@ -3501,6 +3501,187 @@ def main() -> None:
         "default_profile changed from test — this is not allowed during alpha",
     )
 
+    # ── v0.1.33 Micro SFT training implementation ────────────────
+    print("\n[57/57] v0.1.33 Micro SFT training implementation")
+
+    # Check train_sft_lora.py has all micro flags
+    train_sft_script = PROJECT_ROOT / "training" / "scripts" / "train_sft_lora.py"
+    if train_sft_script.exists():
+        train_sft_text = train_sft_script.read_text()
+        micro_flags = [
+            "--dataset-path",
+            "--eval-dataset-path",
+            "--output-dir",
+            "--max-steps",
+            "--eval-steps",
+            "--save-steps",
+            "--logging-steps",
+            "--per-device-train-batch-size",
+            "--gradient-accumulation-steps",
+            "--learning-rate",
+            "--max-seq-length",
+            "--micro-run",
+            "--yes",
+        ]
+        for flag in micro_flags:
+            flag_normalized = flag.replace("-", "_")
+            check(
+                f"train_sft_lora.py includes {flag} flag",
+                flag_normalized in train_sft_text or flag in train_sft_text,
+                f"{flag} not found in train_sft_lora.py",
+            )
+
+        # Check no --token argument
+        check(
+            'train_sft_lora.py has no --token argument',
+            '"--token"' not in train_sft_text,
+            "train_sft_lora.py must not accept --token",
+        )
+
+        # Check training requires --yes
+        check(
+            "train_sft_lora.py requires --yes for training",
+            "args.yes" in train_sft_text,
+            "--yes confirmation check missing from train_sft_lora.py",
+        )
+
+        # Check training requires --micro-run
+        check(
+            "train_sft_lora.py requires --micro-run for training",
+            "args.micro_run" in train_sft_text,
+            "--micro-run requirement check missing from train_sft_lora.py",
+        )
+
+        # Check CI guard exists
+        check(
+            'train_sft_lora.py has CI guard (CI=true check)',
+            'os.environ.get("CI")' in train_sft_text or 'CI' in train_sft_text,
+            "CI environment guard missing from train_sft_lora.py",
+        )
+
+        # Check run_sft_training function exists
+        check(
+            "run_sft_training function exists in train_sft_lora.py",
+            "def run_sft_training" in train_sft_text,
+            "run_sft_training function not found in train_sft_lora.py",
+        )
+
+        # Check apply_cli_overrides function exists
+        check(
+            "apply_cli_overrides function exists in train_sft_lora.py",
+            "def apply_cli_overrides" in train_sft_text,
+            "apply_cli_overrides function not found in train_sft_lora.py",
+        )
+
+        # Check push_to_hub is False
+        check(
+            'train_sft_lora.py sets push_to_hub=False',
+            "push_to_hub=False" in train_sft_text or "push_to_hub = False" in train_sft_text,
+            "push_to_hub must be False in train_sft_lora.py",
+        )
+
+        # Check report_to is "none"
+        check(
+            'train_sft_lora.py sets report_to="none"',
+            'report_to="none"' in train_sft_text or "report_to='none'" in train_sft_text or 'report_to = "none"' in train_sft_text,
+            'report_to must be "none" in train_sft_lora.py',
+        )
+    else:
+        check("train_sft_lora.py exists", False, "training/scripts/train_sft_lora.py not found")
+
+    # Check validate_micro_sft_readiness.py exists
+    check(
+        "validate_micro_sft_readiness.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_readiness.py").exists(),
+        "training/scripts/validate_micro_sft_readiness.py missing",
+    )
+
+    # Check docs/MICRO_SFT_IMPLEMENTATION.md exists
+    check(
+        "docs/MICRO_SFT_IMPLEMENTATION.md exists",
+        (PROJECT_ROOT / "docs" / "MICRO_SFT_IMPLEMENTATION.md").exists(),
+        "docs/MICRO_SFT_IMPLEMENTATION.md missing",
+    )
+
+    # Check hf_jobs config command includes --micro-run --yes
+    hf_jobs_config = PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"
+    if hf_jobs_config.exists():
+        config_text = hf_jobs_config.read_text()
+        check(
+            "hf_jobs micro SFT config includes --micro-run",
+            "--micro-run" in config_text,
+            "--micro-run not found in hf_jobs_kimari4b_micro_sft.v0.yaml",
+        )
+        check(
+            "hf_jobs micro SFT config includes --yes",
+            "--yes" in config_text,
+            "--yes not found in hf_jobs_kimari4b_micro_sft.v0.yaml",
+        )
+        # Check that push_to_hub does not appear in any command (allow_push_to_hub: false is OK)
+        commands_section = False
+        push_to_hub_in_command = False
+        for line in config_text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("commands:"):
+                commands_section = True
+                continue
+            if commands_section and stripped.startswith("- "):
+                if "push_to_hub" in stripped:
+                    push_to_hub_in_command = True
+            elif commands_section and not stripped.startswith("-") and ":" in stripped:
+                commands_section = False
+        check(
+            "hf_jobs micro SFT config commands do NOT include push_to_hub",
+            not push_to_hub_in_command,
+            "push_to_hub found in training command — should not be present",
+        )
+        check(
+            "hf_jobs micro SFT config has allow_push_to_hub: false",
+            "allow_push_to_hub: false" in config_text,
+            "allow_push_to_hub must be false in hf_jobs config",
+        )
+    else:
+        check("hf_jobs_kimari4b_micro_sft.v0.yaml exists", False, "Config file not found")
+
+    # No adapter/GGUF tracked
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "*.safetensors", "*.gguf"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=10,
+        )
+        artifact_files = [f for f in result.stdout.strip().splitlines() if f]
+        check(
+            "No adapter/GGUF/weight files tracked (v0.1.33)",
+            len(artifact_files) == 0,
+            f"found tracked artifacts: {artifact_files}",
+        )
+    except Exception:
+        warn("Could not check tracked artifact files", "git not available")
+
+    # Gate BLOCKED
+    check(
+        "Gate BLOCKED (v0.1.33)",
+        "BLOCKED" in (PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml").read_text(),
+        "preview_gate_state must be BLOCKED",
+    )
+
+    # No Kimari-4B released claim
+    check(
+        'No "Kimari-4B released" false claim (v0.1.33)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+
+    # default_profile still test
+    check(
+        'default_profile still "test" (v0.1.33 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:

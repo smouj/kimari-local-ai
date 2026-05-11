@@ -5,6 +5,33 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.33-alpha] - 2026-06-02
+
+### Added
+- `training/scripts/train_sft_lora.py` now supports real micro SFT training with LoRA/QLoRA
+  - New CLI flags: --dataset-path, --eval-dataset-path, --output-dir, --max-steps, --eval-steps, --save-steps, --logging-steps, --per-device-train-batch-size, --gradient-accumulation-steps, --learning-rate, --max-seq-length, --micro-run, --yes
+  - `apply_cli_overrides()` function to merge CLI args with YAML config
+  - `run_sft_training()` function for actual LoRA SFT training (imports torch/transformers/peft/trl only when training)
+  - CI guard: training blocked when CI=true
+  - Training requires --micro-run --yes (double confirmation)
+  - No --token argument. No push_to_hub. report_to="none". Gate BLOCKED.
+  - --show-supported-flags lists all flags without importing torch
+- `training/scripts/validate_micro_sft_readiness.py` — Pre-flight validation for micro SFT config safety
+- `docs/MICRO_SFT_IMPLEMENTATION.md` — Documentation for micro SFT training implementation
+
+### Changed
+- `training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml` updated with --micro-run --yes in training command
+- `docs/HF_JOBS_MICRO_SFT_RUN.md` updated with micro-run real training support
+- README updated with micro SFT training implementation status
+- `docs/index.html` updated with micro SFT training block
+- `RELEASE_CHECKLIST.md` updated with v0.1.33 checks
+- `scripts/release/check-release.py` updated with v0.1.33 validation checks
+
+### Fixed
+- train_sft_lora.py no longer calls unsupported flags from hf_jobs config — all flags now properly supported
+- Training loop is no longer a skeleton — real LoRA SFT training is implemented
+- No training performed in CI. No adapters committed. No HF upload. Gate still BLOCKED. Micro SFT pipeline ready for real execution.
+
 ## [0.1.32-alpha] - 2026-06-02
 
 ### Added

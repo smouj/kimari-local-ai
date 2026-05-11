@@ -386,7 +386,7 @@
 - ✅ Smoke must pass before micro SFT gate
 - ✅ Version bumped to v0.1.31-alpha
 
-## v0.1.32-alpha (Current)
+## v0.1.32-alpha (Released)
 
 - ✅ HF Jobs micro SFT run guide (docs/HF_JOBS_MICRO_SFT_RUN.md)
 - ✅ Micro SFT config (training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml)
@@ -396,6 +396,20 @@
 - ✅ Micro SFT result doc (docs/HF_JOBS_MICRO_SFT_RESULT.md)
 - ✅ Updated runbook, private SFT guide, and checklist
 - ✅ Version bumped to v0.1.32-alpha
+
+## v0.1.33-alpha (Current)
+
+- ✅ train_sft_lora.py supports real micro SFT training with LoRA/QLoRA
+- ✅ New CLI flags: --dataset-path, --eval-dataset-path, --output-dir, --max-steps, --eval-steps, --save-steps, --logging-steps, --per-device-train-batch-size, --gradient-accumulation-steps, --learning-rate, --max-seq-length, --micro-run, --yes
+- ✅ apply_cli_overrides() merges CLI args with YAML config
+- ✅ run_sft_training() implements real LoRA SFT training loop
+- ✅ CI guard blocks training when CI=true
+- ✅ Training requires --micro-run --yes (double confirmation)
+- ✅ No --token argument. No push_to_hub. report_to="none".
+- ✅ validate_micro_sft_readiness.py for pre-flight config validation
+- ✅ docs/MICRO_SFT_IMPLEMENTATION.md
+- ✅ hf_jobs config includes --micro-run --yes
+- ✅ Gate BLOCKED
 
 ## v0.2.0-alpha
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Kimari SFT LoRA Training Script (Skeleton).
+"""Kimari SFT LoRA Training Script.
 
 This is an experimental training script. It:
 - Reads configuration from a YAML file
@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -327,10 +328,7 @@ def count_dataset_records(dataset_path: str) -> int | None:
     if p.is_dir():
         arrow_files = list(p.glob("*.arrow")) + list(p.glob("*.parquet"))
         if arrow_files:
-            # Rough heuristic: we can't easily count rows from arrow/parquet
-            # without pyarrow, so return the file count as a signal.
-            # The user should inspect manually for exact counts.
-            return None  # Can't count without pyarrow
+            return None
         # Maybe a JSONL inside
         for ext in ("*.jsonl", "*.json", "*.ndjson"):
             inner = list(p.glob(ext))
@@ -498,6 +496,209 @@ def print_training_plan(config: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
+# CLI overrides
+# ---------------------------------------------------------------------------
+
+
+def apply_cli_overrides(config: dict, args) -> dict:
+    """Override config values with explicitly provided CLI arguments.
+
+    Only overrides values where the CLI arg is not None.
+    Returns the updated config dict.
+    """
+    override_map = {
+        "dataset_path": "dataset_path",
+        "eval_dataset_path": "eval_dataset_path",
+        "output_dir": "output_dir",
+        "max_steps": "max_steps",
+        "eval_steps": "eval_steps",
+        "save_steps": "save_steps",
+        "logging_steps": "logging_steps",
+        "per_device_train_batch_size": "per_device_train_batch_size",
+        "gradient_accumulation_steps": "gradient_accumulation_steps",
+        "learning_rate": "learning_rate",
+        "max_seq_length": "max_seq_length",
+    }
+
+    for cli_attr, config_key in override_map.items():
+        cli_value = getattr(args, cli_attr, None)
+        if cli_value is not None:
+            config[config_key] = cli_value
+
+    return config
+
+
+# ---------------------------------------------------------------------------
+# SFT Training
+# ---------------------------------------------------------------------------
+
+
+def run_sft_training(config: dict, micro_run: bool = True) -> dict:
+    """Run SFT LoRA training with the given configuration.
+
+    Imports torch/transformers/datasets/peft/trl ONLY inside this function.
+    Returns a sanitized summary dict.
+    """
+    # --- Lazy imports (only inside this function) ---
+    try:
+        import torch  # noqa: F401
+        from datasets import load_dataset
+        from peft import LoraConfig, get_peft_model
+        from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+        from trl import SFTTrainer
+    except ImportError as e:
+        print(
+            f"ERROR: Required training dependency not installed: {e}",
+            file=sys.stderr,
+        )
+        print(
+            "Install training dependencies with: pip install -r training/requirements-training.txt",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # --- Determine base model ---
+    base_model = config.get("base_model") or config.get("base_model_or_adapter")
+    if not base_model or base_model == "TBD":
+        print(
+            "\nERROR: Base model is 'TBD' or not set. Select a base model before training.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    output_dir = config.get("output_dir", "training/adapters/micro-sft-output")
+    dataset_path = config.get("dataset_path")
+    eval_dataset_path = config.get("eval_dataset_path")
+
+    if not dataset_path:
+        print(
+            "ERROR: No dataset_path specified in config or CLI.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # --- Load dataset ---
+    try:
+        dataset = load_dataset("json", data_files=dataset_path, split="train")
+    except Exception as e:
+        print(f"ERROR: Failed to load training dataset from {dataset_path}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    eval_dataset = None
+    if eval_dataset_path:
+        try:
+            eval_dataset = load_dataset("json", data_files=eval_dataset_path, split="train")
+        except Exception as e:
+            print(f"WARNING: Failed to load eval dataset from {eval_dataset_path}: {e}", file=sys.stderr)
+
+    # --- Load tokenizer and model ---
+    tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model,
+        trust_remote_code=True,
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+        device_map="auto" if torch.cuda.is_available() else None,
+    )
+
+    # --- LoRA config ---
+    lora_r = config.get("lora_r", 8)
+    lora_alpha = config.get("lora_alpha", 16)
+    lora_dropout = config.get("lora_dropout", 0.05)
+    lora_target_modules = config.get("lora_target_modules")
+
+    lora_config = LoraConfig(
+        r=lora_r,
+        lora_alpha=lora_alpha,
+        lora_dropout=lora_dropout,
+        target_modules=lora_target_modules,
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+    model = get_peft_model(model, lora_config)
+
+    # --- Training arguments ---
+    max_steps = config.get("max_steps", 10)
+    if micro_run:
+        max_steps = min(max_steps, 10)
+
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        max_steps=max_steps,
+        per_device_train_batch_size=config.get("per_device_train_batch_size", 1),
+        gradient_accumulation_steps=config.get("gradient_accumulation_steps", 1),
+        learning_rate=config.get("learning_rate", 1e-4),
+        logging_steps=config.get("logging_steps", 2),
+        eval_steps=config.get("eval_steps", 5) if eval_dataset else None,
+        save_steps=config.get("save_steps", 50),
+        evaluation_strategy="steps" if eval_dataset else "no",
+        report_to="none",
+        push_to_hub=False,
+        fp16=torch.cuda.is_available(),
+        gradient_checkpointing=config.get("gradient_checkpointing", False),
+        seed=config.get("seed", 42),
+        max_seq_length=config.get("max_seq_length", 512),
+    )
+
+    # --- Train ---
+    try:
+        trainer = SFTTrainer(
+            model=model,
+            args=training_args,
+            train_dataset=dataset,
+            eval_dataset=eval_dataset,
+            tokenizer=tokenizer,
+        )
+    except TypeError as e:
+        print(
+            f"ERROR: SFTTrainer API has changed or is incompatible: {e}",
+            file=sys.stderr,
+        )
+        print(
+            "This may be due to a trl version mismatch. Check your trl version and consult the trl changelog.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    result = trainer.train()
+
+    # --- Save adapter ---
+    trainer.model.save_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
+
+    # --- Build sanitized summary ---
+    adapter_generated = False
+    adapter_path = Path(output_dir)
+    if adapter_path.exists():
+        adapter_files = list(adapter_path.glob("adapter_model.*")) + list(adapter_path.glob("adapter_config.json"))
+        adapter_generated = len(adapter_files) > 0
+
+    steps_completed = 0
+    if hasattr(result, "global_step"):
+        steps_completed = result.global_step
+    elif isinstance(result, dict):
+        steps_completed = result.get("global_step", max_steps)
+
+    summary = {
+        "training_performed": True,
+        "adapter_generated": adapter_generated,
+        "adapter_committed": False,
+        "hf_upload_performed": False,
+        "gguf_generated": False,
+        "gate_state": "BLOCKED",
+        "output_dir": output_dir,
+        "micro_run": True,
+        "steps_completed": steps_completed,
+        "base_model": base_model,
+    }
+
+    return summary
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -505,9 +706,9 @@ def print_training_plan(config: dict) -> None:
 def main() -> None:
     """CLI entry point for SFT LoRA training."""
     parser = argparse.ArgumentParser(
-        description="Kimari SFT LoRA Training Script (Skeleton). "
-        "Experimental \u2014 no training has been performed yet. "
-        "No network calls. No downloads.",
+        description="Kimari SFT LoRA Training Script. "
+        "Experimental \u2014 v0.1.33-alpha supports micro-run mode only. "
+        "No network calls in dry-run. No downloads in dry-run.",
     )
     parser.add_argument(
         "--config",
@@ -546,6 +747,95 @@ def main() -> None:
         dest="json_output",
         help="Output structured JSON (used with --show-supported-flags).",
     )
+    # --- New CLI flags for v0.1.33 ---
+    parser.add_argument(
+        "--dataset-path",
+        dest="dataset_path",
+        type=str,
+        default=None,
+        help="Path to training dataset (JSONL)",
+    )
+    parser.add_argument(
+        "--eval-dataset-path",
+        dest="eval_dataset_path",
+        type=str,
+        default=None,
+        help="Path to eval dataset (JSONL)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        dest="output_dir",
+        type=str,
+        default=None,
+        help="Output directory for adapter",
+    )
+    parser.add_argument(
+        "--max-steps",
+        dest="max_steps",
+        type=int,
+        default=None,
+        help="Maximum training steps",
+    )
+    parser.add_argument(
+        "--eval-steps",
+        dest="eval_steps",
+        type=int,
+        default=None,
+        help="Evaluation steps",
+    )
+    parser.add_argument(
+        "--save-steps",
+        dest="save_steps",
+        type=int,
+        default=None,
+        help="Save checkpoint steps",
+    )
+    parser.add_argument(
+        "--logging-steps",
+        dest="logging_steps",
+        type=int,
+        default=None,
+        help="Logging steps",
+    )
+    parser.add_argument(
+        "--per-device-train-batch-size",
+        dest="per_device_train_batch_size",
+        type=int,
+        default=None,
+        help="Per-device training batch size",
+    )
+    parser.add_argument(
+        "--gradient-accumulation-steps",
+        dest="gradient_accumulation_steps",
+        type=int,
+        default=None,
+        help="Gradient accumulation steps",
+    )
+    parser.add_argument(
+        "--learning-rate",
+        dest="learning_rate",
+        type=float,
+        default=None,
+        help="Learning rate",
+    )
+    parser.add_argument(
+        "--max-seq-length",
+        dest="max_seq_length",
+        type=int,
+        default=None,
+        help="Maximum sequence length",
+    )
+    parser.add_argument(
+        "--micro-run",
+        dest="micro_run",
+        action="store_true",
+        help="Enable micro-run mode (required for v0.1.33)",
+    )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Confirm training execution",
+    )
 
     args = parser.parse_args()
 
@@ -561,6 +851,19 @@ def main() -> None:
                 "--require-dataset",
                 "--show-supported-flags",
                 "--json",
+                "--dataset-path",
+                "--eval-dataset-path",
+                "--output-dir",
+                "--max-steps",
+                "--eval-steps",
+                "--save-steps",
+                "--logging-steps",
+                "--per-device-train-batch-size",
+                "--gradient-accumulation-steps",
+                "--learning-rate",
+                "--max-seq-length",
+                "--micro-run",
+                "--yes",
             ],
             "note": "No training is performed by this script. --show-supported-flags does not import torch/transformers.",
         }
@@ -613,11 +916,14 @@ def main() -> None:
         ]
         if config.get("output_dir"):
             cmd_parts.append(f"# output_dir: {config['output_dir']}")
+        cmd_parts.append("--micro-run")
+        cmd_parts.append("--yes")
         print("# Recommended training command:")
         print(" \\\n  ".join(cmd_parts))
         print()
         print("# IMPORTANT: Real training must not run in CI.")
         print("# Run manually on a GPU machine only.")
+        print("# v0.1.33-alpha: micro-run mode required (--micro-run).")
         sys.exit(0)
 
     # --estimate-only: print step estimation and exit
@@ -684,6 +990,67 @@ def main() -> None:
     # Real training path (not dry-run)
     # -------------------------------------------------------------------
 
+    # -------------------------------------------------------------------
+    # v0.1.33 protections (MUST come before dependency check)
+    # -------------------------------------------------------------------
+
+    # CI guard: if CI=true, abort training (no deps needed for this check)
+    if os.environ.get("CI") == "true":
+        print(
+            "\nERROR: CI=true detected. Training is not allowed in CI environments.",
+            file=sys.stderr,
+        )
+        print(
+            "   Training scripts must only run on dedicated GPU machines, not in CI.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # --micro-run required: v0.1.33 only supports micro-run
+    if not args.micro_run:
+        print(
+            "\nERROR: --micro-run is required. v0.1.33-alpha only supports micro-run mode.",
+            file=sys.stderr,
+        )
+        print(
+            "   Add --micro-run to your command to enable micro-run training.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # --yes required: confirmation needed before training
+    if not args.yes:
+        print(
+            "\nERROR: --yes is required to confirm training execution.",
+            file=sys.stderr,
+        )
+        print(
+            "   Add --yes to your command to confirm you want to proceed with training.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # output_dir inside repo and not gitignored warning
+    output_dir = config.get("output_dir")
+    if output_dir:
+        od = Path(output_dir)
+        if not od.is_absolute():
+            od = PROJECT_ROOT / od
+        try:
+            inside_repo = PROJECT_ROOT in od.resolve().parents or od.resolve() == PROJECT_ROOT
+        except (ValueError, OSError):
+            inside_repo = False
+        if inside_repo and not is_gitignored(od):
+            print(
+                f"\n\u26a0 WARNING: output_dir {output_dir} is inside the repo but NOT gitignored. "
+                "Training artifacts could be committed!",
+                file=sys.stderr,
+            )
+            print(
+                "   Add the output directory to .gitignore before proceeding.",
+                file=sys.stderr,
+            )
+
     # Step 4: Check training dependencies (only needed for real training)
     missing = check_dependencies()
     if missing:
@@ -712,10 +1079,6 @@ def main() -> None:
         file=sys.stderr,
     )
     print(
-        "   No base model has been selected yet.",
-        file=sys.stderr,
-    )
-    print(
         "   Real training must not run in CI.",
         file=sys.stderr,
     )
@@ -724,13 +1087,22 @@ def main() -> None:
         file=sys.stderr,
     )
 
-    # Step 7: Actual training would go here
-    # This is a skeleton — the real training loop is not implemented.
-    print(
-        "\nNOTE: The actual training loop is not yet implemented. This is a skeleton script.",
-    )
-    print("To implement training, add the SFTTrainer setup and training call here.")
-    print("See docs/MODEL_TRAINING_PLAN.md for the full training plan.")
+    # Step 7: Apply CLI overrides to config
+    config = apply_cli_overrides(config, args)
+
+    # Step 8: Run SFT training
+    summary = run_sft_training(config, micro_run=True)
+
+    # Step 9: Print sanitized summary
+    print()
+    print("=" * 60)
+    print("  Training Summary (Sanitized)")
+    print("=" * 60)
+    for key, value in summary.items():
+        print(f"  {key}: {value}")
+    print("=" * 60)
+    print()
+    print("Gate state: BLOCKED — adapter not committed, not uploaded, not exported.")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # HF Jobs Micro SFT Run — Kimari Local AI
 
 > **Document Type:** Guide for running Kimari-4B micro SFT on Hugging Face Jobs  
-> **Version:** v0.1.32-alpha  
+> **Version:** v0.1.33-alpha  
 > **Date:** 2026-06-02  
 > **Status:** Active — governs micro SFT execution on HF Jobs  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -67,6 +67,8 @@ hf auth login
 
 ## 3. Configuration
 
+> **⚠️ WARNING:** Do NOT use micro SFT if the smoke test has not passed. Smoke test validation is a prerequisite — see `training/scripts/validate_hf_jobs_smoke_summary.py`.
+
 The micro SFT is configured in `training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml`:
 
 | Field | Value | Notes |
@@ -102,6 +104,11 @@ If validation fails, do NOT proceed. Fix the smoke test first.
 ### Step 2: Dry-Run (No Execution)
 
 ```bash
+python training/scripts/validate_micro_sft_readiness.py \
+    --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml \
+    --json
+
+# Then dry-run
 python training/scripts/hf_jobs_micro_sft.py \
     --config training/configs/hf_jobs_kimari4b_micro_sft.v0.yaml \
     --dry-run --json
@@ -205,7 +212,7 @@ The micro SFT validates:
 1. **GPU + CUDA** — nvidia-smi and torch.cuda work
 2. **Repo Install** — pip install -e . succeeds
 3. **Dataset Build** — build_dataset_mix.py works
-4. **Training Pipeline** — train_sft_lora.py runs for 10 steps
+4. **Training Pipeline** — train_sft_lora.py runs for 10 steps with `--micro-run --yes`
 5. **Adapter Generation** — LoRA adapter is created (local only)
 
 ---
@@ -300,9 +307,10 @@ After a successful micro SFT:
 | [HF_JOBS_SMOKE_EXECUTION_RECORD.md](HF_JOBS_SMOKE_EXECUTION_RECORD.md) | Smoke execution record |
 | [HF_JOBS_MICRO_SFT_RESULT.md](HF_JOBS_MICRO_SFT_RESULT.md) | Micro SFT result template |
 | [KIMARI4B_PRIVATE_SFT_RUN.md](KIMARI4B_PRIVATE_SFT_RUN.md) | Full private SFT guide |
+| [MICRO_SFT_IMPLEMENTATION.md](MICRO_SFT_IMPLEMENTATION.md) | Micro SFT implementation details (train_sft_lora.py) |
 | [HF_TOKEN_SAFETY.md](HF_TOKEN_SAFETY.md) | Token safety procedures |
 | [ADAPTER_PREVIEW_GATE.md](ADAPTER_PREVIEW_GATE.md) | Gate state machine (BLOCKED) |
 
 ---
 
-*Micro SFT validates the pipeline. No upload. No export. No commit. Gate BLOCKED. Manual review required. Not a release.*
+*Micro SFT validates the pipeline. `train_sft_lora.py` now supports real micro-run training with `--micro-run --yes`. No upload. No export. No commit. No HF token. Gate BLOCKED. Manual review required. Not a release.*
