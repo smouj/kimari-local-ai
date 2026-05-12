@@ -31,7 +31,6 @@ from pathlib import Path
 
 from kimari.core.paths import get_defaults_dir, get_user_config_path
 
-
 # ─── Helper functions ─────────────────────────────────────────────────────────
 
 
@@ -58,8 +57,7 @@ def is_config_complete(config: dict) -> bool:
     if not default:
         return False
 
-    if default not in profiles:
-        return False
+    return default in profiles
 
     return True
 
@@ -400,7 +398,7 @@ def write_setup_config(patch: dict, config_path: Path | str, reset: bool = False
 
     # Apply patch — resolve and update default_profile
     recommended = patch.get("recommended_profile")
-    resolved = patch.get("resolved_profile", recommended)
+    _resolved = patch.get("resolved_profile", recommended)
     profiles = config.get("profiles", {})
 
     # Resolve the profile name
@@ -564,7 +562,7 @@ def apply_setup_changes(patch: dict, config_path: Path | str, reset: bool = Fals
 
     # Apply patch — resolve and update default_profile
     recommended = patch.get("recommended_profile")
-    resolved = patch.get("resolved_profile", recommended)
+    _resolved = patch.get("resolved_profile", recommended)
     profiles = config.get("profiles", {})
 
     # Resolve the profile name

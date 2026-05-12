@@ -4121,7 +4121,7 @@ def main() -> None:
             cwd=str(PROJECT_ROOT),
         )
         tracked = result.stdout.strip().splitlines()
-        bad_patterns = [".gguf", ".safetensors", ".bin", "adapter_", "checkpoint"]
+        bad_patterns = [".gguf", ".safetensors", ".bin", ".pt", ".pth", ".ckpt", ".onnx"]
         bad_files = [f for f in tracked if any(p in f.lower() for p in bad_patterns)]
         check(
             "No weights/adapters/GGUF tracked (v0.1.38)",

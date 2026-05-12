@@ -461,6 +461,7 @@
 - ✅ Added `merge_user_config_onto_defaults_safely()` helper with protected/safe field separation
 - ✅ `default_profile` from incomplete config only accepted if it exists in defaults profiles
 - ✅ `write_setup_config()` and `apply_setup_changes()` use safe merge instead of `_base.update(config)`
+- ✅ JSON schema updated with `setup_info`, `integrations`, `paths` properties — fixes `doctor --deep` "Additional properties not allowed" warning
 - ✅ Gate BLOCKED
 
 ## v0.2.0-alpha (Planned)

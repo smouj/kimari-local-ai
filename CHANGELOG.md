@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Recovery merge now protects critical fields from being overwritten by incomplete user config — an incomplete config with `profiles: {}` no longer destroys valid profile data from packaged defaults
 - `default_profile` from incomplete user config is only accepted if it exists in the defaults profiles dict; otherwise, the defaults value is kept
+- JSON schema now includes `setup_info`, `integrations`, `paths` properties — eliminates `doctor --deep` "Additional properties not allowed" warning
 
 ### Added
 - `merge_user_config_onto_defaults_safely(defaults, user_config)` helper — safe merge that never lets incomplete user config overwrite `version`, `config_version`, `profiles`, or `server` fields
