@@ -4587,9 +4587,10 @@ def main() -> None:
             )
 
     # Benchmark false positive fix
+    check_release_content = (PROJECT_ROOT / "scripts" / "release" / "check-release.py").read_text()
     check(
         "check-release.py excludes *.example.json from measured results",
-        ".example.json" in content,
+        ".example.json" in check_release_content,
         "check-release.py should exclude .example.json from real results check",
     )
 
