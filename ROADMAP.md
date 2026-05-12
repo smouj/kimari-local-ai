@@ -457,11 +457,15 @@
 
 ## v0.1.49-alpha (Current)
 
-- ✅ Micro SFT dataset (80 examples, Spanish technical + CUDA + Python)
-- ✅ HF Jobs micro SFT config (a10g-small, 30min timeout, LoRA r=8)
+- ✅ Micro SFT dataset (72 examples, Spanish technical + CUDA + Python + Kimari API)
+- ✅ HF Jobs micro SFT config (a10g-small, 20min timeout, LoRA r=8, Qwen2.5-1.5B)
 - ✅ HF Jobs micro SFT wrapper (dry-run default, --allow-submit --yes)
-- ✅ Summary template + validator
-- ✅ Gate BLOCKED — no adapter committed, no upload
+- ✅ **Job 6a038ec87618f125ee2b7984 COMPLETED** — training_performed=true, adapter_generated=true
+- ✅ Summary template + validator (0 errors)
+- ✅ PyTorch 2.5.1 + transformers>=4.46 = working combo
+- ✅ 4 failed attempts (PyTorch/transformers version incompatibilities)
+- ✅ Estimated cost: ~$0.35
+- ✅ Gate BLOCKED — no adapter committed, no upload, no GGUF
 
 ## v0.1.48-alpha
 

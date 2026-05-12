@@ -5,37 +5,39 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.49-alpha] - 2026-05-12
+## [0.1.49-alpha] - 2026-05-13
 
 ### Added
-- `dataset/build/kimari-fit-v0/sft_micro.jsonl` — 80 curated examples (Spanish technical, CUDA, Linux, Python, Kimari API)
+- `dataset/build/kimari-fit-v0/sft_micro.jsonl` — 72 curated examples (Spanish technical, CUDA, Linux, Python, Kimari API)
 - `dataset/build/kimari-fit-v0/report.json` — dataset report (hash, count, categories)
 - `docs/KIMARI4B_MICRO_SFT_DATASET.md` — dataset documentation
-- `training/configs/hf_jobs_kimari4b_micro_sft_real.v0.yaml` — micro SFT config (a10g-small, 30min, LoRA r=8)
-- `training/scripts/hf_jobs_micro_sft_real.py` — HF Jobs micro SFT wrapper
+- `training/configs/hf_jobs_kimari4b_micro_sft_real.v0.yaml` — micro SFT config (a10g-small, 20min, LoRA r=8)
+- `training/scripts/hf_jobs_micro_sft_real.py` — HF Jobs micro SFT wrapper (dry-run default, --allow-submit --yes required)
 - `training/templates/hf_jobs_micro_sft_real_summary.template.json` — summary template
 - `training/scripts/create_hf_jobs_micro_sft_real_summary.py` — summary creator
 - `training/scripts/validate_hf_jobs_micro_sft_real_summary.py` — summary validator
 - `docs/HF_JOBS_MICRO_SFT_REAL_RUN.md` — real run documentation
-- `docs/KIMARI4B_MICRO_SFT_RESULT.md` — result doc (pending/completed)
-- check-release.py v0.1.49 checks
-- tests/test_release_v0149.py
+- `docs/KIMARI4B_MICRO_SFT_RESULT.md` — result doc (COMPLETED)
+- `docs/KIMARI4B_MICRO_SFT_RESULT_SUMMARY.json` — sanitized result summary
+- check-release.py v0.1.49 checks (22/22 pass)
+- tests/test_release_v0149.py (17 tests)
 
 ### Deployed
-- HF Jobs micro SFT: Job ID pending execution
-- Flavor: a10g-small (NVIDIA A10G, 22.3 GB VRAM)
-- Base model: Qwen/Qwen2.5-3B-Instruct (Apache 2.0)
-- Dataset: kimari-fit-v0 (80 examples)
+- HF Jobs micro SFT: **Job 6a038ec87618f125ee2b7984 — COMPLETED**
+- Flavor: a10g-small (NVIDIA A10G, 22.3 GB VRAM, CUDA 12.4)
+- Base model: Qwen/Qwen2.5-1.5B-Instruct (Apache 2.0)
+- Docker: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
+- Dataset: kimari-fit-v0 (72 examples)
+- Loss: 2.62 (step 0) → 3.19 (step 5)
+- Estimated cost: ~$0.35
+- 4 failed attempts before success (PyTorch/transformers version incompatibilities)
 
 ### Safety
 - Gate remains BLOCKED
-- No adapter committed to git
-- No HF upload
-- No GGUF generated
-- No push_to_hub
-- No raw logs committed
-- No tokens
-- No billing/plan info
+- training_performed: true, adapter_generated: true
+- adapter_committed: false, hf_upload_performed: false
+- No GGUF generated, no push_to_hub
+- No raw logs committed, no tokens, no billing info
 
 ## [0.1.48-alpha] - 2026-05-12
 
