@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kimari-local-ai"
-version = "0.1.39-alpha"
+version = "0.1.40-alpha"
 description = "Open-source framework for running local LLMs on consumer NVIDIA GPUs"
 readme = "README.md"
 license = "MIT"

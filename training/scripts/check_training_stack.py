@@ -293,6 +293,138 @@ def check_gpu_arch_compatibility() -> dict[str, Any]:
     }
 
 
+def check_gpu_cuda_info() -> dict[str, Any]:
+    """Check GPU/CUDA info even when PyTorch is not installed.
+
+    Uses kimari.core.detection functions as fallbacks so that GPU and CUDA
+    information is available without requiring torch.  If torch *is* present
+    it is used as the primary source for compute capability and the CUDA
+    build tag.
+
+    Returns a check dict with:
+      name:              "gpu_cuda_info"
+      passed:            True (always — informational)
+      value:             Human-readable summary string
+      message:           Descriptive message
+      gpu_name:          GPU name or None
+      compute_capability: e.g. "sm_61" or None
+      compute_cap_source: "torch" | "llama-server" | None
+      torch_cuda_build:  e.g. "cu126" or None
+      cuda_version_source: e.g. "12.0 (via nvcc)" or None
+    """
+    # Lazy imports from kimari.core.detection — may not be on sys.path
+    detect_gpu = None
+    detect_cuda_version_detailed = None
+    detect_compute_capability_from_llama_server = None
+
+    try:
+        from kimari.core.detection import (
+            detect_compute_capability_from_llama_server as _detect_cc_llama,
+        )
+        from kimari.core.detection import (
+            detect_cuda_version_detailed as _detect_cuda_detailed,
+        )
+        from kimari.core.detection import (
+            detect_gpu as _detect_gpu,
+        )
+
+        detect_gpu = _detect_gpu
+        detect_cuda_version_detailed = _detect_cuda_detailed
+        detect_compute_capability_from_llama_server = _detect_cc_llama
+    except ImportError:
+        pass
+
+    # ---- GPU name ----
+    gpu_name: str | None = None
+    if detect_gpu is not None:
+        try:
+            gpu_info = detect_gpu()
+            if gpu_info:
+                gpu_name = gpu_info.get("name")
+        except Exception:  # noqa: BLE001
+            pass
+
+    # ---- CUDA version with source ----
+    cuda_version_source: str | None = None
+    if detect_cuda_version_detailed is not None:
+        try:
+            cuda_detail = detect_cuda_version_detailed()
+            if cuda_detail:
+                cuda_version_source = f"{cuda_detail['version']} (via {cuda_detail['source']})"
+        except Exception:  # noqa: BLE001
+            pass
+
+    # ---- Compute capability — try torch first, then llama-server ----
+    compute_capability: str | None = None
+    compute_cap_source: str | None = None
+    torch_cuda_build: str | None = None
+
+    # Try torch
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            cap = torch.cuda.get_device_capability(0)
+            compute_capability = f"sm_{cap[0]}{cap[1]}"
+            compute_cap_source = "torch"
+            # Torch CUDA build tag (e.g. "cu126")
+            if torch.version.cuda:
+                torch_cuda_build = f"cu{torch.version.cuda.replace('.', '')}"
+    except (ImportError, RuntimeError):
+        pass
+
+    # Fallback: llama-server
+    if compute_capability is None and detect_compute_capability_from_llama_server is not None:
+        try:
+            cc_str = detect_compute_capability_from_llama_server()
+            if cc_str:
+                compute_capability = f"sm_{cc_str.replace('.', '')}"
+                compute_cap_source = "llama-server"
+        except Exception:  # noqa: BLE001
+            pass
+
+    # ---- Build the result ----
+    # If nothing was detected at all, return a minimal "nothing found" result
+    if gpu_name is None and compute_capability is None and cuda_version_source is None:
+        return {
+            "name": "gpu_cuda_info",
+            "passed": True,
+            "value": "No GPU/CUDA detected",
+            "message": "No GPU/CUDA detected",
+            "gpu_name": None,
+            "compute_capability": None,
+            "compute_cap_source": None,
+            "torch_cuda_build": None,
+            "cuda_version_source": None,
+        }
+
+    # Assemble human-readable value string
+    parts: list[str] = []
+    if gpu_name:
+        parts.append(gpu_name)
+    if compute_capability:
+        cc_part = f"{compute_capability} (via {compute_cap_source})"
+        parts.append(cc_part)
+    if torch_cuda_build:
+        parts.append(f"PyTorch {torch_cuda_build}")
+    if cuda_version_source:
+        parts.append(f"CUDA {cuda_version_source}")
+
+    value_str = ", ".join(parts)
+
+    return {
+        "name": "gpu_cuda_info",
+        "passed": True,
+        "value": value_str,
+        "message": "GPU and CUDA detection completed",
+        "gpu_name": gpu_name,
+        "compute_capability": compute_capability,
+        "compute_cap_source": compute_cap_source,
+        "torch_cuda_build": torch_cuda_build,
+        "cuda_version_source": cuda_version_source,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------------
@@ -325,6 +457,9 @@ def run_all_checks(verbose: bool = False) -> dict[str, Any]:
     # 15. GPU arch compatibility (Pascal/cu128+ check)
     checks.append(check_gpu_arch_compatibility())
 
+    # 16. GPU/CUDA info (works without PyTorch)
+    checks.append(check_gpu_cuda_info())
+
     # Build compatibility dict from the param checks
     compatibility: dict[str, Any] = {}
     for check in checks:
@@ -334,6 +469,14 @@ def run_all_checks(verbose: bool = False) -> dict[str, Any]:
         elif name.startswith("sft_trainer_accepts_"):
             param_name = name.replace("sft_trainer_accepts_", "")
             compatibility[f"sft_trainer_accepts_{param_name}"] = check["value"]
+        elif name == "gpu_cuda_info":
+            compatibility["gpu_cuda_info"] = {
+                "gpu_name": check.get("gpu_name"),
+                "compute_capability": check.get("compute_capability"),
+                "compute_cap_source": check.get("compute_cap_source"),
+                "torch_cuda_build": check.get("torch_cuda_build"),
+                "cuda_version_source": check.get("cuda_version_source"),
+            }
 
     # Determine ready_for_training
     # True only if ALL core imports succeed AND TrainingArguments does NOT
@@ -459,14 +602,23 @@ def print_human_output(result: dict[str, Any], verbose: bool = False) -> None:
     print("  Compatibility Details")
     print("-" * 70)
     for key, value in result["compatibility"].items():
-        if value is None:
-            display = "unknown (library not available)"
-        elif isinstance(value, bool):
-            display = str(value)
+        if isinstance(value, dict):
+            # Nested dict (e.g. gpu_cuda_info) — display sub-fields
+            label = key.replace("_", " ")
+            print(f"  {label}:")
+            for sub_key, sub_value in value.items():
+                sub_label = sub_key.replace("_", " ")
+                display = "—" if sub_value is None else str(sub_value)
+                print(f"    {sub_label}: {display}")
         else:
-            display = str(value)
-        label = key.replace("_", " ").replace("accepts ", "accepts ")
-        print(f"  {label}: {display}")
+            if value is None:
+                display = "unknown (library not available)"
+            elif isinstance(value, bool):
+                display = str(value)
+            else:
+                display = str(value)
+            label = key.replace("_", " ").replace("accepts ", "accepts ")
+            print(f"  {label}: {display}")
 
     # Warnings
     if result["warnings"]:

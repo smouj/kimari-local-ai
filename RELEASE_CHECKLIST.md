@@ -763,6 +763,36 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.40 Checks
+
+- [ ] `docs/GTX1060_LOCAL_RUNTIME_RESULT.md` exists
+- [ ] `benchmarks/results/gtx1060-tinyllama-wsl2.example.json` exists and parses as valid JSON
+- [ ] Benchmark JSON has `kimari4b: false`
+- [ ] Benchmark JSON has `result_type: local_runtime_validation`
+- [ ] Benchmark JSON has `measured: true`
+- [ ] Benchmark JSON has `public_claim_allowed: limited`
+- [ ] GTX1060 result doc mentions TinyLlama (NOT Kimari-4B)
+- [ ] No "Kimari-4B benchmark" claim in GTX1060 result doc
+- [ ] `detect_compute_capability_from_llama_server()` exists in `kimari/core/detection.py`
+- [ ] `detect_cuda_version_detailed()` exists in `kimari/core/detection.py`
+- [ ] `doctor --deep` compute capability fallback uses llama-server when PyTorch unavailable
+- [ ] `detect_cuda_version()` falls back to nvidia-smi header parsing
+- [ ] `check_training_stack.py` has `check_gpu_cuda_info()` function
+- [ ] `check_gpu_cuda_info()` works without PyTorch installed
+- [ ] README includes "Validated Locally on GTX 1060" section
+- [ ] README CUDA vs CPU-only comparison table present
+- [ ] README says NOT Kimari-4B in GTX 1060 section
+- [ ] docs/index.html has GTX 1060 validation card
+- [ ] docs/SCREENSHOTS.md has GTX 1060 recommended captures section
+- [ ] pyproject.toml version is 0.1.40-alpha
+- [ ] kimari/__init__.py __version__ is 0.1.40-alpha
+- [ ] CHANGELOG.md has [0.1.40-alpha] entry
+- [ ] ROADMAP.md marks v0.1.40-alpha as Current, v0.1.39-alpha as Released
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No "Kimari-4B released" false claim anywhere
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

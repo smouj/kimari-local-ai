@@ -5,6 +5,7 @@ Detects GPU, CUDA, llama-server binary, and port availability.
 """
 
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -75,22 +76,106 @@ def detect_gpu() -> dict | None:
     return None
 
 
+def detect_cuda_version_detailed() -> dict | None:
+    """Detect CUDA version with source information via a fallback chain.
+
+    Returns dict with 'version' and 'source' keys, or None if undetectable.
+
+    Fallback order:
+      1. nvcc --version  (source='nvcc')
+      2. nvidia-smi header  (source='nvidia-smi')
+      3. /usr/local/cuda/bin/nvcc  (source='nvcc')
+    """
+    # 1. Try nvcc from PATH
+    nvcc = shutil.which("nvcc")
+    if nvcc:
+        try:
+            result = subprocess.run(
+                [nvcc, "--version"], capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 0:
+                for line in result.stdout.split("\n"):
+                    if "release" in line.lower():
+                        parts = line.split("release")
+                        if len(parts) >= 2:
+                            version = parts[1].strip().split(",")[0].strip()
+                            return {"version": version, "source": "nvcc"}
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            pass
+
+    # 2. Try nvidia-smi header ("CUDA Version: X.Y")
+    nvidia_smi = _nvidia_smi_path()
+    if nvidia_smi:
+        try:
+            result = subprocess.run(
+                [nvidia_smi], capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 0:
+                match = re.search(r"CUDA Version:\s*(\d+\.\d+)", result.stdout)
+                if match:
+                    return {"version": match.group(1), "source": "nvidia-smi"}
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            pass
+
+    # 3. Try /usr/local/cuda/bin/nvcc directly
+    fallback_nvcc = "/usr/local/cuda/bin/nvcc"
+    if Path(fallback_nvcc).exists():
+        try:
+            result = subprocess.run(
+                [fallback_nvcc, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            if result.returncode == 0:
+                for line in result.stdout.split("\n"):
+                    if "release" in line.lower():
+                        parts = line.split("release")
+                        if len(parts) >= 2:
+                            version = parts[1].strip().split(",")[0].strip()
+                            return {"version": version, "source": "nvcc"}
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            pass
+
+    return None
+
+
 def detect_cuda_version() -> str | None:
-    """Detect CUDA version via nvcc --version."""
-    nvcc = _nvcc_path()
-    if not nvcc:
-        return None
+    """Detect CUDA version (backward-compatible wrapper).
+
+    Returns just the version string, or None if undetectable.
+    For source information, use detect_cuda_version_detailed().
+    """
+    detailed = detect_cuda_version_detailed()
+    if detailed:
+        return detailed["version"]
+    return None
+
+
+def detect_compute_capability_from_llama_server() -> str | None:
+    """Detect GPU compute capability from llama-server --version output.
+
+    Runs llama-server --version and parses the output for a
+    "compute capability N.N" pattern (e.g. "compute capability 6.1").
+
+    Returns the compute capability string (e.g. "6.1") or None.
+    Never raises — always returns None on failure.
+    """
     try:
-        result = subprocess.run([nvcc, "--version"], capture_output=True, text=True, timeout=10)
-        if result.returncode == 0:
-            # Parse output like: "release 12.4, V12.4.131"
-            for line in result.stdout.split("\n"):
-                if "release" in line.lower():
-                    parts = line.split("release")
-                    if len(parts) >= 2:
-                        version = parts[1].strip().split(",")[0].strip()
-                        return version
-    except (FileNotFoundError, subprocess.TimeoutExpired):
+        llama_path = detect_llama_server()
+        if not llama_path:
+            return None
+        result = subprocess.run(
+            [llama_path, "--version"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        output = result.stdout + result.stderr
+        match = re.search(r"compute capability\s+(\d+\.\d+)", output, re.IGNORECASE)
+        if match:
+            return match.group(1)
+    except Exception:  # noqa: BLE001
         pass
     return None
 

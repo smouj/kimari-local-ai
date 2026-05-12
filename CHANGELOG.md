@@ -5,6 +5,28 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.40-alpha] - 2026-03-06
+
+### Added
+- `docs/GTX1060_LOCAL_RUNTIME_RESULT.md` — honest, sanitized documentation of first real GTX 1060 inference result
+- `benchmarks/results/gtx1060-tinyllama-wsl2.example.json` — machine-readable local runtime validation (TinyLlama, NOT Kimari-4B)
+- `detect_cuda_version_detailed()` in `detection.py` — returns CUDA version with detection source (nvcc, nvidia-smi, or fallback path)
+- `detect_compute_capability_from_llama_server()` in `detection.py` — extracts GPU compute capability from llama-server output as fallback when PyTorch is not installed
+- `check_gpu_cuda_info()` in `check_training_stack.py` — reports GPU name, compute capability, CUDA version and source even without PyTorch installed
+- README section "Validated Locally on GTX 1060" with CUDA vs CPU-only comparison table
+- docs/index.html GTX 1060 local validation card with performance metrics
+- docs/SCREENSHOTS.md recommended captures list for GTX 1060 validation
+
+### Fixed
+- `doctor --deep` compute capability fallback: if PyTorch not installed, now tries llama-server to detect compute capability (e.g., "6.1 (via llama-server)")
+- `detect_cuda_version()` now falls back to parsing nvidia-smi header "CUDA Version: X.Y" when nvcc is not available
+- `check_training_stack.py` reports GPU/CUDA info (gpu_name, compute_capability, cuda_version_source) even without PyTorch
+
+### Safety
+- Gate remains BLOCKED
+- No Kimari-4B weights tested or published
+- GTX 1060 result uses TinyLlama test model only
+
 ## [0.1.39-alpha] - 2026-03-06
 
 ### Fixed

@@ -20,6 +20,7 @@ from kimari import __version__ as KIMARI_VERSION  # noqa: N812
 from kimari.config.loader import load_config, validate_config
 from kimari.core.constants import PROJECT_ROOT
 from kimari.core.detection import (
+    detect_compute_capability_from_llama_server,
     detect_cuda,
     detect_cuda_version,
     detect_gpu,
@@ -410,6 +411,10 @@ def check_gpu_compute_capability() -> dict:
     WARNs if GPU is Pascal (sm_61, e.g. GTX 1060) and PyTorch build is
     cu128/cu130 (which dropped sm_61 support). Recommends cu126 legacy build.
 
+    Fallback chain for compute capability detection:
+      1. PyTorch (most accurate)
+      2. llama-server --version output
+
     No FAIL state — this is informational.
     """
     # Try to get compute capability via torch
@@ -417,6 +422,7 @@ def check_gpu_compute_capability() -> dict:
     gpu_name = None
     torch_version = None
     torch_cuda_version = None
+    source = None
 
     try:
         import torch
@@ -426,8 +432,19 @@ def check_gpu_compute_capability() -> dict:
             compute_cap = torch.cuda.get_device_capability(0)
             gpu_name = torch.cuda.get_device_name(0)
             torch_cuda_version = torch.version.cuda
+            source = "torch"
     except (ImportError, RuntimeError):
         pass
+
+    # Fallback: try llama-server --version for compute capability
+    if compute_cap is None:
+        llama_cap = detect_compute_capability_from_llama_server()
+        if llama_cap is not None:
+            compute_cap = tuple(int(x) for x in llama_cap.split("."))
+            if len(compute_cap) < 2:
+                compute_cap = None
+            else:
+                source = "llama-server"
 
     # Also try nvidia-smi for GPU name if torch didn't work
     if gpu_name is None:
@@ -449,6 +466,9 @@ def check_gpu_compute_capability() -> dict:
         cap_str = f"sm_{compute_cap[0]}{compute_cap[1]}"
         cap_major, cap_minor = compute_cap
 
+        # Build value string with source attribution
+        source_label = f" (via {source})" if source else ""
+
         # Check if Pascal (sm_61) with incompatible PyTorch
         is_pascal = cap_major == 6 and cap_minor == 1
         if is_pascal and torch_cuda_version:
@@ -458,7 +478,7 @@ def check_gpu_compute_capability() -> dict:
                 return {
                     "name": "GPU Compute Capability",
                     "status": "WARN",
-                    "value": f"{gpu_name} — {cap_str} — PyTorch {torch_version}+cu{torch_cuda_version}",
+                    "value": f"{gpu_name} — {cap_str}{source_label} — PyTorch {torch_version}+cu{torch_cuda_version}",
                     "detail": (
                         f"Pascal GPU ({cap_str}) detected with PyTorch cu{torch_cuda_version}. "
                         f"PyTorch builds cu128+ dropped sm_61 support. "
@@ -472,16 +492,16 @@ def check_gpu_compute_capability() -> dict:
         return {
             "name": "GPU Compute Capability",
             "status": "PASS",
-            "value": f"{gpu_name} — {cap_str}{torch_info}",
+            "value": f"{gpu_name} — {cap_str}{source_label}{torch_info}",
             "detail": "",
         }
 
-    # Have GPU name but no compute capability (torch not installed or no CUDA)
+    # Have GPU name but no compute capability (torch and llama-server both failed)
     return {
         "name": "GPU Compute Capability",
         "status": "WARN",
         "value": f"{gpu_name} — compute capability unknown",
-        "detail": "Install PyTorch with CUDA for compute capability detection",
+        "detail": "Install PyTorch with CUDA or ensure llama-server is available for compute capability detection",
     }
 
 

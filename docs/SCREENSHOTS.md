@@ -390,6 +390,47 @@ Until real screenshots exist, use the text examples above as illustration.
 
 ---
 
+## GTX 1060 Local Validation — Recommended Captures
+
+These captures document the first real inference validation on GTX 1060 hardware.
+
+### 1. nvidia-smi on WSL2
+
+**Command:** `nvidia-smi`
+**Purpose:** Shows GPU detection, driver version, CUDA version in WSL2
+**Safety:** Ensure no process details with private paths are visible
+**Status:** planned
+
+### 2. kimari doctor --deep
+
+**Command:** `kimari doctor --deep`
+**Purpose:** Shows diagnostic output including CUDA/NVIDIA detection, compute capability
+**Safety:** May show local paths — sanitize before committing
+**Status:** planned
+
+### 3. llama-server CUDA startup
+
+**Command:** `llama-server -m <model> --port 8081`
+**Purpose:** Shows CUDA initialization, compute capability detection, model loading
+**Safety:** Model path is OK to show (it's in models/ directory)
+**Status:** planned
+
+### 4. Health endpoint check
+
+**Command:** `curl http://127.0.0.1:8081/health`
+**Purpose:** Confirms inference server is running and healthy
+**Safety:** No secrets in health endpoint response
+**Status:** planned
+
+### 5. Token/s generation output
+
+**Command:** llama-server output during generation
+**Purpose:** Shows prompt eval and generation speed (tok/s)
+**Safety:** No secrets in performance metrics
+**Status:** planned
+
+---
+
 ## Rules
 
 1. **No secrets** — API keys, tokens, local paths, or user names must not appear.

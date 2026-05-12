@@ -1,0 +1,40 @@
+{
+  "result_type": "local_runtime_validation",
+  "measured": true,
+  "model": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+  "kimari4b": false,
+  "hardware": {
+    "gpu": "NVIDIA GeForce GTX 1060 6GB",
+    "vram_mb": 6144,
+    "driver": "581.57"
+  },
+  "environment": {
+    "os": "WSL2 Ubuntu 24.04",
+    "python": "3.12",
+    "torch": "2.7.1+cu126"
+  },
+  "llama_server": {
+    "version": "706fbd8",
+    "cuda_enabled": true
+  },
+  "cuda": {
+    "enabled": true,
+    "compute_capability": "6.1",
+    "source": "llama-server"
+  },
+  "results": {
+    "cuda": {
+      "prompt_tokens_per_second": 228,
+      "generation_tokens_per_second": 73,
+      "vram_model_mb": 1221
+    },
+    "cpu_only": {
+      "prompt_tokens_per_second": 77,
+      "generation_tokens_per_second": 33
+    }
+  },
+  "health_endpoint": "ok",
+  "public_claim_allowed": "limited",
+  "notes": "TinyLlama test model, not Kimari-4B. Local validation only. No public benchmark claims.",
+  "date": "2026-03-06"
+}

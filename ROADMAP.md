@@ -455,7 +455,20 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.39-alpha (Current)
+## v0.1.40-alpha (Current)
+
+- ✅ GTX 1060 local runtime validation documented (TinyLlama, NOT Kimari-4B)
+- ✅ `docs/GTX1060_LOCAL_RUNTIME_RESULT.md` — honest, sanitized result documentation
+- ✅ `benchmarks/results/gtx1060-tinyllama-wsl2.example.json` — machine-readable validation result
+- ✅ `detect_compute_capability_from_llama_server()` — fallback compute capability when PyTorch not installed
+- ✅ `detect_cuda_version_detailed()` — CUDA version with detection source (nvcc/nvidia-smi)
+- ✅ `doctor --deep` compute capability now tries llama-server fallback
+- ✅ `check_training_stack.py` reports GPU/CUDA info even without PyTorch
+- ✅ README "Validated Locally on GTX 1060" section with CUDA vs CPU-only table
+- ✅ docs/index.html GTX 1060 validation card
+- ✅ Gate BLOCKED
+
+## v0.1.39-alpha (Released)
 
 - ✅ Fixed recovery merge protects critical fields from incomplete user config (`profiles: {}` no longer destroys valid defaults)
 - ✅ Added `merge_user_config_onto_defaults_safely()` helper with protected/safe field separation

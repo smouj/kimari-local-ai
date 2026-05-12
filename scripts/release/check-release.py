@@ -4325,6 +4325,178 @@ def main() -> None:
     except Exception:
         warn("Could not check preview gate status (v0.1.39)")
 
+
+    # ── v0.1.40 GTX 1060 local runtime validation + doctor CUDA improvements ──
+    print("\n[58/62] v0.1.40 GTX 1060 local runtime validation + CUDA improvements")
+
+    # GTX 1060 result documentation
+    check(
+        "docs/GTX1060_LOCAL_RUNTIME_RESULT.md exists",
+        (PROJECT_ROOT / "docs" / "GTX1060_LOCAL_RUNTIME_RESULT.md").exists(),
+        "GTX 1060 local runtime result doc missing",
+    )
+
+    benchmark_json = PROJECT_ROOT / "benchmarks" / "results" / "gtx1060-tinyllama-wsl2.example.json"
+    check(
+        "benchmarks/results/gtx1060-tinyllama-wsl2.example.json exists",
+        benchmark_json.exists(),
+        "GTX 1060 benchmark result JSON missing",
+    )
+
+    if benchmark_json.exists():
+        try:
+            bdata = json.loads(benchmark_json.read_text())
+            check(
+                "Benchmark JSON has kimari4b=false",
+                bdata.get("kimari4b") is False,
+                f"kimari4b should be false, got: {bdata.get('kimari4b')}",
+            )
+            check(
+                "Benchmark JSON has result_type=local_runtime_validation",
+                bdata.get("result_type") == "local_runtime_validation",
+                f"result_type should be local_runtime_validation, got: {bdata.get('result_type')}",
+            )
+            check(
+                "Benchmark JSON has measured=true",
+                bdata.get("measured") is True,
+                f"measured should be true, got: {bdata.get('measured')}",
+            )
+            check(
+                "Benchmark JSON has public_claim_allowed=limited",
+                bdata.get("public_claim_allowed") == "limited",
+                f"public_claim_allowed should be limited, got: {bdata.get('public_claim_allowed')}",
+            )
+        except (json.JSONDecodeError, OSError) as exc:
+            check("Benchmark JSON parses correctly", False, str(exc))
+
+    # Check GTX 1060 doc mentions TinyLlama not Kimari-4B
+    gtx_doc = PROJECT_ROOT / "docs" / "GTX1060_LOCAL_RUNTIME_RESULT.md"
+    if gtx_doc.exists():
+        gtx_text = gtx_doc.read_text()
+        check(
+            "GTX1060 doc mentions TinyLlama",
+            "tinyllama" in gtx_text.lower() or "TinyLlama" in gtx_text,
+            "GTX1060 result doc should mention TinyLlama test model",
+        )
+        check(
+            "GTX1060 doc does NOT claim Kimari-4B benchmark",
+            "kimari-4b benchmark" not in gtx_text.lower() and "kimari 4b benchmark" not in gtx_text.lower(),
+            "GTX1060 result doc must not claim Kimari-4B benchmark",
+        )
+
+    # Detection improvements
+    detection_py = PROJECT_ROOT / "kimari" / "core" / "detection.py"
+    if detection_py.exists():
+        det_text = detection_py.read_text()
+        check(
+            "detect_compute_capability_from_llama_server() exists",
+            "detect_compute_capability_from_llama_server" in det_text,
+            "llama-server compute capability fallback missing from detection.py",
+        )
+        check(
+            "detect_cuda_version_detailed() exists",
+            "detect_cuda_version_detailed" in det_text,
+            "detect_cuda_version_detailed missing from detection.py",
+        )
+    else:
+        check("kimari/core/detection.py exists", False, "file not found")
+
+    # Doctor deep improvements
+    deep_py = PROJECT_ROOT / "kimari" / "doctor" / "deep.py"
+    if deep_py.exists():
+        deep_text = deep_py.read_text()
+        check(
+            "doctor deep uses llama-server compute capability fallback",
+            "detect_compute_capability_from_llama_server" in deep_text,
+            "doctor deep does not import llama-server compute capability fallback",
+        )
+    else:
+        check("kimari/doctor/deep.py exists", False, "file not found")
+
+    # check_training_stack improvement
+    training_stack = PROJECT_ROOT / "training" / "scripts" / "check_training_stack.py"
+    if training_stack.exists():
+        ts_text = training_stack.read_text()
+        check(
+            "check_gpu_cuda_info() exists in check_training_stack.py",
+            "check_gpu_cuda_info" in ts_text,
+            "check_gpu_cuda_info missing from check_training_stack.py",
+        )
+    else:
+        check("training/scripts/check_training_stack.py exists", False, "file not found")
+
+    # README GTX 1060 section
+    readme = PROJECT_ROOT / "README.md"
+    if readme.exists():
+        readme_text = readme.read_text()
+        check(
+            'README includes "Validated Locally on GTX 1060" section',
+            "Validated Locally on GTX 1060" in readme_text or "GTX 1060" in readme_text,
+            "README missing GTX 1060 local validation section",
+        )
+        check(
+            "README GTX section says NOT Kimari-4B",
+            "NOT Kimari-4B" in readme_text or "not Kimari-4B" in readme_text or "NOT Kimari" in readme_text,
+            "README GTX 1060 section should clarify NOT Kimari-4B",
+        )
+
+    # docs/index.html GTX card
+    index_html = PROJECT_ROOT / "docs" / "index.html"
+    if index_html.exists():
+        html_text = index_html.read_text()
+        check(
+            "docs/index.html has GTX 1060 validation card",
+            "GTX 1060" in html_text and "228 tok/s" in html_text,
+            "docs/index.html missing GTX 1060 validation card",
+        )
+
+    # SCREENSHOTS.md recommended captures
+    screenshots_md = PROJECT_ROOT / "docs" / "SCREENSHOTS.md"
+    if screenshots_md.exists():
+        ss_text = screenshots_md.read_text()
+        check(
+            "docs/SCREENSHOTS.md has GTX 1060 recommended captures",
+            "GTX 1060" in ss_text and "nvidia-smi" in ss_text,
+            "SCREENSHOTS.md missing GTX 1060 recommended captures section",
+        )
+
+    # Version checks
+    check(
+        "pyproject.toml version is 0.1.40-alpha",
+        get_pyproject_version() == "0.1.40-alpha",
+        f"Expected 0.1.40-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ is 0.1.40-alpha",
+        init_version == "0.1.40-alpha",
+        f"Expected 0.1.40-alpha, got {init_version}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.40-alpha] entry",
+        "[0.1.40-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.40-alpha] entry",
+    )
+    check(
+        "ROADMAP.md marks v0.1.40-alpha as Current",
+        "v0.1.40-alpha (Current)" in roadmap_text,
+        "ROADMAP.md does not mark v0.1.40-alpha as Current",
+    )
+    check(
+        "No weights/GGUF/adapters tracked (v0.1.40)",
+        len(false_claims) == 0,
+        "Weight/adapter files found in git tracking",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.40)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        'default_profile still "test" (v0.1.40)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
