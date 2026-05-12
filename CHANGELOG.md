@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.49-alpha] - 2026-05-13
+## [0.1.52-alpha] - 2026-05-13
+
+### Added
+- `eval/kimari_private_v1/` — 104 eval cases across 7 categories (Spanish technical, coding, server ops, local LLM/GGUF, agents, refusal/safety, style)
+- `eval/schema/kimari_eval_item.schema.json` — JSON Schema for eval items
+- `eval/scripts/validate_kimari_eval.py` — dataset validator
+- `eval/scripts/run_kimari_eval.py` — eval harness (dry-run + endpoint modes)
+- `docs/KIMARI_EVAL_PRIVATE_V1.md` — eval documentation
+- `docs/KIMARIFIT_SCORE_PLAN.md` — scoring framework (experimental)
+- `docs/BASELINE_VS_ADAPTER_EVAL_PLAN.md` — comparison plan
+- `reports/evals/baseline_qwen25_15b/README.md` — baseline plan
+- `reports/evals/baseline_qwen25_15b/baseline_plan.json` — baseline config
+- Version bump: 0.1.51-alpha → 0.1.52-alpha
+
+### Note
+- No training executed in this version
+- No HF Jobs submitted
+- No adapter or GGUF generated
+- Eval dataset is private, for internal use only
+- No benchmark claims
+- Gate: BLOCKED
+
 ## [0.1.51-alpha] - 2026-05-13
 
 ### Added

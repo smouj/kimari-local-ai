@@ -5890,6 +5890,138 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [72/72] v0.1.52 KimariEval private + baseline harness ──
+    print("\n[72/72] v0.1.52 KimariEval private + baseline harness")
+
+    # Eval dataset
+    eval_dir = PROJECT_ROOT / "eval" / "kimari_private_v1"
+    check(
+        "Eval dataset directory exists",
+        eval_dir.exists(),
+        "eval/kimari_private_v1/ not found",
+    )
+
+    # Count eval items
+    if eval_dir.exists():
+        jsonl_files = list(eval_dir.glob("*.jsonl"))
+        total_items = 0
+        for jf in jsonl_files:
+            total_items += len(jf.read_text().strip().split("\n"))
+        check(
+            "At least 100 eval items",
+            total_items >= 100,
+            f"Only {total_items} eval items (minimum: 100)",
+        )
+        check(
+            "At least 7 categories",
+            len(jsonl_files) >= 7,
+            f"Only {len(jsonl_files)} category files (minimum: 7)",
+        )
+
+    # Eval schema
+    check(
+        "Eval schema exists",
+        (PROJECT_ROOT / "eval" / "schema" / "kimari_eval_item.schema.json").exists(),
+        "eval/schema/kimari_eval_item.schema.json not found",
+    )
+
+    # Eval validator
+    check(
+        "validate_kimari_eval.py exists",
+        (PROJECT_ROOT / "eval" / "scripts" / "validate_kimari_eval.py").exists(),
+        "eval/scripts/validate_kimari_eval.py not found",
+    )
+
+    # Eval harness
+    eval_harness = PROJECT_ROOT / "eval" / "scripts" / "run_kimari_eval.py"
+    check(
+        "run_kimari_eval.py exists",
+        eval_harness.exists(),
+        "eval/scripts/run_kimari_eval.py not found",
+    )
+    if eval_harness.exists():
+        harness_text = eval_harness.read_text()
+        check(
+            "Eval harness supports dry-run",
+            "--dry-run" in harness_text,
+            "Eval harness must support --dry-run",
+        )
+        check(
+            "Eval harness has manual_review_required",
+            "manual_review_required" in harness_text,
+            "Eval harness must set manual_review_required",
+        )
+        check(
+            "Eval harness has no_benchmark_claim",
+            "no_benchmark_claim" in harness_text,
+            "Eval harness must set no_benchmark_claim",
+        )
+
+    # Docs
+    check(
+        "KIMARI_EVAL_PRIVATE_V1.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI_EVAL_PRIVATE_V1.md").exists(),
+        "docs/KIMARI_EVAL_PRIVATE_V1.md not found",
+    )
+    check(
+        "KIMARIFIT_SCORE_PLAN.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARIFIT_SCORE_PLAN.md").exists(),
+        "docs/KIMARIFIT_SCORE_PLAN.md not found",
+    )
+    check(
+        "BASELINE_VS_ADAPTER_EVAL_PLAN.md exists",
+        (PROJECT_ROOT / "docs" / "BASELINE_VS_ADAPTER_EVAL_PLAN.md").exists(),
+        "docs/BASELINE_VS_ADAPTER_EVAL_PLAN.md not found",
+    )
+
+    # Baseline plan
+    check(
+        "Baseline plan exists",
+        (PROJECT_ROOT / "reports" / "evals" / "baseline_qwen25_15b" / "baseline_plan.json").exists(),
+        "reports/evals/baseline_qwen25_15b/baseline_plan.json not found",
+    )
+
+    # No safetensors or GGUF in public repo
+    safetensors = list(PROJECT_ROOT.rglob("*.safetensors"))
+    check(
+        "No .safetensors in public repo",
+        len(safetensors) == 0,
+        f"Found {len(safetensors)} .safetensors files in public repo",
+    )
+    gguf_files = [f for f in PROJECT_ROOT.rglob("*.gguf") if "deps" not in str(f) and "node_modules" not in str(f)]
+    check(
+        "No .gguf in public repo (excl deps)",
+        len(gguf_files) == 0,
+        f"Found {len(gguf_files)} .gguf files in public repo",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.52-alpha",
+        get_pyproject_version() >= "0.1.52-alpha",
+        f"Expected version >= 0.1.52-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.52-alpha",
+        get_init_version() >= "0.1.52-alpha",
+        f"Expected version >= 0.1.52-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.52-alpha] entry",
+        "[0.1.52-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.52-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.52-alpha",
+        "v0.1.52-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.52-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.52)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

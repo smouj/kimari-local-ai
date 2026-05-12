@@ -1,0 +1,29 @@
+{
+  "model_label": "qwen25-15b-base",
+  "model_source": "Qwen/Qwen2.5-1.5B-Instruct",
+  "dataset": "kimari_private_v1",
+  "total_items": 100,
+  "categories": {
+    "spanish_technical": 16,
+    "coding_debug": 14,
+    "server_ops": 15,
+    "local_llm_gguf": 14,
+    "openclaw_agents": 14,
+    "refusal_safety": 15,
+    "style_consistency": 15
+  },
+  "difficulties": {
+    "easy": 28,
+    "medium": 48,
+    "hard": 24
+  },
+  "temperature": 0.1,
+  "max_tokens": 512,
+  "seed": 42,
+  "status": "pending",
+  "score_status": "not_scored",
+  "manual_review_required": true,
+  "no_benchmark_claim": true,
+  "created_at": "2026-05-13T00:00:00+0200",
+  "notes": "Baseline evaluation plan. No results yet. Manual review required."
+}

@@ -793,6 +793,21 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.52 Checks
+
+- [ ] eval private dataset exists (7 categories, 100+ cases)
+- [ ] eval validator exists and passes
+- [ ] eval harness exists (dry-run + endpoint)
+- [ ] eval schema exists
+- [ ] baseline plan exists
+- [ ] score_status = not_scored in dry-run output
+- [ ] manual_review_required = true
+- [ ] no_benchmark_claim = true
+- [ ] no invented scores
+- [ ] no safetensors in public repo
+- [ ] no GGUF in public repo
+- [ ] Gate BLOCKED
+
 ## v0.1.51 Checks
 
 - [ ] Persisted config exists

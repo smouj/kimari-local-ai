@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KimariEvalItem",
+  "description": "Schema for a single Kimari evaluation item",
+  "type": "object",
+  "required": ["id", "prompt", "ideal", "tags", "difficulty"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z]+-[0-9]{3}$",
+      "description": "Unique identifier (category-number)"
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 10,
+      "description": "The evaluation prompt/question"
+    },
+    "ideal": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Ideal reference response"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Category tags for the item"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["easy", "medium", "hard"],
+      "description": "Difficulty level"
+    }
+  },
+  "additionalProperties": false
+}

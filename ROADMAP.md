@@ -455,7 +455,16 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.51-alpha (Current)
+## v0.1.52-alpha (Current)
+
+- ✅ KimariEval Private v1: 104 cases across 7 categories
+- ✅ Eval validator + harness (dry-run + endpoint)
+- ✅ Baseline vs adapter eval plan
+- ✅ KimariFit score plan (experimental)
+- ✅ No training, no HF Jobs, no adapter, no GGUF
+- Gate BLOCKED — no benchmark claims
+
+## v0.1.51-alpha
 
 - ✅ Second micro SFT completed (Job 6a03a25e72518a06598ffae0)
 - ✅ adapter_persisted_private: true (uploaded to Smouj013/kimari4b-micro-sft-adapter-v0)
