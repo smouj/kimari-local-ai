@@ -455,7 +455,20 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.41-alpha (Current)
+## v0.1.42-alpha (Current)
+
+- ✅ `build_hf_jobs_command_args()` — safe `list[str]` command construction for subprocess
+- ✅ `hf_jobs_private_run.py` submit uses arg list, not `hf_cmd.split()` and not `shell=True`
+- ✅ `check-release.py` historical version checks no longer hardcode exact versions
+- ✅ `check-release.py` benchmark exclusion of `*.example.json` and `*.template.json`
+- ✅ Doctor/status suggests `--profile test` when default model missing
+- ✅ `docs/LOCAL_OPENAI_ENDPOINT_TEST.md` — local endpoint validation guide
+- ✅ README local endpoint GTX 1060 validation section
+- ✅ docs/index.html OpenAI-compatible endpoint card
+- ✅ docs/SCREENSHOTS.md local endpoint captures
+- ✅ Gate BLOCKED
+
+## v0.1.41-alpha
 
 - ✅ `docs/HF_JOBS_ACCESS.md` — generic HF Jobs access documentation (no private details)
 - ✅ `docs/HF_JOBS_FALLBACK_RUNNERS.md` — alternative GPU runners

@@ -243,6 +243,7 @@ def check_default_profile() -> dict:
 
     During alpha, the default profile must be 'test'.
     PASS if test, WARN if something else.
+    If default profile exists but its model file is missing, suggest --profile test.
     """
     try:
         config = load_config()
@@ -255,6 +256,9 @@ def check_default_profile() -> dict:
         }
 
     default = config.get("default_profile", "")
+    profiles = config.get("profiles", {})
+    models_dir = Path.home() / ".local" / "share" / "kimari" / "models"
+
     if default == "test":
         return {
             "name": "Default Profile",
@@ -262,11 +266,23 @@ def check_default_profile() -> dict:
             "value": "test",
             "detail": "",
         }
+
+    # Check if the default profile's model file exists
+    profile_info = profiles.get(default, {})
+    model_name = profile_info.get("model", "")
+    detail = "Expected 'test' during alpha"
+    if model_name and not (models_dir / Path(model_name).name).exists():
+        detail = (
+            f"Expected 'test' during alpha. "
+            f"Model '{Path(model_name).name}' for profile '{default}' not found — "
+            f"use --profile test for the bundled TinyLlama validation model"
+        )
+
     return {
         "name": "Default Profile",
         "status": "WARN",
         "value": default or "(none)",
-        "detail": "Expected 'test' during alpha",
+        "detail": detail,
     }
 
 

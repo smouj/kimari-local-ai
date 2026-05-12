@@ -10,16 +10,17 @@ IMPORTANT SECURITY RULES:
 - No --token flag accepted
 - Actual submission requires --allow-submit AND --yes
 - No files uploaded
+- Submit uses arg list (subprocess.run(args_list)), NOT hf_cmd.split() or shell=True
 
 Usage:
-    python training/scripts/hf_jobs_private_run.py \
-        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \
+    python training/scripts/hf_jobs_private_run.py \\
+        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \\
         --dry-run --json
-    python training/scripts/hf_jobs_private_run.py \
-        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \
+    python training/scripts/hf_jobs_private_run.py \\
+        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \\
         --print-command
-    python training/scripts/hf_jobs_private_run.py \
-        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \
+    python training/scripts/hf_jobs_private_run.py \\
+        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \\
         --allow-submit --yes
 """
 
@@ -101,17 +102,39 @@ def parse_simple_yaml(path: Path) -> dict | None:
 
 
 def build_hf_jobs_command(config: dict) -> str:
-    """Build the hf jobs run command from config."""
+    """Build the hf jobs run command from config as a human-readable string."""
     flavor = config.get("flavor", "a10g-small")
     image = config.get("image", "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel")
     commands = config.get("commands", [])
 
-    # Build the command string that runs inside the container
     inner_cmd = " && ".join(commands)
-
-    # Build the full hf jobs run command
     hf_cmd = f"hf jobs run --flavor {flavor} {image} bash -lc '{inner_cmd}'"
     return hf_cmd
+
+
+def build_hf_jobs_command_args(config: dict) -> list[str]:
+    """Build the hf jobs run command as a safe list[str] for subprocess.
+
+    The inner command (bash -lc '...') is kept as a single argument
+    to avoid shell splitting issues with quotes and special characters.
+    This function is used for actual submission via subprocess.run().
+    """
+    flavor = config.get("flavor", "a10g-small")
+    image = config.get("image", "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel")
+    commands = config.get("commands", [])
+
+    inner_cmd = " && ".join(commands)
+    return [
+        "hf",
+        "jobs",
+        "run",
+        "--flavor",
+        flavor,
+        image,
+        "bash",
+        "-lc",
+        inner_cmd,
+    ]
 
 
 def check_hf_cli() -> bool:
@@ -211,8 +234,9 @@ def main() -> None:
         print("ERROR: Smoke config must have allow_hf_upload: false", file=sys.stderr)
         sys.exit(1)
 
-    # Build command
+    # Build command (both human-readable string and safe arg list)
     hf_cmd = build_hf_jobs_command(config)
+    hf_cmd_args = build_hf_jobs_command_args(config)
 
     # Prepare result
     result = {
@@ -227,6 +251,9 @@ def main() -> None:
         "command_count": len(config.get("commands", [])),
         "forbidden_actions": config.get("forbidden", []),
         "hf_jobs_command": hf_cmd,
+        "hf_jobs_command_args": hf_cmd_args,
+        "command_arg_count": len(hf_cmd_args),
+        "submit_uses_arg_list": True,
         "mode": "dry_run",
         "submitted": False,
         "job_id": None,
@@ -257,6 +284,7 @@ def main() -> None:
             print(f"  Gate:        {result['preview_gate_state']}")
             print(f"  Commands:    {result['command_count']}")
             print(f"\n  HF Command:\n    {hf_cmd}")
+            print(f"\n  Arg list ({len(hf_cmd_args)} args):\n    {hf_cmd_args}")
             print("\n  Forbidden:")
             for f in result["forbidden_actions"]:
                 print(f"    X {f}")
@@ -298,14 +326,14 @@ def main() -> None:
             )
             sys.exit(1)
 
-    # Submit the job
+    # Submit the job using safe arg list (NOT hf_cmd.split(), NOT shell=True)
     result["mode"] = "submit"
     print(f"Submitting job: {result['job_name']}")
-    print(f"Command: {hf_cmd}")
+    print(f"Command args: {hf_cmd_args}")
 
     try:
         submit_result = subprocess.run(
-            hf_cmd.split(),
+            hf_cmd_args,
             capture_output=True,
             text=True,
             timeout=300,

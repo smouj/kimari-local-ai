@@ -431,6 +431,58 @@ These captures document the first real inference validation on GTX 1060 hardware
 
 ---
 
+## Local OpenAI-Compatible Endpoint (GTX 1060)
+
+### 1. nvidia-smi GPU detection (WSL2)
+
+**Command:** `/usr/lib/wsl/lib/nvidia-smi` (or `nvidia-smi` if on PATH)
+**Purpose:** Shows GPU detection in WSL2 environment
+**Safety:** No secrets in GPU output; redact any user-specific paths
+**Status:** planned
+
+### 2. kimari doctor --deep
+
+**Command:** `kimari doctor --deep`
+**Purpose:** Full environment diagnostic including CUDA, GPU, profiles
+**Safety:** No secrets; may show model paths — redact user-specific paths
+**Status:** planned
+
+### 3. kimari start --profile test --dry-run
+
+**Command:** `kimari start --profile test --dry-run`
+**Purpose:** Shows the command that would start llama-server with TinyLlama
+**Safety:** No secrets; shows model path and port only
+**Status:** planned
+
+### 4. curl /health
+
+**Command:** `curl http://127.0.0.1:11435/health`
+**Purpose:** Confirms inference server is running and healthy
+**Safety:** No secrets in health endpoint response
+**Status:** planned
+
+### 5. curl /v1/models
+
+**Command:** `curl http://127.0.0.1:11435/v1/models`
+**Purpose:** Lists available models via OpenAI-compatible API
+**Safety:** No secrets; model IDs are public (TinyLlama GGUF names)
+**Status:** planned
+
+### 6. curl /v1/chat/completions
+
+**Command:** `curl http://127.0.0.1:11435/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf","messages":[{"role":"user","content":"Hello"}],"max_tokens":50}'`
+**Purpose:** Demonstrates chat completion via OpenAI-compatible endpoint
+**Safety:** No secrets; prompt and response are safe to show
+**Status:** planned
+
+### 7. GTX 1060 benchmark results
+
+**Purpose:** Shows CUDA vs CPU performance comparison table
+**Safety:** Performance numbers only, no secrets
+**Status:** planned
+
+---
+
 ## Rules
 
 1. **No secrets** — API keys, tokens, local paths, or user names must not appear.

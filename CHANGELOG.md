@@ -5,6 +5,29 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.42-alpha] - 2026-05-12
+
+### Added
+- `build_hf_jobs_command_args()` in `hf_jobs_private_run.py` — returns `list[str]` for safe subprocess invocation
+- `--dry-run --json` output now includes `hf_jobs_command_args`, `command_arg_count`, `submit_uses_arg_list: true`
+- `docs/LOCAL_OPENAI_ENDPOINT_TEST.md` — documented local OpenAI-compatible endpoint validation
+- README section for local endpoint validation on GTX 1060
+- docs/index.html card for OpenAI-compatible local endpoint
+- docs/SCREENSHOTS.md recommended captures for local endpoint
+
+### Fixed
+- `hf_jobs_private_run.py` submit path now uses `command_args` (list[str]) instead of `hf_cmd.split()` — no shell injection risk
+- `check-release.py` historical version checks no longer hardcode exact version strings — eliminates cosmetic FAIL on version bumps
+- `check-release.py` benchmark results check correctly excludes `*.example.json` and `*.template.json`
+- Doctor/status message suggests `--profile test` when default model file is missing
+
+### Safety
+- Gate remains BLOCKED
+- No HF upload performed
+- No training performed
+- No tokens or private account data committed
+- `shell=True` removed from all subprocess calls in `hf_jobs_private_run.py`
+
 ## [0.1.41-alpha] - 2026-03-06
 
 ### Added

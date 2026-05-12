@@ -53,7 +53,8 @@ def detect_gpu() -> dict | None:
         return None
     try:
         result = subprocess.run(
-            [nvidia_smi,
+            [
+                nvidia_smi,
                 "--query-gpu=name,memory.total,driver_version",
                 "--format=csv,noheader,nounits",
             ],
@@ -90,9 +91,7 @@ def detect_cuda_version_detailed() -> dict | None:
     nvcc = shutil.which("nvcc")
     if nvcc:
         try:
-            result = subprocess.run(
-                [nvcc, "--version"], capture_output=True, text=True, timeout=10
-            )
+            result = subprocess.run([nvcc, "--version"], capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
                 for line in result.stdout.split("\n"):
                     if "release" in line.lower():
@@ -107,9 +106,7 @@ def detect_cuda_version_detailed() -> dict | None:
     nvidia_smi = _nvidia_smi_path()
     if nvidia_smi:
         try:
-            result = subprocess.run(
-                [nvidia_smi], capture_output=True, text=True, timeout=10
-            )
+            result = subprocess.run([nvidia_smi], capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
                 match = re.search(r"CUDA Version:\s*(\d+\.\d+)", result.stdout)
                 if match:

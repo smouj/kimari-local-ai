@@ -52,7 +52,13 @@ class TestHFJobsAccessDocs:
         if not path.exists():
             pytest.skip("HF Jobs access doc not found")
         content = path.read_text().lower()
-        for pattern in ("pro subscription active", "smouj013 has pro", "billing active", "paid account", "my pro subscription"):
+        for pattern in (
+            "pro subscription active",
+            "smouj013 has pro",
+            "billing active",
+            "paid account",
+            "my pro subscription",
+        ):
             assert pattern not in content, f"Private detail found: {pattern}"
 
     def test_hf_jobs_fallback_runners_doc_exists(self):
@@ -132,13 +138,13 @@ class TestCheckHFJobsAccess:
         assert "can_continue_to_smoke" in content
         # The 403 case should set this to False
         # Look for the pattern in the code
-        lines = content.split('\n')
+        lines = content.split("\n")
         found_403_block = False
         for i, line in enumerate(lines):
-            if '403' in line or 'forbidden' in line:
+            if "403" in line or "forbidden" in line:
                 # Check nearby lines for can_continue_to_smoke = false
-                nearby = '\n'.join(lines[max(0, i-3):min(len(lines), i+10)])
-                if 'can_continue_to_smoke' in nearby:
+                nearby = "\n".join(lines[max(0, i - 3) : min(len(lines), i + 10)])
+                if "can_continue_to_smoke" in nearby:
                     found_403_block = True
                     break
         assert found_403_block, "403 handling should set can_continue_to_smoke to false"
@@ -184,9 +190,7 @@ class TestBenchmarkFalsePositiveFix:
         """check-release.py excludes .example.json from measured results check."""
         path = PROJECT_ROOT / "scripts" / "release" / "check-release.py"
         content = path.read_text()
-        assert ".example.json" in content, (
-            "check-release.py should exclude .example.json files from real results check"
-        )
+        assert ".example.json" in content, "check-release.py should exclude .example.json files from real results check"
 
     def test_check_release_excludes_template_json(self):
         """check-release.py excludes .template.json from measured results check."""
@@ -215,14 +219,17 @@ class TestBenchmarkFalsePositiveFix:
 class TestPrivacySafeguards:
     """Test that no private plan/billing details appear in any committed file."""
 
-    @pytest.mark.parametrize("pattern", [
-        "Pro subscription active",
-        "Smouj013 has Pro",
-        "billing active",
-        "paid account",
-        "my Pro subscription",
-        "kimari-ai billing",
-    ])
+    @pytest.mark.parametrize(
+        "pattern",
+        [
+            "Pro subscription active",
+            "Smouj013 has Pro",
+            "billing active",
+            "paid account",
+            "my Pro subscription",
+            "kimari-ai billing",
+        ],
+    )
     def test_no_private_patterns_in_readme(self, pattern):
         """README does not contain private details."""
         path = PROJECT_ROOT / "README.md"
@@ -231,12 +238,15 @@ class TestPrivacySafeguards:
         content = path.read_text().lower()
         assert pattern.lower() not in content, f"Private pattern '{pattern}' found in README"
 
-    @pytest.mark.parametrize("pattern", [
-        "Pro subscription active",
-        "Smouj013 has Pro",
-        "billing active",
-        "paid account",
-    ])
+    @pytest.mark.parametrize(
+        "pattern",
+        [
+            "Pro subscription active",
+            "Smouj013 has Pro",
+            "billing active",
+            "paid account",
+        ],
+    )
     def test_no_private_patterns_in_docs(self, pattern):
         """docs/ does not contain private details."""
         docs_dir = PROJECT_ROOT / "docs"
@@ -246,12 +256,15 @@ class TestPrivacySafeguards:
             content = doc.read_text().lower()
             assert pattern.lower() not in content, f"Private pattern '{pattern}' found in {doc}"
 
-    @pytest.mark.parametrize("pattern", [
-        "Pro subscription active",
-        "Smouj013 has Pro",
-        "billing active",
-        "paid account",
-    ])
+    @pytest.mark.parametrize(
+        "pattern",
+        [
+            "Pro subscription active",
+            "Smouj013 has Pro",
+            "billing active",
+            "paid account",
+        ],
+    )
     def test_no_private_patterns_in_training_scripts(self, pattern):
         """training/ scripts do not contain private details."""
         training_dir = PROJECT_ROOT / "training"
@@ -268,30 +281,37 @@ class TestPrivacySafeguards:
 
 
 class TestVersionV0141:
-    """Test v0.1.41-alpha version consistency."""
+    """Test v0.1.41-alpha version presence (not necessarily current)."""
 
     def test_pyproject_version(self):
-        """pyproject.toml has version 0.1.41-alpha."""
+        """pyproject.toml version >= 0.1.41-alpha."""
         for line in (PROJECT_ROOT / "pyproject.toml").read_text().splitlines():
             if line.strip().startswith("version") and "python" not in line.lower():
-                assert "0.1.41-alpha" in line, f"Expected 0.1.41-alpha in: {line}"
+                version = line.split("=", 1)[1].strip().strip('"').strip("'")
+                assert version >= "0.1.41-alpha", f"Expected version >= 0.1.41-alpha, got {version}"
                 return
         pytest.fail("version line not found in pyproject.toml")
 
     def test_init_version(self):
-        """kimari/__init__.py has __version__ = '0.1.41-alpha'."""
+        """kimari/__init__.py __version__ >= 0.1.41-alpha."""
         content = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
-        assert '"0.1.41-alpha"' in content or "'0.1.41-alpha'" in content
+        # Extract version
+        import re
+
+        match = re.search(r'__version__\s*=\s*["\']([^"\']+)["\']', content)
+        assert match, "__version__ not found in __init__.py"
+        version = match.group(1)
+        assert version >= "0.1.41-alpha", f"Expected version >= 0.1.41-alpha, got {version}"
 
     def test_changelog_entry(self):
         """CHANGELOG.md has [0.1.41-alpha] entry."""
         content = (PROJECT_ROOT / "CHANGELOG.md").read_text()
         assert "[0.1.41-alpha]" in content
 
-    def test_roadmap_marks_current(self):
-        """ROADMAP.md marks v0.1.41-alpha as Current."""
+    def test_roadmap_mentions_v0141(self):
+        """ROADMAP.md mentions v0.1.41-alpha."""
         content = (PROJECT_ROOT / "ROADMAP.md").read_text()
-        assert "v0.1.41-alpha (Current)" in content
+        assert "v0.1.41-alpha" in content
 
     def test_readme_mentions_hf_jobs(self):
         """README mentions HF Jobs smoke test access requirement."""
@@ -316,11 +336,20 @@ class TestNoFalseClaims:
             content = path.read_text()
             for line in content.splitlines():
                 line_lower = line.lower().strip()
-                if any(phrase in line_lower for phrase in (
-                    "false claim", "no false", "claim detection", "not released",
-                    "not yet released", "no weights released", "no public release",
-                    "when kimari-4b is released", "is released —",
-                )):
+                if any(
+                    phrase in line_lower
+                    for phrase in (
+                        "false claim",
+                        "no false",
+                        "claim detection",
+                        "not released",
+                        "not yet released",
+                        "no weights released",
+                        "no public release",
+                        "when kimari-4b is released",
+                        "is released —",
+                    )
+                ):
                     continue
                 if "released" in line_lower and "kimari" in line_lower and "4b" in line_lower:
                     # Check it's not a conditional statement

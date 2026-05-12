@@ -174,15 +174,17 @@ class TestDetectionImprovements:
         """detect_compute_capability_from_llama_server can parse 'compute capability 6.1'."""
         from kimari.core.detection import detect_compute_capability_from_llama_server
 
-        with patch("kimari.core.detection.detect_llama_server", return_value="/usr/local/bin/llama-server"), \
-             patch("subprocess.run") as mock_run:
-                mock_run.return_value = MagicMock(
-                    returncode=0,
-                    stdout="llama-server 706fbd8\ncompute capability 6.1\n",
-                    stderr="",
-                )
-                result = detect_compute_capability_from_llama_server()
-                assert result == "6.1", f"Expected 6.1, got {result}"
+        with (
+            patch("kimari.core.detection.detect_llama_server", return_value="/usr/local/bin/llama-server"),
+            patch("subprocess.run") as mock_run,
+        ):
+            mock_run.return_value = MagicMock(
+                returncode=0,
+                stdout="llama-server 706fbd8\ncompute capability 6.1\n",
+                stderr="",
+            )
+            result = detect_compute_capability_from_llama_server()
+            assert result == "6.1", f"Expected 6.1, got {result}"
 
     def test_detect_compute_capability_from_llama_server_no_llama(self):
         """detect_compute_capability_from_llama_server returns None if no llama-server."""
@@ -196,18 +198,20 @@ class TestDetectionImprovements:
         """detect_cuda_version_detailed can parse nvidia-smi CUDA Version header."""
         from kimari.core.detection import detect_cuda_version_detailed
 
-        with patch("kimari.core.detection._nvcc_path", return_value=None), \
-             patch("kimari.core.detection._nvidia_smi_path", return_value="/usr/bin/nvidia-smi"), \
-             patch("subprocess.run") as mock_run:
-                    mock_run.return_value = MagicMock(
-                        returncode=0,
-                        stdout="+-----------------------------------------------------------------------------+\n| NVIDIA-SMI 581.57       Driver Version: 581.57       CUDA Version: 13.0     |\n+-----------------------------------------------------------------------------+",
-                        stderr="",
-                    )
-                    result = detect_cuda_version_detailed()
-                    assert result is not None, "Should detect CUDA version from nvidia-smi"
-                    assert result["version"] == "13.0", f"Expected 13.0, got {result['version']}"
-                    assert result["source"] == "nvidia-smi", f"Expected source nvidia-smi, got {result['source']}"
+        with (
+            patch("kimari.core.detection._nvcc_path", return_value=None),
+            patch("kimari.core.detection._nvidia_smi_path", return_value="/usr/bin/nvidia-smi"),
+            patch("subprocess.run") as mock_run,
+        ):
+            mock_run.return_value = MagicMock(
+                returncode=0,
+                stdout="+-----------------------------------------------------------------------------+\n| NVIDIA-SMI 581.57       Driver Version: 581.57       CUDA Version: 13.0     |\n+-----------------------------------------------------------------------------+",
+                stderr="",
+            )
+            result = detect_cuda_version_detailed()
+            assert result is not None, "Should detect CUDA version from nvidia-smi"
+            assert result["version"] == "13.0", f"Expected 13.0, got {result['version']}"
+            assert result["source"] == "nvidia-smi", f"Expected source nvidia-smi, got {result['source']}"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -230,17 +234,20 @@ class TestDoctorDeepImprovements:
         """check_gpu_compute_capability shows detection source when using fallback."""
         from kimari.doctor.deep import check_gpu_compute_capability
 
-        with patch.dict("sys.modules", {"torch": None}), \
-             patch("kimari.doctor.deep.detect_compute_capability_from_llama_server", return_value="6.1"), \
-             patch("kimari.doctor.deep.detect_gpu", return_value={"name": "NVIDIA GeForce GTX 1060 6GB", "vram_mb": 6144, "driver": "581.57"}):
-                    result = check_gpu_compute_capability()
-                    assert result["status"] in ("PASS", "WARN"), f"Unexpected status: {result['status']}"
-                    assert "6.1" in result["value"] or "sm_61" in result["value"], (
-                        f"Should show compute capability, got: {result['value']}"
-                    )
-                    assert "llama-server" in result["value"].lower(), (
-                        f"Should show detection source, got: {result['value']}"
-                    )
+        with (
+            patch.dict("sys.modules", {"torch": None}),
+            patch("kimari.doctor.deep.detect_compute_capability_from_llama_server", return_value="6.1"),
+            patch(
+                "kimari.doctor.deep.detect_gpu",
+                return_value={"name": "NVIDIA GeForce GTX 1060 6GB", "vram_mb": 6144, "driver": "581.57"},
+            ),
+        ):
+            result = check_gpu_compute_capability()
+            assert result["status"] in ("PASS", "WARN"), f"Unexpected status: {result['status']}"
+            assert "6.1" in result["value"] or "sm_61" in result["value"], (
+                f"Should show compute capability, got: {result['value']}"
+            )
+            assert "llama-server" in result["value"].lower(), f"Should show detection source, got: {result['value']}"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -277,9 +284,7 @@ class TestVersionV0140:
     def test_init_version(self):
         """kimari/__init__.py has __version__ = '0.1.40-alpha'."""
         content = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
-        assert '"0.1.40-alpha"' in content or "'0.1.40-alpha'" in content, (
-            "__version__ should be 0.1.40-alpha"
-        )
+        assert '"0.1.40-alpha"' in content or "'0.1.40-alpha'" in content, "__version__ should be 0.1.40-alpha"
 
     def test_changelog_entry(self):
         """CHANGELOG.md has [0.1.40-alpha] entry."""
@@ -325,28 +330,34 @@ class TestNoFalseClaims:
             for line in content.splitlines():
                 line_lower = line.lower().strip()
                 # Skip lines about false claim detection/scan/policy
-                if any(phrase in line_lower for phrase in (
-                    "false claim",
-                    "no false",
-                    "claim detection",
-                    "claim regression",
-                    "no claim",
-                    "not claim",
-                    "should not claim",
-                )):
+                if any(
+                    phrase in line_lower
+                    for phrase in (
+                        "false claim",
+                        "no false",
+                        "claim detection",
+                        "claim regression",
+                        "no claim",
+                        "not claim",
+                        "should not claim",
+                    )
+                ):
                     continue
                 # Check for "kimari-4b released" or "kimari 4b released" as standalone claims
                 if "released" in line_lower and "kimari" in line_lower and "4b" in line_lower:
                     # Allow mentions of "no weights released", "not released", "not yet released"
-                    if any(phrase in line_lower for phrase in (
-                        "not released",
-                        "no weights released",
-                        "not yet released",
-                        "no public release",
-                        "no weights. no public release",
-                        "when kimari-4b is released",
-                        "is released —",
-                    )):
+                    if any(
+                        phrase in line_lower
+                        for phrase in (
+                            "not released",
+                            "no weights released",
+                            "not yet released",
+                            "no public release",
+                            "no weights. no public release",
+                            "when kimari-4b is released",
+                            "is released —",
+                        )
+                    ):
                         continue
                     pytest.fail(f"{fname} contains potential false release claim: {line.strip()}")
 

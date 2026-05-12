@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.41--alpha-9b59b6.svg" alt="v0.1.41-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.42--alpha-9b59b6.svg" alt="v0.1.42-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.41-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.42-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.41-alpha**
+> **Kimari Local AI v0.1.42-alpha**
 
 ### ✅ Works Today
 
@@ -135,6 +135,30 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Full result**: [docs/GTX1060_LOCAL_RUNTIME_RESULT.md](docs/GTX1060_LOCAL_RUNTIME_RESULT.md)
 - ⚠️ This is a local validation using a test model. No claims about Kimari-4B.
 
+### Local OpenAI-Compatible Endpoint
+
+> After starting `kimari start --profile test`, the server exposes an OpenAI-compatible API:
+
+```bash
+# Health check
+curl http://127.0.0.1:11435/health
+# {"status":"ok"}
+
+# List models
+curl http://127.0.0.1:11435/v1/models
+
+# Chat completion
+curl http://127.0.0.1:11435/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf","messages":[{"role":"user","content":"Hello"}],"max_tokens":50}'
+
+# Stop server
+kimari stop
+```
+
+See [docs/LOCAL_OPENAI_ENDPOINT_TEST.md](docs/LOCAL_OPENAI_ENDPOINT_TEST.md) for full details.
+
+> **Note:** The `test` profile uses TinyLlama, not Kimari-4B.
 
 ## HF Jobs Smoke Tests
 
@@ -611,7 +635,7 @@ See [scripts/windows/README.md](scripts/windows/README.md) for details.
 
 Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmin/agent assistant designed for consumer GPUs.
 
-> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.41-alpha — HF Jobs access gate, smoke test preparation, privacy safeguards. No weights. No public release.
+> **Status: Planned / Training Design** — No weights released yet. SmolLM3-3B accepted for first private SFT candidate. v0.1.42-alpha — HF Jobs access gate, smoke test preparation, privacy safeguards. No weights. No public release.
 
 ### What's Ready
 
