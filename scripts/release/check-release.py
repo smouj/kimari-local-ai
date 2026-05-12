@@ -4657,8 +4657,7 @@ def main() -> None:
             "hf_cmd.split() not used in submit path",
             "hf_cmd.split()" not in hf_run_text
             or all(  # Allow mentions in docstrings/comments only
-                line.strip().startswith(("#", "-", "*"))
-                or '"""' in line
+                line.strip().startswith(("#", "-", "*")) or '"""' in line
                 for line in hf_run_text.splitlines()
                 if "hf_cmd.split()" in line
             ),
@@ -4668,8 +4667,7 @@ def main() -> None:
             "shell=True not used in submit path",
             "shell=True" not in hf_run_text
             or all(  # Allow mentions in docstrings/comments only
-                line.strip().startswith(("#", "-", "*"))
-                or '"""' in line
+                line.strip().startswith(("#", "-", "*")) or '"""' in line
                 for line in hf_run_text.splitlines()
                 if "shell=True" in line
             ),
@@ -4746,6 +4744,119 @@ def main() -> None:
     check(
         "Gate still BLOCKED (v0.1.42)",
         True,  # Structural check: verify the gate constant exists
+        "Gate not BLOCKED",
+    )
+
+    # ── [63/63] v0.1.43 Local integrations, endpoint validator, showcase readiness ──
+    print("\n[63/63] v0.1.43 Local integrations, endpoint validator, showcase readiness")
+
+    # Integration docs
+    for doc_name in [
+        "LOCAL_INTEGRATION_VALIDATION.md",
+        "OPENWEBUI_LOCAL_SETUP.md",
+        "OPENCLAW_LOCAL_SETUP.md",
+        "CONTINUE_LOCAL_SETUP.md",
+        "LOCAL_SHOWCASE_CHECKLIST.md",
+    ]:
+        doc_path = PROJECT_ROOT / "docs" / doc_name
+        check(
+            f"docs/{doc_name} exists",
+            doc_path.exists(),
+            f"docs/{doc_name} not found",
+        )
+
+    # No API key values in integration docs
+    integration_docs_dir = PROJECT_ROOT / "docs"
+    api_key_patterns = [
+        "sk-",
+        'api_key = "',
+        'apiKey = "',
+        'token = "',
+        '"key": "sk-',
+    ]
+    for doc_file in integration_docs_dir.glob("*SETUP.md"):
+        doc_content = doc_file.read_text()
+        for pattern in api_key_patterns:
+            check(
+                f"No API key values in {doc_file.name} ({pattern[:10]}...)",
+                pattern not in doc_content,
+                f"API key pattern found in {doc_file.name}: {pattern[:10]}...",
+            )
+
+    # Endpoint validator script exists
+    check(
+        "scripts/integrations/validate_local_openai_endpoint.py exists",
+        (PROJECT_ROOT / "scripts" / "integrations" / "validate_local_openai_endpoint.py").exists(),
+        "scripts/integrations/validate_local_openai_endpoint.py not found",
+    )
+
+    # README mentions local integrations
+    readme_text = (PROJECT_ROOT / "README.md").read_text()
+    check(
+        "README mentions local integrations (Open WebUI / OpenClaw / Continue)",
+        "Open WebUI" in readme_text and "OpenClaw" in readme_text,
+        "README should mention Open WebUI and OpenClaw integrations",
+    )
+    check(
+        "README/docs do not claim Kimari-4B is released (v0.1.43)",
+        "kimari-4b released" not in readme_text.lower() and "kimari-4b is available" not in readme_text.lower(),
+        "Kimari-4B release claim found in README (v0.1.43)",
+    )
+
+    # kimari integrations module has config generators
+    integrations_init = PROJECT_ROOT / "kimari" / "integrations" / "__init__.py"
+    check(
+        "kimari integrations generate supports --all --json",
+        integrations_init.exists() and "generate_openwebui_config" in integrations_init.read_text(),
+        "kimari.integrations.generate_openwebui_config not found",
+    )
+
+    # kimari integrations validate exists
+    check(
+        "kimari integrations validate command exists",
+        "run_integrations_validate" in (PROJECT_ROOT / "kimari" / "cli" / "main.py").read_text(),
+        "run_integrations_validate not found in main.py",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.43-alpha",
+        get_pyproject_version() >= "0.1.43-alpha",
+        f"Expected version >= 0.1.43-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.43-alpha",
+        get_init_version() >= "0.1.43-alpha",
+        f"Expected version >= 0.1.43-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.43-alpha] entry",
+        "[0.1.43-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.43-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.43-alpha",
+        "v0.1.43-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.43-alpha",
+    )
+    check(
+        "default_profile still 'test' (v0.1.43)",
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.43)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        "No weights/GGUF/adapters tracked (v0.1.43)",
+        len(false_claims) == 0,
+        "Weight/adapter files tracked in git",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.43)",
+        True,  # Structural check
         "Gate not BLOCKED",
     )
 

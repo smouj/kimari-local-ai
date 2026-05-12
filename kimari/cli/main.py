@@ -96,6 +96,8 @@ def run_integrations_generate(
     write: bool = False,
     output: str | None = None,
     force: bool = False,
+    profile: str | None = None,
+    model: str | None = None,
 ):
     """Generate integration configuration for local AI tools.
 
@@ -126,6 +128,23 @@ def run_integrations_generate(
         print(f"  Valid targets: {', '.join(valid_targets)}")
         return
 
+    # Resolve model name from profile or --model flag
+    resolved_model = model or ""
+    if not resolved_model and profile:
+        # Try to load profile config to get model name
+        try:
+            from kimari.config import load_config as load_kimari_config
+
+            config_data = load_kimari_config()
+            profile_data = config_data.get("profiles", {}).get(profile, {})
+            resolved_model = profile_data.get("model", "")
+        except (SystemExit, Exception):  # noqa: BLE001
+            pass  # Keep empty if config not loadable
+
+    # If using test profile, set default model name
+    if profile == "test" and not resolved_model:
+        resolved_model = "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+
     generators = {
         "openwebui": generate_openwebui_config,
         "openclaw": generate_openclaw_config,
@@ -137,6 +156,11 @@ def run_integrations_generate(
     for t in targets:
         config = generators[t](base_url=base_url)
         config = sanitize_config(config)
+        # Inject resolved model and metadata
+        config["base_url"] = base_url
+        config["model"] = resolved_model
+        config["notes"] = "TinyLlama validation model, NOT Kimari-4B" if profile == "test" else ""
+        config["no_api_key_required_for_localhost"] = True
         results[t] = config
 
     # JSON output (also write to file if requested)
@@ -183,6 +207,112 @@ def run_integrations_generate(
 
 
 # ─── Performance Commands ─────────────────────────────────────────────────────
+
+
+def run_integrations_validate(
+    base_url: str = "http://127.0.0.1:11435/v1",
+    json_output: bool = False,
+):
+    """Validate a local OpenAI-compatible endpoint.
+
+    Tests /health, /v1/models, and /v1/chat/completions.
+    No tokens, no private data, no long prompts.
+    """
+    import urllib.error
+    import urllib.request
+
+    # Strip /v1 suffix for health check
+    health_url = base_url.rstrip("/").removesuffix("/v1")
+    if not health_url.startswith("http"):
+        health_url = f"http://{health_url}"
+    health_url = f"{health_url}/health"
+
+    models_url = f"{base_url.rstrip('/')}/models"
+    chat_url = f"{base_url.rstrip('/')}/chat/completions"
+
+    results = {
+        "base_url": base_url,
+        "health": None,
+        "models": None,
+        "chat_completions": None,
+        "overall": False,
+    }
+
+    # 1. Health check
+    try:
+        req = urllib.request.Request(health_url)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            health_data = resp.read().decode("utf-8", errors="replace")
+            results["health"] = {"status": "ok", "response": health_data[:200]}
+    except urllib.error.URLError as e:
+        results["health"] = {"status": "error", "error": str(e)[:200]}
+    except Exception as e:  # noqa: BLE001
+        results["health"] = {"status": "error", "error": str(e)[:200]}
+
+    # 2. Models check
+    try:
+        req = urllib.request.Request(models_url)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            models_data = resp.read().decode("utf-8", errors="replace")
+            results["models"] = {"status": "ok", "response_length": len(models_data)}
+    except urllib.error.URLError as e:
+        results["models"] = {"status": "error", "error": str(e)[:200]}
+    except Exception as e:  # noqa: BLE001
+        results["models"] = {"status": "error", "error": str(e)[:200]}
+
+    # 3. Chat completions (short prompt)
+    import json as _json
+
+    chat_body = _json.dumps(
+        {
+            "model": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+            "messages": [{"role": "user", "content": "Hello"}],
+            "max_tokens": 10,
+        }
+    ).encode("utf-8")
+    try:
+        req = urllib.request.Request(
+            chat_url,
+            data=chat_body,
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            chat_data = resp.read().decode("utf-8", errors="replace")
+            results["chat_completions"] = {"status": "ok", "response_length": len(chat_data)}
+    except urllib.error.URLError as e:
+        results["chat_completions"] = {"status": "error", "error": str(e)[:200]}
+    except Exception as e:  # noqa: BLE001
+        results["chat_completions"] = {"status": "error", "error": str(e)[:200]}
+
+    # Overall status
+    results["overall"] = (
+        results["health"].get("status") == "ok"
+        and results["models"].get("status") == "ok"
+        and results["chat_completions"].get("status") == "ok"
+    )
+
+    if json_output:
+        print(_json.dumps(results, indent=2))
+        return
+
+    # Human-readable output
+    print(f"\n{Color.BOLD}Kimari Local Endpoint Validation{Color.RESET}")
+    print(f"  Base URL: {base_url}")
+    for check in ["health", "models", "chat_completions"]:
+        result = results[check]
+        status = result.get("status", "unknown")
+        icon = f"{Color.GREEN}✓{Color.RESET}" if status == "ok" else f"{Color.RED}✗{Color.RESET}"
+        label = check.replace("_", " ").title()
+        if status == "ok":
+            print(f"  {icon} {label}")
+        else:
+            error = result.get("error", "unknown")
+            print(f"  {icon} {label}: {error}")
+
+    if results["overall"]:
+        print(f"\n{Color.GREEN}All checks passed!{Color.RESET}")
+    else:
+        print(f"\n{Color.YELLOW}Some checks failed. Is Kimari running?{Color.RESET}")
 
 
 def run_optimize(
@@ -2653,6 +2783,16 @@ def main():
         default="http://127.0.0.1:11435/v1",
         help="Base URL for the llama-server endpoint (default: http://127.0.0.1:11435/v1)",
     )
+    integrations_gen_parser.add_argument(
+        "--profile",
+        default=None,
+        help="Kimari profile to use (e.g. test, gtx1060). Populates model name in configs.",
+    )
+    integrations_gen_parser.add_argument(
+        "--model",
+        default=None,
+        help="Model name override for configs (e.g. tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf)",
+    )
     integrations_gen_parser.add_argument("--json", action="store_true", help="JSON output")
     integrations_gen_parser.add_argument(
         "--write", action="store_true", help="Write config to file (requires --output)"
@@ -2661,6 +2801,15 @@ def main():
     integrations_gen_parser.add_argument(
         "--force", action="store_true", help="Allow writing to sensitive paths or non-local base_url"
     )
+
+    # integrations validate subcommand
+    integrations_val_parser = integrations_sub.add_parser("validate", help="Validate local OpenAI-compatible endpoint")
+    integrations_val_parser.add_argument(
+        "--base-url",
+        default="http://127.0.0.1:11435/v1",
+        help="Base URL to validate (default: http://127.0.0.1:11435/v1)",
+    )
+    integrations_val_parser.add_argument("--json", action="store_true", help="JSON output")
 
     args = parser.parse_args()
 
@@ -2914,9 +3063,18 @@ def main():
                 write=getattr(args, "write", False),
                 output=getattr(args, "output", None),
                 force=getattr(args, "force", False),
+                profile=getattr(args, "profile", None),
+                model=getattr(args, "model", None),
+            )
+        elif getattr(args, "integrations_command", None) == "validate":
+            run_integrations_validate(
+                base_url=getattr(args, "base_url", "http://127.0.0.1:11435/v1"),
+                json_output=getattr(args, "json", False),
             )
         else:
-            print("Usage: kimari integrations generate --target <name> --json")
+            print("Usage: kimari integrations <generate|validate>")
+            print("  generate --target <name> --json  Generate integration config")
+            print("  validate --base-url <url> --json  Validate local endpoint")
             print("  Targets: openwebui, openclaw, hermes, continue")
             print("  Use --all to generate all, --write --output <path> to save")
     else:

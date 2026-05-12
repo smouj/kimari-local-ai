@@ -5,6 +5,32 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.43-alpha] - 2026-05-12
+
+### Added
+- `docs/LOCAL_INTEGRATION_VALIDATION.md` — local integration validation guide
+- `docs/OPENWEBUI_LOCAL_SETUP.md` — Open WebUI setup with Kimari
+- `docs/OPENCLAW_LOCAL_SETUP.md` — OpenClaw setup with Kimari
+- `docs/CONTINUE_LOCAL_SETUP.md` — Continue.dev setup with Kimari
+- `docs/LOCAL_SHOWCASE_CHECKLIST.md` — public screenshot checklist
+- `scripts/integrations/validate_local_openai_endpoint.py` — endpoint validator script
+- `kimari integrations generate` — `--all --json` output with base_url, model, notes
+- `kimari integrations validate` — validate local OpenAI-compatible endpoint
+- README section for local integrations validated
+- docs/index.html card: "Works with local AI tools"
+- check-release.py checks for v0.1.43 (integration docs, no API keys, endpoint validator)
+- tests/test_release_v0143.py (15 tests)
+
+### Fixed
+- Doctor `--profile test` suggestion improved when default model missing
+
+### Safety
+- Gate remains BLOCKED
+- No HF upload performed
+- No training performed
+- No tokens or private data in integration docs
+- No API key values in any committed file
+
 ## [0.1.42-alpha] - 2026-05-12
 
 ### Added

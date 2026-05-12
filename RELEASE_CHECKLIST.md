@@ -793,28 +793,49 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
-## v0.1.42 Checks
+## v0.1.43 Checks
 
-- [ ] `build_hf_jobs_command_args()` exists in `hf_jobs_private_run.py`
-- [ ] `hf_cmd.split()` not used in submit path
-- [ ] `shell=True` not used in `hf_jobs_private_run.py`
-- [ ] Submit uses `subprocess.run(hf_cmd_args, ...)` (arg list, not string)
-- [ ] `--dry-run --json` includes `hf_jobs_command_args` and `command_arg_count`
-- [ ] `check-release.py` has no false version hardcode FAIL
-- [ ] `docs/LOCAL_OPENAI_ENDPOINT_TEST.md` exists
-- [ ] README mentions `profile test` for TinyLlama validation model
+- [ ] `docs/LOCAL_INTEGRATION_VALIDATION.md` exists
+- [ ] `docs/OPENWEBUI_LOCAL_SETUP.md` exists
+- [ ] `docs/OPENCLAW_LOCAL_SETUP.md` exists
+- [ ] `docs/CONTINUE_LOCAL_SETUP.md` exists
+- [ ] `docs/LOCAL_SHOWCASE_CHECKLIST.md` exists
+- [ ] `scripts/integrations/validate_local_openai_endpoint.py` exists
+- [ ] No API key values in any integration doc
+- [ ] `kimari integrations generate --all --json` outputs open-webui/openclaw/continue/hermes configs
+- [ ] `kimari integrations validate` supports --json output
+- [ ] README mentions local integrations (Open WebUI, OpenClaw, Continue.dev)
 - [ ] README/docs do not claim Kimari-4B is released
-- [ ] Doctor/status suggests `--profile test` when default model missing
-- [ ] pyproject.toml version is 0.1.42-alpha
-- [ ] kimari/__init__.py __version__ is 0.1.42-alpha
-- [ ] CHANGELOG.md has [0.1.42-alpha] entry
-- [ ] ROADMAP.md mentions v0.1.42-alpha
-- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] pyproject.toml version is 0.1.43-alpha
+- [ ] kimari/__init__.py __version__ is 0.1.43-alpha
+- [ ] CHANGELOG.md has [0.1.43-alpha] entry
+- [ ] ROADMAP.md mentions v0.1.43-alpha
 - [ ] Gate BLOCKED
 - [ ] No HF upload performed
 - [ ] No training performed
-- [ ] No "Kimari-4B released" false claim anywhere
-- [ ] default_profile still "test"
+
+## v0.1.42 Checks
+
+- [x] `build_hf_jobs_command_args()` exists in `hf_jobs_private_run.py`
+- [x] `hf_cmd.split()` not used in submit path
+- [x] `shell=True` not used in `hf_jobs_private_run.py`
+- [x] Submit uses `subprocess.run(hf_cmd_args, ...)` (arg list, not string)
+- [x] `--dry-run --json` includes `hf_jobs_command_args` and `command_arg_count`
+- [x] `check-release.py` has no false version hardcode FAIL
+- [x] `docs/LOCAL_OPENAI_ENDPOINT_TEST.md` exists
+- [x] README mentions `profile test` for TinyLlama validation model
+- [x] README/docs do not claim Kimari-4B is released
+- [x] Doctor/status suggests `--profile test` when default model missing
+- [x] pyproject.toml version >= 0.1.42-alpha
+- [x] kimari/__init__.py __version__ >= 0.1.42-alpha
+- [x] CHANGELOG.md has [0.1.42-alpha] entry
+- [x] ROADMAP.md mentions v0.1.42-alpha
+- [x] No adapter/GGUF/checkpoint/raw logs committed
+- [x] Gate BLOCKED
+- [x] No HF upload performed
+- [x] No training performed
+- [x] No "Kimari-4B released" false claim anywhere
+- [x] default_profile still "test"
 
 ## v0.1.41 Checks
 

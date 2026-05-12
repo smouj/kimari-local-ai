@@ -455,7 +455,21 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.42-alpha (Current)
+## v0.1.43-alpha (Current)
+
+- ✅ `docs/LOCAL_INTEGRATION_VALIDATION.md` — local integration validation guide
+- ✅ `docs/OPENWEBUI_LOCAL_SETUP.md` — Open WebUI setup
+- ✅ `docs/OPENCLAW_LOCAL_SETUP.md` — OpenClaw setup
+- ✅ `docs/CONTINUE_LOCAL_SETUP.md` — Continue.dev setup
+- ✅ `docs/LOCAL_SHOWCASE_CHECKLIST.md` — public screenshot checklist
+- ✅ `scripts/integrations/validate_local_openai_endpoint.py` — endpoint validator
+- ✅ `kimari integrations generate` — `--all --json` with base_url, model, notes
+- ✅ `kimari integrations validate` — validate local endpoint
+- ✅ README local integrations section
+- ✅ docs/index.html "Works with local AI tools" card
+- ✅ Gate BLOCKED
+
+## v0.1.42-alpha
 
 - ✅ `build_hf_jobs_command_args()` — safe `list[str]` command construction for subprocess
 - ✅ `hf_jobs_private_run.py` submit uses arg list, not `hf_cmd.split()` and not `shell=True`
