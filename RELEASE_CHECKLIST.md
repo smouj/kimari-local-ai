@@ -690,6 +690,28 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.37 Checks
+
+- [ ] validate_config() does not crash with UnboundLocalError when jsonschema is missing
+- [ ] validate_config() returns clear error message when jsonschema is not installed
+- [ ] check_gpu_compute_capability() exists in kimari/doctor/deep.py
+- [ ] check_gpu_compute_capability() is in run_deep_checks() results
+- [ ] check_gpu_arch_compatibility() exists in training/scripts/check_training_stack.py
+- [ ] check_gpu_arch_compatibility() is in run_all_checks() results (check #15)
+- [ ] GPU arch warning extracted to warnings list in check_training_stack
+- [ ] docs/INSTALL_WSL2.md mentions Pascal/cu126/sm_61
+- [ ] docs/INSTALL_MATRIX.md mentions Pascal/cu126/sm_61
+- [ ] docs/TRAINING_STACK_COMPATIBILITY.md mentions Pascal/cu126/sm_61
+- [ ] tests/test_release_v0137.py exists and passes
+- [ ] pyproject.toml version is 0.1.37-alpha
+- [ ] kimari/__init__.py __version__ is 0.1.37-alpha
+- [ ] CHANGELOG.md has [0.1.37-alpha] entry
+- [ ] ROADMAP.md marks v0.1.37-alpha as Current, v0.1.36-alpha as Released
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

@@ -43,6 +43,23 @@ Complete reference for all supported installation methods and platforms.
 - CPU-only inference works but is significantly slower
 - AMD GPUs require ROCm and `hipcc` — see ROCm section below
 
+### Pascal GPU Compatibility (GTX 1060/1070/1080)
+
+Pascal GPUs (compute capability sm_61) require the **PyTorch cu126 legacy build**. PyTorch cu128 and cu130 dropped sm_61 support.
+
+| GPU Series | Compute Capability | PyTorch Build |
+|------------|-------------------|---------------|
+| GTX 1060 / 1070 / 1080 / 1080 Ti | sm_61 | cu126 legacy |
+| GTX 1650+ / RTX 2060+ | sm_75+ | cu128 / cu130 (default) |
+
+**Install PyTorch cu126 for Pascal GPUs:**
+
+```bash
+pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126
+```
+
+> **Why:** PyTorch builds cu128+ compile kernels for sm_75+ (Turing and later). On sm_61 GPUs, `torch.cuda.is_available()` returns `True` but training fails with `RuntimeError`. The cu126 build includes sm_61 kernels. Run `kimari doctor --deep` to check compatibility automatically.
+
 ## llama-server Build
 
 llama-server must be built separately — it is NOT included in the pip package.

@@ -377,6 +377,86 @@ def check_cuda_nvidia() -> dict:
     }
 
 
+def check_gpu_compute_capability() -> dict:
+    """Check GPU compute capability and warn about incompatible PyTorch builds.
+
+    WARNs if GPU is Pascal (sm_61, e.g. GTX 1060) and PyTorch build is
+    cu128/cu130 (which dropped sm_61 support). Recommends cu126 legacy build.
+
+    No FAIL state — this is informational.
+    """
+    # Try to get compute capability via torch
+    compute_cap = None
+    gpu_name = None
+    torch_version = None
+    torch_cuda_version = None
+
+    try:
+        import torch
+        torch_version = torch.__version__
+        if torch.cuda.is_available():
+            compute_cap = torch.cuda.get_device_capability(0)
+            gpu_name = torch.cuda.get_device_name(0)
+            torch_cuda_version = torch.version.cuda
+    except (ImportError, RuntimeError):
+        pass
+
+    # Also try nvidia-smi for GPU name if torch didn't work
+    if gpu_name is None:
+        gpu = detect_gpu()
+        if gpu:
+            gpu_name = gpu["name"]
+
+    # No GPU detected at all — just report
+    if compute_cap is None and gpu_name is None:
+        return {
+            "name": "GPU Compute Capability",
+            "status": "WARN",
+            "value": "No GPU detected",
+            "detail": "Cannot check compute capability without GPU",
+        }
+
+    # Have compute capability
+    if compute_cap is not None:
+        cap_str = f"sm_{compute_cap[0]}{compute_cap[1]}"
+        cap_major, cap_minor = compute_cap
+
+        # Check if Pascal (sm_61) with incompatible PyTorch
+        is_pascal = cap_major == 6 and cap_minor == 1
+        if is_pascal and torch_cuda_version:
+            # cu126 = supports sm_61, cu128/cu130 = dropped sm_61
+            cuda_ver_num = torch_cuda_version.replace(".", "")
+            if int(cuda_ver_num) >= 128:
+                return {
+                    "name": "GPU Compute Capability",
+                    "status": "WARN",
+                    "value": f"{gpu_name} — {cap_str} — PyTorch {torch_version}+cu{torch_cuda_version}",
+                    "detail": (
+                        f"Pascal GPU ({cap_str}) detected with PyTorch cu{torch_cuda_version}. "
+                        f"PyTorch builds cu128+ dropped sm_61 support. "
+                        f"Install PyTorch cu126 legacy: "
+                        f"pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126"
+                    ),
+                }
+
+        # Normal case - GPU and torch compatible
+        torch_info = f" — PyTorch {torch_version}+cu{torch_cuda_version}" if torch_cuda_version else ""
+        return {
+            "name": "GPU Compute Capability",
+            "status": "PASS",
+            "value": f"{gpu_name} — {cap_str}{torch_info}",
+            "detail": "",
+        }
+
+    # Have GPU name but no compute capability (torch not installed or no CUDA)
+    return {
+        "name": "GPU Compute Capability",
+        "status": "WARN",
+        "value": f"{gpu_name} — compute capability unknown",
+        "detail": "Install PyTorch with CUDA for compute capability detection",
+    }
+
+
 def check_packaged_defaults() -> dict:
     """Check if packaged defaults (models, profiles, schema) exist.
 
@@ -579,6 +659,7 @@ def run_deep_checks(project_root: Path | None = None) -> list[dict]:
         check_packaged_defaults(),
         check_llama_server_presence(),
         check_cuda_nvidia(),
+        check_gpu_compute_capability(),
         check_default_profile(),
         check_secret_scanner_available(),
         check_benchmark_prompts(),

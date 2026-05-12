@@ -5,6 +5,27 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.37-alpha] - 2026-06-03
+
+### Added
+- `check_gpu_compute_capability()` in `kimari/doctor/deep.py` — Detects GPU compute capability and warns about Pascal GPUs (sm_61) with incompatible PyTorch cu128/cu130 builds
+- `check_gpu_arch_compatibility()` in `training/scripts/check_training_stack.py` — Same Pascal/cu128+ incompatibility check in training stack checker (check #15)
+- `kimari doctor --deep` now includes GPU Compute Capability check after CUDA/NVIDIA check
+- Pascal GPU compatibility documentation in `docs/INSTALL_WSL2.md` (Step 5b + troubleshooting)
+- Pascal GPU compatibility documentation in `docs/INSTALL_MATRIX.md` (GPU Notes subsection)
+- Pascal GPU compatibility documentation in `docs/TRAINING_STACK_COMPATIBILITY.md` (Section 6b)
+- `tests/test_release_v0137.py` — Test suite for v0.1.37-alpha
+
+### Changed
+- `check_training_stack.py` now performs 15 checks (was 14), with `gpu_arch_compatibility` as check #15
+- `docs/TRAINING_STACK_COMPATIBILITY.md` version updated to v0.1.37-alpha
+- `docs/INSTALL_MATRIX.md` updated with Pascal GPU compatibility table
+
+### Fixed
+- Critical bug: `validate_config()` in `kimari/config/loader.py` no longer crashes with `UnboundLocalError` when `jsonschema` is not installed — returns clear error message with install instructions instead
+- Pascal GPU (GTX 1060/1070/1080) users now get automatic warning when running `kimari doctor --deep` or `check_training_stack.py --json` with incompatible PyTorch cu128/cu130 builds
+- No training in CI. No adapters committed. No HF upload. Gate still BLOCKED.
+
 ## [0.1.36-alpha] - 2026-06-03
 
 ### Added

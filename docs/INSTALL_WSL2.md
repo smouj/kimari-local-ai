@@ -109,6 +109,45 @@ pip install -e .
 pip install -e ".[dev]"
 ```
 
+## Step 5b: PyTorch for GTX 1060 (Pascal GPUs)
+
+If you have a **GTX 1060, GTX 1070, GTX 1080, or GTX 1080 Ti** (Pascal architecture, compute capability sm_61), you **must** use the PyTorch cu126 legacy build. PyTorch cu128 and cu130 **dropped sm_61 support** — they will detect your GPU but fail with `RuntimeError` during training.
+
+**Check your GPU compute capability:**
+
+```bash
+python -c "import torch; print(torch.cuda.get_device_capability(0))" 2>/dev/null
+# If output is (6, 1) → you need cu126
+```
+
+**Install PyTorch cu126 legacy:**
+
+```bash
+pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126
+```
+
+**Verify:**
+
+```bash
+python -c "import torch; print(f'torch={torch.__version__}, cuda={torch.version.cuda}')"
+# Should show: torch=2.7.1+cu126 (or similar cu126)
+python -c "import torch; print(torch.cuda.is_available())"
+# Should show: True
+```
+
+**Prevent accidental upgrades:**
+
+```bash
+pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126 --no-deps
+```
+
+Or pin in `requirements-training.txt`:
+```
+torch==2.7.1+cu126
+```
+
+> **Note:** `kimari doctor --deep` will automatically warn you if it detects a Pascal GPU with an incompatible PyTorch build.
+
 ## Step 6: Build llama.cpp with CUDA
 
 ```bash
@@ -209,6 +248,27 @@ kimari pull test
 # Verify it exists
 ls -la models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
 ```
+
+### PyTorch CUDA error on GTX 1060
+
+If you see `RuntimeError` related to CUDA when running training on a GTX 1060/1070/1080:
+
+1. **Identify the problem:** Your PyTorch build (cu128/cu130) doesn't support Pascal GPUs (sm_61)
+   ```bash
+   python -c "import torch; print(f'cuda={torch.version.cuda}, capability={torch.cuda.get_device_capability(0)}')"
+   ```
+2. **Install PyTorch cu126:**
+   ```bash
+   pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126
+   ```
+3. **Verify compatibility:**
+   ```bash
+   python -c "import torch; print(torch.cuda.is_available())"
+   ```
+4. **Run deep check:**
+   ```bash
+   kimari doctor --deep
+   ```
 
 ### CUDA out of memory
 

@@ -1,7 +1,7 @@
 # Training Stack Compatibility — Kimari Local AI
 
 > **Document Type:** Reference guide for training dependency compatibility and TRL/SFTTrainer version differences  
-> **Version:** v0.1.35-alpha  
+> **Version:** v0.1.37-alpha  
 > **Date:** 2026-06-03  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -41,7 +41,7 @@ The training stack is **not installed by default** — it is separate from the c
 
 ## 3. Running check_training_stack.py
 
-The compatibility checker inspects your Python environment for SFT LoRA training readiness. It performs **14 checks** covering Python version, core library imports, SFTTrainer import, TrainingArguments signature, and API compatibility.
+The compatibility checker inspects your Python environment for SFT LoRA training readiness. It performs **15 checks** covering Python version, core library imports, SFTTrainer import, TrainingArguments signature, API compatibility, and GPU architecture compatibility.
 
 ### Basic Usage
 
@@ -57,7 +57,7 @@ Outputs a human-readable table with PASS/FAIL/WARN per check.
 python training/scripts/check_training_stack.py --json
 ```
 
-Outputs structured JSON with all 14 checks, a `compatibility` dict, and a `warnings` list. Useful for scripting and CI integration.
+Outputs structured JSON with all 15 checks, a `compatibility` dict, and a `warnings` list. Useful for scripting and CI integration.
 
 ### Verbose Output
 
@@ -282,6 +282,59 @@ To be absolutely clear:
 | Modify files | **No** |
 
 The compatibility checker only inspects installed package versions and their API signatures using `inspect.signature()`. It is safe to run in any environment, including CI.
+
+---
+
+## 6b. Pascal GPU Compatibility (GTX 1060/1070/1080)
+
+### The Problem
+
+PyTorch builds cu128 and cu130 compile CUDA kernels for sm_75+ (Turing and later). On Pascal GPUs (sm_61 — GTX 1060, 1070, 1080, 1080 Ti), `torch.cuda.is_available()` returns `True`, but any training operation fails with:
+
+```
+RuntimeError: CUDA error: no kernel image is available for execution on the device
+```
+
+### The Solution
+
+Install the **PyTorch cu126 legacy build**, which includes sm_61 kernels:
+
+```bash
+pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126
+```
+
+### Checking Compatibility
+
+Two tools detect this issue automatically:
+
+**1. check_training_stack.py (v0.1.37+):**
+
+```bash
+python training/scripts/check_training_stack.py --json
+# Look for "gpu_arch_compatibility" check in output
+```
+
+**2. kimari doctor --deep (v0.1.37+):**
+
+```bash
+kimari doctor --deep
+# Look for "GPU Compute Capability" check — warns if Pascal + cu128+
+```
+
+### Preventing Accidental Upgrades
+
+When reinstalling training dependencies, pip may upgrade PyTorch to the default (cu128/cu130) build. To prevent this:
+
+```bash
+# Install PyTorch first with --no-deps, then install the rest
+pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126 --no-deps
+pip install -r training/requirements-training.txt
+```
+
+Or pin in your local `requirements-training.txt`:
+```
+torch==2.7.1+cu126
+```
 
 ---
 

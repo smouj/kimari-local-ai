@@ -428,12 +428,21 @@
 - ✅ HF Jobs micro SFT runbook
 - ✅ Gate BLOCKED
 
-## v0.1.36-alpha (Current)
+## v0.1.36-alpha (Released)
 
 - ✅ resolve_smoke_gate() — unified smoke gate resolution (explicit path, /tmp fallback, override)
 - ✅ Critical bug fix: explicit --require-smoke-summary PATH no longer blocked by missing /tmp file
 - ✅ Submit uses single smoke gate check (no duplicate)
 - ✅ docs/HF_JOBS_SMOKE_GATE.md
+- ✅ Gate BLOCKED
+
+## v0.1.37-alpha (Current)
+
+- ✅ Fixed validate_config() UnboundLocalError when jsonschema not installed
+- ✅ Added check_gpu_compute_capability() to kimari doctor --deep
+- ✅ Added check_gpu_arch_compatibility() to check_training_stack.py (check #15)
+- ✅ Pascal GPU (GTX 1060/1070/1080) + PyTorch cu126 compatibility docs
+- ✅ Updated INSTALL_WSL2.md, INSTALL_MATRIX.md, TRAINING_STACK_COMPATIBILITY.md
 - ✅ Gate BLOCKED
 
 ## v0.2.0-alpha

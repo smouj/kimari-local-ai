@@ -3928,6 +3928,88 @@ def main() -> None:
         "default_profile changed from test — this is not allowed during alpha",
     )
 
+    # ── [61/61] v0.1.37 jsonschema fix, GPU compute capability, Pascal/cu126 ──
+    print("\n[61/61] v0.1.37 jsonschema fix, GPU compute capability, Pascal/cu126 compatibility")
+
+    # validate_config jsonschema crash fix
+    loader_path = PROJECT_ROOT / "kimari" / "config" / "loader.py"
+    loader_text = loader_path.read_text() if loader_path.exists() else ""
+    check(
+        "validate_config handles missing jsonschema gracefully (v0.1.37)",
+        "ModuleNotFoundError" in loader_text and "jsonschema" in loader_text,
+        "validate_config must handle missing jsonschema without UnboundLocalError",
+    )
+
+    # check_gpu_compute_capability in doctor deep
+    deep_path = PROJECT_ROOT / "kimari" / "doctor" / "deep.py"
+    deep_text = deep_path.read_text() if deep_path.exists() else ""
+    check(
+        "check_gpu_compute_capability exists in deep.py (v0.1.37)",
+        "check_gpu_compute_capability" in deep_text,
+        "check_gpu_compute_capability function missing from kimari/doctor/deep.py",
+    )
+    check(
+        "check_gpu_compute_capability is in run_deep_checks (v0.1.37)",
+        "check_gpu_compute_capability()" in deep_text,
+        "check_gpu_compute_capability() not called in run_deep_checks()",
+    )
+
+    # check_gpu_arch_compatibility in training stack checker
+    training_stack_path = PROJECT_ROOT / "training" / "scripts" / "check_training_stack.py"
+    training_stack_text = training_stack_path.read_text() if training_stack_path.exists() else ""
+    check(
+        "check_gpu_arch_compatibility exists in check_training_stack.py (v0.1.37)",
+        "check_gpu_arch_compatibility" in training_stack_text,
+        "check_gpu_arch_compatibility function missing from check_training_stack.py",
+    )
+    check(
+        "check_gpu_arch_compatibility is called in run_all_checks (v0.1.37)",
+        "check_gpu_arch_compatibility()" in training_stack_text,
+        "check_gpu_arch_compatibility() not called in run_all_checks()",
+    )
+
+    # Pascal/cu126 documentation
+    install_wsl2_text = (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").read_text() if (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists() else ""
+    check(
+        "INSTALL_WSL2.md mentions Pascal/cu126 (v0.1.37)",
+        "Pascal" in install_wsl2_text or "cu126" in install_wsl2_text or "sm_61" in install_wsl2_text,
+        "INSTALL_WSL2.md missing Pascal/cu126/sm_61 references",
+    )
+    install_matrix_text = (PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md").read_text() if (PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md").exists() else ""
+    check(
+        "INSTALL_MATRIX.md mentions Pascal/cu126 (v0.1.37)",
+        "Pascal" in install_matrix_text or "cu126" in install_matrix_text or "sm_61" in install_matrix_text,
+        "INSTALL_MATRIX.md missing Pascal/cu126/sm_61 references",
+    )
+    training_compat_text = (PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md").read_text() if (PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md").exists() else ""
+    check(
+        "TRAINING_STACK_COMPATIBILITY.md mentions Pascal/cu126 (v0.1.37)",
+        "Pascal" in training_compat_text or "cu126" in training_compat_text or "sm_61" in training_compat_text,
+        "TRAINING_STACK_COMPATIBILITY.md missing Pascal/cu126/sm_61 references",
+    )
+
+    # Test file
+    check(
+        "tests/test_release_v0137.py exists (v0.1.37)",
+        (PROJECT_ROOT / "tests" / "test_release_v0137.py").exists(),
+        "v0.1.37 test file missing",
+    )
+
+    check(
+        "No adapter/GGUF/weight files tracked (v0.1.37)",
+        True,  # Already checked above
+    )
+    check(
+        'default_profile still "test" (v0.1.37 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.37)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:
