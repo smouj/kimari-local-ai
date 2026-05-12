@@ -53,9 +53,19 @@ class TestCreateExecutionRecordV0135:
     def test_json_output_works(self) -> None:
         """Script should work with --json and produce valid JSON."""
         result = subprocess.run(
-            [sys.executable, "training/scripts/create_micro_sft_execution_record.py",
-             "--status", "pending", "--adapter-generated", "unknown", "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/create_micro_sft_execution_record.py",
+                "--status",
+                "pending",
+                "--adapter-generated",
+                "unknown",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         assert result.returncode == 0, f"Script failed: {result.stderr}"
         data = json.loads(result.stdout)
@@ -65,9 +75,19 @@ class TestCreateExecutionRecordV0135:
     def test_default_fields_safe(self) -> None:
         """Default fields must always be safe."""
         result = subprocess.run(
-            [sys.executable, "training/scripts/create_micro_sft_execution_record.py",
-             "--status", "pending", "--adapter-generated", "unknown", "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/create_micro_sft_execution_record.py",
+                "--status",
+                "pending",
+                "--adapter-generated",
+                "unknown",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         data = json.loads(result.stdout)
         assert data["adapter_committed"] is False, "adapter_committed must be False"
@@ -80,9 +100,19 @@ class TestCreateExecutionRecordV0135:
     def test_completed_status(self) -> None:
         """Completed status should set started=true, completed=true."""
         result = subprocess.run(
-            [sys.executable, "training/scripts/create_micro_sft_execution_record.py",
-             "--status", "completed", "--adapter-generated", "true", "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/create_micro_sft_execution_record.py",
+                "--status",
+                "completed",
+                "--adapter-generated",
+                "true",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         data = json.loads(result.stdout)
         assert data["micro_sft_started"] is True
@@ -91,9 +121,19 @@ class TestCreateExecutionRecordV0135:
     def test_failed_status(self) -> None:
         """Failed status should set started=true, completed=false."""
         result = subprocess.run(
-            [sys.executable, "training/scripts/create_micro_sft_execution_record.py",
-             "--status", "failed", "--adapter-generated", "false", "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/create_micro_sft_execution_record.py",
+                "--status",
+                "failed",
+                "--adapter-generated",
+                "false",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         data = json.loads(result.stdout)
         assert data["micro_sft_started"] is True
@@ -105,10 +145,20 @@ class TestCreateExecutionRecordV0135:
             output_path = f.name
         try:
             result = subprocess.run(
-                [sys.executable, "training/scripts/create_micro_sft_execution_record.py",
-                 "--status", "pending", "--adapter-generated", "unknown",
-                 "--output", output_path],
-                capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+                [
+                    sys.executable,
+                    "training/scripts/create_micro_sft_execution_record.py",
+                    "--status",
+                    "pending",
+                    "--adapter-generated",
+                    "unknown",
+                    "--output",
+                    output_path,
+                ],
+                capture_output=True,
+                text=True,
+                cwd=str(PROJECT_ROOT),
+                timeout=30,
             )
             assert result.returncode == 0, f"Script failed: {result.stderr}"
             data = json.loads(Path(output_path).read_text())
@@ -155,9 +205,17 @@ class TestValidateExecutionRecordV0135:
         """Validator should accept a safe execution record."""
         record_path = self._create_safe_record(tmp_path)
         result = subprocess.run(
-            [sys.executable, "training/scripts/validate_micro_sft_execution_record.py",
-             "--record", str(record_path), "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/validate_micro_sft_execution_record.py",
+                "--record",
+                str(record_path),
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         assert result.returncode == 0, f"Validator failed: {result.stderr}"
         data = json.loads(result.stdout)
@@ -170,9 +228,17 @@ class TestValidateExecutionRecordV0135:
         data["gate_state"] = "OPEN"
         record_path.write_text(json.dumps(data))
         result = subprocess.run(
-            [sys.executable, "training/scripts/validate_micro_sft_execution_record.py",
-             "--record", str(record_path), "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/validate_micro_sft_execution_record.py",
+                "--record",
+                str(record_path),
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         assert result.returncode != 0, "Validator should reject non-BLOCKED gate"
 
@@ -183,9 +249,17 @@ class TestValidateExecutionRecordV0135:
         data["adapter_committed"] = True
         record_path.write_text(json.dumps(data))
         result = subprocess.run(
-            [sys.executable, "training/scripts/validate_micro_sft_execution_record.py",
-             "--record", str(record_path), "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/validate_micro_sft_execution_record.py",
+                "--record",
+                str(record_path),
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         assert result.returncode != 0, "Validator should reject adapter_committed=true"
 
@@ -196,9 +270,17 @@ class TestValidateExecutionRecordV0135:
         data["hf_upload_performed"] = True
         record_path.write_text(json.dumps(data))
         result = subprocess.run(
-            [sys.executable, "training/scripts/validate_micro_sft_execution_record.py",
-             "--record", str(record_path), "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/validate_micro_sft_execution_record.py",
+                "--record",
+                str(record_path),
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         assert result.returncode != 0, "Validator should reject hf_upload_performed=true"
 
@@ -209,9 +291,17 @@ class TestValidateExecutionRecordV0135:
         data["raw_logs_committed"] = True
         record_path.write_text(json.dumps(data))
         result = subprocess.run(
-            [sys.executable, "training/scripts/validate_micro_sft_execution_record.py",
-             "--record", str(record_path), "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/validate_micro_sft_execution_record.py",
+                "--record",
+                str(record_path),
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         assert result.returncode != 0, "Validator should reject raw_logs_committed=true"
 
@@ -222,9 +312,17 @@ class TestValidateExecutionRecordV0135:
         data["notes"] = "hf_abcdefghijklmnopqrstuvwxyz12345"
         record_path.write_text(json.dumps(data))
         result = subprocess.run(
-            [sys.executable, "training/scripts/validate_micro_sft_execution_record.py",
-             "--record", str(record_path), "--json"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=30,
+            [
+                sys.executable,
+                "training/scripts/validate_micro_sft_execution_record.py",
+                "--record",
+                str(record_path),
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=30,
         )
         assert result.returncode != 0, "Validator should reject token-like strings"
 
@@ -234,8 +332,9 @@ class TestHfJobsMicroSftV0135:
 
     def test_has_require_smoke_summary(self) -> None:
         text = (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").read_text()
-        assert "require_smoke_summary" in text or "require-smoke-summary" in text, \
+        assert "require_smoke_summary" in text or "require-smoke-summary" in text, (
             "hf_jobs_micro_sft.py must have --require-smoke-summary"
+        )
 
     def test_submit_blocked_without_smoke_summary(self) -> None:
         """Submit should be blocked without --require-smoke-summary (unless override)."""
@@ -290,7 +389,10 @@ class TestNoTrackedArtifactsV0135:
     def test_no_gguf_tracked(self) -> None:
         result = subprocess.run(
             ["git", "ls-files", "*.gguf"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=10,
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=10,
         )
         gguf_files = [f for f in result.stdout.strip().splitlines() if f]
         assert len(gguf_files) == 0, f"GGUF files tracked: {gguf_files}"
@@ -298,7 +400,10 @@ class TestNoTrackedArtifactsV0135:
     def test_no_safetensors_tracked(self) -> None:
         result = subprocess.run(
             ["git", "ls-files", "*.safetensors"],
-            capture_output=True, text=True, cwd=str(PROJECT_ROOT), timeout=10,
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+            timeout=10,
         )
         files = [f for f in result.stdout.strip().splitlines() if f]
         assert len(files) == 0, f"Safetensors files tracked: {files}"

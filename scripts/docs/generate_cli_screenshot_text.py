@@ -36,6 +36,7 @@ VALID_KINDS = (
 # Text generators — one per kind
 # ---------------------------------------------------------------------------
 
+
 def _generate_setup() -> str:
     return """\
 $ kimari setup --json
@@ -144,6 +145,7 @@ def generate_text(kind: str) -> str:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(

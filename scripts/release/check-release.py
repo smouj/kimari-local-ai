@@ -1875,6 +1875,7 @@ def main() -> None:
             # "token=" is allowed when it's a reference or assignment in safe examples
             # Only flag if it's an actual token value assignment (token="value")
             import re as _re
+
             if _re.search(r'token\s*=\s*["\'][^"\']{8,}["\']', doc_text):
                 secret_patterns.append("token=")
             for pattern in secret_patterns:
@@ -2210,8 +2211,7 @@ def main() -> None:
     _hf_token_pattern = "hf_" + "x" * 34  # Placeholder: never include real tokens
     check(
         'No real "hf_" token pattern in README/CHANGELOG (critical)',
-        _hf_token_pattern not in readme_text
-        and _hf_token_pattern not in changelog_text,
+        _hf_token_pattern not in readme_text and _hf_token_pattern not in changelog_text,
         "Real HF token detected in README or CHANGELOG — revoke and remove immediately",
     )
     # No adapter/weights/GGUF tracked
@@ -2348,7 +2348,9 @@ def main() -> None:
         scan_text = scan_secrets.read_text()
         check(
             "scan_for_secrets.py no longer skips security guide files entirely",
-            "SECURITY_GUIDE_FILES" not in scan_text or "_should_skip_file" not in scan_text or "SAFE_PLACEHOLDERS" in scan_text,
+            "SECURITY_GUIDE_FILES" not in scan_text
+            or "_should_skip_file" not in scan_text
+            or "SAFE_PLACEHOLDERS" in scan_text,
             "Scanner still skips security guide files entirely",
         )
         check(
@@ -2655,7 +2657,8 @@ def main() -> None:
         gp_md_text = gateway_plan_md.read_text()
         check(
             "GATEWAY_PLAN.md clarifies gateway is management layer, not OpenAI endpoint",
-            "management and diagnostic layer" in gp_md_text.lower() or "helps configure and monitor" in gp_md_text.lower(),
+            "management and diagnostic layer" in gp_md_text.lower()
+            or "helps configure and monitor" in gp_md_text.lower(),
             "GATEWAY_PLAN.md should clarify gateway helps configure/monitor llama-server, not serve endpoints",
         )
 
@@ -2676,15 +2679,24 @@ def main() -> None:
         # Check generated configs don't contain token/API key fields
         try:
             import importlib.util
+
             spec = importlib.util.spec_from_file_location("config_generator", str(config_gen_py))
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
-            for target_func in ["generate_openwebui_config", "generate_openclaw_config", "generate_hermes_config", "generate_continue_config"]:
+            for target_func in [
+                "generate_openwebui_config",
+                "generate_openclaw_config",
+                "generate_hermes_config",
+                "generate_continue_config",
+            ]:
                 func = getattr(mod, target_func, None)
                 if func:
                     config = func()
-                    config_str = str(config).lower()
-                    has_token = any(k for k in config if any(t in k.lower() for t in ["token", "api_key", "apikey", "password", "secret"]))
+                    has_token = any(
+                        k
+                        for k in config
+                        if any(t in k.lower() for t in ["token", "api_key", "apikey", "password", "secret"])
+                    )
                     check(
                         f"{target_func}() output contains no token/API key fields",
                         not has_token,
@@ -2845,7 +2857,11 @@ def main() -> None:
         model_card_lower = model_card_path.read_text().lower()
         check(
             "MODEL_CARD.md still says no public weights (v0.1.28)",
-            "not released" in model_card_lower or "no public" in model_card_lower or "not yet released" in model_card_lower or "planned" in model_card_lower or "not been trained" in model_card_lower,
+            "not released" in model_card_lower
+            or "no public" in model_card_lower
+            or "not yet released" in model_card_lower
+            or "planned" in model_card_lower
+            or "not been trained" in model_card_lower,
             "MODEL_CARD.md must still indicate no public weights",
         )
 
@@ -2960,6 +2976,7 @@ def main() -> None:
         smoke_config = None
         try:
             import yaml
+
             with open(smoke_config_path) as f:
                 smoke_config = yaml.safe_load(f)
         except ImportError:
@@ -3019,7 +3036,9 @@ def main() -> None:
     # Gate still BLOCKED
     check(
         "Gate still BLOCKED (v0.1.29 final)",
-        "BLOCKED" in (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").read_text() if (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").exists() else False,
+        "BLOCKED" in (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").read_text()
+        if (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").exists()
+        else False,
         "Preview gate must be BLOCKED",
     )
     check(
@@ -3048,10 +3067,20 @@ def main() -> None:
     # Check smoke summary script works
     try:
         summary_result = subprocess.run(
-            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_smoke_summary.py"),
-             "--status", "pending", "--flavor", "a10g-small",
-             "--image", "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel", "--json"],
-            capture_output=True, text=True, timeout=30,
+            [
+                sys.executable,
+                str(PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_smoke_summary.py"),
+                "--status",
+                "pending",
+                "--flavor",
+                "a10g-small",
+                "--image",
+                "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         if summary_result.returncode == 0:
             summary_data = json.loads(summary_result.stdout)
@@ -3300,7 +3329,8 @@ def main() -> None:
         micro_sft_config_text = micro_sft_config.read_text()
         check(
             "Micro SFT config has allow_hf_upload: false",
-            "allow_hf_upload: false" in micro_sft_config_text or "allow_hf_upload:false" in micro_sft_config_text.replace(" ", ""),
+            "allow_hf_upload: false" in micro_sft_config_text
+            or "allow_hf_upload:false" in micro_sft_config_text.replace(" ", ""),
             "Micro SFT config must have allow_hf_upload: false",
         )
         check(
@@ -3345,15 +3375,23 @@ def main() -> None:
     # Check micro SFT summary generator works
     try:
         ms_summary_result = subprocess.run(
-            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_micro_sft_summary.py"),
-             "--status", "pending", "--json"],
-            capture_output=True, text=True, timeout=30,
+            [
+                sys.executable,
+                str(PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_micro_sft_summary.py"),
+                "--status",
+                "pending",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         if ms_summary_result.returncode == 0:
             ms_summary_data = json.loads(ms_summary_result.stdout)
             check(
                 "create_hf_jobs_micro_sft_summary --json works",
-                True, "",
+                True,
+                "",
             )
             check(
                 "micro SFT summary has adapter_committed=false",
@@ -3378,10 +3416,17 @@ def main() -> None:
     # Check micro SFT wrapper --dry-run works
     try:
         ms_dry_result = subprocess.run(
-            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"),
-             "--config", str(PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"),
-             "--dry-run", "--json"],
-            capture_output=True, text=True, timeout=30,
+            [
+                sys.executable,
+                str(PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"),
+                "--config",
+                str(PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"),
+                "--dry-run",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         check(
             "hf_jobs_micro_sft.py --dry-run --json works",
@@ -3394,10 +3439,16 @@ def main() -> None:
     # Check micro SFT wrapper --print-command works
     try:
         ms_print_result = subprocess.run(
-            [sys.executable, str(PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"),
-             "--config", str(PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"),
-             "--print-command"],
-            capture_output=True, text=True, timeout=30,
+            [
+                sys.executable,
+                str(PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"),
+                "--config",
+                str(PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft.v0.yaml"),
+                "--print-command",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         check(
             "hf_jobs_micro_sft.py --print-command works",
@@ -3413,13 +3464,16 @@ def main() -> None:
         try:
             # Test rejection of hf_upload_performed=true
             import tempfile
+
             unsafe_hf_upload = {"hf_upload_performed": True, "adapter_committed": False, "gate_state": "BLOCKED"}
             with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                 json.dump(unsafe_hf_upload, f)
                 unsafe_hf_upload_path = f.name
             unsafe_result = subprocess.run(
                 [sys.executable, str(validate_micro_sft), "--summary", unsafe_hf_upload_path, "--json"],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             check(
                 "validate_hf_jobs_micro_sft_summary rejects hf_upload_performed=true",
@@ -3435,7 +3489,9 @@ def main() -> None:
                 unsafe_adapter_path = f.name
             unsafe_adapter_result = subprocess.run(
                 [sys.executable, str(validate_micro_sft), "--summary", unsafe_adapter_path, "--json"],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             check(
                 "validate_hf_jobs_micro_sft_summary rejects adapter_committed=true",
@@ -3451,7 +3507,9 @@ def main() -> None:
                 unsafe_gate_path = f.name
             unsafe_gate_result = subprocess.run(
                 [sys.executable, str(validate_micro_sft), "--summary", unsafe_gate_path, "--json"],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             check(
                 "validate_hf_jobs_micro_sft_summary rejects gate_state != BLOCKED",
@@ -3465,8 +3523,16 @@ def main() -> None:
     # Check no adapter/GGUF/checkpoint/raw logs tracked
     try:
         artifact_result = subprocess.run(
-            ["git", "ls-files", "*.safetensors", "*.gguf", "*.ckpt", "*.bin",
-             "training/adapters/*", "training/raw_logs/*"],
+            [
+                "git",
+                "ls-files",
+                "*.safetensors",
+                "*.gguf",
+                "*.ckpt",
+                "*.bin",
+                "training/adapters/*",
+                "training/raw_logs/*",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -3482,19 +3548,21 @@ def main() -> None:
 
     check(
         "Gate BLOCKED (v0.1.32)",
-        True, "",
+        True,
+        "",
     )
     check(
         'No "Kimari-4B released" false claim (v0.1.32)',
-        True, "",
+        True,
+        "",
     )
+    import contextlib
+
     profiles_path = PROJECT_ROOT / "config" / "kimari.profiles.json"
     profiles = {}
     if profiles_path.exists():
-        try:
+        with contextlib.suppress(json.JSONDecodeError):
             profiles = json.loads(profiles_path.read_text())
-        except json.JSONDecodeError:
-            pass
     check(
         'default_profile still "test" (v0.1.32 check)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
@@ -3533,7 +3601,7 @@ def main() -> None:
 
         # Check no --token argument
         check(
-            'train_sft_lora.py has no --token argument',
+            "train_sft_lora.py has no --token argument",
             '"--token"' not in train_sft_text,
             "train_sft_lora.py must not accept --token",
         )
@@ -3554,8 +3622,8 @@ def main() -> None:
 
         # Check CI guard exists
         check(
-            'train_sft_lora.py has CI guard (CI=true check)',
-            'os.environ.get("CI")' in train_sft_text or 'CI' in train_sft_text,
+            "train_sft_lora.py has CI guard (CI=true check)",
+            'os.environ.get("CI")' in train_sft_text or "CI" in train_sft_text,
             "CI environment guard missing from train_sft_lora.py",
         )
 
@@ -3575,15 +3643,22 @@ def main() -> None:
 
         # Check push_to_hub is False
         check(
-            'train_sft_lora.py sets push_to_hub=False',
-            "push_to_hub=False" in train_sft_text or "push_to_hub = False" in train_sft_text or '\"push_to_hub\": False' in train_sft_text or "'push_to_hub': False" in train_sft_text,
+            "train_sft_lora.py sets push_to_hub=False",
+            "push_to_hub=False" in train_sft_text
+            or "push_to_hub = False" in train_sft_text
+            or '"push_to_hub": False' in train_sft_text
+            or "'push_to_hub': False" in train_sft_text,
             "push_to_hub must be False in train_sft_lora.py",
         )
 
         # Check report_to is "none"
         check(
             'train_sft_lora.py sets report_to="none"',
-            'report_to="none"' in train_sft_text or "report_to='none'" in train_sft_text or 'report_to = "none"' in train_sft_text or '\"report_to\": "none"' in train_sft_text or "'report_to': 'none'" in train_sft_text,
+            'report_to="none"' in train_sft_text
+            or "report_to='none'" in train_sft_text
+            or 'report_to = "none"' in train_sft_text
+            or '"report_to": "none"' in train_sft_text
+            or "'report_to': 'none'" in train_sft_text,
             'report_to must be "none" in train_sft_lora.py',
         )
     else:
@@ -3796,7 +3871,11 @@ def main() -> None:
     )
 
     # Check create script enforces safe invariants
-    create_record_script = (PROJECT_ROOT / "training" / "scripts" / "create_micro_sft_execution_record.py").read_text() if (PROJECT_ROOT / "training" / "scripts" / "create_micro_sft_execution_record.py").exists() else ""
+    create_record_script = (
+        (PROJECT_ROOT / "training" / "scripts" / "create_micro_sft_execution_record.py").read_text()
+        if (PROJECT_ROOT / "training" / "scripts" / "create_micro_sft_execution_record.py").exists()
+        else ""
+    )
     check(
         "create_micro_sft_execution_record sets adapter_committed=false",
         "adapter_committed" in create_record_script and "false" in create_record_script,
@@ -3814,7 +3893,11 @@ def main() -> None:
     )
 
     # Check validate script rejects unsafe records
-    validate_record_script = (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_execution_record.py").read_text() if (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_execution_record.py").exists() else ""
+    validate_record_script = (
+        (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_execution_record.py").read_text()
+        if (PROJECT_ROOT / "training" / "scripts" / "validate_micro_sft_execution_record.py").exists()
+        else ""
+    )
     check(
         "validate_micro_sft_execution_record checks gate_state",
         "gate_state" in validate_record_script and "BLOCKED" in validate_record_script,
@@ -3837,7 +3920,11 @@ def main() -> None:
     )
 
     # Check hf_jobs_micro_sft.py has --require-smoke-summary
-    hf_micro_sft_script = (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").read_text() if (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").exists() else ""
+    hf_micro_sft_script = (
+        (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").read_text()
+        if (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py").exists()
+        else ""
+    )
     check(
         "hf_jobs_micro_sft.py has --require-smoke-summary",
         "require_smoke_summary" in hf_micro_sft_script or "require-smoke-summary" in hf_micro_sft_script,
@@ -3969,19 +4056,31 @@ def main() -> None:
     )
 
     # Pascal/cu126 documentation
-    install_wsl2_text = (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").read_text() if (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists() else ""
+    install_wsl2_text = (
+        (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").read_text()
+        if (PROJECT_ROOT / "docs" / "INSTALL_WSL2.md").exists()
+        else ""
+    )
     check(
         "INSTALL_WSL2.md mentions Pascal/cu126 (v0.1.37)",
         "Pascal" in install_wsl2_text or "cu126" in install_wsl2_text or "sm_61" in install_wsl2_text,
         "INSTALL_WSL2.md missing Pascal/cu126/sm_61 references",
     )
-    install_matrix_text = (PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md").read_text() if (PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md").exists() else ""
+    install_matrix_text = (
+        (PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md").read_text()
+        if (PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md").exists()
+        else ""
+    )
     check(
         "INSTALL_MATRIX.md mentions Pascal/cu126 (v0.1.37)",
         "Pascal" in install_matrix_text or "cu126" in install_matrix_text or "sm_61" in install_matrix_text,
         "INSTALL_MATRIX.md missing Pascal/cu126/sm_61 references",
     )
-    training_compat_text = (PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md").read_text() if (PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md").exists() else ""
+    training_compat_text = (
+        (PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md").read_text()
+        if (PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md").exists()
+        else ""
+    )
     check(
         "TRAINING_STACK_COMPATIBILITY.md mentions Pascal/cu126 (v0.1.37)",
         "Pascal" in training_compat_text or "cu126" in training_compat_text or "sm_61" in training_compat_text,

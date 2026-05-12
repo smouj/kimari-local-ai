@@ -161,13 +161,13 @@ SECURITY_GUIDE_FILES = {
 # If a line matches a secret pattern BUT the matched content is exactly one of
 # these placeholders, the finding is skipped.
 SAFE_PLACEHOLDERS = {
-    "hf_...",          # exactly hf_ followed by only dots
+    "hf_...",  # exactly hf_ followed by only dots
     "hf_your_token_here",
     "hf_YOUR_TOKEN_HERE",
     "<HF_TOKEN>",
     "your-api-key",
     "your_api_key",
-    "sk-...",          # exactly sk- followed by only dots
+    "sk-...",  # exactly sk- followed by only dots
     "<token>",
     "<API_KEY>",
 }
@@ -209,12 +209,7 @@ def _should_skip_file(path: Path) -> bool:
     """Check if a file should be skipped based on extension or directory."""
     if path.suffix.lower() in SKIP_EXTENSIONS:
         return True
-    for part in path.parts:
-        if part in SKIP_DIRS or part.endswith(".egg-info"):
-            return True
-    # Security guide files are no longer fully skipped; they are scanned
-    # line by line with safe placeholder allowances instead.
-    return False
+    return any(part in SKIP_DIRS or part.endswith(".egg-info") for part in path.parts)
 
 
 def scan_file(path: Path) -> list[dict]:

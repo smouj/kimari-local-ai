@@ -100,21 +100,26 @@ def main() -> None:
 
             lines = result.stdout.splitlines()
             # Apply Python-side tailing as safeguard (no-op if HF CLI already tailed)
-            tailed = lines[-args.tail:] if len(lines) > args.tail else lines
+            tailed = lines[-args.tail :] if len(lines) > args.tail else lines
 
             # Sanitize if requested
             if args.sanitize_logs:
                 tailed = [sanitize_line(line) for line in tailed]
 
             if args.json_output:
-                print(json.dumps({
-                    "job_id": args.job_id,
-                    "log_lines": len(lines),
-                    "showing": len(tailed),
-                    "logs": "\n".join(tailed),
-                    "sanitized": args.sanitize_logs,
-                    "tail_used": True,
-                }, indent=2))
+                print(
+                    json.dumps(
+                        {
+                            "job_id": args.job_id,
+                            "log_lines": len(lines),
+                            "showing": len(tailed),
+                            "logs": "\n".join(tailed),
+                            "sanitized": args.sanitize_logs,
+                            "tail_used": True,
+                        },
+                        indent=2,
+                    )
+                )
             else:
                 sanitized_note = " (sanitized)" if args.sanitize_logs else ""
                 print(f"Logs for job {args.job_id}{sanitized_note} (last {len(tailed)} of {len(lines)} lines):")
@@ -155,12 +160,17 @@ def main() -> None:
                     data["_sanitized"] = args.sanitize_logs
                     print(json.dumps(data, indent=2))
                 except json.JSONDecodeError:
-                    print(json.dumps({
-                        "job_id": args.job_id,
-                        "raw_output": inspect_output,
-                        "_read_only": True,
-                        "_sanitized": args.sanitize_logs,
-                    }, indent=2))
+                    print(
+                        json.dumps(
+                            {
+                                "job_id": args.job_id,
+                                "raw_output": inspect_output,
+                                "_read_only": True,
+                                "_sanitized": args.sanitize_logs,
+                            },
+                            indent=2,
+                        )
+                    )
             else:
                 sanitized_note = " (sanitized)" if args.sanitize_logs else ""
                 print(f"Job status for: {args.job_id}{sanitized_note}")

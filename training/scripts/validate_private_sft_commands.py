@@ -56,9 +56,7 @@ def extract_flags_from_command(command: str) -> list[str]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Validate generated private SFT commands against supported flags."
-    )
+    parser = argparse.ArgumentParser(description="Validate generated private SFT commands against supported flags.")
     parser.add_argument(
         "--command-json",
         type=Path,
@@ -132,9 +130,22 @@ def main() -> None:
 
     # Check 5: No HF upload commands
     all_commands = []
-    for key in ["environment_setup", "dataset_build", "preflight", "training_dryrun", "training_real", "baseline_eval", "adapter_eval", "manifest", "summary", "secret_scan"]:
+    for key in [
+        "environment_setup",
+        "dataset_build",
+        "preflight",
+        "training_dryrun",
+        "training_real",
+        "baseline_eval",
+        "adapter_eval",
+        "manifest",
+        "summary",
+        "secret_scan",
+    ]:
         all_commands.extend(commands.get(key, []))
-    has_hf_upload = any("hf upload" in cmd or "huggingface-cli upload" in cmd or "huggingface_hub.upload" in cmd for cmd in all_commands)
+    has_hf_upload = any(
+        "hf upload" in cmd or "huggingface-cli upload" in cmd or "huggingface_hub.upload" in cmd for cmd in all_commands
+    )
     checks["no_hf_upload_commands"] = not has_hf_upload
     if has_hf_upload:
         errors.append("HF upload commands found in generated commands")

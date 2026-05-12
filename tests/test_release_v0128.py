@@ -31,6 +31,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # Helper: simple YAML parser (no pyyaml dependency)
 # ---------------------------------------------------------------------------
 
+
 def parse_simple_yaml(path: Path) -> dict | None:
     """Parse a simple YAML file without pyyaml."""
     try:
@@ -201,8 +202,13 @@ class TestScriptsV0128:
 
     def test_command_script_json(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/kimari4b_private_sft_command.py",
-             "--config", "training/configs/kimari4b_private_sft_run.v0.yaml", "--json"],
+            [
+                sys.executable,
+                "training/scripts/kimari4b_private_sft_command.py",
+                "--config",
+                "training/configs/kimari4b_private_sft_run.v0.yaml",
+                "--json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -216,8 +222,13 @@ class TestScriptsV0128:
 
     def test_command_script_markdown(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/kimari4b_private_sft_command.py",
-             "--config", "training/configs/kimari4b_private_sft_run.v0.yaml", "--markdown"],
+            [
+                sys.executable,
+                "training/scripts/kimari4b_private_sft_command.py",
+                "--config",
+                "training/configs/kimari4b_private_sft_run.v0.yaml",
+                "--markdown",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -228,8 +239,13 @@ class TestScriptsV0128:
 
     def test_command_script_gate_blocked(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/kimari4b_private_sft_command.py",
-             "--config", "training/configs/kimari4b_private_sft_run.v0.yaml", "--json"],
+            [
+                sys.executable,
+                "training/scripts/kimari4b_private_sft_command.py",
+                "--config",
+                "training/configs/kimari4b_private_sft_run.v0.yaml",
+                "--json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -246,8 +262,7 @@ class TestScriptsV0128:
 
     def test_eval_plan_json(self) -> None:
         result = subprocess.run(
-            [sys.executable, "eval/scripts/kimari4b_eval_plan.py",
-             "--baseline-label", "smollm3-base", "--json"],
+            [sys.executable, "eval/scripts/kimari4b_eval_plan.py", "--baseline-label", "smollm3-base", "--json"],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -260,10 +275,15 @@ class TestScriptsV0128:
 
     def test_eval_plan_markdown(self) -> None:
         result = subprocess.run(
-            [sys.executable, "eval/scripts/kimari4b_eval_plan.py",
-             "--baseline-label", "smollm3-base",
-             "--adapter-label", "kimari4b-smollm3-sft-v0",
-             "--markdown"],
+            [
+                sys.executable,
+                "eval/scripts/kimari4b_eval_plan.py",
+                "--baseline-label",
+                "smollm3-base",
+                "--adapter-label",
+                "kimari4b-smollm3-sft-v0",
+                "--markdown",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -274,8 +294,7 @@ class TestScriptsV0128:
 
     def test_eval_plan_no_scores(self) -> None:
         result = subprocess.run(
-            [sys.executable, "eval/scripts/kimari4b_eval_plan.py",
-             "--baseline-label", "smollm3-base", "--json"],
+            [sys.executable, "eval/scripts/kimari4b_eval_plan.py", "--baseline-label", "smollm3-base", "--json"],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -387,8 +406,9 @@ class TestReferencesV0128:
             pytest.skip("MODEL_CARD.md not found")
         text = path.read_text().lower()
         # Must indicate no public release
-        assert "not released" in text or "not yet released" in text or "no public" in text or "planned" in text, \
+        assert "not released" in text or "not yet released" in text or "no public" in text or "planned" in text, (
             "MODEL_CARD.md must indicate no public weights"
+        )
 
 
 # ---------------------------------------------------------------------------

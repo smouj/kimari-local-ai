@@ -314,7 +314,9 @@ class TestLoadBaseConfigForSetup:
             config = load_base_config_for_setup()
         assert "version" in config, "Loaded config missing 'version'"
         assert "profiles" in config and config["profiles"], "Loaded config missing or empty 'profiles'"
-        assert config.get("default_profile") == "test", f"Expected default_profile='test', got {config.get('default_profile')}"
+        assert config.get("default_profile") == "test", (
+            f"Expected default_profile='test', got {config.get('default_profile')}"
+        )
 
     def test_load_base_config_for_setup_incomplete(self, tmp_path: Path):
         """Loads defaults and marks recovery_needed when user config is incomplete."""

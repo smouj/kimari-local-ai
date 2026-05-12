@@ -425,4 +425,6 @@ class TestTuneCommand:
             timeout=30,
         )
         assert result.returncode != 0, "--apply should be blocked"
-        assert "not yet available" in result.stderr.lower() or "not yet available" in result.stdout.lower(), "Should explain --apply is blocked"
+        assert "not yet available" in result.stderr.lower() or "not yet available" in result.stdout.lower(), (
+            "Should explain --apply is blocked"
+        )

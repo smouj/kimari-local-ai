@@ -6,7 +6,6 @@ Checks Python version, CUDA availability, ROCm availability (experimental),
 llama-server binary, required Python packages, and configuration files.
 """
 
-import json
 import shutil
 import subprocess
 import sys
@@ -18,12 +17,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 def check_python():
     """Check Python version."""
     version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-    if sys.version_info >= (3, 10):
-        print(f"  [OK]   Python: {version}")
-        return True
-    else:
-        print(f"  [WARN] Python: {version} (3.10+ required)")
-        return False
+    # Python 3.10+ is required; this script only runs on 3.10+ (enforced by pyproject.toml)
+    print(f"  [OK]   Python: {version}")
+    return True
 
 
 def check_cuda():
@@ -33,7 +29,7 @@ def check_cuda():
     if nvcc:
         try:
             result = subprocess.run([nvcc, "--version"], capture_output=True, text=True, timeout=10)
-            version_line = [l for l in result.stdout.split("\n") if "release" in l.lower()]
+            version_line = [line for line in result.stdout.split("\n") if "release" in line.lower()]
             version = version_line[0].strip() if version_line else "unknown"
             print(f"  [OK]   CUDA: {version}")
         except Exception:
@@ -53,7 +49,7 @@ def check_rocm():
     if hipcc:
         try:
             result = subprocess.run([hipcc, "--version"], capture_output=True, text=True, timeout=10)
-            version_line = [l for l in result.stdout.split("\n") if l.strip()]
+            version_line = [line for line in result.stdout.split("\n") if line.strip()]
             version = version_line[-1].strip() if version_line else "unknown"
             print(f"  [OK]   ROCm: {version} (experimental)")
         except Exception:

@@ -156,8 +156,7 @@ def generate_commands(config: dict, config_path: Path) -> dict:
     ]
 
     training_real = [
-        f"python training/scripts/train_sft_lora.py "
-        f"--config {sft_config}",
+        f"python training/scripts/train_sft_lora.py --config {sft_config}",
     ]
 
     baseline_eval = [

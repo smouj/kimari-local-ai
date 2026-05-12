@@ -1,9 +1,7 @@
 """Tests for v0.1.37-alpha: jsonschema crash fix, GPU compute capability check, Pascal/cu126 compatibility."""
 
-import ast
 import json
 import subprocess
-import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -143,9 +141,7 @@ class TestCheckGpuArchCompatibility:
 
         result = run_all_checks()
         check_names = [c["name"] for c in result["checks"]]
-        assert "gpu_arch_compatibility" in check_names, (
-            f"gpu_arch_compatibility not found in: {check_names}"
-        )
+        assert "gpu_arch_compatibility" in check_names, f"gpu_arch_compatibility not found in: {check_names}"
 
 
 # ---------------------------------------------------------------------------

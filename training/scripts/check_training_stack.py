@@ -245,6 +245,7 @@ def check_gpu_arch_compatibility() -> dict[str, Any]:
 
     try:
         import torch
+
         torch_version = torch.__version__
         if torch.cuda.is_available():
             compute_cap = torch.cuda.get_device_capability(0)

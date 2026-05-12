@@ -506,9 +506,7 @@ class TestGatewayNoServer:
         assert status["status"] == "planned", (
             f"Gateway status must be 'planned', not 'running' — got '{status['status']}'"
         )
-        assert status["gateway_available"] is False, (
-            "gateway_available must be False — no real server should exist"
-        )
+        assert status["gateway_available"] is False, "gateway_available must be False — no real server should exist"
 
         from kimari.gateway.plan import gateway_plan
 

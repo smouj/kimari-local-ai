@@ -162,8 +162,13 @@ class TestCommandCompatibilityV0129:
 
     def test_command_script_json(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/kimari4b_private_sft_command.py",
-             "--config", "training/configs/kimari4b_private_sft_run.v0.yaml", "--json"],
+            [
+                sys.executable,
+                "training/scripts/kimari4b_private_sft_command.py",
+                "--config",
+                "training/configs/kimari4b_private_sft_run.v0.yaml",
+                "--json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -175,8 +180,13 @@ class TestCommandCompatibilityV0129:
 
     def test_training_real_no_unsupported_flags(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/kimari4b_private_sft_command.py",
-             "--config", "training/configs/kimari4b_private_sft_run.v0.yaml", "--json"],
+            [
+                sys.executable,
+                "training/scripts/kimari4b_private_sft_command.py",
+                "--config",
+                "training/configs/kimari4b_private_sft_run.v0.yaml",
+                "--json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -191,8 +201,13 @@ class TestCommandCompatibilityV0129:
 
     def test_command_compatibility_status(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/kimari4b_private_sft_command.py",
-             "--config", "training/configs/kimari4b_private_sft_run.v0.yaml", "--json"],
+            [
+                sys.executable,
+                "training/scripts/kimari4b_private_sft_command.py",
+                "--config",
+                "training/configs/kimari4b_private_sft_run.v0.yaml",
+                "--json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -234,7 +249,15 @@ class TestShowSupportedFlagsV0129:
         assert result.returncode == 0, f"--show-supported-flags --json failed: {result.stderr}"
         data = json.loads(result.stdout)
         assert "supported_flags" in data
-        expected_flags = ["--config", "--dry-run", "--print-command", "--estimate-only", "--require-dataset", "--show-supported-flags", "--json"]
+        expected_flags = [
+            "--config",
+            "--dry-run",
+            "--print-command",
+            "--estimate-only",
+            "--require-dataset",
+            "--show-supported-flags",
+            "--json",
+        ]
         for flag in expected_flags:
             assert flag in data["supported_flags"], f"Missing flag: {flag}"
 
@@ -256,8 +279,13 @@ class TestValidateCommandsV0129:
 
         # Generate commands first
         gen_result = subprocess.run(
-            [sys.executable, "training/scripts/kimari4b_private_sft_command.py",
-             "--config", "training/configs/kimari4b_private_sft_run.v0.yaml", "--json"],
+            [
+                sys.executable,
+                "training/scripts/kimari4b_private_sft_command.py",
+                "--config",
+                "training/configs/kimari4b_private_sft_run.v0.yaml",
+                "--json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -271,10 +299,15 @@ class TestValidateCommandsV0129:
 
         try:
             val_result = subprocess.run(
-                [sys.executable, "training/scripts/validate_private_sft_commands.py",
-                 "--command-json", cmd_json_path,
-                 "--training-script", "training/scripts/train_sft_lora.py",
-                 "--json"],
+                [
+                    sys.executable,
+                    "training/scripts/validate_private_sft_commands.py",
+                    "--command-json",
+                    cmd_json_path,
+                    "--training-script",
+                    "training/scripts/train_sft_lora.py",
+                    "--json",
+                ],
                 capture_output=True,
                 text=True,
                 cwd=str(PROJECT_ROOT),
@@ -341,9 +374,14 @@ class TestHFJobsPrivateRunV0129:
 
     def test_dry_run_json(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/hf_jobs_private_run.py",
-             "--config", "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
-             "--dry-run", "--json"],
+            [
+                sys.executable,
+                "training/scripts/hf_jobs_private_run.py",
+                "--config",
+                "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
+                "--dry-run",
+                "--json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -358,9 +396,13 @@ class TestHFJobsPrivateRunV0129:
 
     def test_print_command(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/hf_jobs_private_run.py",
-             "--config", "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
-             "--print-command"],
+            [
+                sys.executable,
+                "training/scripts/hf_jobs_private_run.py",
+                "--config",
+                "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
+                "--print-command",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -371,9 +413,13 @@ class TestHFJobsPrivateRunV0129:
 
     def test_refuses_submit_without_allow_submit(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/hf_jobs_private_run.py",
-             "--config", "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
-             "--yes"],
+            [
+                sys.executable,
+                "training/scripts/hf_jobs_private_run.py",
+                "--config",
+                "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
+                "--yes",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -384,9 +430,13 @@ class TestHFJobsPrivateRunV0129:
 
     def test_refuses_submit_without_yes(self) -> None:
         result = subprocess.run(
-            [sys.executable, "training/scripts/hf_jobs_private_run.py",
-             "--config", "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
-             "--allow-submit"],
+            [
+                sys.executable,
+                "training/scripts/hf_jobs_private_run.py",
+                "--config",
+                "training/configs/hf_jobs_kimari4b_smoke.v0.yaml",
+                "--allow-submit",
+            ],
             capture_output=True,
             text=True,
             cwd=str(PROJECT_ROOT),
@@ -420,7 +470,9 @@ class TestHFJobsStatusV0129:
     def test_read_only(self) -> None:
         text = (PROJECT_ROOT / "training" / "scripts" / "hf_jobs_status.py").read_text().lower()
         # Should mention "read-only" or "does not modify" or "does not cancel"
-        assert "read-only" in text or "read only" in text or "does not modify" in text, "hf_jobs_status must state it is read-only"
+        assert "read-only" in text or "read only" in text or "does not modify" in text, (
+            "hf_jobs_status must state it is read-only"
+        )
         # Should NOT contain subprocess calls that modify jobs (like "hf jobs cancel" or "hf jobs run")
         assert "hf jobs cancel" not in text, "hf_jobs_status must not cancel jobs"
         assert "hf jobs run" not in text, "hf_jobs_status must not run jobs"

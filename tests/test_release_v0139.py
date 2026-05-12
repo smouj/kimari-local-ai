@@ -245,9 +245,7 @@ class TestWriteSetupConfigSafeMerge:
         written = json.loads(tmp_config_path.read_text())
         assert written["version"] == "1.1.0", f"version should be from defaults, got: {written['version']}"
 
-    def test_incomplete_config_invalid_default_profile_resolved(
-        self, tmp_config_path: Path, patch_data: dict
-    ):
+    def test_incomplete_config_invalid_default_profile_resolved(self, tmp_config_path: Path, patch_data: dict):
         """write_setup_config resolves invalid default_profile from incomplete config."""
         from kimari.setup.writer import write_setup_config
 
@@ -309,9 +307,7 @@ class TestNoUnsafeMergePattern:
         """writer.py no longer contains the unsafe _base.update(config) pattern."""
         writer_path = PROJECT_ROOT / "kimari" / "setup" / "writer.py"
         writer_text = writer_path.read_text()
-        assert "_base.update(config)" not in writer_text, (
-            "Unsafe _base.update(config) pattern still found in writer.py"
-        )
+        assert "_base.update(config)" not in writer_text, "Unsafe _base.update(config) pattern still found in writer.py"
         assert "_base = defaults.copy()" not in writer_text, (
             "Unsafe _base = defaults.copy() pattern still found in writer.py"
         )

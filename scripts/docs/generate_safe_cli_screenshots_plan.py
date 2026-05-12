@@ -157,8 +157,7 @@ def _generate_default() -> str:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Generate a PLAN for capturing CLI screenshots. "
-        "Does NOT generate images — only a structured plan.",
+        description="Generate a PLAN for capturing CLI screenshots. Does NOT generate images — only a structured plan.",
     )
     parser.add_argument(
         "--json",

@@ -1592,10 +1592,9 @@ def run_setup(
     result["recovery_needed"] = not user_config_complete or reset_user_config
 
     # Validate that the generated config would be valid
-    from kimari.setup.writer import load_base_config_for_setup, _validate_config_for_write
+    from kimari.setup.writer import _validate_config_for_write, load_base_config_for_setup
 
     base = load_base_config_for_setup(reset=reset_user_config)
-    profiles = base.get("profiles", {})
     resolved_profile = patch.get("resolved_profile", recommended_profile)
     base["default_profile"] = resolved_profile
     base["setup_info"] = {
@@ -1674,9 +1673,13 @@ def run_setup(
             if result.get("backup_path"):
                 print(f"  Backup:  {result['backup_path']}")
             if result.get("recovery_needed"):
-                print(f"  {Color.YELLOW}Note: Config was recovered from packaged defaults (previous config was incomplete or reset requested){Color.RESET}")
+                print(
+                    f"  {Color.YELLOW}Note: Config was recovered from packaged defaults (previous config was incomplete or reset requested){Color.RESET}"
+                )
             if not user_config_complete and not reset_user_config:
-                print(f"  Previous config was incomplete — run {Color.CYAN}kimari doctor --deep{Color.RESET} to verify.")
+                print(
+                    f"  Previous config was incomplete — run {Color.CYAN}kimari doctor --deep{Color.RESET} to verify."
+                )
         elif result.get("confirmed") is False and result.get("would_write"):
             print(f"\n  {Color.YELLOW}⚠ Write cancelled — confirmation denied{Color.RESET}")
             print(f"  Use {Color.CYAN}--yes{Color.RESET} to skip the confirmation prompt.")
