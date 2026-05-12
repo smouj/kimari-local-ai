@@ -27,7 +27,7 @@ dataset:
 hf_jobs:
   flavor: "a10g-small"         # $1.00/hour, NVIDIA A10G 24GB
   timeout_minutes: 20            # Max 20 minutes to limit cost
-  docker_image: "pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel"
+  docker_image: "pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel"
   estimated_cost_usd: 0.35      # 20 min * $1.00/hr ≈ $0.35
 
 # ── LoRA Config ──────────────────────────────────────────────────

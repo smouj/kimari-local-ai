@@ -116,7 +116,7 @@ except ImportError:
 print(json.dumps(result, indent=2))
 
 import subprocess as sp
-sp.run([sys.executable, "-m", "pip", "install", "-q", "trl", "peft", "datasets", "transformers>=4.36"], check=True)
+sp.run([sys.executable, "-m", "pip", "install", "-q", "trl>=0.7", "peft>=0.6", "datasets", "transformers==4.36.4", "accelerate"], check=True)
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model
@@ -229,7 +229,7 @@ def submit_job(config: dict, json_output: bool = False) -> dict:
 
     flavor = config.get("hf_jobs", {}).get("flavor", "a10g-small")
     timeout = config.get("hf_jobs", {}).get("timeout_minutes", 30)
-    docker_image = config.get("hf_jobs", {}).get("docker_image", "pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel")
+    docker_image = config.get("hf_jobs", {}).get("docker_image", "pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel")
     run_id = config.get("run_id", "kimari4b-micro-sft")
 
     training_script = build_training_script(config)
