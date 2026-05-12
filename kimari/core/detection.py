@@ -13,15 +13,46 @@ from pathlib import Path
 from kimari.core.constants import PROJECT_ROOT
 
 
+def _nvidia_smi_path() -> str | None:
+    """Find nvidia-smi, including WSL2 non-standard locations."""
+    # Standard PATH lookup
+    path = shutil.which("nvidia-smi")
+    if path:
+        return path
+    # WSL2: nvidia-smi lives here but is not on PATH
+    wsl_path = "/usr/lib/wsl/lib/nvidia-smi"
+    if Path(wsl_path).exists():
+        return wsl_path
+    # Windows interop (rare)
+    win_path = shutil.which("nvidia-smi.exe")
+    if win_path:
+        return win_path
+    return None
+
+
+def _nvcc_path() -> str | None:
+    """Find nvcc, including WSL2 non-standard locations."""
+    path = shutil.which("nvcc")
+    if path:
+        return path
+    # Common CUDA toolkit paths
+    for p in ["/usr/local/cuda/bin/nvcc", "/usr/lib/wsl/lib/nvcc"]:
+        if Path(p).exists():
+            return p
+    return None
+
+
 def detect_gpu() -> dict | None:
     """Detect NVIDIA GPU using nvidia-smi.
 
     Returns dict with 'name', 'vram_mb', 'driver' or None if not found.
     """
+    nvidia_smi = _nvidia_smi_path()
+    if not nvidia_smi:
+        return None
     try:
         result = subprocess.run(
-            [
-                "nvidia-smi",
+            [nvidia_smi,
                 "--query-gpu=name,memory.total,driver_version",
                 "--format=csv,noheader,nounits",
             ],
@@ -45,11 +76,8 @@ def detect_gpu() -> dict | None:
 
 
 def detect_cuda_version() -> str | None:
-    """Detect CUDA version via nvcc --version.
-
-    Returns version string like '12.4' or None.
-    """
-    nvcc = shutil.which("nvcc")
+    """Detect CUDA version via nvcc --version."""
+    nvcc = _nvcc_path()
     if not nvcc:
         return None
     try:
@@ -69,7 +97,7 @@ def detect_cuda_version() -> str | None:
 
 def detect_cuda() -> bool:
     """Check if CUDA is available via nvcc or nvidia-smi."""
-    return shutil.which("nvcc") is not None or shutil.which("nvidia-smi") is not None
+    return _nvcc_path() is not None or _nvidia_smi_path() is not None
 
 
 def detect_llama_server() -> str | None:

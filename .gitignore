@@ -95,3 +95,5 @@ tmp/
 temp/
 agent-ctx/
 kimari-local-ai/
+deps/llama.cpp/
+deps/
