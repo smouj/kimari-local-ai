@@ -97,3 +97,16 @@ agent-ctx/
 kimari-local-ai/
 deps/llama.cpp/
 deps/
+
+# ── Kimari-4B adapter artifacts (v0.1.47) ──────────────────────
+# These must NEVER be committed. Contains trained weights.
+training/adapters/
+training/checkpoints/
+*.safetensors
+*.gguf
+wandb/
+runs/
+raw_eval/
+eval/raw/
+eval/results/
+*.log

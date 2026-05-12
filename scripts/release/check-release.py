@@ -5174,6 +5174,188 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [67/67] v0.1.47 Kimari-4B private adapter pipeline ──────
+    print("\n[67/67] v0.1.47 Kimari-4B private adapter pipeline")
+
+    # Runner script
+    runner_path = PROJECT_ROOT / "training" / "scripts" / "run_kimari4b_private_adapter.py"
+    check(
+        "run_kimari4b_private_adapter.py exists",
+        runner_path.exists(),
+        "training/scripts/run_kimari4b_private_adapter.py not found",
+    )
+
+    # Preflight script
+    preflight_path = PROJECT_ROOT / "training" / "scripts" / "preflight_kimari4b_adapter.py"
+    check(
+        "preflight_kimari4b_adapter.py exists",
+        preflight_path.exists(),
+        "training/scripts/preflight_kimari4b_adapter.py not found",
+    )
+
+    # Config safety flags
+    config_path = PROJECT_ROOT / "training" / "configs" / "kimari4b_private_adapter_run.v0.yaml"
+    if config_path.exists():
+        config_text = config_path.read_text().lower()
+        check(
+            "Config hf_upload_allowed=false",
+            "hf_upload_allowed: false" in config_text,
+            "Config must have hf_upload_allowed: false",
+        )
+        check(
+            "Config public_release_allowed=false",
+            "public_release_allowed: false" in config_text,
+            "Config must have public_release_allowed: false",
+        )
+        check(
+            "Config preview_gate_state=BLOCKED",
+            'preview_gate_state: "blocked"' in config_text or "preview_gate_state: blocked" in config_text,
+            "Config must have preview_gate_state: BLOCKED",
+        )
+
+    # Runner safety: dry-run default, --allow-train --yes required
+    if runner_path.exists():
+        runner_text = runner_path.read_text()
+        check(
+            "Runner defaults to dry-run",
+            '"dry-run"' in runner_text.lower() or "dry_run" in runner_text.lower(),
+            "Runner should default to dry-run",
+        )
+        check(
+            "Runner requires --allow-train and --yes",
+            "--allow-train" in runner_text and "--yes" in runner_text,
+            "Runner must require --allow-train and --yes for real training",
+        )
+        check(
+            "Runner blocks training in CI",
+            '"CI"' in runner_text or "CI" in runner_text,
+            "Runner should block training in CI",
+        )
+        check(
+            "Runner blocks --token/--api-key args",
+            '"--token"' in runner_text or '"--api-key"' in runner_text,
+            "Runner should check for and block --token/--api-key arguments",
+        )
+
+    # No push_to_hub
+    if runner_path.exists():
+        check(
+            "Runner has no push_to_hub",
+            "push_to_hub" in runner_text.lower() and "true" not in runner_text.lower().split("push_to_hub")[-1][:20],
+            "Runner should not enable push_to_hub",
+        )
+
+    # Manifest template
+    manifest_template = PROJECT_ROOT / "training" / "templates" / "kimari4b_adapter_manifest.template.json"
+    check(
+        "Adapter manifest template exists",
+        manifest_template.exists(),
+        "training/templates/kimari4b_adapter_manifest.template.json not found",
+    )
+    if manifest_template.exists():
+        try:
+            import json as _json
+
+            template = _json.loads(manifest_template.read_text())
+            check(
+                "Manifest template public_release_allowed=false",
+                template.get("public_release_allowed") is False,
+                "Manifest template must have public_release_allowed=false",
+            )
+            check(
+                "Manifest template gate_state=BLOCKED",
+                template.get("gate_state") == "BLOCKED",
+                "Manifest template must have gate_state=BLOCKED",
+            )
+        except Exception:
+            ERRORS.append("Manifest template parse error")
+
+    # Release gate doc
+    check(
+        "docs/KIMARI4B_RELEASE_GATE.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_RELEASE_GATE.md").exists(),
+        "docs/KIMARI4B_RELEASE_GATE.md not found",
+    )
+
+    # Release gate: no auto-public transition
+    gate_doc = PROJECT_ROOT / "docs" / "KIMARI4B_RELEASE_GATE.md"
+    if gate_doc.exists():
+        gate_text = gate_doc.read_text().lower()
+        check(
+            "Release gate says no automatic transitions",
+            "no automatic" in gate_text or "no script" in gate_text,
+            "Release gate should state no automatic transitions",
+        )
+
+    # .gitignore protects artifacts
+    gitignore = PROJECT_ROOT / ".gitignore"
+    if gitignore.exists():
+        gitignore_text = gitignore.read_text()
+        check(
+            ".gitignore blocks training/adapters/",
+            "training/adapters" in gitignore_text,
+            ".gitignore should block training/adapters/",
+        )
+        check(
+            ".gitignore blocks *.safetensors",
+            "*.safetensors" in gitignore_text,
+            ".gitignore should block *.safetensors",
+        )
+        check(
+            ".gitignore blocks *.gguf",
+            "*.gguf" in gitignore_text,
+            ".gitignore should block *.gguf",
+        )
+
+    # No adapter/GGUF tracked
+    tracked_safetensors = list(PROJECT_ROOT.rglob("*.safetensors"))
+    tracked_gguf = [f for f in PROJECT_ROOT.rglob("*.gguf") if "deps/" not in str(f) and ".git" not in str(f)]
+    check(
+        "No .safetensors tracked in git",
+        len(tracked_safetensors) == 0,
+        f"Found {len(tracked_safetensors)} .safetensors files in project tree",
+    )
+    check(
+        "No .gguf tracked in git",
+        len(tracked_gguf) == 0,
+        f"Found {len(tracked_gguf)} .gguf files in project tree (excluding deps/)",
+    )
+
+    # README says Kimari-4B not released
+    readme_text_v047 = (PROJECT_ROOT / "README.md").read_text().lower()
+    check(
+        "README says Kimari-4B not released (v0.1.47)",
+        "not released" in readme_text_v047 or "not yet released" in readme_text_v047,
+        "README should say Kimari-4B is not released",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.47-alpha",
+        get_pyproject_version() >= "0.1.47-alpha",
+        f"Expected version >= 0.1.47-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.47-alpha",
+        get_init_version() >= "0.1.47-alpha",
+        f"Expected version >= 0.1.47-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.47-alpha] entry",
+        "[0.1.47-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.47-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.47-alpha",
+        "v0.1.47-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.47-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.47)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

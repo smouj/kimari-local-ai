@@ -1,0 +1,82 @@
+# Kimari-4B First Private Adapter Run Configuration
+# v0 — initial setup
+# SAFETY: All release/upload flags are FALSE. Gate is BLOCKED.
+
+run_id: "kimari4b-private-adapter-v0"
+
+# ── Base Model ──────────────────────────────────────────────────
+# Qwen2.5-3B-Instruct: Apache 2.0, good Spanish support, fits 6GB+ VRAM for inference
+# This is a CANDIDATE. Final base model choice requires manual review.
+base_model:
+  name: "Qwen/Qwen2.5-3B-Instruct"
+  license: "Apache-2.0"
+  params_billions: 3.0
+  reason: "Permissive license, strong multilingual, reasonable size for first adapter run"
+
+# ── Dataset ─────────────────────────────────────────────────────
+# dataset v0: minimal curated examples for first run validation
+# NOT a production dataset. Just enough to prove the pipeline works.
+dataset:
+  name: "kimari-fit-v0"
+  path: "training/datasets/kimari-fit-v0.jsonl"
+  format: "jsonl"
+  fields: ["prompt", "response"]
+  description: "Minimal curated dataset for first private adapter run. Spanish technical + coding + sysadmin tasks."
+  estimated_examples: 200
+  hash: ""  # Populated by preflight after dataset validation
+
+# ── LoRA Config ──────────────────────────────────────────────────
+lora:
+  r: 16
+  lora_alpha: 32
+  target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# ── Training Hyperparameters ────────────────────────────────────
+training:
+  num_train_epochs: 1
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.1
+  max_seq_length: 2048
+  logging_steps: 10
+  save_steps: 100
+  save_total_limit: 2
+  fp16: true
+  bf16: false
+  max_runtime_minutes: 60
+  seed: 42
+
+# ── Output ──────────────────────────────────────────────────────
+output:
+  dir: "training/adapters/kimari4b-private-adapter-v0"
+  # This directory MUST be gitignored. Preflight verifies this.
+  manifest_file: "training/adapters/kimari4b-private-adapter-v0/manifest.json"
+
+# ── Safety Flags ─────────────────────────────────────────────────
+# ALL of these must be FALSE for a private adapter run.
+# No script should change these automatically.
+safety:
+  public_release_allowed: false
+  hf_upload_allowed: false
+  gguf_export_allowed: false
+  push_to_hub: false
+  report_to: "none"
+  preview_gate_state: "BLOCKED"
+
+# ── Eval ─────────────────────────────────────────────────────────
+eval:
+  baseline_endpoint: ""   # Populated when baseline server is running
+  adapter_endpoint: ""    # Populated when adapter server is running
+  summary_output: "eval/results/kimari4b-private-adapter-v0-summary.json"
+  prompts_file: "eval/prompts/kimarifit-v0.jsonl"
+
+# ── Manual Review ────────────────────────────────────────────────
+# Gate can ONLY advance through explicit human action.
+# See docs/KIMARI4B_RELEASE_GATE.md for state transitions.
+manual_review_required: true
+auto_gate_transition: false

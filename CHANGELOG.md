@@ -5,6 +5,33 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.47-alpha] - 2026-05-12
+
+### Added
+- `docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md` — first private adapter run documentation
+- `training/configs/kimari4b_private_adapter_run.v0.yaml` — private adapter run config
+- `training/scripts/run_kimari4b_private_adapter.py` — adapter runner (dry-run default, --allow-train --yes required)
+- `training/scripts/preflight_kimari4b_adapter.py` — preflight checks (config, dataset, CUDA, gitignore, gate)
+- `training/templates/kimari4b_adapter_manifest.template.json` — adapter artifact manifest template
+- `training/scripts/create_kimari4b_adapter_manifest.py` — manifest creator (hashes, no private paths)
+- `eval/scripts/evaluate_kimari4b_adapter.py` — eval script (baseline vs adapter, dry-run default)
+- `docs/KIMARI4B_ADAPTER_EVAL_PLAN.md` — eval plan (KimariFit, safety, Spanish, coding)
+- `docs/KIMARI4B_RELEASE_GATE.md` — gate states (BLOCKED → PRIVATE_ADAPTER_READY → ... → PUBLIC_PREVIEW_ALLOWED)
+- README "Kimari-4B private adapter work" section
+- docs/index.html "Kimari-4B private adapter pipeline" card
+- `.gitignore` hardened (adapters, safetensors, gguf, checkpoints, wandb, runs, raw_eval)
+- check-release.py v0.1.47 checks (safety flags, no push_to_hub, no artifacts tracked)
+- tests/test_release_v0147.py
+
+### Safety
+- Gate remains BLOCKED — no automatic gate transitions
+- No adapter/GGUF/safetensors committed or uploaded
+- No HF upload, no push_to_hub
+- Runner defaults to dry-run, requires --allow-train --yes for real training
+- All configs: hf_upload_allowed=false, public_release_allowed=false, gguf_export_allowed=false
+- Preflight verifies: gitignore, no HF upload, gate BLOCKED
+- Kimari-4B still "not released"
+
 ## [0.1.46-alpha] - 2026-05-12
 
 ### Added

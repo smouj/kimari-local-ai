@@ -455,7 +455,19 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.46-alpha (Current)
+## v0.1.47-alpha (Current)
+
+- ✅ Kimari-4B private adapter pipeline
+- ✅ Training config (safety flags: no upload, no public, no GGUF)
+- ✅ Runner (dry-run default, --allow-train --yes required)
+- ✅ Preflight checks
+- ✅ Adapter manifest template + creator
+- ✅ Eval plan + script
+- ✅ Release gate doc (no auto-transitions)
+- ✅ .gitignore hardened
+- ✅ Gate BLOCKED — Kimari-4B not released
+
+## v0.1.46-alpha
 
 - ✅ Collection seed plan + validator + example JSON
 - ✅ Public launch pack (X/Reddit/HF/GitHub)

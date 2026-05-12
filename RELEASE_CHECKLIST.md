@@ -793,19 +793,34 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.47 Checks
+
+- [ ] Private adapter config exists with safety flags
+- [ ] Runner dry-run default, requires --allow-train --yes
+- [ ] Preflight script exists
+- [ ] Adapter manifest template exists
+- [ ] Manifest creator script exists
+- [ ] Eval plan exists
+- [ ] Eval script exists
+- [ ] Release gate doc exists
+- [ ] .gitignore protects artifacts
+- [ ] No adapter/GGUF/safetensors committed
+- [ ] No push_to_hub in config
+- [ ] Gate BLOCKED
+
 ## v0.1.46 Checks
 
-- [ ] `docs/PUBLIC_LAUNCH_PACK.md` exists
-- [ ] `docs/POST_X_KIMARI_GTX1060.md` exists
-- [ ] `docs/REDDIT_POST_KIMARI.md` exists
-- [ ] `docs/HUGGINGFACE_COMMUNITY_POST.md` exists
-- [ ] Collection seed exists (`huggingface/collections/`)
-- [ ] Collection seed validator exists
-- [ ] All seed entries `official_kimari_model=false`
-- [ ] No Kimari-4B release claims in posts
-- [ ] No fake benchmarks in posts
-- [ ] Screenshots manifest safe (no real captures if not reviewed)
-- [ ] Gate BLOCKED
+- [x] `docs/PUBLIC_LAUNCH_PACK.md` exists
+- [x] `docs/POST_X_KIMARI_GTX1060.md` exists
+- [x] `docs/REDDIT_POST_KIMARI.md` exists
+- [x] `docs/HUGGINGFACE_COMMUNITY_POST.md` exists
+- [x] Collection seed exists (`huggingface/collections/`)
+- [x] Collection seed validator exists
+- [x] All seed entries `official_kimari_model=false`
+- [x] No Kimari-4B release claims in posts
+- [x] No fake benchmarks in posts
+- [x] Screenshots manifest safe (no real captures if not reviewed)
+- [x] Gate BLOCKED
 
 ## v0.1.45 Checks
 
