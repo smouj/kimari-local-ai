@@ -229,7 +229,7 @@ def submit_job(config: dict, json_output: bool = False) -> dict:
 
     flavor = config.get("hf_jobs", {}).get("flavor", "a10g-small")
     timeout = config.get("hf_jobs", {}).get("timeout_minutes", 30)
-    docker_image = config.get("hf_jobs", {}).get("docker_image", "pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel")
+    docker_image = config.get("hf_jobs", {}).get("docker_image", "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel")
     run_id = config.get("run_id", "kimari4b-micro-sft")
 
     training_script = build_training_script(config)
