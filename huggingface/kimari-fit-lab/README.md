@@ -2,9 +2,9 @@
 title: Kimari Fit Lab
 emoji: 🔬
 colorFrom: purple
-colorTo: teal
+colorTo: blue
 sdk: gradio
-sdk_version: 5.0.0
+sdk_version: 5.34.2
 app_file: app.py
 pinned: false
 license: mit
