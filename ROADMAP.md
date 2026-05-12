@@ -455,7 +455,17 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.40-alpha (Current)
+## v0.1.41-alpha (Current)
+
+- ✅ `docs/HF_JOBS_ACCESS.md` — generic HF Jobs access documentation (no private details)
+- ✅ `docs/HF_JOBS_FALLBACK_RUNNERS.md` — alternative GPU runners
+- ✅ `training/scripts/check_hf_jobs_access.py` — programmatic Jobs access check (403 handling, sanitized output)
+- ✅ `hf_jobs_private_run.py` supports `--require-jobs-access` (blocks submit only, not dry-run/print-command)
+- ✅ `check-release.py` benchmark false positive fix (`*.example.json` ignored)
+- ✅ Privacy safeguard: no Pro/billing/subscription details in any committed file
+- ✅ Gate BLOCKED
+
+## v0.1.40-alpha (Released)
 
 - ✅ GTX 1060 local runtime validation documented (TinyLlama, NOT Kimari-4B)
 - ✅ `docs/GTX1060_LOCAL_RUNTIME_RESULT.md` — honest, sanitized result documentation

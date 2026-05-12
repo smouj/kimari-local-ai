@@ -5,6 +5,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.41-alpha] - 2026-03-06
+
+### Added
+- `docs/HF_JOBS_ACCESS.md` — generic documentation for HF Jobs access requirements (no private account details)
+- `docs/HF_JOBS_FALLBACK_RUNNERS.md` — alternative GPU runners when HF Jobs is unavailable
+- `training/scripts/check_hf_jobs_access.py` — programmatic check for HF Jobs access (handles 403, timeout, unauthenticated)
+- `--require-jobs-access` flag in `hf_jobs_private_run.py` — blocks submission if Jobs access unavailable (does NOT block `--dry-run` or `--print-command`)
+
+### Fixed
+- `check-release.py` benchmark false positive: `*.example.json` and `*.template.json` no longer flagged as real measured results
+- Privacy safeguard: all docs and code avoid mentioning personal plan, billing, Pro subscription, or private account details
+
+### Safety
+- Gate remains BLOCKED
+- No HF upload performed
+- No training performed
+- No tokens or private account data in any committed file
+- `check_hf_jobs_access.py` sanitizes all output (no tokens, no billing info)
+
 ## [0.1.40-alpha] - 2026-03-06
 
 ### Added

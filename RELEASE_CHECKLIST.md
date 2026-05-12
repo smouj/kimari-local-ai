@@ -793,6 +793,32 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.41 Checks
+
+- [ ] `docs/HF_JOBS_ACCESS.md` exists
+- [ ] `docs/HF_JOBS_FALLBACK_RUNNERS.md` exists
+- [ ] `training/scripts/check_hf_jobs_access.py` exists
+- [ ] `check_hf_jobs_access.py` handles 403 Forbidden safely
+- [ ] `check_hf_jobs_access.py` returns `can_continue_to_smoke` field
+- [ ] `check_hf_jobs_access.py` does not expose tokens or billing info
+- [ ] `hf_jobs_private_run.py` supports `--require-jobs-access`
+- [ ] `--require-jobs-access` does NOT block `--dry-run` or `--print-command`
+- [ ] Benchmark `*.example.json` false positive fixed in check-release
+- [ ] `benchmarks/results/gtx1060-tinyllama-wsl2.example.json` not flagged as real result
+- [ ] No "Pro subscription active" in any committed file
+- [ ] No "Smouj013 has Pro" in any committed file
+- [ ] No "billing active" or "paid account" in any committed file
+- [ ] docs mention generic HF Jobs access only (no private plan details)
+- [ ] README includes HF Jobs smoke test access note
+- [ ] pyproject.toml version is 0.1.41-alpha
+- [ ] kimari/__init__.py __version__ is 0.1.41-alpha
+- [ ] CHANGELOG.md has [0.1.41-alpha] entry
+- [ ] ROADMAP.md marks v0.1.41-alpha as Current, v0.1.40-alpha as Released
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No "Kimari-4B released" false claim anywhere
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

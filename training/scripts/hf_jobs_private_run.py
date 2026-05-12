@@ -31,6 +31,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Ensure sibling scripts (e.g. check_hf_jobs_access) are importable
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from check_hf_jobs_access import run_check as check_hf_jobs_access
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
@@ -178,6 +183,11 @@ def main() -> None:
         action="store_true",
         help="Confirm submission (requires --allow-submit)",
     )
+    parser.add_argument(
+        "--require-jobs-access",
+        action="store_true",
+        help="Verify HF Jobs access before submission; does NOT block --dry-run or --print-command",
+    )
     # NOTE: No --token flag is accepted. Auth must be done via hf auth login.
 
     args = parser.parse_args()
@@ -274,6 +284,19 @@ def main() -> None:
         print("  Or: huggingface-cli login", file=sys.stderr)
         print("  NEVER pass tokens as arguments or in commands.", file=sys.stderr)
         sys.exit(1)
+
+    # --require-jobs-access: verify Jobs access before actual submission
+    if args.require_jobs_access:
+        access_result = check_hf_jobs_access()
+        if not access_result.get("can_continue_to_smoke", False):
+            likely_reason = access_result.get("likely_reason", "unknown reason")
+            print(
+                f"ERROR: HF Jobs access check failed: {likely_reason}. "
+                f"Use --dry-run or --print-command to proceed without submission, "
+                f"or use a fallback runner.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
 
     # Submit the job
     result["mode"] = "submit"

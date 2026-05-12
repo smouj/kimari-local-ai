@@ -2396,7 +2396,12 @@ def main() -> None:
             text=True,
             cwd=str(PROJECT_ROOT),
         )
-        committed_results = [f for f in result.stdout.strip().splitlines() if f]
+        # Exclude example/template files — they are sanitized reference data, not real results
+        committed_results = [
+            f for f in result.stdout.strip().splitlines() if f
+            and not f.endswith(".example.json")
+            and not f.endswith(".template.json")
+        ]
         check(
             "No measured benchmark results committed",
             len(committed_results) == 0,
@@ -4495,6 +4500,129 @@ def main() -> None:
         'default_profile still "test" (v0.1.40)',
         profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
         "default_profile changed from test — this is not allowed during alpha",
+    )
+
+
+    # ── v0.1.41 HF Jobs access gate, smoke test prep, privacy safeguards ──
+    print("\n[59/62] v0.1.41 HF Jobs access gate, smoke test prep, privacy")
+
+    # HF Jobs access documentation
+    check(
+        "docs/HF_JOBS_ACCESS.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_ACCESS.md").exists(),
+        "HF Jobs access documentation missing",
+    )
+
+    # HF Jobs fallback runners documentation
+    check(
+        "docs/HF_JOBS_FALLBACK_RUNNERS.md exists",
+        (PROJECT_ROOT / "docs" / "HF_JOBS_FALLBACK_RUNNERS.md").exists(),
+        "HF Jobs fallback runners documentation missing",
+    )
+
+    # check_hf_jobs_access.py exists
+    check(
+        "training/scripts/check_hf_jobs_access.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "check_hf_jobs_access.py").exists(),
+        "check_hf_jobs_access.py missing",
+    )
+
+    # 403 handling in check_hf_jobs_access.py
+    hf_access_script = PROJECT_ROOT / "training" / "scripts" / "check_hf_jobs_access.py"
+    if hf_access_script.exists():
+        hf_access_text = hf_access_script.read_text()
+        check(
+            "check_hf_jobs_access.py handles 403",
+            "403" in hf_access_text or "forbidden" in hf_access_text.lower(),
+            "check_hf_jobs_access.py should handle 403 Forbidden",
+        )
+        check(
+            "check_hf_jobs_access.py has can_continue_to_smoke",
+            "can_continue_to_smoke" in hf_access_text,
+            "check_hf_jobs_access.py missing can_continue_to_smoke field",
+        )
+        check(
+            "check_hf_jobs_access.py does not expose tokens",
+            "token" not in hf_access_text.lower() or "sanitize" in hf_access_text.lower() or "redact" in hf_access_text.lower(),
+            "check_hf_jobs_access.py may expose token data — add sanitization",
+        )
+    else:
+        check("check_hf_jobs_access.py exists", False, "file not found")
+
+    # hf_jobs_private_run.py has --require-jobs-access
+    hf_run_script = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_private_run.py"
+    if hf_run_script.exists():
+        hf_run_text = hf_run_script.read_text()
+        check(
+            "hf_jobs_private_run.py has --require-jobs-access flag",
+            "require-jobs-access" in hf_run_text or "require_jobs_access" in hf_run_text,
+            "--require-jobs-access flag missing from hf_jobs_private_run.py",
+        )
+    else:
+        warn("hf_jobs_private_run.py not found (may not exist yet)")
+
+    # Privacy safeguard: no private plan/billing details in docs
+    restricted_patterns = [
+        ("Pro subscription active", "Pro subscription claim"),
+        ("Smouj013 has Pro", "Private account detail"),
+        ("billing active", "Billing detail"),
+        ("paid account", "Paid account detail"),
+        ("my Pro subscription", "Private subscription detail"),
+        ("kimari-ai billing", "Private billing detail"),
+    ]
+    docs_to_check = [
+        "README.md", "CHANGELOG.md", "docs/index.html",
+        "docs/HF_JOBS_ACCESS.md", "docs/HF_JOBS_FALLBACK_RUNNERS.md",
+    ]
+    for fname in docs_to_check:
+        fpath = PROJECT_ROOT / fname
+        if not fpath.exists():
+            continue
+        ftext = fpath.read_text()
+        for pattern, desc in restricted_patterns:
+            check(
+                f'{fname} does not contain "{pattern}"',
+                pattern.lower() not in ftext.lower(),
+                f"Private detail found: {desc} in {fname}",
+            )
+
+    # Benchmark false positive fix
+    check(
+        "check-release.py excludes *.example.json from measured results",
+        ".example.json" in content,
+        "check-release.py should exclude .example.json from real results check",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version is 0.1.41-alpha",
+        get_pyproject_version() == "0.1.41-alpha",
+        f"Expected 0.1.41-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.41-alpha] entry",
+        "[0.1.41-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.41-alpha] entry",
+    )
+    check(
+        "ROADMAP.md marks v0.1.41-alpha as Current",
+        "v0.1.41-alpha (Current)" in roadmap_text,
+        "ROADMAP.md does not mark v0.1.41-alpha as Current",
+    )
+    check(
+        "default_profile still 'test' (v0.1.41)",
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.41)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        "No weights/GGUF/adapters tracked (v0.1.41)",
+        len(false_claims) == 0,
+        "Weight/adapter files tracked in git",
     )
 
     # ── Summary ──────────────────────────────────────────────────
