@@ -4,6 +4,26 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.1.53-alpha] - 2026-05-13
+
+### Added
+- `eval/configs/kimari_eval_v1_baseline_vs_adapter.yaml` — eval config for baseline vs adapter comparison
+- `eval/scripts/hf_jobs_run_kimari_eval.py` — HF Jobs eval runner (dry-run default, safe flags)
+- `eval/scripts/compare_kimari_eval_runs.py` — compare baseline vs adapter summaries
+- `eval/scripts/validate_kimari_eval_summary.py` — summary validator
+- `eval/templates/kimari_eval_summary.template.json` — summary schema
+- `docs/KIMARI_EVAL_BASELINE_VS_ADAPTER_RUN.md` — run documentation
+- `docs/KIMARI_EVAL_REVIEW_PROTOCOL.md` — manual review protocol
+- `reports/evals/kimari_v0153_baseline_vs_adapter/` — result placeholders
+- Version bump: 0.1.52-alpha → 0.1.53-alpha
+
+### Note
+- No training executed in this version
+- No HF Jobs submitted (eval infrastructure only)
+- No adapter or GGUF generated
+- Eval results are pending — no benchmark claims
+- Gate: BLOCKED
+
 
 ## [0.1.49-alpha] - 2026-05-13
 ## [0.1.52-alpha] - 2026-05-13

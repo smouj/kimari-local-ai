@@ -1,0 +1,36 @@
+# KimariEval v1 — Baseline vs Adapter Evaluation Configuration
+# This config defines how to run baseline vs adapter evaluation.
+# ALL safety flags must be false. No automatic gate transitions.
+
+base_model: "Qwen/Qwen2.5-1.5B-Instruct"
+adapter_repo_private: "Smouj013/kimari4b-micro-sft-adapter-v0"
+dataset_dir: "eval/kimari_private_v1"
+
+# First run: subset of 30 cases. Increase to 104 after validation.
+subset_size: 30
+
+# Generation parameters (fixed for reproducibility)
+temperature: 0.2
+max_tokens: 384
+top_p: 0.9
+seed: 42
+
+# HF Jobs configuration
+hf_jobs_flavor: "a10g-small"
+hf_jobs_timeout_minutes: 30
+hf_jobs_docker_image: "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel"
+
+# Stack verified from v0.1.49 micro SFT
+stack_verified: true
+stack_notes: "PyTorch 2.5.1 + transformers>=4.46 confirmed working on A10G"
+
+# Safety flags — ALL must be false
+manual_review_required: true
+public_benchmark_allowed: false
+raw_outputs_commit_allowed: false
+gate_state: "BLOCKED"
+
+# Metadata
+version: "0.1.53-alpha"
+created_at: "2026-05-13"
+notes: "Baseline vs adapter evaluation using KimariEval Private v1. First run uses subset_size=30. No benchmark claims. No raw outputs committed. Gate BLOCKED."

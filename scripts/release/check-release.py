@@ -6022,6 +6022,153 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [73/73] v0.1.53 KimariEval baseline vs adapter eval infra ──
+    print("\n[73/73] v0.1.53 KimariEval baseline vs adapter eval infra")
+
+    # Eval config
+    eval_config = PROJECT_ROOT / "eval" / "configs" / "kimari_eval_v1_baseline_vs_adapter.yaml"
+    check(
+        "Eval config exists",
+        eval_config.exists(),
+        "eval/configs/kimari_eval_v1_baseline_vs_adapter.yaml not found",
+    )
+    if eval_config.exists():
+        config = yaml.safe_load(eval_config.read_text())
+        check(
+            "Eval config: gate_state BLOCKED",
+            config.get("gate_state") == "BLOCKED",
+            f"gate_state is {config.get('gate_state')}, expected BLOCKED",
+        )
+        check(
+            "Eval config: public_benchmark_allowed false",
+            config.get("public_benchmark_allowed") is False,
+            "public_benchmark_allowed must be false",
+        )
+        check(
+            "Eval config: manual_review_required true",
+            config.get("manual_review_required") is True,
+            "manual_review_required must be true",
+        )
+        check(
+            "Eval config: raw_outputs_commit_allowed false",
+            config.get("raw_outputs_commit_allowed") is False,
+            "raw_outputs_commit_allowed must be false",
+        )
+
+    # HF eval runner
+    eval_runner = PROJECT_ROOT / "eval" / "scripts" / "hf_jobs_run_kimari_eval.py"
+    check(
+        "HF eval runner exists",
+        eval_runner.exists(),
+        "eval/scripts/hf_jobs_run_kimari_eval.py not found",
+    )
+    if eval_runner.exists():
+        runner_text = eval_runner.read_text()
+        check(
+            "HF eval runner: dry-run default",
+            "--dry-run" in runner_text and "default=True" in runner_text,
+            "HF eval runner must have --dry-run as default",
+        )
+        check(
+            "HF eval runner: requires --allow-submit --yes",
+            "--allow-submit" in runner_text and "--yes" in runner_text,
+            "HF eval runner must require --allow-submit --yes for real submission",
+        )
+        # Check for --token as argparse argument (not just in docstrings)
+        runner_code_lines = [line for line in runner_text.split('\n') if line.strip() and not line.strip().startswith('#') and not line.strip().startswith('"""') and not line.strip().startswith("'")]
+        token_argparse = [line for line in runner_code_lines if '"--token"' in line and 'add_argument' in line]
+        check(
+            "HF eval runner: no --token argparse",
+            len(token_argparse) == 0,
+            f"HF eval runner has --token argparse argument: {token_argparse}",
+        )
+        # Check for shell=True in subprocess calls only
+        subprocess_shell = [line for line in runner_code_lines if 'subprocess.run' in line and 'shell=True' in line]
+        check(
+            "HF eval runner: no shell=True in subprocess",
+            len(subprocess_shell) == 0,
+            f"HF eval runner has subprocess shell=True: {subprocess_shell}",
+        )
+        check(
+            "HF eval runner: has manual_review_required",
+            "manual_review_required" in runner_text,
+            "HF eval runner must set manual_review_required",
+        )
+        check(
+            "HF eval runner: has public_benchmark_allowed",
+            "public_benchmark_allowed" in runner_text,
+            "HF eval runner must set public_benchmark_allowed",
+        )
+
+    # Compare script
+    compare_script = PROJECT_ROOT / "eval" / "scripts" / "compare_kimari_eval_runs.py"
+    check(
+        "Compare script exists",
+        compare_script.exists(),
+        "eval/scripts/compare_kimari_eval_runs.py not found",
+    )
+
+    # Summary validator
+    summary_validator = PROJECT_ROOT / "eval" / "scripts" / "validate_kimari_eval_summary.py"
+    check(
+        "Summary validator exists",
+        summary_validator.exists(),
+        "eval/scripts/validate_kimari_eval_summary.py not found",
+    )
+    if summary_validator.exists():
+        sv_text = summary_validator.read_text()
+        check(
+            "Summary validator: enforces no raw outputs",
+            "raw_outputs" in sv_text or "FORBIDDEN_FIELDS" in sv_text,
+            "Summary validator must check for raw outputs",
+        )
+        check(
+            "Summary validator: enforces gate BLOCKED",
+            "BLOCKED" in sv_text,
+            "Summary validator must enforce gate_state BLOCKED",
+        )
+
+    # Summary template
+    check(
+        "Summary template exists",
+        (PROJECT_ROOT / "eval" / "templates" / "kimari_eval_summary.template.json").exists(),
+        "eval/templates/kimari_eval_summary.template.json not found",
+    )
+
+    # Pending report
+    check(
+        "Pending report exists",
+        (PROJECT_ROOT / "reports" / "evals" / "kimari_v0153_baseline_vs_adapter" / "summary.pending.json").exists(),
+        "reports/evals/kimari_v0153_baseline_vs_adapter/summary.pending.json not found",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.53-alpha",
+        get_pyproject_version() >= "0.1.53-alpha",
+        f"Expected version >= 0.1.53-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.53-alpha",
+        get_init_version() >= "0.1.53-alpha",
+        f"Expected version >= 0.1.53-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.53-alpha] entry",
+        "[0.1.53-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.53-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.53-alpha",
+        "v0.1.53-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.53-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.53)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

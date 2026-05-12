@@ -1,0 +1,23 @@
+{
+  "run_id": "kimari-eval-<timestamp>",
+  "model_label": "qwen25-15b-base or qwen25-15b-adapter",
+  "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "adapter_repo_private": "Smouj013/kimari4b-micro-sft-adapter-v0",
+  "dataset_id": "kimari_private_v1",
+  "item_count": 0,
+  "categories": {},
+  "completion_rate": 0.0,
+  "score_status": "not_scored",
+  "manual_review_required": true,
+  "raw_outputs_committed": false,
+  "public_benchmark_allowed": false,
+  "gate_state": "BLOCKED",
+  "temperature": 0.2,
+  "max_tokens": 384,
+  "top_p": 0.9,
+  "seed": 42,
+  "subset_size": 30,
+  "hf_jobs_flavor": "a10g-small",
+  "created_at": "",
+  "notes": "Evaluation pending. No benchmark claims. Gate BLOCKED."
+}

@@ -793,6 +793,24 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.53 Checks
+
+- [ ] eval config exists (YAML with safety flags)
+- [ ] eval config safety flags all false/correct
+- [ ] HF eval runner exists (dry-run default)
+- [ ] HF eval runner requires --allow-submit --yes
+- [ ] HF eval runner has no --token arg
+- [ ] HF eval runner has no shell=True
+- [ ] compare script exists
+- [ ] summary validator exists
+- [ ] summary template exists
+- [ ] pending report placeholder exists
+- [ ] summary validator enforces no raw outputs
+- [ ] no raw eval outputs committed
+- [ ] no safetensors in public repo
+- [ ] no GGUF in public repo
+- [ ] Gate BLOCKED
+
 ## v0.1.52 Checks
 
 - [ ] eval private dataset exists (7 categories, 100+ cases)

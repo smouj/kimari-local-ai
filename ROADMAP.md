@@ -455,7 +455,18 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.52-alpha (Current)
+## v0.1.53-alpha (Current)
+
+- ✅ Eval config for baseline vs adapter comparison
+- ✅ HF Jobs eval runner (dry-run default, safe flags)
+- ✅ Compare script (baseline vs adapter summaries)
+- ✅ Summary validator + schema
+- ✅ Review protocol documentation
+- ✅ Result placeholders (pending)
+- ✅ No training, no HF Jobs submitted, no raw outputs committed
+- Gate BLOCKED — no benchmark claims
+
+## v0.1.52-alpha
 
 - ✅ KimariEval Private v1: 104 cases across 7 categories
 - ✅ Eval validator + harness (dry-run + endpoint)
