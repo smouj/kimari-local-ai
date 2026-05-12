@@ -1,44 +1,76 @@
-# Kimari-4B HF Jobs Smoke Test Config v0
-#
-# This config defines a smoke test to validate the HF Jobs environment
-# before any real training. It does NOT train, upload, or export.
-#
-# IMPORTANT:
-# - Run with: python training/scripts/hf_jobs_private_run.py --config this_file.yaml
-# - Actual submission requires --allow-submit --yes
-# - No tokens accepted as arguments
-# - No HF upload
-# - No training
-# - Gate stays BLOCKED
+# Kimari-4B HF Jobs Smoke Test Configuration
+# v0 — minimal smoke test, NO training, NO adapter, NO upload
+# Purpose: verify HF Jobs can run, detect GPU, install deps, and exit cleanly.
 
-job_name: kimari4b-smoke-v0
-image: pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
-flavor: a10g-small
-max_budget_usd: 10
-run_type: smoke_test
-allow_training: false
-allow_hf_upload: false
-local_only: true
-commit_allowed: false
-publish_allowed: false
-preview_gate_state: BLOCKED
+run_id: "kimari4b-hf-jobs-smoke-v0"
 
-commands:
-  - "nvidia-smi"
-  - "python -c 'import torch; print(torch.cuda.is_available())'"
-  - "git clone https://github.com/smouj/kimari-local-ai.git /tmp/kimari-local-ai && cd /tmp/kimari-local-ai"
-  - "pip install -e /tmp/kimari-local-ai"
-  - "python /tmp/kimari-local-ai/training/scripts/build_dataset_mix.py --sft /tmp/kimari-local-ai/dataset/v0/sft_v0.jsonl --preference /tmp/kimari-local-ai/dataset/v0/preference_v0.jsonl --output-dir /tmp/kimari-dataset --holdout /tmp/kimari-local-ai/dataset/v0/eval_holdout.jsonl"
-  - "python /tmp/kimari-local-ai/training/scripts/train_sft_lora.py --config /tmp/kimari-local-ai/training/configs/kimari_sft_lora.v0.example.yaml --dry-run"
+# ── Job Settings ────────────────────────────────────────────────
+# This is a SMOKE TEST. It runs a simple Python script that:
+# 1. Prints environment info
+# 2. Checks GPU/CUDA availability
+# 3. Verifies torch import
+# 4. Exits with code 0
+# It does NOT train, does NOT create an adapter, does NOT upload anything.
 
-forbidden:
-  - hf upload
-  - huggingface-cli upload
-  - git push
-  - adapter commit
-  - GGUF export
-  - pip install huggingface_hub
-  - huggingface-cli login
+flavor: "a10g-small"  # $1.00/hour — cheapest GPU flavor
+timeout_minutes: 5     # Maximum 5 minutes to limit cost
 
-notes: "Smoke test only. Validates GPU, torch, repo install, dataset build dry-run, and SFT dry-run. No training. No upload. No export. Budget cap $10. Gate BLOCKED."
-created_date: "2026-05-31"
+# ── Safety Flags ────────────────────────────────────────────────
+# ALL of these must be false. No script should change them automatically.
+safety:
+  training_performed: false
+  adapter_generated: false
+  hf_upload_performed: false
+  push_to_hub: false
+  gguf_export: false
+  gate_state: "BLOCKED"
+  manual_review_required: true
+
+# ── Smoke Command ───────────────────────────────────────────────
+# The command that runs inside the HF Job.
+# Simple: print env info, check GPU, verify torch, exit 0.
+# This is intentionally minimal to limit cost.
+smoke_command: |
+  python3 -c "
+  import sys, os, json
+  result = {
+      'smoke': True,
+      'python': sys.version,
+      'platform': sys.platform,
+  }
+  try:
+      import torch
+      result['torch_version'] = torch.__version__
+      result['cuda_available'] = torch.cuda.is_available()
+      if torch.cuda.is_available():
+          result['gpu_name'] = torch.cuda.get_device_name(0)
+          result['gpu_count'] = torch.cuda.device_count()
+          result['cuda_version'] = torch.version.cuda
+          props = torch.cuda.get_device_properties(0)
+          result['gpu_vram_gb'] = round(props.total_mem / (1024**3), 1)
+      else:
+          result['gpu_name'] = None
+          result['gpu_count'] = 0
+  except ImportError:
+      result['torch_version'] = None
+      result['cuda_available'] = False
+  result['training_performed'] = False
+  result['adapter_generated'] = False
+  result['gate_state'] = 'BLOCKED'
+  print(json.dumps(result, indent=2))
+  "
+
+# ── Output ───────────────────────────────────────────────────────
+# Smoke results are captured from stdout, not uploaded.
+output:
+  summary_dir: "training/results"
+  summary_file: "training/results/hf_jobs_smoke_summary.json"
+
+# ── Cost Estimate ───────────────────────────────────────────────
+# a10g-small: $1.00/hour, max 5 minutes ≈ $0.08
+# This is a ONE-TIME cost to verify HF Jobs access.
+cost_estimate:
+  flavor: "a10g-small"
+  cost_per_hour_usd: 1.00
+  max_runtime_minutes: 5
+  estimated_cost_usd: 0.08

@@ -1,0 +1,14 @@
+{
+  "job_id": "6a036dd77251...",
+  "status": "completed",
+  "timestamp": "2026-05-12T20:19:16+0200",
+  "flavor": "a10g-small",
+  "training_performed": false,
+  "adapter_generated": false,
+  "hf_upload_performed": false,
+  "gguf_export": false,
+  "push_to_hub": false,
+  "gate_state": "BLOCKED",
+  "manual_review_required": true,
+  "notes": "HF Jobs smoke test. No training performed. No adapter generated. No upload."
+}

@@ -5,6 +5,35 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.48-alpha] - 2026-05-12
+
+### Added
+- `docs/HF_JOBS_SMOKE_REAL_RESULT.md` — real smoke test results (GPU detected, no training)
+- `training/configs/hf_jobs_kimari4b_smoke.v0.yaml` — HF Jobs smoke config (a10g-small, 5min timeout)
+- `training/scripts/check_hf_jobs_access.py` — access gate checker
+- `training/scripts/hf_jobs_private_run.py` — HF Jobs runner (--allow-submit --yes required)
+- `training/scripts/hf_jobs_status.py` — job status and sanitized logs
+- `training/scripts/create_hf_jobs_smoke_summary.py` — sanitized summary creator
+- `training/scripts/validate_hf_jobs_smoke_summary.py` — summary validator
+- `training/results/hf_jobs_smoke_summary.json` — sanitized smoke result
+- check-release.py v0.1.48 checks (smoke result, training=false, adapter=false)
+- tests/test_release_v0148.py
+
+### Deployed
+- HF Jobs smoke: `6a036dd772518a06598ff86f` (python:3.12-slim, COMPLETED)
+- HF Jobs smoke: `6a036f1a7618f125ee2b78f2` (pytorch:2.1.0-cuda12.1, COMPLETED)
+- GPU detected: NVIDIA A10G, 22.3 GB VRAM, CUDA 12.1
+- Cost: ~$0.05 total
+
+### Safety
+- Gate remains BLOCKED
+- No training performed
+- No adapter generated
+- No GGUF exported
+- No HF upload
+- No raw logs committed
+- No billing/plan info in docs
+
 ## [0.1.47-alpha] - 2026-05-12
 
 ### Added

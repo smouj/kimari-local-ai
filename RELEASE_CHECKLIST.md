@@ -793,6 +793,16 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.48 Checks
+
+- [ ] `docs/HF_JOBS_SMOKE_REAL_RESULT.md` exists
+- [ ] `training/results/hf_jobs_smoke_summary.json` exists and is sanitized
+- [ ] Smoke summary training_performed=false
+- [ ] Smoke summary adapter_generated=false
+- [ ] Smoke summary hf_upload_performed=false
+- [ ] No raw logs committed
+- [ ] Gate BLOCKED
+
 ## v0.1.47 Checks
 
 - [ ] Private adapter config exists with safety flags

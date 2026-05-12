@@ -455,7 +455,18 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.47-alpha (Current)
+## v0.1.48-alpha (Current)
+
+- ✅ HF Jobs smoke test COMPLETED
+- ✅ GPU detected: NVIDIA A10G, 22.3 GB VRAM, CUDA 12.1
+- ✅ PyTorch 2.1.0 with CUDA works on a10g-small
+- ✅ No training, no adapter, no upload
+- ✅ Access gate script
+- ✅ Smoke runner (--allow-submit --yes required)
+- ✅ Summary creator + validator
+- ✅ Gate BLOCKED
+
+## v0.1.47-alpha
 
 - ✅ Kimari-4B private adapter pipeline
 - ✅ Training config (safety flags: no upload, no public, no GGUF)

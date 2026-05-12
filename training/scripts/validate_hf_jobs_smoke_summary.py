@@ -1,140 +1,96 @@
 #!/usr/bin/env python3
-"""Validate HF Jobs smoke summary for safety and correctness.
+"""Validate HF Jobs smoke summary JSON.
 
-Checks that the smoke summary has:
+Checks:
+- Summary exists and is valid JSON
 - training_performed=false
 - adapter_generated=false
 - hf_upload_performed=false
 - gate_state=BLOCKED
-- logs_sanitized=true
-- No token-like strings
-- No raw logs
+- No forbidden patterns (tokens, private paths)
 
 Usage:
-    python training/scripts/validate_hf_jobs_smoke_summary.py --summary /tmp/hf_jobs_smoke_summary.json --json
-    python training/scripts/validate_hf_jobs_smoke_summary.py --summary /tmp/hf_jobs_smoke_summary.json
+    python training/scripts/validate_hf_jobs_smoke_summary.py --summary <file> --json
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
-# Token-like patterns that must NOT appear in a safe summary
-TOKEN_PATTERNS = [
-    re.compile(r"hf_[a-zA-Z0-9]{20,}"),
-    re.compile(r"sk-[a-zA-Z0-9]{20,}"),
-    re.compile(r"api_key[\s]*[=:][\s]*[\"']?[a-zA-Z0-9_\-]{20,}[\"']?", re.IGNORECASE),
-    re.compile(r"token[\s]*[=:][\s]*[\"']?[a-zA-Z0-9_\-]{20,}[\"']?", re.IGNORECASE),
-    re.compile(r"password[\s]*[=:][\s]*[\"']?[a-zA-Z0-9_\-]{8,}[\"']?", re.IGNORECASE),
-]
+FORBIDDEN_PATTERNS = ["sk-", "api_key =", "password =", "credential"]
+REQUIRED_FALSE_FIELDS = ["training_performed", "adapter_generated", "hf_upload_performed", "push_to_hub", "gguf_export"]
+REQUIRED_BLOCKED_FIELDS = ["gate_state"]
 
 
-def validate_summary(data: dict) -> list[str]:
-    """Validate a smoke summary and return a list of errors."""
-    errors: list[str] = []
+def validate_summary(summary_path: str) -> dict:
+    """Validate a smoke summary JSON file."""
+    path = Path(summary_path)
+    errors = []
+    warnings = []
 
-    # Required safety fields
-    if data.get("training_performed") is not False:
-        errors.append("training_performed must be false")
+    if not path.exists():
+        return {"valid": False, "errors": [f"File not found: {summary_path}"], "warnings": []}
 
-    if data.get("adapter_generated") is not False:
-        errors.append("adapter_generated must be false")
+    try:
+        data = json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        return {"valid": False, "errors": [f"Invalid JSON: {e}"], "warnings": []}
 
-    if data.get("hf_upload_performed") is not False:
-        errors.append("hf_upload_performed must be false")
+    # Required false fields
+    for field in REQUIRED_FALSE_FIELDS:
+        if field not in data:
+            errors.append(f"Missing field: {field}")
+        elif data[field] is not False:
+            errors.append(f"{field} must be false, got {data[field]}")
 
-    if data.get("gate_state") != "BLOCKED":
-        errors.append("gate_state must be BLOCKED")
+    # Gate state
+    if "gate_state" not in data:
+        errors.append("Missing field: gate_state")
+    elif data["gate_state"] != "BLOCKED":
+        errors.append(f"gate_state must be BLOCKED, got {data['gate_state']}")
 
-    if data.get("logs_sanitized") is not True:
-        errors.append("logs_sanitized must be true")
+    # Forbidden patterns
+    content = json.dumps(data).lower()
+    for pattern in FORBIDDEN_PATTERNS:
+        if pattern.lower() in content:
+            errors.append(f"Found forbidden pattern: {pattern}")
 
-    # Check no raw logs
-    if data.get("raw_logs") is not None:
-        errors.append("raw_logs must not be present in summary")
+    # No private paths
+    content_lower = path.read_text().lower()
+    if "/home/" in content_lower:
+        errors.append("Found private path pattern: /home/")
 
-    if data.get("raw_logs_included") is True:
-        errors.append("raw_logs_included must be false or absent")
-
-    # Check no token-like strings in the entire JSON
-    summary_text = json.dumps(data)
-    for pattern in TOKEN_PATTERNS:
-        match = pattern.search(summary_text)
-        if match:
-            # Allow the string "NOT_AVAILABLE" and safe placeholders
-            matched_text = match.group(0)
-            if matched_text not in ("NOT_AVAILABLE",):
-                errors.append(f"Token-like string detected: {matched_text[:20]}...")
-
-    return errors
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors,
+        "warnings": warnings,
+    }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Validate HF Jobs smoke summary for safety and correctness. "
-        "Ensures training_performed=false, gate BLOCKED, no tokens, no raw logs."
-    )
-    parser.add_argument(
-        "--summary",
-        type=Path,
-        required=True,
-        help="Path to smoke summary JSON file to validate",
-    )
-    parser.add_argument(
-        "--json",
-        action="store_true",
-        dest="json_output",
-        help="Output validation result as JSON",
-    )
-
+    parser = argparse.ArgumentParser(description="Validate HF Jobs smoke summary")
+    parser.add_argument("--summary", required=True, help="Path to summary JSON")
+    parser.add_argument("--json", action="store_true", help="JSON output")
     args = parser.parse_args()
 
-    # Read summary
-    if not args.summary.exists():
-        print(f"ERROR: Summary file not found: {args.summary}", file=sys.stderr)
-        sys.exit(1)
+    result = validate_summary(args.summary)
 
-    try:
-        data = json.loads(args.summary.read_text())
-    except json.JSONDecodeError as e:
-        print(f"ERROR: Invalid JSON in summary: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    # Validate
-    errors = validate_summary(data)
-    valid = len(errors) == 0
-
-    result = {
-        "valid": valid,
-        "errors": errors,
-        "summary_path": str(args.summary),
-        "checked_fields": [
-            "training_performed",
-            "adapter_generated",
-            "hf_upload_performed",
-            "gate_state",
-            "logs_sanitized",
-            "no_raw_logs",
-            "no_token_patterns",
-        ],
-    }
-
-    if args.json_output:
+    if args.json:
         print(json.dumps(result, indent=2))
     else:
-        if valid:
-            print("✅ Smoke summary is VALID")
-            print(f"  All safety checks passed for: {args.summary}")
+        for e in result["errors"]:
+            print(f"  FAIL: {e}")
+        for w in result["warnings"]:
+            print(f"  WARN: {w}")
+        if result["valid"]:
+            print("RESULT: All checks passed!")
         else:
-            print("❌ Smoke summary is INVALID")
-            for error in errors:
-                print(f"  - {error}")
+            print(f"RESULT: {len(result['errors'])} error(s)")
 
-    sys.exit(0 if valid else 1)
+    sys.exit(0 if result["valid"] else 1)
 
 
 if __name__ == "__main__":

@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
-"""CLI wrapper for running Kimari-4B smoke tests on Hugging Face Jobs.
+"""Kimari-4B HF Jobs smoke runner.
 
-Reads a smoke test config YAML and generates/submits HF Jobs commands.
-By default does NOT submit any job. Requires --allow-submit --yes for actual submission.
+Submits a minimal smoke job to Hugging Face Jobs to verify
+that the infrastructure works. Does NOT train, create adapters,
+or upload anything.
 
-IMPORTANT SECURITY RULES:
-- No tokens accepted as arguments
-- No tokens printed or logged
-- No --token flag accepted
-- Actual submission requires --allow-submit AND --yes
-- No files uploaded
-- Submit uses arg list (subprocess.run(args_list)), NOT hf_cmd.split() or shell=True
+Safety:
+- Smoke command only: prints env info and exits
+- Requires --allow-submit --yes for actual submission
+- Requires --require-jobs-access to verify access first
+- Uses safe subprocess (no shell=True, no hf_cmd.split())
+- Short timeout to limit cost
+- No upload, no push_to_hub, no training
 
 Usage:
-    python training/scripts/hf_jobs_private_run.py \\
-        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \\
-        --dry-run --json
-    python training/scripts/hf_jobs_private_run.py \\
-        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \\
-        --print-command
-    python training/scripts/hf_jobs_private_run.py \\
-        --config training/configs/hf_jobs_kimari4b_smoke.v0.yaml \\
-        --allow-submit --yes
+    # Print command only
+    python training/scripts/hf_jobs_private_run.py --config ... --print-command
+
+    # Dry-run (default)
+    python training/scripts/hf_jobs_private_run.py --config ... --dry-run --json
+
+    # Actual submission (requires explicit consent)
+    python training/scripts/hf_jobs_private_run.py --config ... --require-jobs-access --allow-submit --yes
 """
 
 from __future__ import annotations
@@ -32,348 +32,232 @@ import subprocess
 import sys
 from pathlib import Path
 
-# Ensure sibling scripts (e.g. check_hf_jobs_access) are importable
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from check_hf_jobs_access import run_check as check_hf_jobs_access
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
-def parse_simple_yaml(path: Path) -> dict | None:
-    """Parse YAML with PyYAML fallback to simple parser."""
+def load_config(config_path: str) -> dict:
+    """Load YAML config."""
     try:
         import yaml
-
-        with open(path) as f:
-            return yaml.safe_load(f)
     except ImportError:
-        pass
-
-    text = path.read_text()
-    result: dict = {}
-    current_list_key: str | None = None
-    current_list: list | None = None
-
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-
-        if stripped.startswith("- ") and current_list_key is not None:
-            item = stripped[2:].strip().strip('"').strip("'")
-            if current_list is not None:
-                current_list.append(item)
-            continue
-
-        if ":" in stripped:
-            if current_list_key is not None and current_list is not None:
-                result[current_list_key] = current_list
-                current_list_key = None
-                current_list = None
-
-            key, _, value = stripped.partition(":")
-            key = key.strip()
-            value = value.strip().strip('"').strip("'")
-
-            if not value:
-                current_list_key = key
-                current_list = []
-            else:
-                if value.lower() == "true":
-                    result[key] = True
-                elif value.lower() == "false":
-                    result[key] = False
-                elif value.lower() in ("null", "~", "none"):
-                    result[key] = None
-                else:
-                    try:
-                        result[key] = int(value)
-                    except ValueError:
-                        try:
-                            result[key] = float(value)
-                        except ValueError:
-                            result[key] = value
-
-    if current_list_key is not None and current_list is not None:
-        result[current_list_key] = current_list
-
-    return result
+        print("ERROR: PyYAML required. Install with: pip install pyyaml")
+        sys.exit(1)
+    with open(config_path) as f:
+        return yaml.safe_load(f)
 
 
-def build_hf_jobs_command(config: dict) -> str:
-    """Build the hf jobs run command from config as a human-readable string."""
+def verify_safety_flags(config: dict) -> list[str]:
+    """Verify all safety flags are correct."""
+    errors = []
+    safety = config.get("safety", {})
+    if safety.get("training_performed") is True:
+        errors.append("training_performed must be false")
+    if safety.get("adapter_generated") is True:
+        errors.append("adapter_generated must be false")
+    if safety.get("hf_upload_performed") is True:
+        errors.append("hf_upload_performed must be false")
+    if safety.get("push_to_hub") is True:
+        errors.append("push_to_hub must be false")
+    if safety.get("gguf_export") is True:
+        errors.append("gguf_export must be false")
+    if safety.get("gate_state") != "BLOCKED":
+        errors.append(f"gate_state must be BLOCKED, got {safety.get('gate_state')}")
+    return errors
+
+
+def check_jobs_access() -> dict:
+    """Check HF Jobs access by running check_hf_jobs_access.py."""
+    script = PROJECT_ROOT / "training" / "scripts" / "check_hf_jobs_access.py"
+    try:
+        result = subprocess.run(
+            [sys.executable, str(script), "--json"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if result.returncode != 0:
+            return {"can_continue_to_smoke": False, "error": f"Access check failed: {result.stderr[:200]}"}
+        return json.loads(result.stdout)
+    except Exception as e:
+        return {"can_continue_to_smoke": False, "error": str(e)}
+
+
+def build_hf_jobs_command(config: dict) -> list[str]:
+    """Build the hf jobs run command as a safe argument list."""
     flavor = config.get("flavor", "a10g-small")
-    image = config.get("image", "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel")
-    commands = config.get("commands", [])
+    timeout = config.get("timeout_minutes", 5)
+    smoke_command = config.get("smoke_command", "")
 
-    inner_cmd = " && ".join(commands)
-    hf_cmd = f"hf jobs run --flavor {flavor} {image} bash -lc '{inner_cmd}'"
-    return hf_cmd
-
-
-def build_hf_jobs_command_args(config: dict) -> list[str]:
-    """Build the hf jobs run command as a safe list[str] for subprocess.
-
-    The inner command (bash -lc '...') is kept as a single argument
-    to avoid shell splitting issues with quotes and special characters.
-    This function is used for actual submission via subprocess.run().
-    """
-    flavor = config.get("flavor", "a10g-small")
-    image = config.get("image", "pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel")
-    commands = config.get("commands", [])
-
-    inner_cmd = " && ".join(commands)
-    return [
+    # Use safe subprocess argument list
+    args = [
         "hf",
         "jobs",
         "run",
         "--flavor",
         flavor,
-        image,
+        "--timeout",
+        str(timeout),
+        "--name",
+        config.get("run_id", "kimari4b-smoke"),
+        "--",
         "bash",
-        "-lc",
-        inner_cmd,
+        "-c",
+        smoke_command.strip(),
     ]
+    return args
 
 
-def check_hf_cli() -> bool:
-    """Check if hf CLI is available."""
+def print_command(config: dict) -> None:
+    """Print the command that would be executed."""
+    args = build_hf_jobs_command(config)
+    # Safe: print each arg quoted
+    cmd_str = " ".join(f'"{a}"' if " " in a else a for a in args)
+    print(f"Command: {cmd_str}")
+
+
+def dry_run(config: dict, json_output: bool = False) -> dict:
+    """Simulate job submission without actually submitting."""
+    safety_errors = verify_safety_flags(config)
+
+    result = {
+        "mode": "dry-run",
+        "run_id": config.get("run_id", "unknown"),
+        "flavor": config.get("flavor", "unknown"),
+        "timeout_minutes": config.get("timeout_minutes", 5),
+        "cost_estimate_usd": config.get("cost_estimate", {}).get("estimated_cost_usd", 0),
+        "safety_flags": config.get("safety", {}),
+        "safety_errors": safety_errors,
+        "command_preview": " ".join(build_hf_jobs_command(config)),
+    }
+
+    if json_output:
+        return result
+
+    print("DRY-RUN: No job will be submitted")
+    print(f"  Run ID: {result['run_id']}")
+    print(f"  Flavor: {result['flavor']}")
+    print(f"  Timeout: {result['timeout_minutes']} min")
+    print(f"  Est. cost: ${result['cost_estimate_usd']:.2f}")
+    print(f"  Safety errors: {result['safety_errors']}")
+    print(f"\n  Command preview:\n  {result['command_preview']}")
+    return result
+
+
+def submit_job(config: dict, json_output: bool = False) -> dict:
+    """Submit the actual HF Jobs smoke job."""
+    # Safety checks
+    safety_errors = verify_safety_flags(config)
+    if safety_errors:
+        return {"error": f"Safety violations: {safety_errors}", "submitted": False}
+
+    # Check access first
+    access = check_jobs_access()
+    if not access.get("can_continue_to_smoke"):
+        return {"error": f"Jobs access denied: {access.get('reason', 'unknown')}", "submitted": False}
+
+    # Build command
+    args = build_hf_jobs_command(config)
+    print("\nSubmitting HF Jobs smoke test...")
+    print(f"  Flavor: {config.get('flavor', 'unknown')}")
+    print(f"  Timeout: {config.get('timeout_minutes', 5)} min")
+    print(f"  Est. cost: ${config.get('cost_estimate', {}).get('estimated_cost_usd', 0):.2f}")
+    print()
+
     try:
         result = subprocess.run(
-            ["hf", "--version"],
+            args,
             capture_output=True,
             text=True,
-            timeout=10,
+            timeout=config.get("timeout_minutes", 5) * 60 + 30,
         )
-        return result.returncode == 0
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
+        stdout = result.stdout.strip()
+        stderr = result.stderr.strip()
+        returncode = result.returncode
 
+        result_data = {
+            "submitted": True,
+            "run_id": config.get("run_id", "unknown"),
+            "flavor": config.get("flavor", "unknown"),
+            "returncode": returncode,
+            "stdout_tail": stdout[-500:] if len(stdout) > 500 else stdout,
+            "stderr_tail": stderr[-500:] if len(stderr) > 500 else stderr,
+            "training_performed": False,
+            "adapter_generated": False,
+            "hf_upload_performed": False,
+            "gate_state": "BLOCKED",
+        }
 
-def check_hf_auth() -> bool:
-    """Check if user is authenticated with hf CLI."""
-    for cmd in [["hf", "auth", "whoami"], ["huggingface-cli", "whoami"]]:
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-            if result.returncode == 0 and result.stdout.strip():
-                return True
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            continue
-    return False
+        if json_output:
+            print(json.dumps(result_data, indent=2))
+        else:
+            print(f"\nJob completed with return code: {returncode}")
+            if stdout:
+                print(f"STDOUT:\n{stdout[-1000:]}")
+            if stderr:
+                print(f"STDERR:\n{stderr[-500:]}")
+
+        return result_data
+
+    except subprocess.TimeoutExpired:
+        return {"error": "Job timed out", "submitted": True, "timed_out": True}
+    except Exception as e:
+        return {"error": str(e), "submitted": False}
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Run Kimari-4B smoke test on Hugging Face Jobs. "
-        "By default does NOT submit. Requires --allow-submit --yes for actual submission. "
-        "No tokens accepted as arguments."
-    )
+    parser = argparse.ArgumentParser(description="Kimari-4B HF Jobs smoke runner")
+    parser.add_argument("--config", required=True, help="Path to config YAML")
+    parser.add_argument("--print-command", action="store_true", help="Print command only")
+    parser.add_argument("--dry-run", action="store_true", default=True, help="Dry-run (default)")
     parser.add_argument(
-        "--config",
-        type=Path,
-        required=True,
-        help="Path to HF Jobs smoke config YAML",
+        "--require-jobs-access", action="store_true", default=False, help="Verify HF Jobs access before submitting"
     )
-    parser.add_argument(
-        "--print-command",
-        action="store_true",
-        help="Print the hf jobs run command without executing it",
-    )
-    parser.add_argument(
-        "--json",
-        action="store_true",
-        dest="json_output",
-        help="Output structured JSON result",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Validate config and show plan without submitting",
-    )
-    parser.add_argument(
-        "--allow-submit",
-        action="store_true",
-        help="Allow actual job submission (requires --yes)",
-    )
-    parser.add_argument(
-        "--yes",
-        action="store_true",
-        help="Confirm submission (requires --allow-submit)",
-    )
-    parser.add_argument(
-        "--require-jobs-access",
-        action="store_true",
-        help="Verify HF Jobs access before submission; does NOT block --dry-run or --print-command",
-    )
-    # NOTE: No --token flag is accepted. Auth must be done via hf auth login.
-
+    parser.add_argument("--allow-submit", action="store_true", default=False, help="Allow actual job submission")
+    parser.add_argument("--yes", action="store_true", default=False, help="Confirm consent for submission")
+    parser.add_argument("--json", action="store_true", help="JSON output")
     args = parser.parse_args()
 
-    # Load config
-    config_path = args.config
-    if not config_path.exists():
-        print(f"ERROR: Config file not found: {config_path}", file=sys.stderr)
-        sys.exit(1)
+    config = load_config(args.config)
 
-    config = parse_simple_yaml(config_path)
-    if config is None:
-        print(f"ERROR: Failed to parse config: {config_path}", file=sys.stderr)
-        sys.exit(1)
-
-    # Validate config safety constraints
-    if config.get("allow_training") is not False:
-        print("ERROR: Smoke config must have allow_training: false", file=sys.stderr)
-        sys.exit(1)
-    if config.get("allow_hf_upload") is not False:
-        print("ERROR: Smoke config must have allow_hf_upload: false", file=sys.stderr)
-        sys.exit(1)
-
-    # Build command (both human-readable string and safe arg list)
-    hf_cmd = build_hf_jobs_command(config)
-    hf_cmd_args = build_hf_jobs_command_args(config)
-
-    # Prepare result
-    result = {
-        "job_name": config.get("job_name", "unknown"),
-        "flavor": config.get("flavor", "a10g-small"),
-        "image": config.get("image"),
-        "max_budget_usd": config.get("max_budget_usd"),
-        "run_type": config.get("run_type", "smoke_test"),
-        "allow_training": config.get("allow_training", False),
-        "allow_hf_upload": config.get("allow_hf_upload", False),
-        "preview_gate_state": config.get("preview_gate_state", "BLOCKED"),
-        "command_count": len(config.get("commands", [])),
-        "forbidden_actions": config.get("forbidden", []),
-        "hf_jobs_command": hf_cmd,
-        "hf_jobs_command_args": hf_cmd_args,
-        "command_arg_count": len(hf_cmd_args),
-        "submit_uses_arg_list": True,
-        "mode": "dry_run",
-        "submitted": False,
-        "job_id": None,
-    }
-
-    # --print-command: just print the command
+    # Print command only
     if args.print_command:
-        print(hf_cmd)
-        if not args.json_output:
-            sys.exit(0)
-
-    # --dry-run or default: validate and show plan, no submission
-    if args.dry_run or (not args.allow_submit and not args.yes):
-        result["mode"] = "dry_run"
-        result["submitted"] = False
-        if args.json_output:
-            print(json.dumps(result, indent=2))
-        else:
-            print("\n" + "=" * 60)
-            print("  HF Jobs Private Run — DRY RUN")
-            print("=" * 60)
-            print(f"\n  Job name:    {result['job_name']}")
-            print(f"  Flavor:      {result['flavor']}")
-            print(f"  Image:       {result['image']}")
-            print(f"  Budget:      ${result['max_budget_usd']}")
-            print(f"  Training:    {result['allow_training']}")
-            print(f"  HF Upload:   {result['allow_hf_upload']}")
-            print(f"  Gate:        {result['preview_gate_state']}")
-            print(f"  Commands:    {result['command_count']}")
-            print(f"\n  HF Command:\n    {hf_cmd}")
-            print(f"\n  Arg list ({len(hf_cmd_args)} args):\n    {hf_cmd_args}")
-            print("\n  Forbidden:")
-            for f in result["forbidden_actions"]:
-                print(f"    X {f}")
-            print("\n  No job was submitted. Use --allow-submit --yes to submit.")
-            print("=" * 60)
+        print_command(config)
         sys.exit(0)
 
-    # Actual submission: requires both --allow-submit AND --yes
+    # Safety: --allow-submit requires --yes
     if args.allow_submit and not args.yes:
-        print("ERROR: --allow-submit requires --yes to confirm submission.", file=sys.stderr)
-        print("Usage: --allow-submit --yes", file=sys.stderr)
+        print("ERROR: --allow-submit requires --yes for explicit consent")
+        print("Usage: --allow-submit --yes")
         sys.exit(1)
 
-    if args.yes and not args.allow_submit:
-        print("ERROR: --yes requires --allow-submit.", file=sys.stderr)
-        sys.exit(1)
-
-    # Both flags present — check prerequisites
-    if not check_hf_cli():
-        print("ERROR: 'hf' CLI not found. Install with: pip install huggingface_hub[cli]", file=sys.stderr)
-        sys.exit(1)
-
-    if not check_hf_auth():
-        print("ERROR: Not authenticated with HF. Run: hf auth login", file=sys.stderr)
-        print("  Or: huggingface-cli login", file=sys.stderr)
-        print("  NEVER pass tokens as arguments or in commands.", file=sys.stderr)
-        sys.exit(1)
-
-    # --require-jobs-access: verify Jobs access before actual submission
-    if args.require_jobs_access:
-        access_result = check_hf_jobs_access()
-        if not access_result.get("can_continue_to_smoke", False):
-            likely_reason = access_result.get("likely_reason", "unknown reason")
-            print(
-                f"ERROR: HF Jobs access check failed: {likely_reason}. "
-                f"Use --dry-run or --print-command to proceed without submission, "
-                f"or use a fallback runner.",
-                file=sys.stderr,
-            )
+    # Safety: no token arguments
+    for arg in sys.argv:
+        if arg.startswith("--token") or arg.startswith("--api-key"):
+            print(f"ERROR: Token/API key arguments not allowed: {arg}")
             sys.exit(1)
 
-    # Submit the job using safe arg list (NOT hf_cmd.split(), NOT shell=True)
-    result["mode"] = "submit"
-    print(f"Submitting job: {result['job_name']}")
-    print(f"Command args: {hf_cmd_args}")
+    # Safety: block in CI
+    import os
 
-    try:
-        submit_result = subprocess.run(
-            hf_cmd_args,
-            capture_output=True,
-            text=True,
-            timeout=300,
-        )
-        result["submit_exit_code"] = submit_result.returncode
-        result["submit_stdout"] = submit_result.stdout.strip()
-        result["submit_stderr"] = submit_result.stderr.strip()
-        result["submitted"] = submit_result.returncode == 0
-
-        # Try to extract job_id from output
-        for line in submit_result.stdout.splitlines():
-            if "job" in line.lower() and "id" in line.lower():
-                result["job_id"] = line.strip()
-                break
-
-        if args.json_output:
-            print(json.dumps(result, indent=2))
-        else:
-            if result["submitted"]:
-                print("\n  Job submitted successfully!")
-                if result["job_id"]:
-                    print(f"  Job ID: {result['job_id']}")
-                print("  Check status: python training/scripts/hf_jobs_status.py --job-id <id>")
-            else:
-                print("\n  Job submission failed!")
-                print(f"  Error: {submit_result.stderr}")
-
-    except subprocess.TimeoutExpired:
-        print("ERROR: Job submission timed out", file=sys.stderr)
-        result["submitted"] = False
-        result["error"] = "timeout"
-        if args.json_output:
-            print(json.dumps(result, indent=2))
+    if os.environ.get("CI") == "true" and args.allow_submit:
+        print("ERROR: Job submission blocked in CI environment")
         sys.exit(1)
-    except FileNotFoundError:
-        print("ERROR: 'hf' command not found", file=sys.stderr)
-        result["submitted"] = False
-        result["error"] = "hf_not_found"
-        if args.json_output:
-            print(json.dumps(result, indent=2))
+
+    if args.allow_submit and args.yes:
+        if args.require_jobs_access:
+            access = check_jobs_access()
+            if not access.get("can_continue_to_smoke"):
+                print(f"ERROR: HF Jobs access denied: {access.get('reason', 'unknown')}")
+                sys.exit(1)
+            print("HF Jobs access verified ✅")
+        result = submit_job(config, json_output=args.json)
+    else:
+        result = dry_run(config, json_output=args.json)
+
+    if args.json and not (args.allow_submit and args.yes):
+        print(json.dumps(result, indent=2))
+
+    if result.get("error"):
         sys.exit(1)
 
 

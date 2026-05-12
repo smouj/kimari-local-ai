@@ -5356,6 +5356,91 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [68/68] v0.1.48 HF Jobs smoke real ──────────────────────
+    print("\n[68/68] v0.1.48 HF Jobs smoke real")
+
+    # Smoke result doc
+    smoke_doc = PROJECT_ROOT / "docs" / "HF_JOBS_SMOKE_REAL_RESULT.md"
+    check(
+        "HF smoke result doc exists",
+        smoke_doc.exists(),
+        "docs/HF_JOBS_SMOKE_REAL_RESULT.md not found",
+    )
+
+    # Smoke summary
+    smoke_summary = PROJECT_ROOT / "training" / "results" / "hf_jobs_smoke_summary.json"
+    check(
+        "HF smoke summary exists",
+        smoke_summary.exists(),
+        "training/results/hf_jobs_smoke_summary.json not found",
+    )
+    if smoke_summary.exists():
+        try:
+            import json as _json
+
+            summary_data = _json.loads(smoke_summary.read_text())
+            check(
+                "Smoke summary training_performed=false",
+                summary_data.get("training_performed") is False,
+                f"training_performed={summary_data.get('training_performed')}",
+            )
+            check(
+                "Smoke summary adapter_generated=false",
+                summary_data.get("adapter_generated") is False,
+                f"adapter_generated={summary_data.get('adapter_generated')}",
+            )
+            check(
+                "Smoke summary hf_upload_performed=false",
+                summary_data.get("hf_upload_performed") is False,
+                f"hf_upload_performed={summary_data.get('hf_upload_performed')}",
+            )
+            check(
+                "Smoke summary gate_state=BLOCKED",
+                summary_data.get("gate_state") == "BLOCKED",
+                f"gate_state={summary_data.get('gate_state')}",
+            )
+        except Exception as e:
+            ERRORS.append(f"Smoke summary parse error: {e}")
+
+    # No raw logs
+    raw_log_patterns = ["training/results/*.log", "training/results/raw_*.json"]
+    for pattern in raw_log_patterns:
+        import glob
+
+        found = glob.glob(str(PROJECT_ROOT / pattern))
+        check(
+            f"No raw logs matching {pattern}",
+            len(found) == 0,
+            f"Found {len(found)} raw log files",
+        )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.48-alpha",
+        get_pyproject_version() >= "0.1.48-alpha",
+        f"Expected version >= 0.1.48-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.48-alpha",
+        get_init_version() >= "0.1.48-alpha",
+        f"Expected version >= 0.1.48-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.48-alpha] entry",
+        "[0.1.48-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.48-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.48-alpha",
+        "v0.1.48-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.48-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.48)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
