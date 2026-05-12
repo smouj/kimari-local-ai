@@ -103,7 +103,6 @@ training_args = SFTConfig(
     save_steps=10,
     report_to="none",
     dataset_text_field="text",
-    max_seq_length=512,
 )
 trainer = SFTTrainer(model=model, args=training_args, train_dataset=train_data)
 trainer.train()
