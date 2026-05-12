@@ -5,6 +5,38 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.49-alpha] - 2026-05-12
+
+### Added
+- `dataset/build/kimari-fit-v0/sft_micro.jsonl` — 80 curated examples (Spanish technical, CUDA, Linux, Python, Kimari API)
+- `dataset/build/kimari-fit-v0/report.json` — dataset report (hash, count, categories)
+- `docs/KIMARI4B_MICRO_SFT_DATASET.md` — dataset documentation
+- `training/configs/hf_jobs_kimari4b_micro_sft_real.v0.yaml` — micro SFT config (a10g-small, 30min, LoRA r=8)
+- `training/scripts/hf_jobs_micro_sft_real.py` — HF Jobs micro SFT wrapper
+- `training/templates/hf_jobs_micro_sft_real_summary.template.json` — summary template
+- `training/scripts/create_hf_jobs_micro_sft_real_summary.py` — summary creator
+- `training/scripts/validate_hf_jobs_micro_sft_real_summary.py` — summary validator
+- `docs/HF_JOBS_MICRO_SFT_REAL_RUN.md` — real run documentation
+- `docs/KIMARI4B_MICRO_SFT_RESULT.md` — result doc (pending/completed)
+- check-release.py v0.1.49 checks
+- tests/test_release_v0149.py
+
+### Deployed
+- HF Jobs micro SFT: Job ID pending execution
+- Flavor: a10g-small (NVIDIA A10G, 22.3 GB VRAM)
+- Base model: Qwen/Qwen2.5-3B-Instruct (Apache 2.0)
+- Dataset: kimari-fit-v0 (80 examples)
+
+### Safety
+- Gate remains BLOCKED
+- No adapter committed to git
+- No HF upload
+- No GGUF generated
+- No push_to_hub
+- No raw logs committed
+- No tokens
+- No billing/plan info
+
 ## [0.1.48-alpha] - 2026-05-12
 
 ### Added

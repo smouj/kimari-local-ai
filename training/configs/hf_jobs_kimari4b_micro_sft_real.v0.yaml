@@ -1,0 +1,78 @@
+# Kimari-4B HF Jobs Micro SFT Real Configuration
+# v0 — first real micro SFT run on HF Jobs
+# SAFETY: All release/upload flags are FALSE. Gate is BLOCKED.
+
+run_id: "kimari4b-hfjobs-micro-sft-v0"
+
+# ── Base Model ──────────────────────────────────────────────────
+base_model:
+  name: "Qwen/Qwen2.5-3B-Instruct"
+  license: "Apache-2.0"
+  params_billions: 3.0
+  reason: "Permissive license, strong multilingual, reasonable size for a10g-small"
+
+# ── Dataset ─────────────────────────────────────────────────────
+dataset:
+  name: "kimari-fit-v0"
+  path: "dataset/build/kimari-fit-v0/sft_micro.jsonl"
+  format: "jsonl"
+  fields: ["prompt", "response"]
+  description: "72 curated examples: Spanish technical, CUDA/GPU, Python/Bash, Kimari API"
+  record_count: 72
+  hash: "2a7f55ef157e1be68d1e01daa715d9ae"
+  private_data: false
+  tokens_or_secrets: false
+
+# ── HF Jobs Settings ───────────────────────────────────────────
+hf_jobs:
+  flavor: "a10g-small"         # $1.00/hour, NVIDIA A10G 24GB
+  timeout_minutes: 30            # Max 30 minutes to limit cost
+  docker_image: "pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel"
+  estimated_cost_usd: 0.50      # 30 min * $1.00/hr ≈ $0.50
+
+# ── LoRA Config ──────────────────────────────────────────────────
+lora:
+  r: 8
+  lora_alpha: 16
+  target_modules: ["q_proj", "v_proj"]
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# ── Training Hyperparameters ────────────────────────────────────
+training:
+  num_train_epochs: 1
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 4
+  learning_rate: 5.0e-4
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.1
+  max_steps: 20                # Short run for first micro SFT
+  max_seq_length: 512
+  logging_steps: 5
+  save_steps: 10
+  save_total_limit: 2
+  fp16: true
+  bf16: false
+  seed: 42
+
+# ── Output ──────────────────────────────────────────────────────
+output:
+  dir: "training/adapters/kimari4b-hfjobs-micro-sft-v0"
+  manifest_file: "training/adapters/kimari4b-hfjobs-micro-sft-v0/manifest.json"
+
+# ── Safety Flags ────────────────────────────────────────────────
+# ALL false. No script should change these automatically.
+safety:
+  training_performed: true      # This IS a training run, but private
+  adapter_generated: true       # Adapter WILL be generated, but NOT committed
+  adapter_committed: false       # NEVER commit adapter to git
+  hf_upload_performed: false    # NEVER upload to Hugging Face
+  push_to_hub: false            # NEVER push to hub
+  gguf_export: false            # NO GGUF export
+  report_to: "none"             # NO wandb/tensorboard
+  preview_gate_state: "BLOCKED"
+
+# ── Manual Review ────────────────────────────────────────────────
+manual_review_required: true
+auto_gate_transition: false

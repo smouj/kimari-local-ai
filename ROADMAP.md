@@ -455,7 +455,15 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.48-alpha (Current)
+## v0.1.49-alpha (Current)
+
+- ✅ Micro SFT dataset (80 examples, Spanish technical + CUDA + Python)
+- ✅ HF Jobs micro SFT config (a10g-small, 30min timeout, LoRA r=8)
+- ✅ HF Jobs micro SFT wrapper (dry-run default, --allow-submit --yes)
+- ✅ Summary template + validator
+- ✅ Gate BLOCKED — no adapter committed, no upload
+
+## v0.1.48-alpha
 
 - ✅ HF Jobs smoke test COMPLETED
 - ✅ GPU detected: NVIDIA A10G, 22.3 GB VRAM, CUDA 12.1

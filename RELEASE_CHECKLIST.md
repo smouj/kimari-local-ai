@@ -793,6 +793,21 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.49 Checks
+
+- [ ] Micro SFT dataset exists (sft_micro.jsonl)
+- [ ] Micro SFT dataset report valid (no private data, no tokens)
+- [ ] Micro SFT config exists with safety flags false
+- [ ] HF Jobs micro SFT runner exists
+- [ ] Runner dry-run default, requires --allow-submit --yes
+- [ ] Micro SFT result doc exists
+- [ ] training_performed field exists
+- [ ] adapter_committed false
+- [ ] hf_upload_performed false
+- [ ] gguf_generated false
+- [ ] No raw logs committed
+- [ ] Gate BLOCKED
+
 ## v0.1.48 Checks
 
 - [ ] `docs/HF_JOBS_SMOKE_REAL_RESULT.md` exists
