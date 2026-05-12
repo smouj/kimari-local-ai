@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -67,120 +68,116 @@ def verify_safety_flags(config: dict) -> list[str]:
 
 
 def build_training_script(config: dict) -> str:
-    """Build the training script that runs inside the HF Job."""
+    """Build the training script that runs inside the HF Job.
+
+    This returns a Python script as a string. It will be passed to
+    ``hf jobs run <image> python3 -c <script>``.
+    Double braces ({{ }}) are used for literal braces in the generated
+    script because the outer f-string consumes single braces.
+    """
     lora = config.get("lora", {})
     training_cfg = config.get("training", {})
     max_steps = training_cfg.get("max_steps", 20)
+    model_name = config.get("base_model", {}).get("name", "Qwen/Qwen2.5-3B-Instruct")
+    lora_r = lora.get("r", 8)
+    lora_alpha = lora.get("lora_alpha", 16)
+    lr = training_cfg.get("learning_rate", "5e-4")
+    max_seq = training_cfg.get("max_seq_length", 512)
 
-    # This is a minimal training script using trl SFTTrainer
+    # NOTE: This script runs inside the HF Job Docker container, not locally.
+    # Double braces {{ }} produce literal braces in the f-string output.
     script = f"""
 import json
 import sys
 
-# Print environment info
 result = {{
-    'phase': 'micro_sft_start',
-    'training_performed': True,
-    'adapter_generated': False,
-    'adapter_committed': False,
-    'hf_upload_performed': False,
-    'push_to_hub': False,
-    'gguf_export': False,
-    'gate_state': 'BLOCKED'
+    "phase": "micro_sft_start",
+    "training_performed": True,
+    "adapter_generated": False,
+    "adapter_committed": False,
+    "hf_upload_performed": False,
+    "push_to_hub": False,
+    "gguf_export": False,
+    "gate_state": "BLOCKED"
 }}
 
 try:
     import torch
-    result['torch_version'] = torch.__version__
-    result['cuda_available'] = torch.cuda.is_available()
+    result["torch_version"] = torch.__version__
+    result["cuda_available"] = torch.cuda.is_available()
     if torch.cuda.is_available():
-        result['gpu_name'] = torch.cuda.get_device_name(0)
-        result['gpu_count'] = torch.cuda.device_count()
-        result['gpu_vram_gb'] = round(torch.cuda.get_device_properties(0).total_memory / (1024**3), 1)
+        result["gpu_name"] = torch.cuda.get_device_name(0)
+        result["gpu_count"] = torch.cuda.device_count()
+        result["gpu_vram_gb"] = round(torch.cuda.get_device_properties(0).total_memory / (1024**3), 1)
 except ImportError:
-    result['torch_version'] = None
-    result['cuda_available'] = False
+    result["torch_version"] = None
+    result["cuda_available"] = False
 
 print(json.dumps(result, indent=2))
 
-# Install training deps
-import subprocess
-subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'trl', 'peft', 'datasets', 'transformers>=4.36'], check=True)
+import subprocess as sp
+sp.run([sys.executable, "-m", "pip", "install", "-q", "trl", "peft", "datasets", "transformers>=4.36"], check=True)
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model
-from datasets import load_dataset
+from datasets import Dataset
 
-# Load base model
-model_name = "{config.get("base_model", {}).get("name", "Qwen/Qwen2.5-3B-Instruct")}"
+model_name = "{model_name}"
 print(f"Loading model: {{model_name}}")
 tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto", trust_remote_code=True)
 
-# Apply LoRA
 lora_config = LoraConfig(
-    r={lora.get("r", 8)},
-    lora_alpha={lora.get("lora_alpha", 16)},
-    target_modules={lora.get("target_modules", ["q_proj", "v_proj"])},
-    lora_dropout={lora.get("lora_dropout", 0.05)},
-    bias="{lora.get("bias", "none")}",
-    task_type="{lora.get("task_type", "CAUSAL_LM")}",
+    r={lora_r},
+    lora_alpha={lora_alpha},
+    target_modules=["q_proj", "v_proj"],
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM",
 )
 model = get_peft_model(model, lora_config)
 model.print_trainable_parameters()
 
-# Load dataset from inline JSONL
-# (In a real scenario, we'd mount the dataset; here we use a small subset)
-from datasets import Dataset
-import random
-
-# Create minimal dataset inline for the job
 data = [
-    {{"prompt": "¿Qué es CUDA?", "response": "CUDA es una plataforma de computación paralela de NVIDIA que permite usar GPUs para procesamiento general. Permite ejecutar código en la GPU acelerando cálculos intensivos."}},
-    {{"prompt": "¿Cómo verifico mi GPU en Linux?", "response": "Ejecuta nvidia-smi en la terminal. Si muestra el modelo de GPU y la versión de CUDA, el soporte está activo."}},
-    {{"prompt": "¿Qué es Kimari Local AI?", "response": "Kimari Local AI es un framework de código abierto para ejecutar inferencia de modelos de lenguaje en GPUs de consumo. Funciona con GTX 1060 y superiores, proporcionando un endpoint OpenAI-compatible en localhost."}},
+    {{"prompt": "What is CUDA?", "response": "CUDA is a parallel computing platform by NVIDIA that enables using GPUs for general processing."}},
+    {{"prompt": "How do I check my GPU on Linux?", "response": "Run nvidia-smi in the terminal. If it shows the GPU model and CUDA version, support is active."}},
+    {{"prompt": "What is Kimari Local AI?", "response": "Kimari Local AI is a framework for running LLM inference on consumer GPUs with an OpenAI-compatible endpoint."}},
 ]
 
 dataset = Dataset.from_list(data)
 
-def format_example(example):
-    return {{{"text": f"User: { {example['prompt']} }\\nAssistant: { {example['response']} }"}}}
+def format_example(ex):
+    return {{"text": "User: " + ex["prompt"] + "\\nAssistant: " + ex["response"]}}
 
 dataset = dataset.map(format_example)
 
-# Simple training loop (micro SFT)
-from torch.utils.data import DataLoader
 import torch.optim as optim
-
-optimizer = optim.AdamW(model.parameters(), lr={training_cfg.get("learning_rate", "5e-4")})
+optimizer = optim.AdamW(model.parameters(), lr={lr})
 model.train()
 
 print(f"Starting micro SFT training for {max_steps} steps...")
 for step in range({max_steps}):
     batch = dataset[step % len(dataset)]
-    inputs = tokenizer(batch['text'], return_tensors='pt', truncation=True, max_length={training_cfg.get("max_seq_length", 512)})
+    inputs = tokenizer(batch["text"], return_tensors="pt", truncation=True, max_length={max_seq})
     inputs = {{k: v.to(model.device) for k, v in inputs.items()}}
-    
-    outputs = model(**inputs, labels=inputs['input_ids'])
+    outputs = model(**inputs, labels=inputs["input_ids"])
     loss = outputs.loss
     loss.backward()
     optimizer.step()
     optimizer.zero_grad()
-    
     if step % 5 == 0:
         print(f"Step {{step}}/{max_steps}, Loss: {{loss.item():.4f}}")
 
-# Save adapter locally
 adapter_path = "/tmp/kimari4b-micro-sft-adapter"
 model.save_pretrained(adapter_path)
 print(f"Adapter saved to {{adapter_path}}")
 
-result['phase'] = 'micro_sft_complete'
-result['adapter_generated'] = True
-result['adapter_path'] = adapter_path
-result['training_performed'] = True
-result['steps_completed'] = {max_steps}
-result['gate_state'] = 'BLOCKED'
+result["phase"] = "micro_sft_complete"
+result["adapter_generated"] = True
+result["adapter_path"] = adapter_path
+result["training_performed"] = True
+result["steps_completed"] = {max_steps}
+result["gate_state"] = "BLOCKED"
 print(json.dumps(result, indent=2))
 """
     return script
@@ -237,7 +234,7 @@ def submit_job(config: dict, json_output: bool = False) -> dict:
 
     training_script = build_training_script(config)
 
-    # Build safe command list
+    # Build safe command list (no shell=True, no string splitting)
     args = [
         "hf",
         "jobs",
@@ -329,8 +326,6 @@ def main() -> None:
     if args.allow_submit and not args.yes:
         print("ERROR: --allow-submit requires --yes for explicit consent")
         sys.exit(1)
-
-    import os
 
     if os.environ.get("CI") == "true" and args.allow_submit:
         print("ERROR: Training blocked in CI environment")
