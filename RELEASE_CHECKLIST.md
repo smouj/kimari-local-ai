@@ -738,6 +738,31 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.39 Checks
+
+- [ ] `merge_user_config_onto_defaults_safely()` function exists in `kimari/setup/writer.py`
+- [ ] `_PROTECTED_FIELDS` constant includes `version`, `config_version`, `profiles`, `server`
+- [ ] `_SAFE_USER_FIELDS` constant includes `setup_info`, `integrations`, `paths`
+- [ ] Recovery merge does NOT use `_base.update(config)` pattern
+- [ ] Incomplete user config with `profiles: {}` does NOT overwrite defaults profiles
+- [ ] Incomplete user config with wrong `version` does NOT overwrite defaults version
+- [ ] Incomplete user config with wrong `config_version` does NOT overwrite defaults
+- [ ] Incomplete user config with wrong `server` does NOT overwrite defaults server
+- [ ] Invalid `default_profile` from incomplete user config is rejected (keeps defaults value)
+- [ ] Valid `default_profile` from incomplete user config is accepted if it exists in defaults profiles
+- [ ] Safe user fields (`setup_info`, `integrations`, `paths`) are preserved from user config
+- [ ] `write_setup_config()` uses `merge_user_config_onto_defaults_safely()` for recovery
+- [ ] `apply_setup_changes()` uses `merge_user_config_onto_defaults_safely()` for recovery
+- [ ] `tests/test_release_v0139.py` exists and passes
+- [ ] pyproject.toml version is 0.1.39-alpha
+- [ ] kimari/__init__.py __version__ is 0.1.39-alpha
+- [ ] CHANGELOG.md has [0.1.39-alpha] entry
+- [ ] ROADMAP.md marks v0.1.39-alpha as Current, v0.1.38-alpha as Released
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

@@ -4,12 +4,22 @@ Setup configuration persistence for Kimari.
 Builds patches from detected hardware/software information, creates backups,
 and writes the setup_info section into the user config file.
 
-Key invariant: writer NEVER starts from an empty dict (``{}``) when building
-a config to write.  If no user config exists, packaged defaults are loaded
-first, then the setup patch is applied on top.  This prevents the bug where
-``kimari setup --write --yes`` would produce an incomplete config with only
-``default_profile`` and ``setup_info`` keys (missing ``version``,
-``profiles``, ``server``, etc.).
+Key invariants:
+
+1. Writer NEVER starts from an empty dict (``{}``) when building a config
+   to write.  If no user config exists, packaged defaults are loaded first,
+   then the setup patch is applied on top.  This prevents the bug where
+   ``kimari setup --write --yes`` would produce an incomplete config with
+   only ``default_profile`` and ``setup_info`` keys (missing ``version``,
+   ``profiles``, ``server``, etc.).
+
+2. When recovering from an incomplete user config, the merge is **safe**:
+   critical fields (``version``, ``config_version``, ``profiles``, ``server``)
+   are never overwritten by incomplete user data.  Only safe user
+   customizations (``setup_info``, ``integrations``, ``paths``, user
+   metadata) are preserved.  This prevents the bug where an incomplete
+   user config with ``profiles: {}`` would overwrite the valid profiles
+   from packaged defaults.
 """
 
 import json
@@ -127,6 +137,71 @@ def load_base_config_for_setup(reset: bool = False) -> dict:
     # No user config — load packaged defaults
     defaults = _load_packaged_defaults()
     return defaults
+
+
+# Fields that must NOT be overwritten by an incomplete user config during
+# recovery merge.  These are always taken from packaged defaults when the
+# user config is incomplete.
+_PROTECTED_FIELDS = frozenset({"version", "config_version", "profiles", "server"})
+
+# Fields that are safe to carry over from an incomplete user config during
+# recovery merge.  These are non-critical user customizations that don't
+# affect core functionality.
+_SAFE_USER_FIELDS = frozenset({"setup_info", "integrations", "paths"})
+
+
+def merge_user_config_onto_defaults_safely(defaults: dict, user_config: dict) -> dict:
+    """Safely merge an incomplete user config onto packaged defaults.
+
+    When a user config is incomplete (detected by :func:`is_config_complete`),
+    this function creates a merged config where:
+
+    - **Protected fields** (``version``, ``config_version``, ``profiles``,
+      ``server``) are always taken from *defaults*, never overwritten by
+      *user_config*.  This prevents an incomplete user config with
+      ``profiles: {}`` from destroying valid profile data.
+    - **Safe user fields** (``setup_info``, ``integrations``, ``paths``) are
+      carried over from *user_config* if present, preserving user
+      customizations.
+    - ``default_profile`` from *user_config* is only accepted if it exists
+      in the *defaults* profiles dict; otherwise, the defaults value is
+      kept.
+    - Any other fields in *user_config* not in either set are carried over
+      (they are assumed to be user customizations or metadata).
+
+    Parameters
+    ----------
+    defaults:
+        Packaged defaults dict (complete, valid).
+    user_config:
+        Incomplete user config dict (may have empty/missing critical fields).
+
+    Returns
+    -------
+    dict
+        Merged config with protected fields always from defaults.
+    """
+    merged = json.loads(json.dumps(defaults))  # deep copy
+
+    for key, value in user_config.items():
+        if key in _PROTECTED_FIELDS:
+            # Never let incomplete user config overwrite protected fields
+            continue
+
+        if key == "default_profile":
+            # Only accept user's default_profile if it exists in the
+            # defaults profiles — otherwise keep the defaults value
+            default_profiles = defaults.get("profiles", {})
+            if isinstance(value, str) and value in default_profiles:
+                merged["default_profile"] = value
+            # else: keep defaults' default_profile
+            continue
+
+        # All other fields (safe user fields + unknown metadata) are
+        # carried over from user_config
+        merged[key] = value
+
+    return merged
 
 
 def resolve_recommended_profile(recommended_profile: str, profiles: dict) -> str:
@@ -303,14 +378,11 @@ def write_setup_config(patch: dict, config_path: Path | str, reset: bool = False
         backup_path = backup_config(config_path)
 
         if not is_config_complete(config):
-            # Merge: start from defaults, overlay user config on top
+            # Safe merge: start from defaults, only overlay safe user fields
             defaults = _load_packaged_defaults()
             recovery_needed = True
             recovery_reason = "user config incomplete — recovered from packaged defaults"
-            # Preserve user customizations where possible
-            _base = defaults.copy()
-            _base.update(config)
-            config = _base
+            config = merge_user_config_onto_defaults_safely(defaults, config)
     else:
         # No existing config or reset requested — start from packaged defaults
         config = _load_packaged_defaults()
@@ -471,13 +543,11 @@ def apply_setup_changes(patch: dict, config_path: Path | str, reset: bool = Fals
         backup_path = backup_config(config_path)
 
         if not is_config_complete(config):
-            # Merge: start from defaults, overlay user config on top
+            # Safe merge: start from defaults, only overlay safe user fields
             defaults = _load_packaged_defaults()
             recovery_needed = True
             recovery_reason = "user config incomplete — recovered from packaged defaults"
-            _base = defaults.copy()
-            _base.update(config)
-            config = _base
+            config = merge_user_config_onto_defaults_safely(defaults, config)
     else:
         config = _load_packaged_defaults()
         backup_path = None

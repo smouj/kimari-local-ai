@@ -4141,6 +4141,92 @@ def main() -> None:
             "Gate must remain BLOCKED during alpha",
         )
 
+    # ── v0.1.39 safe recovery merge ──────────────────────────────────
+    print("\n[57/62] v0.1.39 safe recovery merge")
+    writer_py = PROJECT_ROOT / "kimari" / "setup" / "writer.py"
+    if writer_py.exists():
+        writer_text = writer_py.read_text()
+        check(
+            "merge_user_config_onto_defaults_safely exists in writer.py",
+            "merge_user_config_onto_defaults_safely" in writer_text,
+            "Safe merge helper missing from writer.py",
+        )
+        check(
+            "_PROTECTED_FIELDS constant exists in writer.py",
+            "_PROTECTED_FIELDS" in writer_text,
+            "_PROTECTED_FIELDS constant missing from writer.py",
+        )
+        check(
+            "_SAFE_USER_FIELDS constant exists in writer.py",
+            "_SAFE_USER_FIELDS" in writer_text,
+            "_SAFE_USER_FIELDS constant missing from writer.py",
+        )
+        check(
+            "No unsafe _base.update(config) pattern in writer.py",
+            "_base.update(config)" not in writer_text,
+            "Unsafe _base.update(config) pattern still present in writer.py",
+        )
+        check(
+            "writer.py uses safe merge in write_setup_config",
+            "merge_user_config_onto_defaults_safely" in writer_text,
+            "Safe merge not used in writer.py",
+        )
+        check(
+            "writer.py docstring mentions safe merge invariant",
+            "safe" in writer_text.lower() and "protected" in writer_text.lower(),
+            "Writer docstring does not mention safe merge / protected fields invariant",
+        )
+    else:
+        check("kimari/setup/writer.py exists (v0.1.39)", False, "file not found")
+
+    check(
+        "tests/test_release_v0139.py exists",
+        (PROJECT_ROOT / "tests" / "test_release_v0139.py").exists(),
+        "v0.1.39 test file missing",
+    )
+
+    # v0.1.39 content integrity
+    check(
+        'default_profile still "test" (v0.1.39 re-check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.39)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "*.safetensors", "*.gguf"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        artifact_files = [f for f in result.stdout.strip().splitlines() if f]
+        check(
+            "No weights/adapters/GGUF tracked (v0.1.39)",
+            len(artifact_files) == 0,
+            f"found: {artifact_files}",
+        )
+    except Exception:
+        warn("Could not check tracked files for weights (v0.1.39)")
+    try:
+        gate_check = subprocess.run(
+            ["git", "grep", "-c", "BLOCKED", "--", "docs/ADAPTER_PREVIEW_GATE.md"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        check(
+            "Preview gate is BLOCKED (v0.1.39)",
+            gate_check.returncode == 0 and int(gate_check.stdout.strip() or "0") > 0,
+            "Preview gate not BLOCKED",
+        )
+    except Exception:
+        warn("Could not check preview gate status (v0.1.39)")
+
+    # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
         for e in ERRORS:

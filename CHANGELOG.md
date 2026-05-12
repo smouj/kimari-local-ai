@@ -5,6 +5,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.39-alpha] - 2026-03-06
+
+### Fixed
+- Recovery merge now protects critical fields from being overwritten by incomplete user config — an incomplete config with `profiles: {}` no longer destroys valid profile data from packaged defaults
+- `default_profile` from incomplete user config is only accepted if it exists in the defaults profiles dict; otherwise, the defaults value is kept
+
+### Added
+- `merge_user_config_onto_defaults_safely(defaults, user_config)` helper — safe merge that never lets incomplete user config overwrite `version`, `config_version`, `profiles`, or `server` fields
+- `_PROTECTED_FIELDS` constant — fields always taken from defaults during recovery merge
+- `_SAFE_USER_FIELDS` constant — fields safe to carry over from incomplete user config
+- `tests/test_release_v0139.py` — Test suite for v0.1.39-alpha safe merge behavior
+
+### Changed
+- `write_setup_config()` and `apply_setup_changes()` now use `merge_user_config_onto_defaults_safely()` instead of `_base.update(config)` for recovery merges
+- Writer module docstring updated with second invariant about safe merge
+
+### Safety
+- Gate remains BLOCKED
+
 ## [0.1.38-alpha] - 2026-03-05
 
 ### Fixed

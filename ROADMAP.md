@@ -445,7 +445,7 @@
 - ✅ Updated INSTALL_WSL2.md, INSTALL_MATRIX.md, TRAINING_STACK_COMPATIBILITY.md
 - ✅ Gate BLOCKED
 
-## v0.1.38-alpha (Current)
+## v0.1.38-alpha (Released)
 
 - ✅ Fixed setup writer never starts from empty dict (was producing incomplete configs)
 - ✅ Fixed recommended profile resolves to safe fallback if original doesn't exist
@@ -453,6 +453,14 @@
 - ✅ Added `kimari setup --write --yes --reset-user-config` flag for safe config regeneration
 - ✅ Added `kimari setup --json` fields: resolved_profile, user_config_complete, recovery_needed, config_would_be_valid
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
+- ✅ Gate BLOCKED
+
+## v0.1.39-alpha (Current)
+
+- ✅ Fixed recovery merge protects critical fields from incomplete user config (`profiles: {}` no longer destroys valid defaults)
+- ✅ Added `merge_user_config_onto_defaults_safely()` helper with protected/safe field separation
+- ✅ `default_profile` from incomplete config only accepted if it exists in defaults profiles
+- ✅ `write_setup_config()` and `apply_setup_changes()` use safe merge instead of `_base.update(config)`
 - ✅ Gate BLOCKED
 
 ## v0.2.0-alpha (Planned)
