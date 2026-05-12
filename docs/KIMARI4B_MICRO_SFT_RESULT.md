@@ -62,4 +62,10 @@
 
 ## Gate
 
-**BLOCKED** — No automatic gate transition. Even though training succeeded, gate stays BLOCKED until manual review.
+**BLOCKED** — No automatic gate transition.
+
+**Adapter persistence note**: The adapter was generated in HF Jobs ephemeral storage and NOT retrieved. This is a known limitation. The next run must implement adapter persistence. See [KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md](KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md).
+
+**No eval performed**: This validates training execution only, not model quality. See [KIMARI4B_MICRO_SFT_RESULT_REVIEW.md](KIMARI4B_MICRO_SFT_RESULT_REVIEW.md).
+
+**Dataset hash note**: Previous config had hash `2a7f55ef...` from an earlier dataset version (before fixing "respuesta" → "response"). Corrected to `f8ce140b...` (file_sha256) and `41afe871...` (normalized_sha256).

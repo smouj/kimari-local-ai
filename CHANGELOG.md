@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.49-alpha] - 2026-05-13
+## [0.1.50-alpha] - 2026-05-13
+
+### Added
+- `training/scripts/hash_dataset.py` — compute file and normalized SHA256 for dataset files
+- `training/scripts/package_private_adapter.py` — package adapter artifacts for private repo
+- `training/scripts/validate_private_artifact_repo.py` — validate private repo structure
+- `docs/KIMARI4B_MICRO_SFT_RESULT_REVIEW.md` — post-run review
+- `docs/KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md` — adapter persistence strategy
+- `docs/PRIVATE_ARTIFACT_REPO_POLICY.md` — private repo policy
+- `docs/KIMARI4B_NEXT_RUN_PLAN.md` — next run plan with adapter retrieval
+- Dataset hash inconsistency fixed (config now uses `f8ce140b...` matching actual file)
+- `docs/KIMARI4B_MICRO_SFT_RESULT_SUMMARY.json` — updated with explicit `dataset_file_sha256` and `dataset_normalized_sha256` fields
+- Private repo created: `smouj/kimari-4b-artifacts` (private, Git LFS for safetensors)
+
+### Changed
+- Version bump: 0.1.49-alpha → 0.1.50-alpha
+- README badge updated to v0.1.50-alpha
+- docs/index.html version updated to v0.1.50-alpha
+
+### Safety
+- Gate remains BLOCKED
+- No adapter committed
+- No HF upload
+- No GGUF
+- No public weights
+
 
 ### Added
 - `dataset/build/kimari-fit-v0/sft_micro.jsonl` — 72 curated examples (Spanish technical, CUDA, Linux, Python, Kimari API)

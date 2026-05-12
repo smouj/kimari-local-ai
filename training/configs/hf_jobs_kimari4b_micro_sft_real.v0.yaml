@@ -19,7 +19,7 @@ dataset:
   fields: ["prompt", "response"]
   description: "72 curated examples: Spanish technical, CUDA/GPU, Python/Bash, Kimari API"
   record_count: 72
-  hash: "2a7f55ef157e1be68d1e01daa715d9ae"
+  hash: "f8ce140b5e2e127e4324f3a7c4785480"
   private_data: false
   tokens_or_secrets: false
 

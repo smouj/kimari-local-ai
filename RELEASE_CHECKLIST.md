@@ -793,6 +793,20 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.50 Checks
+
+- [ ] Dataset hash script exists (hash_dataset.py)
+- [ ] No contradictory dataset hashes between config and summary
+- [ ] KIMARI4B_MICRO_SFT_RESULT_REVIEW.md exists
+- [ ] KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md exists
+- [ ] PRIVATE_ARTIFACT_REPO_POLICY.md exists
+- [ ] package_private_adapter.py defaults to dry-run
+- [ ] validate_private_artifact_repo.py exists
+- [ ] KIMARI4B_NEXT_RUN_PLAN.md exists
+- [ ] No *.safetensors tracked in public repo
+- [ ] No *.gguf tracked in public repo
+- [ ] Gate BLOCKED
+
 ## v0.1.49 Checks
 
 - [ ] Micro SFT dataset exists (sft_micro.jsonl)

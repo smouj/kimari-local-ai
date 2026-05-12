@@ -455,7 +455,20 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.49-alpha (Current)
+## v0.1.50-alpha (Current)
+
+- ✅ Micro SFT completed (Job 6a038ec87618f125ee2b7984)
+- ✅ Dataset hash inconsistency fixed
+- ✅ hash_dataset.py script for computing file/normalized SHA256
+- ✅ Adapter persistence strategy doc
+- ✅ Private artifact repo policy
+- ✅ Package adapter script (dry-run default)
+- ✅ Next run plan with adapter retrieval
+- ✅ Private repo smouj/kimari-4b-artifacts created
+- ✅ Post-run review doc
+- Gate BLOCKED — no public weights, no adapter eval yet
+
+## v0.1.49-alpha
 
 - ✅ Micro SFT dataset (72 examples, Spanish technical + CUDA + Python + Kimari API)
 - ✅ HF Jobs micro SFT config (a10g-small, 20min timeout, LoRA r=8, Qwen2.5-1.5B)

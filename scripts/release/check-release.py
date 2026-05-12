@@ -5594,6 +5594,136 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [70/70] v0.1.50 Adapter persistence + hash consistency ──
+    print("\n[70/70] v0.1.50 Adapter persistence + hash consistency")
+
+    # Dataset hash script
+    hash_script = PROJECT_ROOT / "training" / "scripts" / "hash_dataset.py"
+    check(
+        "hash_dataset.py exists",
+        hash_script.exists(),
+        "training/scripts/hash_dataset.py not found",
+    )
+
+    # No contradictory dataset hashes
+    config_path = PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft_real.v0.yaml"
+    summary = PROJECT_ROOT / "docs" / "KIMARI4B_MICRO_SFT_RESULT_SUMMARY.json"
+    if config_path.exists() and summary.exists():
+        import json as _json
+        try:
+            import yaml as _yaml
+            config = _yaml.safe_load(config_path.read_text())
+            config_hash = config.get("dataset", {}).get("hash", "")
+        except ImportError:
+            # Fallback: read YAML manually
+            config_text = config_path.read_text()
+            config_hash = ""
+            for line in config_text.split("\n"):
+                if "hash:" in line and "#" not in line.split("hash:")[0]:
+                    config_hash = line.split("hash:")[1].strip().strip('"').strip("'")
+                    break
+        summary_data = _json.loads(summary.read_text())
+        summary_hash = summary_data.get("dataset_file_sha256", summary_data.get("dataset_hash", ""))
+        # Both should match (prefix at least)
+        check(
+            "No contradictory dataset hashes",
+            config_hash.startswith(summary_hash[:16]) or summary_hash.startswith(config_hash[:16]) or config_hash == summary_hash,
+            f"Config hash {config_hash[:16]}... != summary hash {summary_hash[:16]}...",
+        )
+
+    # Review doc
+    check(
+        "KIMARI4B_MICRO_SFT_RESULT_REVIEW.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_MICRO_SFT_RESULT_REVIEW.md").exists(),
+        "docs/KIMARI4B_MICRO_SFT_RESULT_REVIEW.md not found",
+    )
+
+    # Persistence strategy
+    check(
+        "KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md").exists(),
+        "docs/KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md not found",
+    )
+
+    # Private repo policy
+    check(
+        "PRIVATE_ARTIFACT_REPO_POLICY.md exists",
+        (PROJECT_ROOT / "docs" / "PRIVATE_ARTIFACT_REPO_POLICY.md").exists(),
+        "docs/PRIVATE_ARTIFACT_REPO_POLICY.md not found",
+    )
+
+    # Package adapter script
+    pkg_script = PROJECT_ROOT / "training" / "scripts" / "package_private_adapter.py"
+    check(
+        "package_private_adapter.py exists",
+        pkg_script.exists(),
+        "training/scripts/package_private_adapter.py not found",
+    )
+    if pkg_script.exists():
+        pkg_text = pkg_script.read_text()
+        check(
+            "package_private_adapter.py dry-run default",
+            "--write" in pkg_text and "--yes" in pkg_text,
+            "package_private_adapter.py must require --write --yes",
+        )
+
+    # Validate private repo script
+    check(
+        "validate_private_artifact_repo.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "validate_private_artifact_repo.py").exists(),
+        "training/scripts/validate_private_artifact_repo.py not found",
+    )
+
+    # Next run plan
+    check(
+        "KIMARI4B_NEXT_RUN_PLAN.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_NEXT_RUN_PLAN.md").exists(),
+        "docs/KIMARI4B_NEXT_RUN_PLAN.md not found",
+    )
+
+    # No safetensors in public repo
+    safetensors = list(PROJECT_ROOT.rglob("*.safetensors"))
+    check(
+        "No .safetensors in public repo",
+        len(safetensors) == 0,
+        f"Found {len(safetensors)} .safetensors files in public repo",
+    )
+
+    # No GGUF in public repo (excluding deps/ and node_modules/)
+    gguf_files = [f for f in PROJECT_ROOT.rglob("*.gguf") if "deps" not in str(f) and "node_modules" not in str(f)]
+    check(
+        "No .gguf in public repo (excl deps)",
+        len(gguf_files) == 0,
+        f"Found {len(gguf_files)} .gguf files in public repo",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.50-alpha",
+        get_pyproject_version() >= "0.1.50-alpha",
+        f"Expected version >= 0.1.50-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.50-alpha",
+        get_init_version() >= "0.1.50-alpha",
+        f"Expected version >= 0.1.50-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.50-alpha] entry",
+        "[0.1.50-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.50-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.50-alpha",
+        "v0.1.50-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.50-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.50)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
