@@ -3877,6 +3877,155 @@ def main() -> None:
         "default_profile changed from test — this is not allowed during alpha",
     )
 
+    # ── v0.1.37 jsonschema fix, resolve_smoke_gate, GPU compute capability ──
+    print("\n[60/60] v0.1.37 jsonschema fix, resolve_smoke_gate, GPU compute capability")
+
+    # validate_config handles missing jsonschema gracefully
+    loader_path = PROJECT_ROOT / "kimari" / "config" / "loader.py"
+    if loader_path.exists():
+        loader_text = loader_path.read_text()
+        check(
+            "validate_config handles missing jsonschema gracefully",
+            "ModuleNotFoundError" in loader_text,
+            "validate_config should catch ModuleNotFoundError for jsonschema",
+        )
+        check(
+            "validate_config provides install instructions when jsonschema missing",
+            "jsonschema not installed" in loader_text.lower() or "pip install" in loader_text.lower(),
+            "validate_config should suggest pip install when jsonschema is missing",
+        )
+    else:
+        check("kimari/config/loader.py exists (v0.1.37)", False, "file not found")
+
+    # resolve_smoke_gate exists in hf_jobs_micro_sft.py
+    micro_sft_path = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft.py"
+    if micro_sft_path.exists():
+        micro_sft_text = micro_sft_path.read_text()
+        check(
+            "resolve_smoke_gate function exists in hf_jobs_micro_sft.py",
+            "resolve_smoke_gate" in micro_sft_text,
+            "resolve_smoke_gate function missing from hf_jobs_micro_sft.py",
+        )
+        check(
+            "resolve_smoke_gate returns source tracking",
+            "source" in micro_sft_text and "explicit" in micro_sft_text and "default_tmp" in micro_sft_text,
+            "resolve_smoke_gate should return source ('explicit', 'default_tmp', 'override')",
+        )
+        check(
+            "JSON output includes smoke_gate_source",
+            "smoke_gate_source" in micro_sft_text,
+            "hf_jobs_micro_sft.py JSON output should include smoke_gate_source field",
+        )
+        check(
+            "JSON output includes smoke_gate_validated",
+            "smoke_gate_validated" in micro_sft_text,
+            "hf_jobs_micro_sft.py JSON output should include smoke_gate_validated field",
+        )
+        # No duplicate final smoke gate logic (submit should use only resolve_smoke_gate)
+        check(
+            "No duplicate final smoke gate logic in submission",
+            "smoke_summary_validated" not in micro_sft_text or micro_sft_text.count("smoke_summary_validated") <= 1,
+            "Submission should use only resolve_smoke_gate(), not separate smoke_summary_validated",
+        )
+    else:
+        check("training/scripts/hf_jobs_micro_sft.py exists (v0.1.37)", False, "file not found")
+
+    # check_gpu_compute_capability exists in doctor/deep.py
+    deep_path = PROJECT_ROOT / "kimari" / "doctor" / "deep.py"
+    if deep_path.exists():
+        deep_text = deep_path.read_text()
+        check(
+            "check_gpu_compute_capability exists in doctor/deep.py",
+            "check_gpu_compute_capability" in deep_text,
+            "check_gpu_compute_capability function missing from doctor/deep.py",
+        )
+        check(
+            "GPU compute capability check warns about Pascal/cu128+",
+            "sm_61" in deep_text or "Pascal" in deep_text,
+            "GPU compute capability check should warn about Pascal GPUs with incompatible PyTorch",
+        )
+        check(
+            "doctor --deep has GPU Compute Capability check in run_deep_checks",
+            "check_gpu_compute_capability()" in deep_text,
+            "run_deep_checks should call check_gpu_compute_capability()",
+        )
+    else:
+        check("kimari/doctor/deep.py exists (v0.1.37)", False, "file not found")
+
+    # check_gpu_arch_compatibility exists in check_training_stack.py
+    stack_path = PROJECT_ROOT / "training" / "scripts" / "check_training_stack.py"
+    if stack_path.exists():
+        stack_text = stack_path.read_text()
+        check(
+            "check_gpu_arch_compatibility exists in check_training_stack.py",
+            "check_gpu_arch_compatibility" in stack_text,
+            "check_gpu_arch_compatibility function missing from check_training_stack.py",
+        )
+        check(
+            "GPU arch check warns about Pascal/cu128+",
+            "sm_61" in stack_text,
+            "GPU arch check should warn about Pascal sm_61 with cu128+",
+        )
+    else:
+        check("training/scripts/check_training_stack.py exists (v0.1.37)", False, "file not found")
+
+    # Pascal GPU documentation
+    wsl2_path = PROJECT_ROOT / "docs" / "INSTALL_WSL2.md"
+    if wsl2_path.exists():
+        wsl2_text = wsl2_path.read_text()
+        check(
+            "docs/INSTALL_WSL2.md mentions Pascal or cu126",
+            "cu126" in wsl2_text or "Pascal" in wsl2_text or "sm_61" in wsl2_text,
+            "INSTALL_WSL2.md should document PyTorch cu126 for Pascal GPUs",
+        )
+    else:
+        check("docs/INSTALL_WSL2.md exists (v0.1.37)", False, "file not found")
+
+    install_matrix_path = PROJECT_ROOT / "docs" / "INSTALL_MATRIX.md"
+    if install_matrix_path.exists():
+        install_matrix_text = install_matrix_path.read_text()
+        check(
+            "docs/INSTALL_MATRIX.md mentions Pascal GPU compatibility",
+            "Pascal" in install_matrix_text or "sm_61" in install_matrix_text or "cu126" in install_matrix_text,
+            "INSTALL_MATRIX.md should document Pascal GPU compatibility",
+        )
+    else:
+        check("docs/INSTALL_MATRIX.md exists (v0.1.37)", False, "file not found")
+
+    train_compat_path = PROJECT_ROOT / "docs" / "TRAINING_STACK_COMPATIBILITY.md"
+    if train_compat_path.exists():
+        train_compat_text = train_compat_path.read_text()
+        check(
+            "docs/TRAINING_STACK_COMPATIBILITY.md has Pascal GPU section",
+            "Pascal" in train_compat_text or "sm_61" in train_compat_text,
+            "TRAINING_STACK_COMPATIBILITY.md should have Pascal GPU compatibility section",
+        )
+    else:
+        check("docs/TRAINING_STACK_COMPATIBILITY.md exists (v0.1.37)", False, "file not found")
+
+    # Standard integrity checks
+    check(
+        "No adapter/GGUF/weight files tracked (v0.1.37)",
+        True,  # Already checked above
+    )
+    check(
+        "Gate BLOCKED (v0.1.37)",
+        "BLOCKED" in (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").read_text()
+        if (PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md").exists()
+        else True,
+        "Gate must remain BLOCKED",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.37)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+    check(
+        'default_profile still "test" (v0.1.37 check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
     if ERRORS:

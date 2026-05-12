@@ -237,6 +237,73 @@ def check_sft_trainer_param(param_name: str) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+def check_gpu_arch_compatibility() -> dict[str, Any]:
+    """Check GPU architecture compatibility with installed PyTorch.
+
+    WARNs if GPU is Pascal (sm_61, e.g. GTX 1060) and PyTorch build
+    is cu128/cu130 (which dropped sm_61 support).
+
+    CRITICAL RULES: No model downloads, no training, no network calls.
+    """
+    try:
+        import torch
+    except ImportError:
+        return {
+            "name": "gpu_arch_compatibility",
+            "passed": True,
+            "value": None,
+            "message": "torch not installed — GPU arch compatibility check skipped",
+        }
+
+    torch_version = getattr(torch, "__version__", "unknown")
+    torch_cuda_version = getattr(torch.version, "cuda", None)
+
+    if not torch.cuda.is_available():
+        return {
+            "name": "gpu_arch_compatibility",
+            "passed": True,
+            "value": None,
+            "message": f"torch {torch_version} — CUDA not available (CPU-only or no GPU)",
+        }
+
+    try:
+        compute_cap = torch.cuda.get_device_capability(0)
+        gpu_name = torch.cuda.get_device_name(0)
+    except (RuntimeError, IndexError):
+        return {
+            "name": "gpu_arch_compatibility",
+            "passed": True,
+            "value": None,
+            "message": "Could not query GPU compute capability",
+        }
+
+    cap_str = f"sm_{compute_cap[0]}{compute_cap[1]}"
+    is_pascal = compute_cap[0] == 6 and compute_cap[1] == 1
+
+    if is_pascal and torch_cuda_version:
+        cuda_ver_num = torch_cuda_version.replace(".", "")
+        if int(cuda_ver_num) >= 128:
+            return {
+                "name": "gpu_arch_compatibility",
+                "passed": True,  # WARN, not FAIL — informational
+                "value": f"{gpu_name} {cap_str} — PyTorch cu{torch_cuda_version}",
+                "message": (
+                    f"WARNING: Pascal GPU ({cap_str}) detected with PyTorch cu{torch_cuda_version}. "
+                    f"PyTorch builds cu128+ dropped sm_61 support. "
+                    f"GPU may not work correctly. "
+                    f"Install PyTorch cu126 legacy: "
+                    f"pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126"
+                ),
+            }
+
+    return {
+        "name": "gpu_arch_compatibility",
+        "passed": True,
+        "value": f"{gpu_name} {cap_str} — PyTorch cu{torch_cuda_version}",
+        "message": f"GPU {cap_str} compatible with PyTorch cu{torch_cuda_version}",
+    }
+
+
 def run_all_checks(verbose: bool = False) -> dict[str, Any]:
     """Run all compatibility checks and return the structured result."""
     checks: list[dict[str, Any]] = []
@@ -260,6 +327,9 @@ def run_all_checks(verbose: bool = False) -> dict[str, Any]:
     # 11-14. SFTTrainer parameter checks
     for param in ("tokenizer", "processing_class", "dataset_text_field", "max_seq_length"):
         checks.append(check_sft_trainer_param(param))
+
+    # 15. GPU architecture compatibility
+    checks.append(check_gpu_arch_compatibility())
 
     # Build compatibility dict from the param checks
     compatibility: dict[str, Any] = {}
@@ -313,6 +383,11 @@ def run_all_checks(verbose: bool = False) -> dict[str, Any]:
         )
     if compatibility.get("sft_trainer_accepts_max_seq_length") is True:
         warnings.append("SFTTrainer accepts max_seq_length — pass it to SFTTrainer, not TrainingArguments")
+
+    # GPU architecture warning
+    for check in checks:
+        if check["name"] == "gpu_arch_compatibility" and "WARNING:" in check.get("message", ""):
+            warnings.append(check["message"])
 
     # Python version warning
     # Note: pyproject.toml requires Python >= 3.10, but we keep this check

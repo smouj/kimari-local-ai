@@ -1,7 +1,7 @@
 # Kimari-4B Private SFT Run — First Training Execution Guide
 
 > **Document Type:** Execution guide for the first private SFT run of Kimari-4B  
-> **Version:** v0.1.35-alpha  
+> **Version:** v0.1.37-alpha  
 > **Date:** 2026-06-03  
 > **Status:** Active — governs the first private SFT training execution  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -376,7 +376,7 @@ See [HF_JOBS_MICRO_SFT_RUN.md](HF_JOBS_MICRO_SFT_RUN.md) for the full micro SFT 
 
 ### Micro SFT Execution Record
 
-As of v0.1.35-alpha, every micro SFT execution produces a sanitized execution record:
+As of v0.1.37-alpha, every micro SFT execution produces a sanitized execution record:
 
 ```bash
 # Create record

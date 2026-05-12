@@ -5,6 +5,28 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.37-alpha] - 2026-06-04
+
+### Added
+- `resolve_smoke_gate()` in `hf_jobs_micro_sft.py` — Unified smoke gate logic with priority: explicit path > /tmp fallback > override. Fixes dual smoke gate bug where `--require-smoke-summary` with valid path could be blocked if `/tmp/hf_jobs_smoke_summary.json` didn't exist
+- `check_gpu_compute_capability()` in `kimari/doctor/deep.py` — New deep check for GPU compute capability and PyTorch build compatibility. WARNs if Pascal GPU (sm_61) detected with PyTorch cu128/cu130 (which dropped sm_61 support). Recommends cu126 legacy build
+- `check_gpu_arch_compatibility()` in `training/scripts/check_training_stack.py` — New check for GPU architecture compatibility. WARNs if Pascal GPU with incompatible PyTorch build
+- Pascal GPU compatibility documentation in `docs/INSTALL_WSL2.md`, `docs/INSTALL_MATRIX.md`, `docs/TRAINING_STACK_COMPATIBILITY.md`
+- `smoke_gate_source` field in `hf_jobs_micro_sft.py` JSON output — Tracks smoke gate resolution source ("override" | "explicit" | "default_tmp")
+
+### Changed
+- `kimari/config/loader.py` — `validate_config()` handles missing `jsonschema` gracefully: returns clear error message with install instructions instead of `UnboundLocalError`
+- `hf_jobs_micro_sft.py` — Submission uses unified `resolve_smoke_gate()` only, no duplicate smoke gate logic. JSON output includes `smoke_gate_source` and `smoke_gate_validated` fields
+- `kimari/doctor/deep.py` — 15 checks total (was 14), added GPU Compute Capability check after CUDA/NVIDIA check
+- `training/scripts/check_training_stack.py` — 15 checks total (was 14), added GPU architecture compatibility check
+- `docs/TRAINING_STACK_COMPATIBILITY.md` — Updated version to v0.1.37-alpha, added Section 6b: Pascal GPU Compatibility
+
+### Fixed
+- `validate_config()` no longer crashes with `UnboundLocalError` when `jsonschema` is not installed — returns clean error message with install instructions
+- Smoke gate dual-path bug fixed: explicit `--require-smoke-summary` path now takes priority over `/tmp/hf_jobs_smoke_summary.json` default. Single `resolve_smoke_gate()` function used throughout
+- GPU compute capability detection protects Pascal GPU users (GTX 1060/1070/1080) from PyTorch builds that don't support sm_61
+- No training in CI. No adapters committed. No HF upload. Gate still BLOCKED.
+
 ## [0.1.35-alpha] - 2026-06-03
 
 ### Added

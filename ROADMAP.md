@@ -421,11 +421,20 @@
 - ✅ HF Jobs config includes check_training_stack before training
 - ✅ Gate BLOCKED
 
-## v0.1.35-alpha (Current)
+## v0.1.35-alpha (Released)
 
 - ✅ Micro SFT execution record (create/validate scripts, docs)
 - ✅ hf_jobs_micro_sft.py smoke-gated submit (--require-smoke-summary)
 - ✅ HF Jobs micro SFT runbook
+- ✅ Gate BLOCKED
+
+## v0.1.37-alpha (Current)
+
+- ✅ Fixed validate_config() jsonschema crash (graceful error when jsonschema not installed)
+- ✅ Unified smoke gate logic with resolve_smoke_gate() (fixes dual-path bug)
+- ✅ GPU compute capability check in doctor --deep (Pascal/cu128+ warning)
+- ✅ GPU architecture compatibility check in check_training_stack.py
+- ✅ Pascal GPU documentation (INSTALL_WSL2, INSTALL_MATRIX, TRAINING_STACK_COMPATIBILITY)
 - ✅ Gate BLOCKED
 
 ## v0.2.0-alpha

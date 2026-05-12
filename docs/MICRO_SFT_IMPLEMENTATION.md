@@ -1,7 +1,7 @@
 # Micro SFT Implementation — Kimari Local AI
 
 > **Document Type:** Technical implementation reference for micro SFT training
-> **Version:** v0.1.35-alpha
+> **Version:** v0.1.37-alpha
 > **Date:** 2026-06-02
 > **Status:** Active
 > **Gate State:** BLOCKED

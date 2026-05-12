@@ -1,7 +1,7 @@
 # HF Jobs Micro SFT Runbook — Kimari Local AI
 
 > **Document Type:** Step-by-step runbook for HF Jobs micro SFT execution  
-> **Version:** v0.1.35-alpha  
+> **Version:** v0.1.37-alpha  
 > **Date:** 2026-06-03  
 > **Status:** Active — governs micro SFT execution procedure  
 > **Gate State:** BLOCKED — no public release, no HF upload

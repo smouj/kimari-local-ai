@@ -1,7 +1,7 @@
 # HF Jobs Micro SFT Run — Kimari Local AI
 
 > **Document Type:** Guide for running Kimari-4B micro SFT on Hugging Face Jobs  
-> **Version:** v0.1.35-alpha
+> **Version:** v0.1.37-alpha
 > **Date:** 2026-06-03  
 > **Status:** Active — governs micro SFT execution on HF Jobs  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -173,7 +173,7 @@ python training/scripts/hf_jobs_micro_sft.py \
 
 **If either `--allow-submit` or `--yes` is missing, the job will NOT be submitted.**
 
-Note: v0.1.35+ requires --require-smoke-summary for submission. See [HF_JOBS_MICRO_SFT_RUNBOOK.md](HF_JOBS_MICRO_SFT_RUNBOOK.md) for the full procedure.
+Note: v0.1.37+ requires --require-smoke-summary for submission. See [HF_JOBS_MICRO_SFT_RUNBOOK.md](HF_JOBS_MICRO_SFT_RUNBOOK.md) for the full procedure.
 
 ### Step 5: Check Job Status
 

@@ -1,7 +1,7 @@
 # HF Jobs Micro SFT Execution Record — Kimari Local AI
 
 > **Document Type:** Template and reference for micro SFT execution records  
-> **Version:** v0.1.35-alpha  
+> **Version:** v0.1.37-alpha  
 > **Date:** 2026-06-03  
 > **Status:** Active — governs micro SFT execution record creation and validation  
 > **Gate State:** BLOCKED — no public release, no HF upload
@@ -21,7 +21,7 @@ This document defines the micro SFT execution record format, creation, and valid
 ```json
 {
   "record_type": "micro_sft_execution_record",
-  "version": "0.1.35-alpha",
+  "version": "0.1.37-alpha",
   "timestamp": "ISO-8601 timestamp",
   "status": "pending|completed|failed",
   "job_id": "optional/sanitized",

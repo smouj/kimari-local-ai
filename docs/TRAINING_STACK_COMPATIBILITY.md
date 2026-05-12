@@ -1,7 +1,7 @@
 # Training Stack Compatibility — Kimari Local AI
 
 > **Document Type:** Reference guide for training dependency compatibility and TRL/SFTTrainer version differences  
-> **Version:** v0.1.35-alpha  
+> **Version:** v0.1.37-alpha  
 > **Date:** 2026-06-03  
 > **Gate State:** BLOCKED — no public release, no HF upload
 
@@ -282,6 +282,65 @@ To be absolutely clear:
 | Modify files | **No** |
 
 The compatibility checker only inspects installed package versions and their API signatures using `inspect.signature()`. It is safe to run in any environment, including CI.
+
+---
+
+## 6b. Pascal GPU Compatibility (GTX 1060/1070/1080)
+
+Pascal GPUs (compute capability sm_61) are a primary target for Kimari but require special PyTorch handling.
+
+### The Problem
+
+PyTorch 2.8+ with CUDA 12.8+ (cu128, cu130) prebuilt binaries no longer include kernels for sm_61 (Pascal). The GPU is detected by `nvidia-smi` and `torch.cuda.is_available()` returns True, but actual CUDA operations fail with:
+
+```
+RuntimeError: CUDA error: no kernel image is available for execution on the device
+```
+
+### The Solution
+
+Install PyTorch with CUDA 12.6 legacy build:
+
+```bash
+pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 \
+  --index-url https://download.pytorch.org/whl/cu126
+```
+
+PyTorch maintained cu126 as a legacy build specifically for older GPU architectures. This build includes sm_61 kernels and works correctly with Pascal GPUs.
+
+### Checking Compatibility
+
+**With check_training_stack.py:**
+```bash
+python training/scripts/check_training_stack.py --json
+```
+
+The `gpu_arch_compatibility` check will warn if a Pascal GPU is detected with an incompatible PyTorch build.
+
+**With kimari doctor --deep:**
+```bash
+kimari doctor --deep
+```
+
+The "GPU Compute Capability" check will warn about Pascal + cu128/cu130 incompatibility and recommend the cu126 legacy build.
+
+### Preventing Accidental Upgrades
+
+After installing PyTorch cu126, be careful when installing training requirements:
+
+```bash
+# Check what the requirements file wants
+grep torch training/requirements-training.txt
+
+# Install without pulling in a newer torch
+pip install -r training/requirements-training.txt --no-deps
+```
+
+Or pin the torch version in your environment:
+```bash
+pip install -r training/requirements-training.txt
+pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu126
+```
 
 ---
 

@@ -109,6 +109,46 @@ pip install -e .
 pip install -e ".[dev]"
 ```
 
+## Step 5b: PyTorch for GTX 1060 (Pascal GPUs)
+
+> **Important if you have a GTX 1060, GTX 1070, GTX 1080, or other Pascal GPU.**
+
+Modern PyTorch builds (cu128/cu130) have dropped support for Pascal architecture (compute capability sm_61). If you install the default PyTorch, it will detect your GPU but **cannot run CUDA operations correctly**.
+
+**Check your GPU architecture:**
+```bash
+nvidia-smi --query-gpu=name,compute_cap --format=csv,noheader
+```
+
+If your GPU shows compute capability 6.1 (Pascal), install PyTorch with CUDA 12.6 legacy:
+
+```bash
+pip uninstall -y torch torchvision torchaudio
+pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 \
+  --index-url https://download.pytorch.org/whl/cu126
+```
+
+**Verify:**
+```bash
+python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_capability(0) if torch.cuda.is_available() else 'N/A')"
+```
+
+Expected output:
+```
+2.7.1+cu126 True (6, 1)
+```
+
+**After installing PyTorch cu126**, be careful when installing training requirements — avoid reinstalling a newer PyTorch:
+
+```bash
+pip install -r training/requirements-training.txt --no-deps
+```
+
+Or check the requirements file first for torch version constraints:
+```bash
+grep torch training/requirements-training.txt
+```
+
 ## Step 6: Build llama.cpp with CUDA
 
 ```bash
@@ -215,6 +255,15 @@ ls -la models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
 - Use the `test` profile (TinyLlama, only 0.7 GB VRAM)
 - Reduce context: `kimari start --ctx 2048`
 - Check GPU memory: `nvidia-smi`
+
+### PyTorch CUDA error on GTX 1060
+
+If you see errors like `CUDA error: no kernel image is available for execution on the device` or PyTorch reports your GPU has compute capability 6.1 but doesn't work:
+
+1. Your PyTorch build is too new for Pascal GPUs
+2. Install the cu126 legacy build (see Step 5b above)
+3. Verify with: `python -c "import torch; print(torch.cuda.get_device_capability(0))"`
+4. Run: `kimari doctor --deep` to check GPU compute capability compatibility
 
 ## File Access
 

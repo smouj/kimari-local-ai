@@ -671,6 +671,27 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.37 Checks
+
+- [ ] validate_config() does not crash when jsonschema is not installed (returns clean error message)
+- [ ] hf_jobs_micro_sft.py has resolve_smoke_gate() function
+- [ ] resolve_smoke_gate() priority: explicit path > /tmp fallback > override
+- [ ] JSON output includes smoke_gate_source and smoke_gate_validated fields
+- [ ] Submission uses only resolve_smoke_gate() (no duplicate smoke gate logic)
+- [ ] kimari/doctor/deep.py has check_gpu_compute_capability() function
+- [ ] doctor --deep has 15 checks total (was 14)
+- [ ] check_gpu_compute_capability() WARNs if Pascal (sm_61) with PyTorch cu128/cu130
+- [ ] training/scripts/check_training_stack.py has check_gpu_arch_compatibility() function
+- [ ] check_training_stack has 15 checks total (was 14)
+- [ ] check_gpu_arch_compatibility() WARNs if Pascal GPU with incompatible PyTorch
+- [ ] docs/INSTALL_WSL2.md has PyTorch cu126 legacy section for Pascal GPUs
+- [ ] docs/INSTALL_MATRIX.md has Pascal GPU compatibility table
+- [ ] docs/TRAINING_STACK_COMPATIBILITY.md has Section 6b: Pascal GPU Compatibility
+- [ ] No adapter/GGUF/checkpoint/raw logs committed
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

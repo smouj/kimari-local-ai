@@ -164,12 +164,18 @@ def validate_config(config: dict, schema: dict | None = None) -> tuple[bool, lis
 
     try:
         import jsonschema
-
-        jsonschema.validate(config, schema)
-    except jsonschema.ValidationError as e:
-        errors.append(f"Schema validation: {e.message}")
-    except Exception as e:
-        errors.append(f"Validation error: {e}")
+    except ModuleNotFoundError:
+        errors.append(
+            "jsonschema not installed — schema validation skipped. "
+            "Install with: pip install 'kimari-local-ai[dev]' or pip install jsonschema"
+        )
+    else:
+        try:
+            jsonschema.validate(config, schema)
+        except jsonschema.ValidationError as e:
+            errors.append(f"Schema validation: {e.message}")
+        except Exception as e:
+            errors.append(f"Validation error: {e}")
 
     # Additional checks beyond schema
     # Check default_profile exists
