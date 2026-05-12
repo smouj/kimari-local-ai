@@ -1,44 +1,54 @@
 # Hugging Face Space: kimari-fit-lab
 
-> A Gradio GPU compatibility checker for Kimari Local AI.
+> **Deployed and running** at https://huggingface.co/spaces/kimari-ai/kimari-fit-lab
 
-## Purpose
+## Deployment Status
 
-`kimari-fit-lab` is a static Gradio Space that helps users determine if their GPU is compatible with Kimari Local AI. It does **not** run any model, download any model, or call any API.
+| Field | Value |
+|-------|-------|
+| **Space ID** | `kimari-ai/kimari-fit-lab` |
+| **URL** | https://huggingface.co/spaces/kimari-ai/kimari-fit-lab |
+| **SDK** | Gradio 5.34.2 |
+| **Status** | RUNNING |
+| **Visibility** | Public |
+| **Deployed** | 2026-05-12 |
+| **Hardware** | CPU basic (free tier) |
 
-## What It Demonstrates
+## What the Space Does
 
-✅ Which GPUs are compatible with Kimari's profiles
-✅ VRAM requirements for different model sizes
-✅ Recommended `kimari` CLI commands
-✅ That Kimari-4B is not yet released
+1. GPU compatibility lookup — select your GPU, see which models fit
+2. Model compatibility table — VRAM requirements per model size
+3. Recommended `kimari` CLI commands
+4. Kimari-4B status panel — clearly states "not released yet"
 
-## What It Does NOT Demonstrate
+## What the Space Does NOT Do
 
-❌ Running any model (no model execution)
-❌ Downloading any model (no model downloads)
-❌ Using any API keys
-❌ Any benchmark claims about Kimari-4B
-❌ That Kimari-4B weights exist (they don't)
+❌ Does not run any model
+❌ Does not download any model
+❌ Does not use any API keys
+❌ Does not claim Kimari-4B is released
+❌ Does not reveal billing/plan information
 
-## Deployment
+## Files
 
-1. Create a new Space on Hugging Face: `kimari-ai/kimari-fit-lab`
-2. Set SDK to `gradio`
-3. Upload the contents of `huggingface/kimari-fit-lab/`
-4. The Space will build automatically
+| File | Purpose |
+|------|---------|
+| `app.py` | Gradio application (GPU/model compatibility lookup) |
+| `README.md` | Space card with metadata |
+| `requirements.txt` | `gradio>=5.34.2` |
+
+## How to Update
+
+1. Edit files locally in `huggingface/kimari-fit-lab/`
+2. Push to `https://huggingface.co/spaces/kimari-ai/kimari-fit-lab`
+3. Wait for Space to rebuild
 
 ```bash
-# Manual deployment via huggingface_hub
 cd huggingface/kimari-fit-lab
-huggingface-cli upload kimari-ai/kimari-fit-lab . --repo-type space
+git add -A
+git commit -m "Update description"
+git push
 ```
-
-## Updating
-
-1. Edit `app.py` locally
-2. Test with `python app.py`
-3. Upload to HF Spaces
 
 ## Safety
 

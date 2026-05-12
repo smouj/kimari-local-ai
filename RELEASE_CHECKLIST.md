@@ -793,22 +793,46 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.45 Checks
+
+- [ ] `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` exists
+- [ ] README links to Hugging Face Space
+- [ ] README says Kimari-4B not released
+- [ ] Collection doc says reference/community models, not official
+- [ ] No billing/plan mentions in docs
+- [ ] No tokens in docs
+- [ ] No model weights uploaded
+- [ ] Gate BLOCKED
+
+## v0.1.45 Checks
+
+- [ ] `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` exists
+- [ ] README links to Hugging Face Space
+- [ ] README says Kimari-4B not released
+- [ ] Collection doc says reference/community models, not official
+- [ ] No billing/plan mentions in docs
+- [ ] No tokens in docs
+- [ ] No model weights uploaded
+- [ ] Gate BLOCKED
+- [ ] No HF Jobs executed
+- [ ] No training performed
+
 ## v0.1.44 Checks
 
-- [ ] `docs/GTX1060_SHOWCASE.md` exists
-- [ ] `docs/assets/screenshots/gtx1060-wsl2/manifest.example.json` exists
-- [ ] `scripts/docs/validate_screenshot_manifest.py` exists
-- [ ] `huggingface/kimari-fit-lab/app.py` exists
-- [ ] `huggingface/kimari-fit-lab/README.md` exists
-- [ ] `docs/HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md` exists
-- [ ] `docs/HUGGINGFACE_ORG_CARD.md` exists
-- [ ] README mentions GTX 1060 local validation
-- [ ] README says Kimari-4B not released
-- [ ] No screenshots with tokens or private paths
-- [ ] No fake benchmarks
-- [ ] Gate BLOCKED
-- [ ] No HF upload
-- [ ] No training
+- [x] `docs/GTX1060_SHOWCASE.md` exists
+- [x] `docs/assets/screenshots/gtx1060-wsl2/manifest.example.json` exists
+- [x] `scripts/docs/validate_screenshot_manifest.py` exists
+- [x] `huggingface/kimari-fit-lab/app.py` exists
+- [x] `huggingface/kimari-fit-lab/README.md` exists
+- [x] `docs/HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md` exists
+- [x] `docs/HUGGINGFACE_ORG_CARD.md` exists
+- [x] README mentions GTX 1060 local validation
+- [x] README says Kimari-4B not released
+- [x] No screenshots with tokens or private paths
+- [x] No fake benchmarks
+- [x] Gate BLOCKED
+- [x] No HF upload
+- [x] No training
 
 ## v0.1.43 Checks
 

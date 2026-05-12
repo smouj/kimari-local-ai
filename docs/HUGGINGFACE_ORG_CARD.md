@@ -1,52 +1,45 @@
 # Hugging Face Organization Card: kimari-ai
 
-> Recommended public text for the `kimari-ai` Hugging Face organization card.
+> **Deployed and updated** at https://huggingface.co/spaces/kimari-ai/README
 
----
+## Deployment Status
 
-## Kimari AI
+| Field | Value |
+|-------|-------|
+| **Space ID** | `kimari-ai/README` |
+| **URL** | https://huggingface.co/spaces/kimari-ai/README |
+| **Status** | Updated |
+| **Deployed** | 2026-05-12 |
+| **Last review** | 2026-05-12 |
 
-**Open-source framework for running local LLMs on consumer NVIDIA GPUs.**
+## Content Summary
 
-### What is Kimari?
+The organization card includes:
 
-Kimari is a Python CLI framework that makes it easy to run local LLM inference on consumer hardware — specifically NVIDIA GTX 1060 (6GB) and GTX 1080 (8GB) GPUs and above. It's built on llama.cpp with CUDA acceleration and provides an OpenAI-compatible API endpoint.
+- **Kimari AI** — open-source framework for local LLMs on consumer GPUs
+- **Framework status**: Alpha (v0.1.45)
+- **What works now**: GTX 1060 validation, OpenAI endpoint, local integrations
+- **Kimari-4B status**: Not released yet. No weights available.
+- **Roadmap table**: Framework CLI ✅, Local inference ✅, Kimari-4B 🔜 Planned (gate BLOCKED)
+- **Links**: GitHub, docs, license
+- **Gate status**: BLOCKED
 
-### What works now?
+## What the Card Does NOT Say
 
-- ✅ **Local inference validated on GTX 1060**: 228 tok/s prompt, 73 tok/s generation with TinyLlama 1.1B Q4_K_M
-- ✅ **OpenAI-compatible endpoint**: `/v1/chat/completions`, `/v1/models`, `/health`
-- ✅ **Local integrations**: Open WebUI, OpenClaw, Continue.dev
-- ✅ **CUDA acceleration**: llama-server compiled for consumer GPUs
-- ✅ **CLI tools**: `kimari doctor --deep`, `kimari start --profile test`, `kimari integrations generate`
+❌ Kimari-4B is released/available
+❌ Benchmarks for Kimari-4B
+❌ Billing/plan/subscription information
+❌ API keys or tokens
 
-### Kimari-4B Status
+## How to Update
 
-**Kimari-4B is not released yet.** No weights, adapters, GGUF files, or checkpoints are available publicly.
+1. Edit `docs/HUGGINGFACE_ORG_CARD.md` locally
+2. Clone the README Space: `git clone https://huggingface.co/spaces/kimari-ai/README`
+3. Copy the updated content into the Space's `README.md`
+4. Push changes
 
-The "Kimari-4B" name refers to a planned fine-tuned model that will be the recommended default for the Kimari framework. Until it's released, Kimari runs any compatible GGUF model (TinyLlama, Qwen, Llama, etc.).
+## Safety
 
-### Roadmap
-
-| Stage | Status |
-|-------|--------|
-| Framework CLI | ✅ Alpha (v0.1.44) |
-| Local inference (GTX 1060) | ✅ Validated |
-| OpenAI-compatible endpoint | ✅ Validated |
-| Kimari-4B fine-tuning | 🔜 Planned (gate BLOCKED) |
-| Kimari-4B weights release | 🔜 Planned (gate BLOCKED) |
-| HF Spaces demo | 📋 Prepared |
-
-### Links
-
-- **GitHub**: [smouj/kimari-local-ai](https://github.com/smouj/kimari-local-ai)
-- **Docs**: [smouj.github.io/kimari-local-ai](https://smouj.github.io/kimari-local-ai/)
-- **License**: MIT
-
-### Gate Status
-
-**BLOCKED** — Kimari is in active early development. No weights, no public releases, no training performed.
-
----
-
-*Last updated: 2026-05-12*
+- No tokens, API keys, or private data
+- No claims about Kimari-4B being released
+- Gate remains BLOCKED

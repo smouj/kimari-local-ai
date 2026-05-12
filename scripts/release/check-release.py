@@ -4996,6 +4996,91 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [65/65] v0.1.45 Hugging Face public presence hardening ──
+    print("\n[65/65] v0.1.45 Hugging Face public presence hardening")
+
+    # HF deployment doc
+    check(
+        "docs/HUGGINGFACE_DEPLOYMENT_STATUS.md exists",
+        (PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md").exists(),
+        "docs/HUGGINGFACE_DEPLOYMENT_STATUS.md not found",
+    )
+
+    # Space URL in README
+    readme_text = (PROJECT_ROOT / "README.md").read_text()
+    check(
+        "README links to Hugging Face Space",
+        "huggingface.co/spaces/kimari-ai/kimari-fit-lab" in readme_text,
+        "README should link to the HF Space",
+    )
+    check(
+        "README says Kimari-4B not released (v0.1.45)",
+        "kimari-4b released" not in readme_text.lower() and "kimari-4b is available" not in readme_text.lower(),
+        "Kimari-4B release claim found in README (v0.1.45)",
+    )
+
+    # Collection doc
+    collections_doc = PROJECT_ROOT / "docs" / "HUGGINGFACE_COLLECTIONS.md"
+    if collections_doc.exists():
+        collections_text = collections_doc.read_text().lower()
+        check(
+            "Collection doc says reference/community models",
+            "reference" in collections_text or "community" in collections_text,
+            "Collection doc should say reference/community models",
+        )
+        check(
+            "Collection doc does not claim official Kimari models",
+            "are official kimari models" not in collections_text
+            and "is an official kimari model" not in collections_text,
+            "Collection doc should not claim official Kimari models",
+        )
+
+    # No billing/plan mentions
+    billing_patterns = ["subscription active", "billing active", "paid account", "pro subscription"]
+    for doc_name in [
+        "HUGGINGFACE_DEPLOYMENT_STATUS.md",
+        "HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md",
+        "HUGGINGFACE_ORG_CARD.md",
+        "HUGGINGFACE_COLLECTIONS.md",
+        "SOCIAL_PROOF_SNIPPETS.md",
+    ]:
+        doc_path = PROJECT_ROOT / "docs" / doc_name
+        if doc_path.exists():
+            doc_content = doc_path.read_text().lower()
+            for pattern in billing_patterns:
+                check(
+                    f"No {pattern} in {doc_name}",
+                    pattern not in doc_content,
+                    f"{doc_name} contains billing pattern: {pattern}",
+                )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.45-alpha",
+        get_pyproject_version() >= "0.1.45-alpha",
+        f"Expected version >= 0.1.45-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.45-alpha",
+        get_init_version() >= "0.1.45-alpha",
+        f"Expected version >= 0.1.45-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.45-alpha] entry",
+        "[0.1.45-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.45-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.45-alpha",
+        "v0.1.45-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.45-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.45)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

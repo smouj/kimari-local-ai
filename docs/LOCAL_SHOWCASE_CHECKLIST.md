@@ -115,3 +115,24 @@
 3. Add descriptive alt text
 4. Update `docs/SCREENSHOTS.md` with new captures
 5. Commit reviewed screenshots only
+
+## Before Publishing Screenshots
+
+Before committing or publishing any screenshot:
+
+1. [ ] **No tokens** — Check for API keys, access tokens, session cookies
+2. [ ] **No private paths** — Redact `/home/username/` to `/home/user/`
+3. [ ] **Model is TinyLlama** — Verify the model shown is TinyLlama, not Kimari-4B
+4. [ ] **No Kimari-4B claim** — Verify no text says Kimari-4B is released or available
+5. [ ] **No raw logs** — Trim long logs, remove stack traces with paths
+6. [ ] **No billing info** — No Pro/subscription/account details
+7. [ ] **Compress images** — Use WebP for large screenshots
+
+## Hugging Face Screenshots
+
+| Screenshot | URL |
+|-----------|-----|
+| Space landing page | https://huggingface.co/spaces/kimari-ai/kimari-fit-lab |
+| GPU compatibility checker | https://huggingface.co/spaces/kimari-ai/kimari-fit-lab |
+| Organization card | https://huggingface.co/spaces/kimari-ai/README |
+| Collection page | https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66 |

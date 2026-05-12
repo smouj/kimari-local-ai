@@ -455,7 +455,19 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.44-alpha (Current)
+## v0.1.45-alpha (Current)
+
+- ✅ `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` — HF deployment documented with URLs
+- ✅ `docs/HUGGINGFACE_COLLECTIONS.md` — collection guide for reference GGUF models
+- ✅ `docs/SOCIAL_PROOF_SNIPPETS.md` — short texts for GitHub/X/Reddit/HF
+- ✅ README Hugging Face presence section
+- ✅ docs/index.html "Hugging Face Space live" card
+- ✅ Space deployed: kimari-ai/kimari-fit-lab (RUNNING)
+- ✅ Org Card updated: kimari-ai/README
+- ✅ Collection created: Smouj013/kimari-compatible-gguf-models
+- ✅ Gate BLOCKED
+
+## v0.1.44-alpha
 
 - ✅ `docs/GTX1060_SHOWCASE.md` — local showcase documentation
 - ✅ `docs/assets/screenshots/gtx1060-wsl2/` — screenshot directory with manifest

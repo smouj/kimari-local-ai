@@ -5,6 +5,35 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.45-alpha] - 2026-05-12
+
+### Added
+- `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` — HF deployment documentation with URLs and status
+- `docs/HUGGINGFACE_COLLECTIONS.md` — collection guide for reference GGUF models
+- `docs/SOCIAL_PROOF_SNIPPETS.md` — short texts for GitHub, X, Reddit, HF community
+- README section for Hugging Face presence (Space, Org Card, Collection)
+- docs/index.html card: "Hugging Face Space live"
+- `docs/HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md` updated with deployed status and URLs
+- `docs/HUGGINGFACE_ORG_CARD.md` updated with deployed status and URLs
+- `docs/LOCAL_SHOWCASE_CHECKLIST.md` updated with pre-publish checklist
+- check-release.py checks for v0.1.45 (HF deployment doc, Space URL, no billing/plan)
+- tests/test_release_v0145.py
+
+### Deployed
+- Hugging Face Space: https://huggingface.co/spaces/kimari-ai/kimari-fit-lab (RUNNING)
+- Organization Card: https://huggingface.co/spaces/kimari-ai/README (updated)
+- Collection: https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66
+
+### Safety
+- Gate remains BLOCKED
+- No HF upload of weights, adapters, or GGUF files
+- No training performed
+- No HF Jobs executed
+- No tokens or private data in any file
+- No Kimari-4B release claims
+- Space does not execute models
+- Collection contains reference models, not official Kimari models
+
 ## [0.1.44-alpha] - 2026-05-12
 
 ### Added
