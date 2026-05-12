@@ -1,6 +1,16 @@
 # Hugging Face Deployment Status
 
-> **Deployed on 2026-05-12** — Kimari Local AI public presence on Hugging Face.
+> **Last reviewed: 2026-05-13** — Kimari Local AI public presence on Hugging Face.
+
+## Current State
+
+| Field | Value |
+|-------|-------|
+| **Repo version** | v0.1.53-alpha |
+| **HF org card version** | v0.1.53-alpha |
+| **Space version** | v0.1.53-alpha |
+| **Gate** | BLOCKED |
+| **Kimari-4B** | NOT released |
 
 ## Deployed Resources
 
@@ -37,17 +47,20 @@
 
 The `kimari-ai` organization card at `kimari-ai/README` includes:
 
-- Framework status: Alpha (v0.1.45)
+- Framework version: v0.1.53-alpha
 - Kimari-4B: Not released yet
-- GTX 1060 validation: TinyLlama test model
-- Links to GitHub, docs, and Space
+- GTX 1060 validation: Completed
+- HF Jobs smoke: Completed
+- Micro SFT: Completed (private)
+- Private adapter: Persisted (private repo)
+- KimariEval Private v1: Created (104 cases)
 - Gate: BLOCKED
 
 ## Collection
 
 The `kimari-compatible-gguf-models` collection contains reference/community GGUF models that Kimari can help run locally.
 
-**Important**: These are NOT official Kimari models. They are community/reference models.
+**Important**: These are NOT official Kimari models. They are community/reference models curated by Smouj013 for the Kimari project.
 
 ### Collection Criteria
 
@@ -64,11 +77,20 @@ The `kimari-compatible-gguf-models` collection contains reference/community GGUF
 - ❌ No raw logs
 - ❌ No Kimari-4B model files (not yet created)
 - ❌ No API keys, tokens, or billing information
+- ❌ No benchmark results
+- ❌ No eval raw outputs
 
 ## Gate Status
 
-**BLOCKED** — Kimari is in alpha. No public model releases, no training performed.
+**BLOCKED** — Kimari is in alpha. No public model releases.
+
+## Version History
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2026-05-13 | v0.1.53-alpha | Updated org card to reflect eval infrastructure, private adapter status |
+| 2026-05-12 | v0.1.45-alpha | Initial HF deployment (Space, Org Card, Collection) |
 
 ## Last Updated
 
-2026-05-12
+2026-05-13

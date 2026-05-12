@@ -554,30 +554,45 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 
       <!-- Kimari-4B Private Adapter Pipeline -->
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
-        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🧪 Kimari-4B Private Adapter Pipeline</h4>
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🧪 Kimari-4B Private Adapter + Eval Pipeline</h4>
         <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
-          Private adapter preparation — no public weights. Gate BLOCKED.
+          Private adapter persisted. KimariEval Private v1 ready. No public weights. Gate BLOCKED.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Adapter Run Doc →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Adapter Run →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Persistence Strategy →</a>
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_RELEASE_GATE.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Release Gate →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_ADAPTER_EVAL_PLAN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Eval Plan →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">KimariEval →</a>
         </div>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Kimari-4B is not released. Local validation uses TinyLlama.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Kimari-4B is not released. No public weights, adapters, or GGUF.</p>
       </div>
 
       <!-- Micro SFT Real (HF Jobs) -->
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
-        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🔬 Micro SFT Real on HF Jobs</h4>
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🔬 Micro SFT + Private Adapter Persisted</h4>
         <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
-          First real LoRA training on A10G GPU. 72 examples, 20 steps. Ephemeral adapter.
+          First real LoRA training on A10G. Private adapter persisted to Smouj013/kimari4b-micro-sft-adapter-v0.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/HF_JOBS_MICRO_SFT_REAL_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Run Doc →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_MICRO_SFT_RESULT.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Result →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/HF_JOBS_SMOKE_REAL_RESULT.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Smoke Result →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Persisted Result →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_MICRO_SFT_RESULT.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">First SFT Result →</a>
         </div>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Adapter ephemeral. Not committed. Not uploaded. Gate BLOCKED.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Private adapter persisted. Not public. Gate BLOCKED.</p>
+      </div>
+
+      <!-- KimariEval Private v1 -->
+      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">📊 KimariEval Private v1</h4>
+        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+          104 evaluation cases across 7 categories. Baseline vs adapter eval infrastructure ready.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Eval Docs →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_BASELINE_VS_ADAPTER_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Baseline vs Adapter →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_REVIEW_PROTOCOL.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Review Protocol →</a>
+        </div>
+        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Private eval. No benchmark claims. No raw outputs committed. Gate BLOCKED.</p>
       </div>
 
       <span style="font-size:1.1rem;font-weight:800;">What's New</span>

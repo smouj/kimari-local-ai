@@ -62,8 +62,7 @@ def test_hf_eval_runner_no_shell_true():
     runner = (PROJECT_ROOT / "eval" / "scripts" / "hf_jobs_run_kimari_eval.py").read_text()
     # Check code lines only (not docstrings) for shell=True in subprocess calls
     code_lines = [line for line in runner.split("\n") if line.strip() and not line.strip().startswith('#')]
-    shell_true_calls = [line for line in code_lines if 'shell=True' in line and 'subprocess' not in line]
-    # Also check subprocess.run calls don't use shell=True
+    # Check subprocess.run calls don't use shell=True
     subprocess_calls = [line for line in code_lines if 'subprocess.run' in line and 'shell=True' in line]
     assert len(subprocess_calls) == 0, f"Found subprocess call with shell=True: {subprocess_calls}"
 
@@ -140,6 +139,51 @@ def test_changelog_has_v0153():
 def test_roadmap_has_v0153():
     roadmap = (PROJECT_ROOT / "ROADMAP.md").read_text()
     assert "v0.1.53-alpha" in roadmap
+
+
+def test_org_card_has_current_version():
+    org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text()
+    assert "v0.1.53-alpha" in org_card
+
+
+def test_org_card_no_stale_version():
+    org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text()
+    assert "v0.1.28-alpha" not in org_card
+
+
+def test_org_card_kimari4b_not_released():
+    org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text().lower()
+    assert "not released" in org_card
+
+
+def test_org_card_gate_blocked():
+    org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text()
+    assert "BLOCKED" in org_card
+
+
+def test_deployment_status_has_current_version():
+    deploy = (PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md").read_text()
+    assert "v0.1.53-alpha" in deploy
+
+
+def test_readme_links_hf_space():
+    readme = (PROJECT_ROOT / "README.md").read_text()
+    assert "kimari-fit-lab" in readme
+
+
+def test_readme_kimari4b_not_released():
+    readme = (PROJECT_ROOT / "README.md").read_text().lower()
+    assert "not released" in readme or "not yet released" in readme
+
+
+def test_space_readme_not_released():
+    space = (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md").read_text().lower()
+    assert "not released" in space
+
+
+def test_index_html_has_kimari_eval():
+    index = (PROJECT_ROOT / "docs" / "index.html").read_text()
+    assert "KimariEval" in index
 
 
 if __name__ == "__main__":

@@ -182,7 +182,7 @@ See [docs/LOCAL_OPENAI_ENDPOINT_TEST.md](docs/LOCAL_OPENAI_ENDPOINT_TEST.md) for
 
 ### Hugging Face Presence
 
-> Kimari is now on Hugging Face with a live demo Space:
+> Kimari is on Hugging Face with a live demo Space:
 
 | Resource | Link |
 |----------|------|
@@ -190,7 +190,7 @@ See [docs/LOCAL_OPENAI_ENDPOINT_TEST.md](docs/LOCAL_OPENAI_ENDPOINT_TEST.md) for
 | **Organization Card** | [kimari-ai/README](https://huggingface.co/spaces/kimari-ai/README) |
 | **Compatible Models Collection** | [Smouj013/kimari-compatible-gguf-models](https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66) |
 
-> **Note:** The Space does not run any model. The collection contains reference/community GGUF models, not official Kimari models. Kimari-4B is not yet released.
+> **Note:** The Space does not run any model. The collection contains reference/community GGUF models, not official Kimari models. Kimari-4B is not yet released. Gate: BLOCKED.
 
 ### Public Showcase
 
@@ -209,15 +209,20 @@ See [docs/LOCAL_OPENAI_ENDPOINT_TEST.md](docs/LOCAL_OPENAI_ENDPOINT_TEST.md) for
 
 ### Kimari-4B Private Adapter Work
 
-> First private adapter run in progress. No public weights yet.
+> Private micro SFT completed. Private adapter persisted. KimariEval Private v1 created.
 
 | Resource | Link |
 |----------|------|
 | **Adapter Run Doc** | [docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md](docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md) |
+| **Adapter Persistence** | [docs/KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md](docs/KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md) |
+| **Persisted Result** | [docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md](docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md) |
 | **Release Gate** | [docs/KIMARI4B_RELEASE_GATE.md](docs/KIMARI4B_RELEASE_GATE.md) |
 | **Eval Plan** | [docs/KIMARI4B_ADAPTER_EVAL_PLAN.md](docs/KIMARI4B_ADAPTER_EVAL_PLAN.md) |
+| **KimariEval v1** | [docs/KIMARI_EVAL_PRIVATE_V1.md](docs/KIMARI_EVAL_PRIVATE_V1.md) |
+| **Baseline vs Adapter** | [docs/KIMARI_EVAL_BASELINE_VS_ADAPTER_RUN.md](docs/KIMARI_EVAL_BASELINE_VS_ADAPTER_RUN.md) |
+| **Review Protocol** | [docs/KIMARI_EVAL_REVIEW_PROTOCOL.md](docs/KIMARI_EVAL_REVIEW_PROTOCOL.md) |
 
-> **Note**: Local GTX 1060 validation uses TinyLlama 1.1B, not Kimari-4B. Kimari-4B is not yet released. Gate is BLOCKED.
+> **Note**: Private adapter on `Smouj013/kimari4b-micro-sft-adapter-v0`. Not public. Kimari-4B is not yet released. Gate is BLOCKED.
 
 ### Micro SFT Real (HF Jobs)
 
@@ -227,9 +232,10 @@ See [docs/LOCAL_OPENAI_ENDPOINT_TEST.md](docs/LOCAL_OPENAI_ENDPOINT_TEST.md) for
 |----------|------|
 | **Micro SFT Run Doc** | [docs/HF_JOBS_MICRO_SFT_REAL_RUN.md](docs/HF_JOBS_MICRO_SFT_REAL_RUN.md) |
 | **Micro SFT Result** | [docs/KIMARI4B_MICRO_SFT_RESULT.md](docs/KIMARI4B_MICRO_SFT_RESULT.md) |
+| **Persisted Result** | [docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md](docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md) |
 | **Dataset** | [dataset/build/kimari-fit-v0/sft_micro.jsonl](dataset/build/kimari-fit-v0/sft_micro.jsonl) |
 
-> **Note**: Adapter is ephemeral (HF Jobs storage). Not committed, not uploaded. Gate BLOCKED.
+> **Note**: Adapter persisted to private HF repo `Smouj013/kimari4b-micro-sft-adapter-v0`. Not public. Gate BLOCKED.
 
 ## HF Jobs Smoke Tests
 

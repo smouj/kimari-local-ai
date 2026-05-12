@@ -6169,6 +6169,116 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [74/74] v0.1.53 HF Sync Checks ──
+    print("\n[74/74] v0.1.53 HF Sync Checks")
+
+    current_version = get_pyproject_version()
+
+    # Org card
+    org_card = PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md"
+    check(
+        "HUGGINGFACE_ORG_CARD.md exists",
+        org_card.exists(),
+        "docs/HUGGINGFACE_ORG_CARD.md not found",
+    )
+    if org_card.exists():
+        org_card_text = org_card.read_text()
+        check(
+            "Org card has current version",
+            current_version in org_card_text,
+            f"Org card does not mention {current_version}",
+        )
+        check(
+            "Org card has no stale v0.1.28-alpha",
+            "v0.1.28-alpha" not in org_card_text,
+            "Org card still mentions stale v0.1.28-alpha",
+        )
+        check(
+            "Org card says Kimari-4B not released",
+            "not released" in org_card_text.lower(),
+            "Org card must say Kimari-4B not released",
+        )
+        check(
+            "Org card says gate BLOCKED",
+            "BLOCKED" in org_card_text,
+            "Org card must mention gate BLOCKED",
+        )
+
+    # Deployment status
+    deploy_status = PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md"
+    check(
+        "HUGGINGFACE_DEPLOYMENT_STATUS.md exists",
+        deploy_status.exists(),
+        "docs/HUGGINGFACE_DEPLOYMENT_STATUS.md not found",
+    )
+    if deploy_status.exists():
+        deploy_text = deploy_status.read_text()
+        check(
+            "Deployment status has current version",
+            current_version in deploy_text,
+            f"Deployment status does not mention {current_version}",
+        )
+
+    # README HF links
+    readme_path = PROJECT_ROOT / "README.md"
+    if readme_path.exists():
+        readme_text = readme_path.read_text()
+        check(
+            "README links HF Space",
+            "kimari-fit-lab" in readme_text,
+            "README must link to HF Space",
+        )
+        check(
+            "README says Kimari-4B not released",
+            "not released" in readme_text.lower() or "not yet released" in readme_text.lower(),
+            "README must say Kimari-4B not released",
+        )
+
+    # No false claims anywhere (check for positive release claims only)
+    for doc_file in PROJECT_ROOT.glob("docs/*.md"):
+        doc_text = doc_file.read_text().lower()
+        if "kimari-4b" in doc_text:
+            # Look for positive claims: "kimari-4b is released" or "kimari-4b released" without negation
+            for line in doc_text.split("\n"):
+                if "kimari-4b" in line and "released" in line:
+                    # Skip if line contains any negation
+                    negations = ["not released", "not yet released", "not available", "no public", "has not been", "is not released", "until.*released", "when.*released", "before.*released", "does not claim", "don't claim"]
+                    if any(neg in line for neg in negations):
+                        continue
+                    # Only flag clearly positive claims
+                    negation_present = any(n in line for n in ["not released", "not yet", "no claim", "no ", "not ", "don't", "doesn't", "when ", "until ", "before ", "after ", "if "])
+                    if _re.search(r'kimari-4b (is |has been |was )?released', line) and not negation_present:
+                        check(
+                            f"{doc_file.name}: no Kimari-4B released claim",
+                            False,
+                            f"{doc_file.name} may claim Kimari-4B is released",
+                        )
+
+    # Space README
+    space_readme = PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md"
+    check(
+        "Space README exists",
+        space_readme.exists(),
+        "huggingface/kimari-fit-lab/README.md not found",
+    )
+    if space_readme.exists():
+        space_text = space_readme.read_text()
+        check(
+            "Space README says not released",
+            "not released" in space_text.lower(),
+            "Space README must say Kimari-4B not released",
+        )
+
+    # index.html has KimariEval card
+    index_html = PROJECT_ROOT / "docs" / "index.html"
+    if index_html.exists():
+        index_text = index_html.read_text()
+        check(
+            "index.html has KimariEval card",
+            "KimariEval" in index_text,
+            "docs/index.html must have KimariEval card",
+        )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

@@ -811,6 +811,20 @@ twine upload dist/*
 - [ ] no GGUF in public repo
 - [ ] Gate BLOCKED
 
+## v0.1.53 HF Sync Checks
+
+- [ ] docs/HUGGINGFACE_ORG_CARD.md version matches pyproject.toml
+- [ ] docs/HUGGINGFACE_ORG_CARD.md does not contain v0.1.28-alpha
+- [ ] docs/HUGGINGFACE_ORG_CARD.md mentions Kimari-4B not released
+- [ ] docs/HUGGINGFACE_ORG_CARD.md mentions gate BLOCKED
+- [ ] docs/HUGGINGFACE_DEPLOYMENT_STATUS.md has current version
+- [ ] README.md links HF Space
+- [ ] README.md says Kimari-4B not released
+- [ ] no "Kimari-4B released" in any doc
+- [ ] no public adapter/GGUF claim
+- [ ] HF Space README mentions version and not released
+- [ ] docs/index.html has KimariEval card
+
 ## v0.1.52 Checks
 
 - [ ] eval private dataset exists (7 categories, 100+ cases)
