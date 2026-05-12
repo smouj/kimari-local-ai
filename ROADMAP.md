@@ -455,7 +455,18 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.50-alpha (Current)
+## v0.1.51-alpha (Current)
+
+- ✅ Second micro SFT completed (Job 6a03a25e72518a06598ffae0)
+- ✅ adapter_persisted_private: true (uploaded to Smouj013/kimari4b-micro-sft-adapter-v0)
+- ✅ adapter_load_check: true (adapter loads and generates text)
+- ✅ Private HF repo created and adapter uploaded
+- ✅ UV-compatible training script (PEP 723)
+- ✅ PyTorch 2.11.0+cu130, transformers 5.8.0, peft 0.19.1, trl 1.4.0
+- ✅ Loss: 5.005 → 4.228 (20 steps, inline dataset)
+- Gate BLOCKED — no public release, no benchmark claims
+
+## v0.1.50-alpha
 
 - ✅ Micro SFT completed (Job 6a038ec87618f125ee2b7984)
 - ✅ Dataset hash inconsistency fixed

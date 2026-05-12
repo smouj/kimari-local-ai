@@ -793,6 +793,27 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.51 Checks
+
+- [ ] Persisted config exists
+- [ ] Private adapter repo documented
+- [ ] Runner dry-run default, requires --allow-submit --yes
+- [ ] No --token arg in runner
+- [ ] No shell=True in runner
+- [ ] No command string split in runner
+- [ ] Summary template exists
+- [ ] Summary creator exists
+- [ ] Summary validator exists
+- [ ] adapter_committed_public false in summary
+- [ ] hf_public_upload_performed false in summary
+- [ ] gguf_generated false in summary
+- [ ] gate_state BLOCKED in summary
+- [ ] Load check script exists
+- [ ] Private repo policy doc exists
+- [ ] No safetensors in public repo
+- [ ] No GGUF in public repo (excl deps)
+- [ ] Gate BLOCKED
+
 ## v0.1.50 Checks
 
 - [ ] Dataset hash script exists (hash_dataset.py)

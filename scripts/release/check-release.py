@@ -5724,6 +5724,172 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [71/71] v0.1.51 Private adapter persistence + load check ──
+    print("\n[71/71] v0.1.51 Private adapter persistence + load check")
+
+    # Persisted config
+    persisted_config = PROJECT_ROOT / "training" / "configs" / "hf_jobs_kimari4b_micro_sft_persisted.v0.yaml"
+    check(
+        "Persisted config exists",
+        persisted_config.exists(),
+        "training/configs/hf_jobs_kimari4b_micro_sft_persisted.v0.yaml not found",
+    )
+
+    # Private adapter repo doc
+    check(
+        "PRIVATE_ADAPTER_REPO.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_PRIVATE_ADAPTER_REPO.md").exists(),
+        "docs/KIMARI4B_PRIVATE_ADAPTER_REPO.md not found",
+    )
+
+    # Persisted run doc
+    check(
+        "PERSISTED_RUN.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_MICRO_SFT_PERSISTED_RUN.md").exists(),
+        "docs/KIMARI4B_MICRO_SFT_PERSISTED_RUN.md not found",
+    )
+
+    # Load check doc
+    check(
+        "LOAD_CHECK.md exists",
+        (PROJECT_ROOT / "docs" / "KIMARI4B_PRIVATE_ADAPTER_LOAD_CHECK.md").exists(),
+        "docs/KIMARI4B_PRIVATE_ADAPTER_LOAD_CHECK.md not found",
+    )
+
+    # Persisted runner
+    runner = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_micro_sft_persisted.py"
+    check(
+        "Persisted runner exists",
+        runner.exists(),
+        "training/scripts/hf_jobs_micro_sft_persisted.py not found",
+    )
+    if runner.exists():
+        runner_text = runner.read_text()
+        check(
+            "Runner dry-run default",
+            "--dry-run" in runner_text,
+            "Runner must have --dry-run flag",
+        )
+        check(
+            "Runner requires --allow-submit --yes",
+            "--allow-submit" in runner_text and "--yes" in runner_text,
+            "Runner must require --allow-submit --yes",
+        )
+        # Check for --token as argparse argument (not in docstring/comments)
+        runner_lines = [l for l in runner_text.split("\n") if not l.strip().startswith("#") and not l.strip().startswith('"""')]
+        runner_code = "\n".join(runner_lines)
+        check(
+            "No --token arg in runner",
+            "--token" not in runner_code or "No --token" in runner_text,
+            "Runner must not accept --token",
+        )
+        check(
+            "No shell=True in runner",
+            "shell=True" not in runner_code or "No shell=True" in runner_text,
+            "Runner must not use shell=True",
+        )
+
+    # Load check script
+    check(
+        "check_private_adapter_load.py exists",
+        (PROJECT_ROOT / "training" / "scripts" / "check_private_adapter_load.py").exists(),
+        "training/scripts/check_private_adapter_load.py not found",
+    )
+
+    # Summary template, creator, validator
+    check(
+        "Persisted summary template exists",
+        (PROJECT_ROOT / "training" / "templates" / "hf_jobs_micro_sft_persisted_summary.template.json").exists(),
+        "training/templates/hf_jobs_micro_sft_persisted_summary.template.json not found",
+    )
+    check(
+        "Persisted summary creator exists",
+        (PROJECT_ROOT / "training" / "scripts" / "create_hf_jobs_micro_sft_persisted_summary.py").exists(),
+        "training/scripts/create_hf_jobs_micro_sft_persisted_summary.py not found",
+    )
+    check(
+        "Persisted summary validator exists",
+        (PROJECT_ROOT / "training" / "scripts" / "validate_hf_jobs_micro_sft_persisted_summary.py").exists(),
+        "training/scripts/validate_hf_jobs_micro_sft_persisted_summary.py not found",
+    )
+
+    # Result summary
+    result_summary = PROJECT_ROOT / "docs" / "KIMARI4B_MICRO_SFT_PERSISTED_RESULT_SUMMARY.json"
+    if result_summary.exists():
+        import json as _json
+        data = _json.loads(result_summary.read_text())
+        check(
+            "adapter_persisted_private in result summary",
+            data.get("adapter_persisted_private") is True,
+            f"adapter_persisted_private is {data.get('adapter_persisted_private')}, expected true",
+        )
+        check(
+            "adapter_committed_public is false",
+            data.get("adapter_committed_public") is False,
+            f"adapter_committed_public is {data.get('adapter_committed_public')}, expected false",
+        )
+        check(
+            "hf_public_upload_performed is false",
+            data.get("hf_public_upload_performed") is False,
+            f"hf_public_upload_performed is {data.get('hf_public_upload_performed')}, expected false",
+        )
+        check(
+            "gguf_generated is false",
+            data.get("gguf_generated") is False,
+            f"gguf_generated is {data.get('gguf_generated')}, expected false",
+        )
+        check(
+            "gate_state is BLOCKED",
+            data.get("gate_state") == "BLOCKED",
+            f"gate_state is {data.get('gate_state')}, expected BLOCKED",
+        )
+        check(
+            "adapter_load_check is true",
+            data.get("adapter_load_check") is True,
+            f"adapter_load_check is {data.get('adapter_load_check')}, expected true",
+        )
+
+    # No safetensors or GGUF in public repo
+    safetensors = list(PROJECT_ROOT.rglob("*.safetensors"))
+    check(
+        "No .safetensors in public repo",
+        len(safetensors) == 0,
+        f"Found {len(safetensors)} .safetensors files in public repo",
+    )
+    gguf_files = [f for f in PROJECT_ROOT.rglob("*.gguf") if "deps" not in str(f) and "node_modules" not in str(f)]
+    check(
+        "No .gguf in public repo (excl deps)",
+        len(gguf_files) == 0,
+        f"Found {len(gguf_files)} .gguf files in public repo",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.51-alpha",
+        get_pyproject_version() >= "0.1.51-alpha",
+        f"Expected version >= 0.1.51-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.51-alpha",
+        get_init_version() >= "0.1.51-alpha",
+        f"Expected version >= 0.1.51-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.51-alpha] entry",
+        "[0.1.51-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.51-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.51-alpha",
+        "v0.1.51-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.51-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.51)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

@@ -6,6 +6,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.49-alpha] - 2026-05-13
+## [0.1.51-alpha] - 2026-05-13
+
+### Added
+- `training/configs/hf_jobs_kimari4b_micro_sft_persisted.v0.yaml` — persisted micro SFT config
+- `training/scripts/hf_jobs_micro_sft_persisted.py` — HF Jobs runner with private repo upload
+- `training/scripts/run_micro_sft_persisted_uv.py` — UV-compatible training script (PEP 723)
+- `training/scripts/check_private_adapter_load.py` — adapter load check script
+- `training/scripts/create_hf_jobs_micro_sft_persisted_summary.py` — summary creator
+- `training/scripts/validate_hf_jobs_micro_sft_persisted_summary.py` — summary validator
+- `training/templates/hf_jobs_micro_sft_persisted_summary.template.json` — summary template
+- `docs/KIMARI4B_PRIVATE_ADAPTER_REPO.md` — private repo policy
+- `docs/KIMARI4B_MICRO_SFT_PERSISTED_RUN.md` — run documentation
+- `docs/KIMARI4B_PRIVATE_ADAPTER_LOAD_CHECK.md` — load check docs
+- `docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md` — result doc
+- `docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT_SUMMARY.json` — result summary
+- Private HF repo `Smouj013/kimari4b-micro-sft-adapter-v0` created and adapter uploaded
+- Version bump: 0.1.50-alpha → 0.1.51-alpha
+
+### Deployed
+- **Job 6a03a25e72518a06598ffae0 — COMPLETED ✅**
+- GPU: NVIDIA A10G, 22.3 GB
+- Base model: Qwen/Qwen2.5-1.5B-Instruct
+- PyTorch: 2.11.0+cu130, transformers: 5.8.0, peft: 0.19.1, trl: 1.4.0
+- Training: 20 steps, loss 5.005 → 4.228
+- **adapter_persisted_private: true** (uploaded to private HF repo)
+- **adapter_load_check: true** (adapter loads and generates text)
+- **generation_success: true**
+- adapter_hash: 26a8190dab52f816157da467369ae88f
+- adapter_size: 4,372,840 bytes
+- Estimated cost: ~$0.50
+
+### Safety
+- Gate remains BLOCKED
+- adapter_committed_public: false
+- hf_public_upload_performed: false
+- gguf_generated: false
+- No raw logs committed
+- No tokens
+- No billing info
+
 ## [0.1.50-alpha] - 2026-05-13
 
 ### Added
