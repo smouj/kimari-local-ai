@@ -6,10 +6,10 @@ run_id: "kimari4b-hfjobs-micro-sft-v0"
 
 # ── Base Model ──────────────────────────────────────────────────
 base_model:
-  name: "Qwen/Qwen2.5-3B-Instruct"
+  name: "Qwen/Qwen2.5-1.5B-Instruct"
   license: "Apache-2.0"
-  params_billions: 3.0
-  reason: "Permissive license, strong multilingual, reasonable size for a10g-small"
+  params_billions: 1.5
+  reason: "Cheaper first pipeline smoke; validate training before investing in 3B"
 
 # ── Dataset ─────────────────────────────────────────────────────
 dataset:
@@ -26,9 +26,9 @@ dataset:
 # ── HF Jobs Settings ───────────────────────────────────────────
 hf_jobs:
   flavor: "a10g-small"         # $1.00/hour, NVIDIA A10G 24GB
-  timeout_minutes: 30            # Max 30 minutes to limit cost
+  timeout_minutes: 20            # Max 20 minutes to limit cost
   docker_image: "pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel"
-  estimated_cost_usd: 0.50      # 30 min * $1.00/hr ≈ $0.50
+  estimated_cost_usd: 0.35      # 20 min * $1.00/hr ≈ $0.35
 
 # ── LoRA Config ──────────────────────────────────────────────────
 lora:
@@ -47,7 +47,7 @@ training:
   learning_rate: 5.0e-4
   lr_scheduler_type: "cosine"
   warmup_ratio: 0.1
-  max_steps: 20                # Short run for first micro SFT
+  max_steps: 10                # Short run for first micro SFT (pipeline validation)
   max_seq_length: 512
   logging_steps: 5
   save_steps: 10

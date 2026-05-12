@@ -51,13 +51,13 @@ python training/scripts/hf_jobs_micro_sft_real.py \
 
 | Parameter | Value |
 |-----------|-------|
-| Base model | Qwen/Qwen2.5-3B-Instruct (Apache 2.0) |
+| Base model | Qwen/Qwen2.5-1.5B-Instruct (Apache 2.0) |
 | Dataset | kimari-fit-v0 (72 examples) |
 | Method | SFT LoRA r=8, alpha=16 |
-| Max steps | 20 |
+| Max steps | 10 |
 | Flavor | a10g-small ($1.00/hour) |
-| Timeout | 30 minutes |
-| Estimated cost | ~$0.50 |
+| Timeout | 20 minutes |
+| Estimated cost | ~$0.35 |
 
 ## Safety Flags
 

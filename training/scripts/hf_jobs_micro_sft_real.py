@@ -78,7 +78,7 @@ def build_training_script(config: dict) -> str:
     lora = config.get("lora", {})
     training_cfg = config.get("training", {})
     max_steps = training_cfg.get("max_steps", 20)
-    model_name = config.get("base_model", {}).get("name", "Qwen/Qwen2.5-3B-Instruct")
+    model_name = config.get("base_model", {}).get("name", "Qwen/Qwen2.5-1.5B-Instruct")
     lora_r = lora.get("r", 8)
     lora_alpha = lora.get("lora_alpha", 16)
     lr = training_cfg.get("learning_rate", "5e-4")

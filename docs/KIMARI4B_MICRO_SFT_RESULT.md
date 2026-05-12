@@ -11,7 +11,7 @@ This document will be updated after the micro SFT run completes.
 | Field | Value |
 |-------|-------|
 | **Run ID** | kimari4b-hfjobs-micro-sft-v0 |
-| **Base model** | Qwen/Qwen2.5-3B-Instruct (Apache 2.0) |
+| **Base model** | Qwen/Qwen2.5-1.5B-Instruct (Apache 2.0) |
 | **Dataset** | kimari-fit-v0 (72 examples) |
 | **Flavor** | a10g-small |
 | **Max steps** | 20 |
