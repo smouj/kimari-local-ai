@@ -455,7 +455,19 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.43-alpha (Current)
+## v0.1.44-alpha (Current)
+
+- ✅ `docs/GTX1060_SHOWCASE.md` — local showcase documentation
+- ✅ `docs/assets/screenshots/gtx1060-wsl2/` — screenshot directory with manifest
+- ✅ `scripts/docs/validate_screenshot_manifest.py` — screenshot manifest validator
+- ✅ `huggingface/kimari-fit-lab/` — HF Space pack (Gradio compatibility checker)
+- ✅ `docs/HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md` — Space deployment guide
+- ✅ `docs/HUGGINGFACE_ORG_CARD.md` — Organization card draft
+- ✅ README visual validation section
+- ✅ docs/index.html enhanced hero
+- ✅ Gate BLOCKED
+
+## v0.1.43-alpha
 
 - ✅ `docs/LOCAL_INTEGRATION_VALIDATION.md` — local integration validation guide
 - ✅ `docs/OPENWEBUI_LOCAL_SETUP.md` — Open WebUI setup

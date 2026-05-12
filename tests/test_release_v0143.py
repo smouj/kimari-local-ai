@@ -168,8 +168,16 @@ def test_version_bump():
     """pyproject.toml and __init__.py must be >= 0.1.43-alpha."""
     pyproject = (PROJECT_ROOT / "pyproject.toml").read_text()
     init = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
-    assert "0.1.43-alpha" in pyproject, "pyproject.toml must have 0.1.43-alpha"
-    assert "0.1.43-alpha" in init, "kimari/__init__.py must have 0.1.43-alpha"
+    import re
+
+    match_p = re.search(r'version\s*=\s*["\']([^"\']+)["\']', pyproject)
+    match_i = re.search(r'__version__\s*=\s*["\']([^"\']+)["\']', init)
+    assert match_p and match_p.group(1) >= "0.1.43-alpha", (
+        f"pyproject.toml version must be >= 0.1.43-alpha, got {match_p.group(1) if match_p else 'not found'}"
+    )
+    assert match_i and match_i.group(1) >= "0.1.43-alpha", (
+        f"__init__.py version must be >= 0.1.43-alpha, got {match_i.group(1) if match_i else 'not found'}"
+    )
 
 
 def test_changelog_has_v0143():

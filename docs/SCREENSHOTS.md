@@ -483,6 +483,77 @@ These captures document the first real inference validation on GTX 1060 hardware
 
 ---
 
+## GTX 1060 Local Showcase Screenshots
+
+### 1. nvidia-smi GPU detection (WSL2)
+
+**Command:** `/usr/lib/wsl/lib/nvidia-smi` (or `nvidia-smi` if on PATH)
+**Purpose:** Shows GPU detection in WSL2 environment
+**Safety:** No secrets in GPU output; redact any user-specific paths
+**Status:** planned
+
+### 2. kimari doctor --deep
+
+**Command:** `kimari doctor --deep`
+**Purpose:** Full environment diagnostic including CUDA, GPU, profiles
+**Safety:** No secrets; may show model paths — redact user-specific paths
+**Status:** planned
+
+### 3. kimari status
+
+**Command:** `kimari status`
+**Purpose:** Shows server status and profile info
+**Safety:** No secrets; shows model path and port
+**Status:** planned
+
+### 4. kimari start --profile test
+
+**Command:** `kimari start --profile test`
+**Purpose:** Shows llama-server startup with CUDA, GTX 1060, compute 6.1
+**Safety:** No secrets; shows binary path and model name
+**Status:** planned
+
+### 5. Endpoint health
+
+**Command:** `curl http://127.0.0.1:11435/health`
+**Purpose:** Confirms inference server is running and healthy
+**Safety:** No secrets in health endpoint response
+**Status:** planned
+
+### 6. Endpoint models
+
+**Command:** `curl http://127.0.0.1:11435/v1/models`
+**Purpose:** Lists available models via OpenAI-compatible API
+**Safety:** No secrets; model IDs are public
+**Status:** planned
+
+### 7. Chat completion
+
+**Command:** `curl http://127.0.0.1:11435/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf","messages":[{"role":"user","content":"Hello"}],"max_tokens":50}'`
+**Purpose:** Demonstrates chat completion via OpenAI-compatible endpoint
+**Safety:** No secrets; prompt and response are safe to show
+**Status:** planned
+
+### 8. Integration configs
+
+**Command:** `kimari integrations generate --all --json --profile test`
+**Purpose:** Shows generated configs for Open WebUI, OpenClaw, Continue.dev, Hermes
+**Safety:** No secrets; base_url is localhost, no API keys
+**Status:** planned
+
+### 9. GTX 1060 benchmark table
+
+**Purpose:** CUDA vs CPU performance comparison
+**Safety:** Performance numbers only
+**Status:** planned
+
+### 10. Endpoint validator
+
+**Command:** `python scripts/integrations/validate_local_openai_endpoint.py --base-url http://127.0.0.1:11435/v1 --json`
+**Purpose:** Shows health/models/chat validation
+**Safety:** No secrets
+**Status:** planned
+
 ## Rules
 
 1. **No secrets** — API keys, tokens, local paths, or user names must not appear.

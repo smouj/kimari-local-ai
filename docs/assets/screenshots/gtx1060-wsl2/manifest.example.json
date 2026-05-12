@@ -1,0 +1,84 @@
+{
+  "screenshots": [
+    {
+      "filename": "nvidia-smi.png",
+      "command": "/usr/lib/wsl/lib/nvidia-smi",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": false,
+      "public_safe": true,
+      "notes": "GPU detection output showing GTX 1060 6GB, driver version, CUDA version"
+    },
+    {
+      "filename": "kimari-status.png",
+      "command": "kimari status",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": true,
+      "public_safe": true,
+      "notes": "May show model path — redact user-specific paths before committing"
+    },
+    {
+      "filename": "kimari-doctor-deep.png",
+      "command": "kimari doctor --deep",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": true,
+      "public_safe": true,
+      "notes": "Full diagnostic output. Redact local paths. Shows 14 PASS, 1 WARN"
+    },
+    {
+      "filename": "local-endpoint-health.png",
+      "command": "curl http://127.0.0.1:11435/health",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": false,
+      "public_safe": true,
+      "notes": "Shows {\"status\":\"ok\"} response"
+    },
+    {
+      "filename": "local-endpoint-models.png",
+      "command": "curl http://127.0.0.1:11435/v1/models",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": false,
+      "public_safe": true,
+      "notes": "Model list with TinyLlama metadata"
+    },
+    {
+      "filename": "local-chat-completion.png",
+      "command": "curl http://127.0.0.1:11435/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf\",\"messages\":[{\"role\":\"user\",\"content\":\"Hello\"}],\"max_tokens\":50}'",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": false,
+      "public_safe": true,
+      "notes": "Chat completion response with timing info"
+    },
+    {
+      "filename": "integrations-generate.png",
+      "command": "kimari integrations generate --all --json --profile test",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": false,
+      "public_safe": true,
+      "notes": "Integration configs for Open WebUI, OpenClaw, Continue.dev, Hermes"
+    },
+    {
+      "filename": "llama-server-cuda-startup.png",
+      "command": "kimari start --profile test",
+      "contains_secret": false,
+      "contains_token": false,
+      "contains_private_path": true,
+      "public_safe": true,
+      "notes": "Shows llama-server starting with CUDA, GTX 1060, compute 6.1. Redact paths if needed"
+    }
+  ],
+  "meta": {
+    "hardware": "NVIDIA GeForce GTX 1060 6GB",
+    "os": "WSL2 Ubuntu 24.04",
+    "cuda": "12.0",
+    "model": "TinyLlama 1.1B Q4_K_M (validation model, NOT Kimari-4B)",
+    "gate": "BLOCKED",
+    "note": "No real screenshots are committed until manually reviewed. This manifest is a template."
+  }
+}

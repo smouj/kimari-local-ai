@@ -793,26 +793,43 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
+## v0.1.44 Checks
+
+- [ ] `docs/GTX1060_SHOWCASE.md` exists
+- [ ] `docs/assets/screenshots/gtx1060-wsl2/manifest.example.json` exists
+- [ ] `scripts/docs/validate_screenshot_manifest.py` exists
+- [ ] `huggingface/kimari-fit-lab/app.py` exists
+- [ ] `huggingface/kimari-fit-lab/README.md` exists
+- [ ] `docs/HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md` exists
+- [ ] `docs/HUGGINGFACE_ORG_CARD.md` exists
+- [ ] README mentions GTX 1060 local validation
+- [ ] README says Kimari-4B not released
+- [ ] No screenshots with tokens or private paths
+- [ ] No fake benchmarks
+- [ ] Gate BLOCKED
+- [ ] No HF upload
+- [ ] No training
+
 ## v0.1.43 Checks
 
-- [ ] `docs/LOCAL_INTEGRATION_VALIDATION.md` exists
-- [ ] `docs/OPENWEBUI_LOCAL_SETUP.md` exists
-- [ ] `docs/OPENCLAW_LOCAL_SETUP.md` exists
-- [ ] `docs/CONTINUE_LOCAL_SETUP.md` exists
-- [ ] `docs/LOCAL_SHOWCASE_CHECKLIST.md` exists
-- [ ] `scripts/integrations/validate_local_openai_endpoint.py` exists
-- [ ] No API key values in any integration doc
-- [ ] `kimari integrations generate --all --json` outputs open-webui/openclaw/continue/hermes configs
-- [ ] `kimari integrations validate` supports --json output
-- [ ] README mentions local integrations (Open WebUI, OpenClaw, Continue.dev)
-- [ ] README/docs do not claim Kimari-4B is released
-- [ ] pyproject.toml version is 0.1.43-alpha
-- [ ] kimari/__init__.py __version__ is 0.1.43-alpha
-- [ ] CHANGELOG.md has [0.1.43-alpha] entry
-- [ ] ROADMAP.md mentions v0.1.43-alpha
-- [ ] Gate BLOCKED
-- [ ] No HF upload performed
-- [ ] No training performed
+- [x] `docs/LOCAL_INTEGRATION_VALIDATION.md` exists
+- [x] `docs/OPENWEBUI_LOCAL_SETUP.md` exists
+- [x] `docs/OPENCLAW_LOCAL_SETUP.md` exists
+- [x] `docs/CONTINUE_LOCAL_SETUP.md` exists
+- [x] `docs/LOCAL_SHOWCASE_CHECKLIST.md` exists
+- [x] `scripts/integrations/validate_local_openai_endpoint.py` exists
+- [x] No API key values in any integration doc
+- [x] `kimari integrations generate --all --json` outputs open-webui/openclaw/continue/hermes configs
+- [x] `kimari integrations validate` supports --json output
+- [x] README mentions local integrations (Open WebUI, OpenClaw, Continue.dev)
+- [x] README/docs do not claim Kimari-4B is released
+- [x] pyproject.toml version >= 0.1.43-alpha
+- [x] kimari/__init__.py __version__ >= 0.1.43-alpha
+- [x] CHANGELOG.md has [0.1.43-alpha] entry
+- [x] ROADMAP.md mentions v0.1.43-alpha
+- [x] Gate BLOCKED
+- [x] No HF upload performed
+- [x] No training performed
 
 ## v0.1.42 Checks
 

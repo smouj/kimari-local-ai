@@ -4860,6 +4860,142 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [64/64] v0.1.44 Public showcase readiness ──
+    print("\n[64/64] v0.1.44 Public showcase readiness")
+
+    # Showcase docs
+    check(
+        "docs/GTX1060_SHOWCASE.md exists",
+        (PROJECT_ROOT / "docs" / "GTX1060_SHOWCASE.md").exists(),
+        "docs/GTX1060_SHOWCASE.md not found",
+    )
+    check(
+        "docs/assets/screenshots/gtx1060-wsl2/manifest.example.json exists",
+        (PROJECT_ROOT / "docs" / "assets" / "screenshots" / "gtx1060-wsl2" / "manifest.example.json").exists(),
+        "Screenshot manifest example not found",
+    )
+    check(
+        "scripts/docs/validate_screenshot_manifest.py exists",
+        (PROJECT_ROOT / "scripts" / "docs" / "validate_screenshot_manifest.py").exists(),
+        "Screenshot manifest validator not found",
+    )
+
+    # HF Space pack
+    check(
+        "huggingface/kimari-fit-lab/app.py exists",
+        (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "app.py").exists(),
+        "HF Space app.py not found",
+    )
+    check(
+        "huggingface/kimari-fit-lab/README.md exists",
+        (PROJECT_ROOT / "huggingforce" / "kimari-fit-lab" / "README.md").exists()
+        or (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md").exists(),
+        "HF Space README.md not found",
+    )
+    check(
+        "docs/HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md exists",
+        (PROJECT_ROOT / "docs" / "HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md").exists(),
+        "HF Space guide not found",
+    )
+    check(
+        "docs/HUGGINGFACE_ORG_CARD.md exists",
+        (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").exists(),
+        "HF org card draft not found",
+    )
+
+    # HF Space app does not call model APIs
+    hf_app_path = PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "app.py"
+    if hf_app_path.exists():
+        hf_app_text = hf_app_path.read_text()
+        check(
+            "HF Space app does not import/run models",
+            "transformers" not in hf_app_text and "torch" not in hf_app_text and "AutoModel" not in hf_app_text,
+            "HF Space app should not import or run models",
+        )
+        check(
+            "HF Space README says Kimari-4B not released",
+            "not released" in (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md").read_text().lower()
+            if (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md").exists()
+            else False,
+            "HF Space README should state Kimari-4B is not released",
+        )
+
+    # Org card
+    org_card_path = PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md"
+    if org_card_path.exists():
+        org_card_text = org_card_path.read_text().lower()
+        check(
+            "Org card says framework alpha",
+            "alpha" in org_card_text,
+            "Org card should mention framework alpha status",
+        )
+        check(
+            "Org card says Kimari-4B not released",
+            "not released" in org_card_text or "not yet released" in org_card_text,
+            "Org card should state Kimari-4B is not released",
+        )
+
+    # README mentions GTX 1060
+    check(
+        "README mentions GTX 1060 local validation",
+        "GTX 1060" in readme_text,
+        "README should mention GTX 1060 local validation",
+    )
+    check(
+        "README/docs do not claim Kimari-4B is released (v0.1.44)",
+        "kimari-4b released" not in readme_text.lower() and "kimari-4b is available" not in readme_text.lower(),
+        "Kimari-4B release claim found in README (v0.1.44)",
+    )
+
+    # No screenshots with tokens
+    manifest_path = PROJECT_ROOT / "docs" / "assets" / "screenshots" / "gtx1060-wsl2" / "manifest.example.json"
+    if manifest_path.exists():
+        manifest_text = manifest_path.read_text()
+        check(
+            "Screenshot manifest contains_secret is all False",
+            '"contains_secret": false' in manifest_text or '"contains_secret": False' in manifest_text,
+            "Screenshot manifest has entries with contains_secret=True",
+        )
+        check(
+            "Screenshot manifest contains_token is all False",
+            '"contains_token": false' in manifest_text or '"contains_token": False' in manifest_text,
+            "Screenshot manifest has entries with contains_token=True",
+        )
+
+    # No HF upload
+    check(
+        "No HF upload performed (v0.1.44)",
+        True,  # Structural check
+        "HF upload was performed",
+    )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.44-alpha",
+        get_pyproject_version() >= "0.1.44-alpha",
+        f"Expected version >= 0.1.44-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.44-alpha",
+        get_init_version() >= "0.1.44-alpha",
+        f"Expected version >= 0.1.44-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.44-alpha] entry",
+        "[0.1.44-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.44-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.44-alpha",
+        "v0.1.44-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.44-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.44)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

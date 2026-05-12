@@ -5,6 +5,32 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.44-alpha] - 2026-05-12
+
+### Added
+- `docs/GTX1060_SHOWCASE.md` — GTX 1060 local showcase documentation
+- `docs/assets/screenshots/gtx1060-wsl2/` — screenshot directory with README and manifest
+- `docs/assets/screenshots/gtx1060-wsl2/manifest.example.json` — screenshot manifest template
+- `scripts/docs/validate_screenshot_manifest.py` — screenshot manifest validator
+- `huggingface/kimari-fit-lab/` — HF Space pack (Gradio GPU compatibility checker)
+- `huggingface/kimari-fit-lab/app.py` — Gradio app for GPU/model compatibility lookup
+- `huggingface/kimari-fit-lab/README.md` — Space README
+- `huggingface/kimari-fit-lab/requirements.txt` — Space dependencies
+- `docs/HUGGINGFACE_SPACE_KIMARI_FIT_LAB.md` — HF Space deployment guide
+- `docs/HUGGINGFACE_ORG_CARD.md` — Organization card draft for kimari-ai
+- README visual validation section with GTX 1060 benchmark table
+- docs/index.html enhanced hero with validation badges
+- check-release.py checks for v0.1.44 (showcase docs, HF Space, org card, screenshot manifest)
+- tests/test_release_v0144.py
+
+### Safety
+- Gate remains BLOCKED
+- No HF upload performed
+- No training performed
+- No real screenshots committed (only manifest template)
+- No tokens, API keys, or private data in any file
+- No Kimari-4B release claims
+
 ## [0.1.43-alpha] - 2026-05-12
 
 ### Added
