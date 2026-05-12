@@ -5,6 +5,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.38-alpha] - 2026-03-05
+
+### Fixed
+- Setup writer never starts from empty dict (was producing incomplete configs with missing `version`, `profiles`, `default_profile` keys)
+- Recommended profile now resolves to safe fallback if original doesn't exist in available profiles
+
+### Added
+- `is_config_complete()` helper — checks user config has required keys (`version`, `profiles`, `default_profile`)
+- `load_base_config_for_setup()` helper — loads a safe base config to merge into instead of starting from `{}`
+- `resolve_recommended_profile()` helper — returns recommended profile or safe fallback if profile doesn't exist
+- `kimari setup --write --yes --reset-user-config` flag for safe config regeneration from packaged defaults
+- `kimari setup --json` now includes `resolved_profile`, `user_config_complete`, `recovery_needed`, `config_would_be_valid` fields
+
+### Improved
+- `kimari doctor --deep` now detects incomplete user config and suggests recovery command (`kimari setup --write --yes --reset-user-config`)
+
+### Safety
+- Gate remains BLOCKED
+
 ## [0.1.37-alpha] - 2026-06-03
 
 ### Added

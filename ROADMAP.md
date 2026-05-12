@@ -436,7 +436,7 @@
 - ✅ docs/HF_JOBS_SMOKE_GATE.md
 - ✅ Gate BLOCKED
 
-## v0.1.37-alpha (Current)
+## v0.1.37-alpha (Released)
 
 - ✅ Fixed validate_config() UnboundLocalError when jsonschema not installed
 - ✅ Added check_gpu_compute_capability() to kimari doctor --deep
@@ -445,7 +445,17 @@
 - ✅ Updated INSTALL_WSL2.md, INSTALL_MATRIX.md, TRAINING_STACK_COMPATIBILITY.md
 - ✅ Gate BLOCKED
 
-## v0.2.0-alpha
+## v0.1.38-alpha (Current)
+
+- ✅ Fixed setup writer never starts from empty dict (was producing incomplete configs)
+- ✅ Fixed recommended profile resolves to safe fallback if original doesn't exist
+- ✅ Added `is_config_complete()`, `load_base_config_for_setup()`, `resolve_recommended_profile()` helpers
+- ✅ Added `kimari setup --write --yes --reset-user-config` flag for safe config regeneration
+- ✅ Added `kimari setup --json` fields: resolved_profile, user_config_complete, recovery_needed, config_would_be_valid
+- ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
+- ✅ Gate BLOCKED
+
+## v0.2.0-alpha (Planned)
 
 - Local REST API via FastAPI (`kimari api`)
 - VRAM reporting in real-time

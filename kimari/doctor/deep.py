@@ -114,6 +114,9 @@ def check_config() -> dict:
 
     Uses kimari.config.loader functions.  PASS if valid,
     WARN if has issues, FAIL if missing or corrupt.
+
+    Also detects incomplete config (missing version, profiles, or
+    default_profile not in profiles) and suggests recovery.
     """
     try:
         config = load_config()
@@ -137,6 +140,30 @@ def check_config() -> dict:
             "status": "FAIL",
             "value": "Config error",
             "detail": str(exc),
+        }
+
+    # Check for incomplete config before schema validation
+    from kimari.setup.writer import is_config_complete
+
+    if not is_config_complete(config):
+        missing = []
+        if "version" not in config:
+            missing.append("'version' missing")
+        profiles = config.get("profiles")
+        if not profiles or not isinstance(profiles, dict) or len(profiles) == 0:
+            missing.append("'profiles' missing or empty")
+        default = config.get("default_profile", "")
+        if not default:
+            missing.append("'default_profile' missing")
+        elif profiles and default not in profiles:
+            missing.append(f"default_profile '{default}' not in profiles")
+
+        detail = "; ".join(missing)
+        return {
+            "name": "Config",
+            "status": "WARN",
+            "value": "User config appears incomplete",
+            "detail": f"{detail} — run 'kimari setup --write --yes --reset-user-config' to regenerate",
         }
 
     is_valid, errors = validate_config(config)

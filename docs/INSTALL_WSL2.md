@@ -211,6 +211,16 @@ Open your browser at `http://localhost:3000`.
 
 ## Troubleshooting
 
+### Recovering from Incomplete Setup Config
+
+If `kimari doctor --deep` warns about an incomplete user config (missing `version`, `profiles`, or `default_profile`), you can regenerate a safe, complete configuration:
+
+```bash
+kimari setup --write --yes --reset-user-config
+```
+
+This flag regenerates the user config from packaged defaults, creating a timestamped backup of the existing config first. Use this when a previous `kimari setup --write` produced an incomplete configuration due to the empty-dict bug fixed in v0.1.38-alpha.
+
 ### `nvidia-smi` not found inside WSL2
 
 - Make sure you're running WSL2, not WSL1: `wsl -l -v`

@@ -712,6 +712,32 @@ twine upload dist/*
 - [ ] No Kimari-4B released claim
 - [ ] default_profile still "test"
 
+## v0.1.38 Checks
+
+- [ ] Setup writer never starts from `{}` (uses `load_base_config_for_setup()`)
+- [ ] Config has `version` after `kimari setup --write`
+- [ ] Config has `profiles` after `kimari setup --write`
+- [ ] Config has `default_profile` after `kimari setup --write`
+- [ ] `default_profile` exists in `profiles` after `kimari setup --write`
+- [ ] `kimari setup --write --yes --reset-user-config` regenerates config from packaged defaults
+- [ ] `--reset-user-config` creates backup before overwriting
+- [ ] `is_config_complete()` returns `false` for config missing `version`
+- [ ] `is_config_complete()` returns `false` for config missing `profiles`
+- [ ] `is_config_complete()` returns `false` for config missing `default_profile`
+- [ ] `is_config_complete()` returns `true` for complete config
+- [ ] `resolve_recommended_profile()` returns safe fallback when recommended profile doesn't exist
+- [ ] `kimari setup --json` includes `resolved_profile` field
+- [ ] `kimari setup --json` includes `user_config_complete` field
+- [ ] `kimari setup --json` includes `recovery_needed` field
+- [ ] `kimari setup --json` includes `config_would_be_valid` field
+- [ ] `kimari doctor --deep` detects incomplete user config
+- [ ] `kimari doctor --deep` suggests recovery command for incomplete config
+- [ ] Incomplete user config recovery documented in README
+- [ ] Incomplete user config recovery documented in INSTALL_WSL2.md
+- [ ] Gate BLOCKED
+- [ ] No Kimari-4B released claim
+- [ ] default_profile still "test"
+
 ## Post-Release
 
 - [ ] GitHub topics still accurate (20 topics, lowercase, hyphens)

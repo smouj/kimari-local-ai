@@ -1414,6 +1414,7 @@ def run_setup(
     json_output: bool = False,
     profile_name: str | None = None,
     integration: str | None = None,
+    reset_user_config: bool = False,
 ):
     """Guided setup and environment detection.
 
@@ -1421,6 +1422,8 @@ def run_setup(
     then recommends a profile and next commands.
 
     With --write, persists the detected configuration to the user config dir.
+    With --reset-user-config, regenerates the config from packaged defaults
+    (always starts fresh, never from an incomplete user config).
     """
     import platform as _platform
     import shutil
@@ -1565,10 +1568,15 @@ def run_setup(
         apply_setup_changes,
         build_setup_patch,
         confirm_setup_write,
+        is_config_complete,
         preview_setup_changes,
     )
 
     config_path = get_user_config_path()
+
+    # Check user config completeness for JSON output
+    user_config_complete = is_config_complete(config)
+
     patch = build_setup_patch(
         recommended_profile=recommended_profile,
         integration=integration,
@@ -1577,18 +1585,44 @@ def run_setup(
         config=config,
     )
 
-    if write and patch["would_write"]:
+    # Add extra info to result
+    result["user_config_complete"] = user_config_complete
+    result["resolved_profile"] = patch.get("resolved_profile")
+    result["profile_exists"] = patch.get("profile_exists")
+    result["recovery_needed"] = not user_config_complete or reset_user_config
+
+    # Validate that the generated config would be valid
+    from kimari.setup.writer import load_base_config_for_setup, _validate_config_for_write
+
+    base = load_base_config_for_setup(reset=reset_user_config)
+    profiles = base.get("profiles", {})
+    resolved_profile = patch.get("resolved_profile", recommended_profile)
+    base["default_profile"] = resolved_profile
+    base["setup_info"] = {
+        "recommended_profile": recommended_profile,
+        "resolved_profile": resolved_profile,
+    }
+    base.pop("_incomplete_fallback", None)
+    base.pop("recovery_needed", None)
+    base.pop("recovery_reason", None)
+    config_would_be_valid, _ = _validate_config_for_write(base)
+    result["config_would_be_valid"] = config_would_be_valid
+
+    if (write or reset_user_config) and (patch["would_write"] or reset_user_config):
         preview = preview_setup_changes(patch, config_path)
         confirmed = confirm_setup_write(preview, yes=yes)
 
         if confirmed:
-            write_result = apply_setup_changes(patch, config_path)
+            write_result = apply_setup_changes(patch, config_path, reset=reset_user_config)
             result["would_write"] = True
             result["written"] = write_result["written"]
             result["config_path"] = write_result["config_path"]
             result["backup_path"] = write_result.get("backup_path")
             result["requires_confirmation"] = preview["requires_confirmation"]
             result["confirmed"] = True
+            result["recovery_needed"] = write_result.get("recovery_needed", False)
+            if not write_result["written"]:
+                result["validation_errors"] = write_result.get("validation_errors", [])
         else:
             result["would_write"] = True
             result["written"] = False
@@ -1633,16 +1667,24 @@ def run_setup(
     print(f"\n  {Color.BOLD}Recommended Profile:{Color.RESET} {Color.GREEN}{recommended_profile}{Color.RESET}")
 
     # Show write-mode status
-    if write:
-        if result["written"]:
+    if write or reset_user_config:
+        if result.get("written"):
             print(f"\n  {Color.GREEN}✓ Configuration written{Color.RESET}")
             print(f"  Config:  {result['config_path']}")
             if result.get("backup_path"):
                 print(f"  Backup:  {result['backup_path']}")
+            if result.get("recovery_needed"):
+                print(f"  {Color.YELLOW}Note: Config was recovered from packaged defaults (previous config was incomplete or reset requested){Color.RESET}")
+            if not user_config_complete and not reset_user_config:
+                print(f"  Previous config was incomplete — run {Color.CYAN}kimari doctor --deep{Color.RESET} to verify.")
         elif result.get("confirmed") is False and result.get("would_write"):
             print(f"\n  {Color.YELLOW}⚠ Write cancelled — confirmation denied{Color.RESET}")
             print(f"  Use {Color.CYAN}--yes{Color.RESET} to skip the confirmation prompt.")
-        elif result["would_write"]:
+        elif result.get("validation_errors"):
+            print(f"\n  {Color.RED}✗ Write failed — validation errors:{Color.RESET}")
+            for err in result.get("validation_errors", []):
+                print(f"    • {err}")
+        elif result.get("would_write"):
             print(f"\n  {Color.YELLOW}⚠ Would write but something went wrong{Color.RESET}")
         else:
             print(f"\n  {Color.DIM}No changes needed — configuration already matches.{Color.RESET}")
@@ -1664,6 +1706,7 @@ def run_setup(
             print(f"  • {change}")
         print(f"\n  {Color.DIM}Tip: Use --write to persist this configuration.{Color.RESET}")
         print(f"  {Color.DIM}     Use --write --yes to skip confirmation.{Color.RESET}")
+        print(f"  {Color.DIM}     Use --write --yes --reset-user-config to regenerate from defaults.{Color.RESET}")
 
     print(f"\n  {Color.BOLD}Next Steps:{Color.RESET}")
     for cmd in next_commands:
@@ -2514,6 +2557,11 @@ def main():
     setup_parser.add_argument("--json", action="store_true", dest="json_output", help="Output as JSON")
     setup_parser.add_argument("--profile", "-p", default=None, help="Profile to recommend")
     setup_parser.add_argument("--integration", default=None, help="Integration target (openclaw, hermes, continue)")
+    setup_parser.add_argument(
+        "--reset-user-config",
+        action="store_true",
+        help="Regenerate user config from packaged defaults (implies --write --yes)",
+    )
 
     # api (experimental)
     api_parser = subparsers.add_parser("api", help="Start experimental Kimari REST API")
@@ -2758,14 +2806,19 @@ def main():
                 if info.get("backup_path"):
                     print(f"  Backup:       {info['backup_path']}")
     elif args.command == "setup":
+        reset_flag = getattr(args, "reset_user_config", False)
+        # --reset-user-config implies --write --yes
+        effective_write = getattr(args, "write", False) or reset_flag
+        effective_yes = getattr(args, "yes", False) or reset_flag
         run_setup(
             config,
             dry_run=args.dry_run,
-            write=getattr(args, "write", False),
-            yes=getattr(args, "yes", False),
+            write=effective_write,
+            yes=effective_yes,
             json_output=getattr(args, "json_output", False),
             profile_name=getattr(args, "profile", None),
             integration=getattr(args, "integration", None),
+            reset_user_config=reset_flag,
         )
     elif args.command == "api":
         from kimari.api.server import run_api_command

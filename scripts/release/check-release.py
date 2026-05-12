@@ -4012,6 +4012,135 @@ def main() -> None:
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
+    # ── v0.1.38 setup writer fix & config recovery ──────────────────
+    print("\n[56/62] v0.1.38 setup writer fix & config recovery")
+    writer_path = PROJECT_ROOT / "kimari" / "setup" / "writer.py"
+    if writer_path.exists():
+        writer_text = writer_path.read_text()
+        check(
+            "writer.py contains is_config_complete",
+            "is_config_complete" in writer_text,
+            "is_config_complete helper missing from writer.py",
+        )
+        check(
+            "writer.py contains load_base_config_for_setup",
+            "load_base_config_for_setup" in writer_text,
+            "load_base_config_for_setup helper missing from writer.py",
+        )
+        check(
+            "writer.py contains resolve_recommended_profile",
+            "resolve_recommended_profile" in writer_text,
+            "resolve_recommended_profile helper missing from writer.py",
+        )
+        check(
+            "writer.py does NOT use config = {} as setup base",
+            "config = {}" not in writer_text or "_incomplete_fallback" in writer_text,
+            "writer.py still uses config = {} — must load from packaged defaults instead",
+        )
+        check(
+            "writer.py contains _validate_config_for_write",
+            "_validate_config_for_write" in writer_text,
+            "_validate_config_for_write missing from writer.py",
+        )
+    else:
+        check("writer.py exists", False, "writer.py not found")
+
+    # CLI checks
+    if main_py_path.exists():
+        main_py_text_v2 = main_py_path.read_text()
+        check(
+            "CLI has --reset-user-config flag",
+            "reset_user_config" in main_py_text_v2,
+            "--reset-user-config flag not found in CLI",
+        )
+        check(
+            "run_setup accepts reset_user_config param",
+            "reset_user_config" in main_py_text_v2,
+            "reset_user_config parameter not found in run_setup",
+        )
+    else:
+        check("kimari/cli/main.py exists (v0.1.38)", False, "file not found")
+
+    # Doctor incomplete config detection
+    deep_path = PROJECT_ROOT / "kimari" / "doctor" / "deep.py"
+    if deep_path.exists():
+        deep_text = deep_path.read_text()
+        check(
+            "doctor/deep.py detects incomplete config",
+            "is_config_complete" in deep_text,
+            "doctor/deep.py does not check for incomplete config",
+        )
+        check(
+            "doctor/deep.py suggests reset-user-config",
+            "reset-user-config" in deep_text,
+            "doctor/deep.py does not suggest --reset-user-config",
+        )
+    else:
+        check("kimari/doctor/deep.py exists (v0.1.38)", False, "file not found")
+
+    # Docs mention incomplete config recovery
+    check(
+        "README mentions incomplete config recovery",
+        "incomplete" in readme_lower and ("reset-user-config" in readme_lower or "recover" in readme_lower),
+        "README does not mention incomplete config recovery",
+    )
+    wsl2_path = PROJECT_ROOT / "docs" / "INSTALL_WSL2.md"
+    if wsl2_path.exists():
+        wsl2_text = wsl2_path.read_text().lower()
+        check(
+            "INSTALL_WSL2.md mentions incomplete config recovery",
+            "incomplete" in wsl2_text or "reset-user-config" in wsl2_text or "recover" in wsl2_text,
+            "INSTALL_WSL2.md does not mention incomplete config recovery",
+        )
+
+    # Tests
+    check(
+        "tests/test_release_v0138.py exists",
+        (PROJECT_ROOT / "tests" / "test_release_v0138.py").exists(),
+        "v0.1.38 release tests missing",
+    )
+
+    # v0.1.38 content integrity
+    check(
+        'default_profile still "test" (v0.1.38 re-check)',
+        profiles.get("default_profile", "") == "test" if profiles_path.exists() else False,
+        "default_profile changed from test — this is not allowed during alpha",
+    )
+    check(
+        'No "Kimari-4B released" false claim (v0.1.38)',
+        len(false_claims) == 0,
+        "Kimari-4B false claim regression detected",
+    )
+
+    # Safety: no weights/adapters/GGUF tracked
+    try:
+        result = subprocess.run(
+            ["git", "ls-files"],
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_ROOT),
+        )
+        tracked = result.stdout.strip().splitlines()
+        bad_patterns = [".gguf", ".safetensors", ".bin", "adapter_", "checkpoint"]
+        bad_files = [f for f in tracked if any(p in f.lower() for p in bad_patterns)]
+        check(
+            "No weights/adapters/GGUF tracked (v0.1.38)",
+            len(bad_files) == 0,
+            f"found tracked files: {bad_files[:5]}",
+        )
+    except Exception:
+        warn("Could not check tracked files for weights (v0.1.38)")
+
+    # Gate must be BLOCKED
+    gate_doc = PROJECT_ROOT / "docs" / "ADAPTER_PREVIEW_GATE.md"
+    if gate_doc.exists():
+        gate_text = gate_doc.read_text()
+        check(
+            "Preview gate is BLOCKED (v0.1.38)",
+            "BLOCKED" in gate_text,
+            "Gate must remain BLOCKED during alpha",
+        )
+
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
         for e in ERRORS:
