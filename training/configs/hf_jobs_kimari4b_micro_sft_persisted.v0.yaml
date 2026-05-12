@@ -1,0 +1,60 @@
+# Kimari-4B Micro SFT Persisted Run Config
+# Second micro SFT run with private adapter persistence
+# v0.1.51-alpha
+
+run_id: "kimari4b-hfjobs-micro-sft-persisted-v0"
+
+# Base model
+base_model: "Qwen/Qwen2.5-1.5B-Instruct"
+base_model_license: "Apache-2.0"
+
+# Dataset
+dataset_path: "dataset/build/kimari-fit-v0/sft_micro.jsonl"
+dataset_file_sha256: "f8ce140b5e2e127e4324f3a7c47854800fa3f059aa44a00c5863022c958e85f6"
+dataset_count: 72
+
+# Output
+output_dir: "/tmp/kimari4b-micro-sft-adapter"
+
+# Private adapter repo
+private_adapter_repo: "Smouj013/kimari4b-micro-sft-adapter-v0"
+private_adapter_persistence_allowed: true
+
+# Safety flags
+public_release_allowed: false
+hf_public_upload_allowed: false
+gguf_export_allowed: false
+adapter_committed_public: false
+push_to_hub: false  # Base trainer does NOT push; explicit upload to private repo only
+report_to: "none"
+
+# Gate
+preview_gate_state: "BLOCKED"
+
+# Training
+max_steps: 20
+lora_r: 8
+lora_alpha: 16
+learning_rate: 0.0002
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 1
+warmup_steps: 2
+logging_steps: 5
+save_steps: 10
+
+# HF Jobs
+flavor: "a10g-small"
+timeout_minutes: 30
+docker_image: "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel"
+
+# Stack (verified working)
+torch_version: "2.5.1+cu124"
+transformers_version: ">=4.46"
+peft_version: ">=0.13"
+trl_version: ">=0.12"
+accelerate_version: ">=1.1"
+datasets_version: ">=3.0"
+safetensors_version: ">=0.4"
+
+# Cost estimate
+estimated_cost_usd: 0.50

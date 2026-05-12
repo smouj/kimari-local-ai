@@ -1,0 +1,20 @@
+{
+  "run_id": "",
+  "job_id": "",
+  "status": "",
+  "base_model": "",
+  "dataset_file_sha256": "",
+  "adapter_generated": false,
+  "adapter_persisted_private": false,
+  "adapter_private_repo": "",
+  "adapter_hash": "",
+  "adapter_size_bytes": 0,
+  "adapter_load_check": false,
+  "adapter_committed_public": false,
+  "hf_public_upload_performed": false,
+  "gguf_generated": false,
+  "gate_state": "BLOCKED",
+  "manual_review_required": true,
+  "auto_gate_transition": false,
+  "notes": "Second micro SFT run with private adapter persistence. Adapter uploaded to private HF repo. No public release."
+}
