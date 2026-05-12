@@ -4468,8 +4468,8 @@ def main() -> None:
     )
     check(
         "kimari/__init__.py __version__ is 0.1.40-alpha",
-        init_version == "0.1.40-alpha",
-        f"Expected 0.1.40-alpha, got {init_version}",
+        get_init_version() == "0.1.40-alpha",
+        f"Expected 0.1.40-alpha, got {get_init_version()}",
     )
     check(
         "CHANGELOG.md has [0.1.40-alpha] entry",
