@@ -5,6 +5,32 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.46-alpha] - 2026-05-12
+
+### Added
+- `docs/COLLECTION_SEED_PLAN.md` — proposed reference GGUF models for Collection
+- `huggingface/collections/kimari-compatible-gguf.seed.example.json` — 5 entry seed example
+- `scripts/huggingface/validate_collection_seed.py` — seed validator with `--input` and `--json`
+- `docs/PUBLIC_LAUNCH_PACK.md` — consolidated launch material for X/Reddit/HF/GitHub
+- `docs/POST_X_KIMARI_GTX1060.md` — X posts in English/Spanish, short/technical/thread
+- `docs/REDDIT_POST_KIMARI.md` — Reddit posts, humble and technical versions
+- `docs/HUGGINGFACE_COMMUNITY_POST.md` — HF community announce post
+- `docs/GTX1060_SHOWCASE.md` updated with public screenshot status section
+- README "Public showcase" section with links
+- docs/index.html "Public launch pack ready" card
+- check-release.py v0.1.46 checks (launch pack, collection seed, no official_kimari_model)
+- tests/test_release_v0146.py
+
+### Safety
+- Gate remains BLOCKED
+- No HF upload of weights, adapters, or GGUF files
+- No training performed
+- No HF Jobs executed
+- No tokens or private data in any file
+- No Kimari-4B release claims
+- All collection seed entries: official_kimari_model=false
+- Screenshots: no real screenshots committed (only manifest template)
+
 ## [0.1.45-alpha] - 2026-05-12
 
 ### Added

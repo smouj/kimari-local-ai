@@ -98,3 +98,20 @@ kimari stop
 - [LOCAL_INTEGRATION_VALIDATION.md](LOCAL_INTEGRATION_VALIDATION.md) — Integration setup guides
 - [GTX1060_LOCAL_RUNTIME_RESULT.md](GTX1060_LOCAL_RUNTIME_RESULT.md) — Detailed runtime validation
 - [LOCAL_SHOWCASE_CHECKLIST.md](LOCAL_SHOWCASE_CHECKLIST.md) — Screenshot checklist
+
+## Public Screenshot Status
+
+| Capture | Status | File |
+|---------|--------|------|
+| `nvidia-smi` | ⏳ Pending | `nvidia-smi.png` |
+| `kimari doctor --deep` | ⏳ Pending | `kimari-doctor.png` |
+| `kimari status` | ⏳ Pending | `kimari-status.png` |
+| `llama-server CUDA startup` | ⏳ Pending | `llama-server-cuda.png` |
+| `/health` endpoint | ⏳ Pending | `endpoint-health.png` |
+| `/v1/models` | ⏳ Pending | `endpoint-models.png` |
+| `/v1/chat/completions` | ⏳ Pending | `endpoint-chat.png` |
+| `kimari integrations generate` | ⏳ Pending | `integrations-generate.png` |
+
+> **Note**: No real screenshots committed yet. Only `manifest.example.json` template exists. Real captures require manual review per [LOCAL_SHOWCASE_CHECKLIST.md](LOCAL_SHOWCASE_CHECKLIST.md) before publishing.
+>
+> All captures show **TinyLlama 1.1B Q4_K_M** (test model), NOT Kimari-4B.

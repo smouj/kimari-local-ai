@@ -1,0 +1,47 @@
+[
+  {
+    "model_id": "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF",
+    "reason": "Current test/validation model used by Kimari. Proven on GTX 1060 6GB.",
+    "license": "Apache-2.0",
+    "official_kimari_model": false,
+    "recommended_vram_gb": 1.5,
+    "kimari_profile": "test",
+    "notes": "Smallest practical model for testing. 228 tok/s prompt / 73 tok/s generation on GTX 1060 CUDA."
+  },
+  {
+    "model_id": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+    "reason": "Good small instruct model. Apache 2.0 license.",
+    "license": "Apache-2.0",
+    "official_kimari_model": false,
+    "recommended_vram_gb": 2,
+    "kimari_profile": "test",
+    "notes": "Qwen2.5 series, strong for its size. Fits any GPU with 2GB+ VRAM."
+  },
+  {
+    "model_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF",
+    "reason": "Lightweight model from HuggingFace. Apache 2.0 license.",
+    "license": "Apache-2.0",
+    "official_kimari_model": false,
+    "recommended_vram_gb": 2,
+    "kimari_profile": "test",
+    "notes": "SmolLM2 is designed for efficiency. Good candidate for low-end hardware."
+  },
+  {
+    "model_id": "hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF",
+    "reason": "Popular Llama model, smallest variant. Llama 3.2 Community license.",
+    "license": "Llama-3.2-Community",
+    "official_kimari_model": false,
+    "recommended_vram_gb": 1.5,
+    "kimari_profile": "test",
+    "notes": "Llama 3.2 1B. Good baseline. Check license terms before commercial use."
+  },
+  {
+    "model_id": "hugging-quants/Llama-3.2-3B-Instruct-Q4_K_M-GGUF",
+    "reason": "Popular Llama model, 3B variant. Fits 6GB VRAM. Llama 3.2 Community license.",
+    "license": "Llama-3.2-Community",
+    "official_kimari_model": false,
+    "recommended_vram_gb": 3,
+    "kimari_profile": "gtx1060",
+    "notes": "Llama 3.2 3B. Fits GTX 1060 6GB at Q4_K_M. Check license terms before commercial use."
+  }
+]

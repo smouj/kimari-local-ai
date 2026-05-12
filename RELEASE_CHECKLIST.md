@@ -793,29 +793,32 @@ twine upload dist/*
 - [ ] No "Kimari-4B released" false claim anywhere
 - [ ] default_profile still "test"
 
-## v0.1.45 Checks
+## v0.1.46 Checks
 
-- [ ] `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` exists
-- [ ] README links to Hugging Face Space
-- [ ] README says Kimari-4B not released
-- [ ] Collection doc says reference/community models, not official
-- [ ] No billing/plan mentions in docs
-- [ ] No tokens in docs
-- [ ] No model weights uploaded
+- [ ] `docs/PUBLIC_LAUNCH_PACK.md` exists
+- [ ] `docs/POST_X_KIMARI_GTX1060.md` exists
+- [ ] `docs/REDDIT_POST_KIMARI.md` exists
+- [ ] `docs/HUGGINGFACE_COMMUNITY_POST.md` exists
+- [ ] Collection seed exists (`huggingface/collections/`)
+- [ ] Collection seed validator exists
+- [ ] All seed entries `official_kimari_model=false`
+- [ ] No Kimari-4B release claims in posts
+- [ ] No fake benchmarks in posts
+- [ ] Screenshots manifest safe (no real captures if not reviewed)
 - [ ] Gate BLOCKED
 
 ## v0.1.45 Checks
 
-- [ ] `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` exists
-- [ ] README links to Hugging Face Space
-- [ ] README says Kimari-4B not released
-- [ ] Collection doc says reference/community models, not official
-- [ ] No billing/plan mentions in docs
-- [ ] No tokens in docs
-- [ ] No model weights uploaded
-- [ ] Gate BLOCKED
-- [ ] No HF Jobs executed
-- [ ] No training performed
+- [x] `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` exists
+- [x] README links to Hugging Face Space
+- [x] README says Kimari-4B not released
+- [x] Collection doc says reference/community models, not official
+- [x] No billing/plan mentions in docs
+- [x] No tokens in docs
+- [x] No model weights uploaded
+- [x] Gate BLOCKED
+- [x] No HF Jobs executed
+- [x] No training performed
 
 ## v0.1.44 Checks
 

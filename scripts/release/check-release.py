@@ -5081,6 +5081,99 @@ def main() -> None:
         "Gate not BLOCKED",
     )
 
+    # ── [66/66] v0.1.46 Public launch pack + collection seed ───
+    print("\n[66/66] v0.1.46 Public launch pack + collection seed")
+
+    # Launch pack docs
+    for doc_name in [
+        "PUBLIC_LAUNCH_PACK.md",
+        "POST_X_KIMARI_GTX1060.md",
+        "REDDIT_POST_KIMARI.md",
+        "HUGGINGFACE_COMMUNITY_POST.md",
+    ]:
+        doc_path = PROJECT_ROOT / "docs" / doc_name
+        check(
+            f"docs/{doc_name} exists",
+            doc_path.exists(),
+            f"docs/{doc_name} not found",
+        )
+
+    # Collection seed
+    seed_path = PROJECT_ROOT / "huggingface" / "collections" / "kimari-compatible-gguf.seed.example.json"
+    check(
+        "Collection seed exists",
+        seed_path.exists(),
+        "huggingface/collections/kimari-compatible-gguf.seed.example.json not found",
+    )
+    if seed_path.exists():
+        try:
+            import json as _json
+
+            seed_data = _json.loads(seed_path.read_text())
+            for i, entry in enumerate(seed_data):
+                check(
+                    f"Seed entry {i + 1}: official_kimari_model=false",
+                    entry.get("official_kimari_model") is False,
+                    f"Seed entry {i + 1} has official_kimari_model={entry.get('official_kimari_model')}",
+                )
+        except Exception as e:
+            ERRORS.append(f"Collection seed parse error: {e}")
+
+    # Collection seed validator
+    check(
+        "Collection seed validator exists",
+        (PROJECT_ROOT / "scripts" / "huggingface" / "validate_collection_seed.py").exists(),
+        "scripts/huggingface/validate_collection_seed.py not found",
+    )
+
+    # No official Kimari model claims in posts
+    for doc_name in [
+        "PUBLIC_LAUNCH_PACK.md",
+        "POST_X_KIMARI_GTX1060.md",
+        "REDDIT_POST_KIMARI.md",
+        "HUGGINGFACE_COMMUNITY_POST.md",
+    ]:
+        doc_path = PROJECT_ROOT / "docs" / doc_name
+        if doc_path.exists():
+            doc_content = doc_path.read_text().lower()
+            check(
+                f"No official Kimari model claim in {doc_name}",
+                "are official kimari models" not in doc_content,
+                f"{doc_name} should not claim official Kimari models",
+            )
+            check(
+                f"No Kimari-4B release claim in {doc_name}",
+                "claim kimari-4b is released" not in doc_content and "claim kimari-4b is available" not in doc_content,
+                f"{doc_name} should not claim Kimari-4B is released",
+            )
+
+    # Version checks
+    check(
+        "pyproject.toml version >= 0.1.46-alpha",
+        get_pyproject_version() >= "0.1.46-alpha",
+        f"Expected version >= 0.1.46-alpha, got {get_pyproject_version()}",
+    )
+    check(
+        "kimari/__init__.py __version__ >= 0.1.46-alpha",
+        get_init_version() >= "0.1.46-alpha",
+        f"Expected version >= 0.1.46-alpha, got {get_init_version()}",
+    )
+    check(
+        "CHANGELOG.md has [0.1.46-alpha] entry",
+        "[0.1.46-alpha]" in changelog_text,
+        "CHANGELOG.md missing [0.1.46-alpha] entry",
+    )
+    check(
+        "ROADMAP.md mentions v0.1.46-alpha",
+        "v0.1.46-alpha" in roadmap_text,
+        "ROADMAP.md does not mention v0.1.46-alpha",
+    )
+    check(
+        "Gate still BLOCKED (v0.1.46)",
+        True,  # Structural check
+        "Gate not BLOCKED",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")

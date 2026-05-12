@@ -455,7 +455,18 @@
 - ✅ Improved `kimari doctor --deep` detects incomplete user config and suggests recovery command
 - ✅ Gate BLOCKED
 
-## v0.1.45-alpha (Current)
+## v0.1.46-alpha (Current)
+
+- ✅ Collection seed plan + validator + example JSON
+- ✅ Public launch pack (X/Reddit/HF/GitHub)
+- ✅ X posts (short/technical/thread, EN/ES)
+- ✅ Reddit posts (technical/humble)
+- ✅ HF community post
+- ✅ README "Public showcase" section
+- ✅ Screenshots: manifest template only (no real captures yet)
+- ✅ Gate BLOCKED
+
+## v0.1.45-alpha
 
 - ✅ `docs/HUGGINGFACE_DEPLOYMENT_STATUS.md` — HF deployment documented with URLs
 - ✅ `docs/HUGGINGFACE_COLLECTIONS.md` — collection guide for reference GGUF models
