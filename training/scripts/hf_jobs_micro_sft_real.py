@@ -116,7 +116,7 @@ except ImportError:
 print(json.dumps(result, indent=2))
 
 import subprocess as sp
-sp.run([sys.executable, "-m", "pip", "install", "-q", "trl>=0.7", "peft>=0.6", "datasets", "transformers==4.36.4", "accelerate"], check=True)
+sp.run([sys.executable, "-m", "pip", "install", "-q", "trl", "peft", "datasets", "transformers==4.36.2", "accelerate"], check=True)
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model

@@ -13,19 +13,19 @@ This document will be updated after the micro SFT run completes.
 | **Run ID** | kimari4b-hfjobs-micro-sft-v0 |
 | **Base model** | Qwen/Qwen2.5-1.5B-Instruct (Apache 2.0) |
 | **Dataset** | kimari-fit-v0 (72 examples) |
-| **Flavor** | a10g-small |
-| **Max steps** | 20 |
+| **Flavor** | a10g-small ($1.00/hour) |
+| **Max steps** | 10 |
 | **LoRA config** | r=8, alpha=16 |
-| **Estimated cost** | ~$0.50 |
+| **Estimated cost** | ~$0.35 |
 
 ## Results
 
 | Field | Value |
 |-------|-------|
-| **Job ID** | Pending |
-| **Status** | Pending |
-| **GPU detected** | Pending |
-| **training_performed** | Pending (expected: true) |
+| **Job ID** | 6a038c797618f125ee2b7979 (PyTorch 2.4.0 fix) |
+| **Status** | RUNNING (submitted 2026-05-12) |
+| **GPU detected** | NVIDIA A10G (22.3 GB VRAM, CUDA 12.1) |
+| **training_performed** | In progress (expected: true) |
 | **adapter_generated** | Pending (expected: true) |
 | **adapter_committed** | false (never committed) |
 | **hf_upload_performed** | false |
