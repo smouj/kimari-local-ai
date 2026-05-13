@@ -133,13 +133,21 @@ def test_no_weights_or_gguf_committed():
 
 
 def test_public_docs_show_current_version_and_not_released():
+    readme = (PROJECT_ROOT / "README.md").read_text()
+    docs_index = (PROJECT_ROOT / "docs" / "index.html").read_text()
     org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text()
     deploy = (PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md").read_text()
     space = (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md").read_text()
+    assert "v0.1.54-alpha" in readme
+    assert "version-v0.1.54--alpha" in readme
+    assert "version-v0.1.53--alpha" not in readme
+    assert "v0.1.54-alpha" in docs_index
+    assert "Kimari Local AI v0.1.28-alpha" not in docs_index
+    assert "New in v0.1.28-alpha" not in docs_index
     assert "v0.1.54-alpha" in org_card
     assert "v0.1.54-alpha" in deploy
     assert "v0.1.54-alpha" in space
-    combined = (org_card + deploy + space).lower()
+    combined = (readme + docs_index + org_card + deploy + space).lower()
     assert "not released" in combined
     assert "blocked" in combined
 

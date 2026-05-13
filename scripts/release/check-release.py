@@ -4250,6 +4250,25 @@ def main() -> None:
         )
         check("v0.1.54 docs gate BLOCKED", "blocked" in result_text, "docs must mention gate BLOCKED")
 
+    readme_path = PROJECT_ROOT / "README.md"
+    docs_index_path = PROJECT_ROOT / "docs" / "index.html"
+    if readme_path.exists():
+        readme_text_current = readme_path.read_text()
+        check(
+            "README version badge is v0.1.54-alpha",
+            "version-v0.1.54--alpha" in readme_text_current and "version-v0.1.53--alpha" not in readme_text_current,
+            "README badge URL must match v0.1.54-alpha",
+        )
+    if docs_index_path.exists():
+        docs_index_text = docs_index_path.read_text()
+        check(
+            "docs/index current status is v0.1.54-alpha",
+            "Kimari Local AI v0.1.54-alpha" in docs_index_text
+            and "Kimari Local AI v0.1.28-alpha" not in docs_index_text
+            and "New in v0.1.28-alpha" not in docs_index_text,
+            "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
+        )
+
     for artifact_pattern in ("*.safetensors", "*.gguf"):
         artifacts = [
             path
@@ -6607,6 +6626,25 @@ def main() -> None:
             "docs contain benchmark-style claim",
         )
         check("v0.1.54 docs gate BLOCKED", "blocked" in result_text, "docs must mention gate BLOCKED")
+
+    readme_path = PROJECT_ROOT / "README.md"
+    docs_index_path = PROJECT_ROOT / "docs" / "index.html"
+    if readme_path.exists():
+        readme_text_current = readme_path.read_text()
+        check(
+            "README version badge is v0.1.54-alpha",
+            "version-v0.1.54--alpha" in readme_text_current and "version-v0.1.53--alpha" not in readme_text_current,
+            "README badge URL must match v0.1.54-alpha",
+        )
+    if docs_index_path.exists():
+        docs_index_text = docs_index_path.read_text()
+        check(
+            "docs/index current status is v0.1.54-alpha",
+            "Kimari Local AI v0.1.54-alpha" in docs_index_text
+            and "Kimari Local AI v0.1.28-alpha" not in docs_index_text
+            and "New in v0.1.28-alpha" not in docs_index_text,
+            "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
+        )
 
     for artifact_pattern in ("*.safetensors", "*.gguf"):
         artifacts = [
