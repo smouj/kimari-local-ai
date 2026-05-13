@@ -5,6 +5,27 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.62-alpha] - 2026-05-13
+
+### Fixed
+
+- **Result doc placeholder corrected**: `training_performed=false`, `adapter_generated=false`, `adapter_persisted_private=false` (was incorrectly `true`)
+- **HF Jobs wrapper execution order fixed**: preflight now runs BEFORE training (was after)
+- **HF Jobs wrapper safety**: added `execution_order`, `preflight_before_training`, `training_after_preflight` to dry-run JSON
+- **HF Jobs wrapper validation**: added `validate_execution_order()` to block submit if preflight is after training
+
+### Added
+
+- **check-release.py**: v0.1.62 checks (result placeholder safety, preflight order, execution order)
+- **Tests**: test_release_v0162.py
+
+### Safety
+
+- No training executed
+- No HF Jobs submitted
+- No adapters or GGUF generated
+- Gate: BLOCKED
+
 ## [0.1.61-alpha] - 2026-05-13
 
 ### Added

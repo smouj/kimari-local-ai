@@ -4256,15 +4256,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.61--alpha" in readme_text_current
+            "version-0.1.62--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.61-alpha",
+            "README badge URL must match 0.1.62-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.61-alpha" in docs_index_text
+            "Kimari Local AI v0.1.62-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.61 appears in public surfaces", "v0.1.61-alpha" in public_text, "current version missing")
+    check("v0.1.62 appears in public surfaces", "v0.1.62-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6790,15 +6790,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.61--alpha" in readme_text_current
+            "version-0.1.62--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.61-alpha",
+            "README badge URL must match 0.1.62-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.61-alpha" in docs_index_text
+            "Kimari Local AI v0.1.62-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.61 appears in public surfaces", "v0.1.61-alpha" in public_text, "current version missing")
+    check("v0.1.62 appears in public surfaces", "v0.1.62-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7353,6 +7353,87 @@ def main() -> None:
 
     check(
         "v0.1.61 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
+
+    # ── v0.1.62 SFT v1 pre-submit hardening ──────────────────────────
+    print("\n[82/82] v0.1.62 SFT v1 pre-submit hardening")
+    result_doc = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_RESULT.md"
+    hf_wrapper_v162 = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_sft_v1.py"
+
+    check("v0.1.62 result doc exists", result_doc.exists(), "missing docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md")
+
+    # Result doc placeholder must NOT claim training success
+    if result_doc.exists():
+        result_text = result_doc.read_text().lower()
+        check(
+            "v0.1.62 result placeholder does not claim training_performed=true",
+            "training_performed=true" not in result_text,
+            "result doc must not claim training_performed=true before real run",
+        )
+        check(
+            "v0.1.62 result placeholder does not claim adapter_generated=true",
+            "adapter_generated=true" not in result_text,
+            "result doc must not claim adapter_generated=true before real run",
+        )
+        check(
+            "v0.1.62 result placeholder status is PENDING",
+            "pending" in result_text,
+            "result doc must have PENDING status",
+        )
+        check(
+            "v0.1.62 result placeholder has warning",
+            "placeholder" in result_text,
+            "result doc must mention it is a placeholder",
+        )
+
+    # HF Jobs wrapper must run preflight before training
+    if hf_wrapper_v162.exists():
+        wrapper_text = hf_wrapper_v162.read_text()
+        check(
+            "v0.1.62 HF Jobs preflight before training",
+            "validate_execution_order" in wrapper_text,
+            "HF Jobs wrapper must have validate_execution_order function",
+        )
+        # Check that preflight appears before train_sft_lora in guarded_command construction
+        guarded_start = wrapper_text.find("guarded_command =")
+        if guarded_start != -1:
+            guarded_section = wrapper_text[guarded_start : guarded_start + 500]
+            preflight_pos = guarded_section.find("preflight_sft_v1")
+            training_pos = guarded_section.find("train_sft_lora")
+            if preflight_pos != -1 and training_pos != -1:
+                check(
+                    "v0.1.62 preflight appears before train in command",
+                    preflight_pos < training_pos,
+                    "preflight must appear before train_sft_lora in guarded_command",
+                )
+        check(
+            "v0.1.62 HF Jobs wrapper no shell=True",
+            "shell=True" not in wrapper_text,
+            "HF Jobs wrapper must not use shell=True",
+        )
+        check(
+            "v0.1.62 HF Jobs wrapper no --token arg",
+            "--token" not in wrapper_text,
+            "HF Jobs wrapper must not accept --token argument",
+        )
+
+    # No public model artifacts
+    public_model_artifacts = [
+        path
+        for pattern in ("*.safetensors", "*.gguf", "adapter_model.bin")
+        for path in PROJECT_ROOT.rglob(pattern)
+        if ".venv" not in path.parts and "deps" not in path.parts
+    ]
+    check(
+        "v0.1.62 no public weights/adapters/GGUF",
+        len(public_model_artifacts) == 0,
+        f"found: {[str(path.relative_to(PROJECT_ROOT)) for path in public_model_artifacts[:5]]}",
+    )
+
+    check(
+        "v0.1.62 gate BLOCKED",
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )

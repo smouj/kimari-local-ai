@@ -494,7 +494,17 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.61-alpha (Current)
+## v0.1.62-alpha (Current)
+
+- ✅ Result doc placeholder corrected (training_performed=false, not true)
+- ✅ HF Jobs wrapper: preflight runs BEFORE training (was incorrectly after)
+- ✅ HF Jobs wrapper: execution_order, preflight_before_training, training_after_preflight in dry-run JSON
+- ✅ HF Jobs wrapper: validate_execution_order() blocks submit if preflight is after training
+- ✅ check-release.py v0.1.62 checks
+- No training executed, no HF Jobs submitted
+- Gate BLOCKED
+
+## v0.1.61-alpha (Released)
 
 - ✅ SFT v1 real short run execution (100 steps, QLoRA, Qwen2.5-1.5B-Instruct)
 - ✅ Run summary creator (`training/scripts/create_sft_v1_run_summary.py`)

@@ -2,6 +2,19 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+## v0.1.62 Checks — SFT v1 pre-submit hardening
+
+- [ ] Result doc placeholder does NOT claim training_performed=true
+- [ ] Result doc placeholder does NOT claim adapter_generated=true
+- [ ] Result doc status is PENDING (not COMPLETED)
+- [ ] HF Jobs wrapper: preflight runs before training in execution_order
+- [ ] HF Jobs wrapper: preflight_before_training=true in dry-run JSON
+- [ ] HF Jobs wrapper: training_after_preflight=true in dry-run JSON
+- [ ] HF Jobs wrapper: validate_execution_order() blocks bad order
+- [ ] No --token *** in any training script
+- [ ] No shell=True or .split() in subprocess calls
+- [ ] Gate BLOCKED
+
 ## v0.1.61 Checks — First SFT v1 real short run
 
 - [ ] SFT v1 run result doc exists (`docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md`)

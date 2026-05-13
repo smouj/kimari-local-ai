@@ -72,8 +72,10 @@ def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path) -> lis
     guarded_command = " && ".join(
         [
             "python -m pip install -r training/requirements-training.txt",
+            "python training/scripts/preflight_sft_v1.py --config "
+            + shell_join([str(config_path)])
+            + " --strict --json",
             training_command,
-            "python training/scripts/preflight_sft_v1.py --config " + shell_join([str(config_path)]),
         ]
     )
     return [
@@ -103,6 +105,20 @@ def validate_safety(config: dict[str, Any]) -> list[str]:
         errors.append("gate_state must be BLOCKED")
     if int(config.get("max_steps", 999999)) > 500:
         errors.append("max_steps must be <= 500")
+    return errors
+
+
+def validate_execution_order(command_str: str) -> list[str]:
+    """Validate that preflight runs before training in the HF Jobs command."""
+    errors: list[str] = []
+    preflight_pos = command_str.find("preflight_sft_v1")
+    training_pos = command_str.find("train_sft_lora")
+    if preflight_pos == -1:
+        errors.append("preflight_sft_v1 not found in execution command")
+    if training_pos == -1:
+        errors.append("train_sft_lora not found in execution command")
+    if preflight_pos != -1 and training_pos != -1 and preflight_pos > training_pos:
+        errors.append("preflight must run before training (preflight_after_training)")
     return errors
 
 
@@ -195,6 +211,9 @@ def main() -> None:
     config = parse_simple_yaml(args.config)
     command_args = build_hf_jobs_command_args(config, args.config)
     safety_errors = validate_safety(config)
+    command_str = shell_join(command_args) if args.print_command else ""
+    execution_order_errors = validate_execution_order(command_str) if command_str else []
+    all_errors = safety_errors + execution_order_errors
 
     wants_submit = bool(args.allow_submit and args.yes)
     is_dry_run = args.dry_run or not wants_submit
@@ -206,7 +225,7 @@ def main() -> None:
         access_ok, access_message = check_jobs_access()
 
     # Determine if real submit can proceed
-    submit_allowed = wants_submit and not is_dry_run and len(safety_errors) == 0 and access_ok is True
+    submit_allowed = wants_submit and not is_dry_run and len(all_errors) == 0 and access_ok is True
 
     result: dict[str, Any] = {
         "run_id": config.get("run_id"),
@@ -217,7 +236,7 @@ def main() -> None:
         "allow_submit_requested": args.allow_submit,
         "yes_confirmed": args.yes,
         "real_submit_allowed": submit_allowed,
-        "safety_errors": safety_errors,
+        "safety_errors": all_errors,
         "hf_token_source": "env" if os.environ.get("HF_TOKEN") else "unset",
         "jobs_access_ok": access_ok,
         "jobs_access_message": access_message,
@@ -228,6 +247,13 @@ def main() -> None:
             "public adapter repository",
             "token CLI arguments",
         ],
+        "execution_order": [
+            "install_training_requirements",
+            "preflight_strict",
+            "train_sft_lora",
+        ],
+        "preflight_before_training": True,
+        "training_after_preflight": True,
     }
 
     if args.print_command:
@@ -249,15 +275,15 @@ def main() -> None:
     else:
         if wants_submit and not submit_allowed:
             blockers = []
-            if safety_errors:
-                blockers.append(f"safety errors: {safety_errors}")
+            if all_errors:
+                blockers.append(f"safety/execution errors: {all_errors}")
             if access_ok is not True:
                 blockers.append(f"jobs access: {access_message}")
             result["message"] = f"Real submit blocked: {'; '.join(blockers)}"
             result["status"] = "fail"
         else:
             result["message"] = "Dry-run only. No job submitted."
-            result["status"] = "pass" if not safety_errors else "fail"
+            result["status"] = "pass" if not all_errors else "fail"
 
     if args.json_output:
         print(json.dumps(result, indent=2, sort_keys=True))
@@ -267,9 +293,9 @@ def main() -> None:
         print(result["message"])
         if result.get("hf_jobs_command_preview"):
             print(f"\nCommand preview:\n{result['hf_jobs_command_preview']}")
-        if safety_errors:
+        if all_errors:
             print("\nSafety errors:")
-            for error in safety_errors:
+            for error in all_errors:
                 print(f"  ✗ {error}")
         print("\nForbidden actions:")
         for item in result["forbidden"]:

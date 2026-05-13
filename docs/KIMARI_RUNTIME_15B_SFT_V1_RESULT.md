@@ -26,24 +26,30 @@ Kimari SFT v1 seed dataset: 320 examples total.
 
 ## Run status
 
-Status: PLACEHOLDER — fill with actual `job_id`, status, GPU, steps, and loss after the real short run.
+Status: **PENDING** — This is a placeholder document. It is **not** evidence of a completed SFT run. No training has been executed yet.
 
 | Field | Value |
 | --- | --- |
-| job_id | PLACEHOLDER |
-| status | PLACEHOLDER |
-| GPU | PLACEHOLDER |
-| steps | PLACEHOLDER |
-| loss | PLACEHOLDER |
+| job_id | PENDING |
+| status | PENDING |
+| GPU | PENDING |
+| steps | PENDING |
+| loss | PENDING |
+
+> **⚠️ This is a pending result placeholder. It is not evidence of a completed SFT run. Do not treat the values below as confirmed until a real job_id replaces the PENDING fields above.**
 
 ## What was done
 
-- `training_performed=true`
-- `adapter_generated=true`
-- `adapter_persisted_private=true`
+- `training_performed=false`
+- `adapter_generated=false`
+- `adapter_persisted_private=false`
+- `adapter_load_check=false`
+- `generation_success=false`
 
 ## What was NOT done
 
+- No training has been executed.
+- No adapter has been generated.
 - No public weights were published.
 - No GGUF was generated.
 - No benchmark was claimed or published.
@@ -55,4 +61,4 @@ BLOCKED
 
 ## Next step
 
-Evaluate baseline vs SFT v1 adapter.
+After the real SFT v1 run is executed and validated: evaluate baseline vs SFT v1 adapter.
