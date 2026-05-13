@@ -67,7 +67,16 @@ benchmarks/results/*.csv
 eval/results/*.json
 
 # Dataset build output
-dataset/build/
+# Keep generated/private dataset outputs ignored by default, but track the
+# reviewed synthetic micro-SFT fixture required by release validation.
+!dataset/build
+!dataset/build/
+dataset/build/*
+!dataset/build/kimari-fit-v0
+!dataset/build/kimari-fit-v0/
+dataset/build/kimari-fit-v0/*
+!dataset/build/kimari-fit-v0/sft_micro.jsonl
+!dataset/build/kimari-fit-v0/report.json
 
 # Cache
 .cache/

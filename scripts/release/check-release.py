@@ -2981,10 +2981,10 @@ def main() -> None:
     if smoke_config_path.exists():
         smoke_config = None
         try:
-            import yaml
+            import yaml as _yaml
 
             with open(smoke_config_path) as f:
-                smoke_config = yaml.safe_load(f)
+                smoke_config = _yaml.safe_load(f)
         except ImportError:
             # Simple parser
             smoke_config = {}
@@ -6283,7 +6283,9 @@ def main() -> None:
         "eval/configs/kimari_eval_v1_baseline_vs_adapter.yaml not found",
     )
     if eval_config.exists():
-        config = yaml.safe_load(eval_config.read_text())
+        import yaml as _yaml
+
+        config = _yaml.safe_load(eval_config.read_text())
         check(
             "Eval config: gate_state BLOCKED",
             config.get("gate_state") == "BLOCKED",

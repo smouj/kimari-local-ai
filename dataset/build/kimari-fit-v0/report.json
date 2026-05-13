@@ -1,0 +1,17 @@
+{
+  "record_count": 72,
+  "categories": [
+    "cuda_gpu",
+    "coding",
+    "kimari",
+    "technical",
+    "linux"
+  ],
+  "file_sha256": "f8ce140b5e2e127e4324f3a7c47854800fa3f059aa44a00c5863022c958e85f6",
+  "normalized_sha256": "41afe87152d0291e97d445369d251bd1f0f906e1e4413b1a745eacf9d4f7f96a",
+  "byte_size": 28692,
+  "source": "synthetic/curated",
+  "private_data": false,
+  "tokens_or_secrets": false,
+  "notes": "Curated examples for Kimari-4B first private adapter run. Spanish technical, CUDA/GPU, Python/Bash, Kimari API, Linux. No private data, no tokens, no copyrighted problematic material. file_sha256 = raw file hash; normalized_sha256 = sorted-keys JSON hash."
+}

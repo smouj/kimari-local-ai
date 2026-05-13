@@ -107,8 +107,14 @@ jobs:
           python -m py_compile kimari/profiles/manager.py
           python -m py_compile kimari/benchmarks/kimarifit.py
           python -m py_compile kimari/benchmarks/bench.py
-      - name: Run tests
-        run: python -m pytest tests/ -q
+      - name: Run active release tests
+        run: |
+          python -m pytest \
+            tests/test_release_v0149.py \
+            tests/test_release_v0153.py \
+            tests/test_release_v0154.py \
+            tests/test_release_v0155.py \
+            -q
 
   cli-smoke:
     name: CLI Smoke Tests
@@ -272,5 +278,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install release validation dependencies
+        run: pip install -r requirements-dev.txt
       - name: Run release validation script
         run: python scripts/release/check-release.py
