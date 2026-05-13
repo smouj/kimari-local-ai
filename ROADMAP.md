@@ -494,7 +494,20 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.58-alpha (Current)
+## v0.1.59-alpha (Current)
+
+- ✅ Kimari SFT v1 dataset structure (8 categories, 320+ examples)
+- ✅ Dataset schema (`dataset/schema/kimari_sft_item.schema.json`)
+- ✅ Dataset validator (`dataset/scripts/validate_kimari_sft_v1.py`)
+- ✅ Dataset builder (`dataset/scripts/build_kimari_sft_v1.py`)
+- ✅ License manifest (`license_manifest.yaml` + `license_manifest.json`)
+- ✅ Quality guide (`docs/KIMARI_SFT_V1_QUALITY_GUIDE.md`)
+- ✅ Dataset documentation (`docs/KIMARI_SFT_V1_DATASET.md`)
+- ✅ SFT v1 dataset license plan updated with real dataset reference
+- ✅ SFT v1 training deferred to v0.1.60-alpha
+- Gate BLOCKED — no training, no HF Jobs, no public weights, no adapters, no GGUF
+
+## v0.1.58-alpha (Released)
 
 - ✅ Open-license base bakeoff config (`eval/configs/open_base_bakeoff_v1.yaml`)
 - ✅ Bakeoff runner (`eval/scripts/run_open_base_bakeoff.py`)

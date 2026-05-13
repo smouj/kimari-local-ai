@@ -2,6 +2,23 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+## v0.1.59 Checks — Kimari SFT v1 dataset
+
+- [ ] `dataset/sft_v1/` exists
+- [ ] `dataset/schema/kimari_sft_item.schema.json` exists
+- [ ] `dataset/scripts/validate_kimari_sft_v1.py` exists
+- [ ] `dataset/scripts/build_kimari_sft_v1.py` exists
+- [ ] license manifest exists (`license_manifest.yaml` + `license_manifest.json`)
+- [ ] build output exists
+- [ ] no blocked licenses in manifest
+- [ ] no secrets in dataset, manifests, or generated build output
+- [ ] no PII in dataset, manifests, or generated build output
+- [ ] no Kimari-4B released claim
+- [ ] no training run executed
+- [ ] no HF Jobs executed
+- [ ] no public weights, adapters, or GGUF files
+- [ ] gate BLOCKED
+
 ## v0.1.58 Checks — Open-license base bakeoff
 
 - [ ] `eval/configs/open_base_bakeoff_v1.yaml` exists

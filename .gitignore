@@ -119,3 +119,5 @@ raw_eval/
 eval/raw/
 eval/results/
 *.log
+dataset/build/
+dataset/kimari_sft_v1/build/

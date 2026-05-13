@@ -5,6 +5,30 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.59-alpha] - 2026-05-13
+
+### Added
+- Kimari SFT v1 dataset structure (8 categories, 320+ examples)
+- Dataset schema (kimari_sft_item.schema.json)
+- Dataset validator (validate_kimari_sft_v1.py)
+- Dataset builder (build_kimari_sft_v1.py)
+- License manifest (license_manifest.yaml + license_manifest.json)
+- Quality guide (KIMARI_SFT_V1_QUALITY_GUIDE.md)
+- Dataset documentation (KIMARI_SFT_V1_DATASET.md)
+
+### Changed
+- Version bump: 0.1.58-alpha → 0.1.59-alpha
+- Updated SFT v1 dataset license plan with real dataset reference
+- Updated SFT v1 training plan: training deferred to v0.1.60-alpha
+
+### Safety
+- No training executed
+- No HF Jobs executed
+- No public weights, adapters, or GGUF files
+- No PII, tokens, or private logs in dataset
+- All data project-owned or permissive-license
+- Gate: BLOCKED
+
 ## [0.1.58-alpha] - 2026-05-13
 
 ### Added

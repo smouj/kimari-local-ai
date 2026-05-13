@@ -4255,16 +4255,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.58-alpha",
-            "version-0.1.58--alpha" in readme_text_current
-            and "version-0.1.58--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.58-alpha",
+            "README version badge is 0.1.59-alpha",
+            "version-0.1.59--alpha" in readme_text_current
+            and "version-0.1.59--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.59-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.58-alpha",
-            "Kimari Local AI v0.1.58-alpha" in docs_index_text
+            "docs/index current status is 0.1.59-alpha",
+            "Kimari Local AI v0.1.59-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.58 appears in public surfaces", "v0.1.58-alpha" in public_text, "current version missing")
+    check("v0.1.59 appears in public surfaces", "v0.1.59-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6612,6 +6612,9 @@ def main() -> None:
                             "before ",
                             "after ",
                             "if ",
+                            "❌",
+                            "do not",
+                            "must not",
                         ]
                     )
                     if _re.search(r"kimari-4b (is |has been |was )?released", line) and not negation_present:
@@ -6786,16 +6789,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.58-alpha",
-            "version-0.1.58--alpha" in readme_text_current
-            and "version-0.1.58--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.58-alpha",
+            "README version badge is 0.1.59-alpha",
+            "version-0.1.59--alpha" in readme_text_current
+            and "version-0.1.59--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.59-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.58-alpha",
-            "Kimari Local AI v0.1.58-alpha" in docs_index_text
+            "docs/index current status is 0.1.59-alpha",
+            "Kimari Local AI v0.1.59-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6859,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.58 appears in public surfaces", "v0.1.58-alpha" in public_text, "current version missing")
+    check("v0.1.59 appears in public surfaces", "v0.1.59-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6975,6 +6978,159 @@ def main() -> None:
         "benchmark-style public claim found",
     )
     check("v0.1.58 gate BLOCKED", "blocked" in bakeoff_text, "bakeoff docs/templates must keep gate BLOCKED")
+
+    # ── v0.1.59 Kimari SFT v1 dataset ───────────────────────────
+    print("\n[79/79] v0.1.59 Kimari SFT v1 dataset")
+    dataset_dir = PROJECT_ROOT / "dataset" / "kimari_sft_v1"
+    dataset_schema = PROJECT_ROOT / "dataset" / "schema" / "kimari_sft_item.schema.json"
+    dataset_validator = PROJECT_ROOT / "dataset" / "scripts" / "validate_kimari_sft_v1.py"
+    dataset_builder = PROJECT_ROOT / "dataset" / "scripts" / "build_kimari_sft_v1.py"
+    license_manifest_yaml = PROJECT_ROOT / "dataset" / "kimari_sft_v1" / "license_manifest.yaml"
+    license_manifest_json = PROJECT_ROOT / "dataset" / "build" / "kimari_sft_v1" / "license_manifest.json"
+    build_output_candidates = [
+        PROJECT_ROOT / "dataset" / "build" / "kimari_sft_v1" / "train.jsonl",
+        PROJECT_ROOT / "dataset" / "build" / "kimari_sft_v1" / "validation.jsonl",
+        PROJECT_ROOT / "dataset" / "build" / "kimari_sft_v1" / "dataset_summary.json",
+    ]
+
+    check("v0.1.59 dataset dir exists", dataset_dir.exists(), "missing dataset/sft_v1/")
+    check("v0.1.59 schema exists", dataset_schema.exists(), "missing dataset/schema/kimari_sft_item.schema.json")
+    check("v0.1.59 validator exists", dataset_validator.exists(), "missing dataset/scripts/validate_kimari_sft_v1.py")
+    check("v0.1.59 builder exists", dataset_builder.exists(), "missing dataset/scripts/build_kimari_sft_v1.py")
+    check(
+        "v0.1.59 license manifest exists",
+        license_manifest_yaml.exists() and license_manifest_json.exists(),
+        "missing license_manifest.yaml and/or license_manifest.json",
+    )
+    check(
+        "v0.1.59 build output exists",
+        any(path.exists() for path in build_output_candidates),
+        "missing expected dataset build output",
+    )
+
+    dataset_public_paths = [
+        path
+        for base in [dataset_dir, PROJECT_ROOT / "dataset" / "build"]
+        if base.exists()
+        for path in base.rglob("*")
+        if path.is_file()
+    ]
+    manifest_text = "\n".join(
+        path.read_text(errors="ignore").lower()
+        for path in [license_manifest_yaml, license_manifest_json]
+        if path.exists()
+    )
+    dataset_text = "\n".join(path.read_text(errors="ignore").lower() for path in dataset_public_paths)
+    release_text = "\n".join(
+        (PROJECT_ROOT / rel).read_text(errors="ignore").lower()
+        for rel in ["README.md", "docs/index.html", "CHANGELOG.md", "ROADMAP.md"]
+        if (PROJECT_ROOT / rel).exists()
+    )
+    blocked_license_phrases = ["non-commercial", "research-only", "cc-by-nc", "nc-only", "proprietary", "unknown"]
+    secret_patterns = ["sk-proj-", "sk-sb-", "ghp_", "gho_", "AKIA", "private_key_pem", "-----begin rsa"]
+    pii_patterns = ["@gmail.com", "@outlook.com", "@yahoo.com", "phone:", "ssn", "passport"]
+
+    # Remove blocked_licenses section from manifest text to avoid false positives
+    # (it lists what is NOT allowed, which should not trigger the check)
+    manifest_text_clean = manifest_text
+    if "blocked_licenses" in manifest_text_clean:
+        blocked_start = manifest_text_clean.find("blocked_licenses")
+        next_section = manifest_text_clean.find("\n\n", blocked_start)
+        if next_section == -1:
+            next_section = len(manifest_text_clean)
+        manifest_text_clean = manifest_text_clean[:blocked_start] + manifest_text_clean[next_section:]
+
+    check(
+        "v0.1.59 no blocked licenses in manifest",
+        not any(phrase in manifest_text_clean for phrase in blocked_license_phrases),
+        "blocked/non-permissive license phrase found in manifest",
+    )
+    check(
+        "v0.1.59 no secrets",
+        not any(pattern in dataset_text or pattern in manifest_text for pattern in secret_patterns),
+        "secret-like pattern found in dataset/manifest text",
+    )
+    check(
+        "v0.1.59 no PII",
+        not any(pattern in dataset_text or pattern in manifest_text for pattern in pii_patterns),
+        "PII-like pattern found in dataset/manifest text",
+    )
+    # Check for Kimari-4B release claims, but allow conditional/future mentions
+    k4b_false_claim = False
+    for phrase in [
+        "kimari-4b is released",
+        "kimari-4b is now released",
+        "kimari-4b has been released",
+        "kimari-4b is available",
+    ]:
+        if phrase in release_text:
+            # Check if it's a conditional/future mention ("for when", "ready for when", etc.)
+            idx = release_text.find(phrase)
+            context = release_text[max(0, idx - 120) : idx + len(phrase) + 10]
+            if (
+                "when kimari-4b is released" in context
+                or "for when kimari-4b is released" in context
+                or "until kimari-4b is released" in context
+                or "until kimari-4b is available" in context
+                or "ready for when kimari-4b is released" in context
+            ):
+                continue  # conditional/future mention, not a claim
+            k4b_false_claim = True
+
+    # Also check for standalone "kimari-4b released" that isn't a conditional or negation
+    k4b_released_standalone = False
+    idx = 0
+    while True:
+        idx = release_text.find("kimari-4b released", idx)
+        if idx == -1:
+            break
+        context = release_text[max(0, idx - 120) : idx + 60]
+        conditional_patterns = [
+            "when kimari-4b is released",
+            "for when kimari-4b is released",
+            "until kimari-4b is released",
+            "ready for when kimari-4b is released",
+            'no "kimari-4b released"',
+            'kimari-4b released" false claim',
+            "claim kimari-4b is released",
+            "claim kimari-4b released",
+        ]
+        if not any(p in context for p in conditional_patterns):
+            k4b_released_standalone = True
+            break
+        idx += 1
+
+    check(
+        "v0.1.59 no Kimari-4B released claim",
+        not k4b_false_claim and not k4b_released_standalone,
+        "Kimari-4B release claim found",
+    )
+    check(
+        "v0.1.59 no training run",
+        "v0.1.59" not in release_text or "no training executed" in release_text,
+        "v0.1.59 must explicitly state no training executed",
+    )
+    check(
+        "v0.1.59 no HF Jobs executed",
+        "v0.1.59" not in release_text or "no hf jobs executed" in release_text,
+        "v0.1.59 must explicitly state no HF Jobs executed",
+    )
+    public_model_artifacts = [
+        path
+        for pattern in ("*.safetensors", "*.gguf", "adapter_model.bin")
+        for path in PROJECT_ROOT.rglob(pattern)
+        if ".venv" not in path.parts and "deps" not in path.parts
+    ]
+    check(
+        "v0.1.59 no public weights/adapters/GGUF",
+        len(public_model_artifacts) == 0,
+        f"found: {[str(path.relative_to(PROJECT_ROOT)) for path in public_model_artifacts[:5]]}",
+    )
+    check(
+        "v0.1.59 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:

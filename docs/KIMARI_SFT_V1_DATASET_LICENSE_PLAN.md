@@ -1,8 +1,8 @@
 # Kimari SFT v1 Dataset License Plan
 
-> **Version**: v0.1.57-alpha  
+> **Version**: v0.1.59-alpha  
 > **Last updated**: 2026-05-13  
-> **Status**: Planned  
+> **Status**: Seed created — 320 examples, 8 categories  
 > **Gate**: BLOCKED — no training until bakeoff complete
 
 ## 1. Objective

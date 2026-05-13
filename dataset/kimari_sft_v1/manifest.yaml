@@ -1,0 +1,85 @@
+# Kimari SFT v1 — Dataset Manifest
+
+name: kimari_sft_v1
+version: "0.1.59-alpha"
+stage: seed
+created: "2026-05-13"
+description: "Kimari SFT v1 dataset for supervised fine-tuning of Kimari models"
+
+categories:
+  - id: spanish_technical
+    name: "Spanish Technical"
+    source_file: spanish_technical.jsonl
+    target_count: 40
+    language: es
+    description: "Technical Q&A in Spanish covering DNS, SSL, Docker, systemd, bash"
+
+  - id: coding_debug
+    name: "Coding & Debug"
+    source_file: coding_debug.jsonl
+    target_count: 40
+    language: mixed
+    description: "Programming debugging across Python, JS, Git, Docker, SQL"
+
+  - id: server_ops
+    name: "Server Operations"
+    source_file: server_ops.jsonl
+    target_count: 40
+    language: es
+    description: "Linux/sysadmin operations: process, disk, user, network management"
+
+  - id: local_llm_cuda_gguf
+    name: "Local LLM / CUDA / GGUF"
+    source_file: local_llm_cuda_gguf.jsonl
+    target_count: 40
+    language: mixed
+    description: "Local AI deployment, CUDA, GGUF quantization, VRAM management"
+
+  - id: openclaw_agents
+    name: "OpenClaw & Agents"
+    source_file: openclaw_agents.jsonl
+    target_count: 40
+    language: mixed
+    description: "OpenClaw setup, agent workflows, tool integration, skills"
+
+  - id: safety_refusal
+    name: "Safety & Refusal"
+    source_file: safety_refusal.jsonl
+    target_count: 40
+    language: mixed
+    description: "Harmful request refusal, privacy protection, safe alternatives"
+
+  - id: json_tooling
+    name: "JSON & Tooling"
+    source_file: json_tooling.jsonl
+    target_count: 40
+    language: mixed
+    description: "Structured output, API patterns, schema validation, data formats"
+
+  - id: style_consistency
+    name: "Style Consistency"
+    source_file: style_consistency.jsonl
+    target_count: 40
+    language: es
+    description: "Kimari style: direct, helpful, no filler, honest uncertainty"
+
+total_target: 320
+format_version: "1.0"
+schema: dataset/schema/kimari_sft_item.schema.json
+
+build:
+  train_ratio: 0.9
+  validation_ratio: 0.1
+  seed: 42
+  shuffle: true
+  dedup_by: prompt_hash
+
+safety:
+  no_training: true
+  no_hf_jobs: true
+  no_public_weights: true
+  no_public_benchmarks: true
+  no_pii: true
+  no_tokens: true
+  no_private_logs: true
+  gate: BLOCKED

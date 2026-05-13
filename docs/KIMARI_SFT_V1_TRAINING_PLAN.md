@@ -1,8 +1,8 @@
 # Kimari SFT v1 Training Plan
 
-> **Version**: v0.1.57-alpha  
+> **Version**: v0.1.59-alpha  
 > **Last updated**: 2026-05-13  
-> **Status**: Planned  
+> **Status**: Dataset seed created — Training deferred to v0.1.60-alpha  
 > **Gate**: BLOCKED — no training until bakeoff complete and license review
 
 ## 1. Overview
