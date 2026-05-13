@@ -494,7 +494,20 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.63-alpha (Current)
+## v0.1.64-alpha (Current)
+
+- ✅ SFT v1 result reconciliation: run history updated
+- ✅ check-release.py v0.1.62 checks now conditional (PENDING vs COMPLETED)
+- ✅ Eval readiness config: `eval/configs/kimari_runtime_15b_sft_v1_eval_subset10.yaml`
+- ✅ Eval readiness validator: `eval/scripts/validate_sft_v1_eval_readiness.py`
+- ✅ Eval plan document: `docs/KIMARI_RUNTIME_15B_SFT_V1_EVAL_PLAN.md`
+- ✅ check-release.py v0.1.64 checks
+- ✅ tests/test_release_v0164.py
+- No training executed, no HF Jobs submitted
+- No public weights, no GGUF, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.63-alpha (Released)
 
 - ✅ SFT v1 real short run completed (Job `6a0501dae48bea4538b9c17a`, a10g-small)
 - ✅ Training results: 10 steps micro-run, loss 2.753→2.652 (eval), accuracy 52.08%

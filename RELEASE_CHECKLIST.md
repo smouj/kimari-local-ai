@@ -1190,3 +1190,41 @@ twine upload dist/*
 - [ ] ROADMAP.md next version entry created
 - [ ] TestPyPI validation result recorded (if attempted)
 - [ ] GitHub release tag pushed
+
+## v0.1.63 Checks
+
+- [x] SFT v1 micro-run completed (Job 6a0501dae48bea4538b9c17a)
+- [x] Result summary JSON validated
+- [x] Result doc COMPLETED (not PENDING)
+- [x] training_performed=true in summary
+- [x] adapter_generated=true in summary
+- [x] adapter_committed=false
+- [x] hf_public_upload_performed=false
+- [x] gguf_generated=false
+- [x] gate_state=BLOCKED
+- [x] HF Jobs command syntax fixed (positional IMAGE, bash -c, git clone, --micro-run --yes)
+- [x] Config: dataset_path/eval_dataset_path (not dataset_train)
+- [x] Dataset build files tracked in git
+- [x] pyproject.toml version = 0.1.63-alpha
+- [x] kimari/__init__.py __version__ = 0.1.63-alpha
+- [x] No adapter/GGUF/checkpoint/raw logs committed
+- [x] Gate BLOCKED
+- [x] No "Kimari-4B released" false claim anywhere
+
+## v0.1.64 Checks
+
+- [x] check-release.py v0.1.62 checks conditional on result doc status
+- [x] check-release clean (0 FAIL)
+- [x] SFT v1 result doc says COMPLETED
+- [x] SFT v1 result doc says 10 steps (micro-run, not final model)
+- [x] SFT v1 result doc says no public benchmark
+- [x] Run history updated with micro-run entry
+- [x] Eval subset10 config exists
+- [x] Eval readiness validator passes
+- [x] Eval plan doc exists
+- [x] No training executed, no HF Jobs submitted
+- [x] No public weights/GGUF
+- [x] No benchmark público
+- [x] Gate BLOCKED
+- [x] pyproject.toml version = 0.1.64-alpha
+- [x] kimari/__init__.py __version__ = 0.1.64-alpha

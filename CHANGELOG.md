@@ -4,6 +4,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.64-alpha] - 2026-05-13
+
+### Added
+- **SFT v1 result reconciliation**: Run history updated with micro-run results
+- **Eval readiness config**: `eval/configs/kimari_runtime_15b_sft_v1_eval_subset10.yaml`
+- **Eval readiness validator**: `eval/scripts/validate_sft_v1_eval_readiness.py`
+- **Eval plan document**: `docs/KIMARI_RUNTIME_15B_SFT_V1_EVAL_PLAN.md`
+- **v0.1.64 release tests**: `tests/test_release_v0164.py`
+- **check-release.py v0.1.64 checks**: Result reconciliation, eval readiness
+
+### Fixed
+- **check-release.py v0.1.62 checks**: Now conditional on result doc status (PENDING vs COMPLETED)
+- **check-release clean**: 0 FAIL after reconciliation
+
+### Security
+- No public weights, GGUF, or benchmarks
+- Gate remains BLOCKED
+- Adapter not persisted (micro-run only)
+
 ## [0.1.63-alpha] - 2026-05-13
 
 ### Added

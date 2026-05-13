@@ -43,8 +43,28 @@
 
 > **Note**: No raw evaluation outputs are committed. No public benchmark claims.
 
+## Run 4: SFT v1 Real Micro-Run
+
+| Field | Value |
+|-------|-------|
+| **Job ID** | `6a0501dae48bea4538b9c17a` |
+| **Run ID** | kimari-runtime-15b-sft-v1 |
+| **Type** | SFT v1 micro-run (10 steps) |
+| **Base model** | Qwen/Qwen2.5-1.5B-Instruct |
+| **Hardware** | A10G (small) |
+| **Steps** | 10 |
+| **Loss** | 2.753 → 2.652 (eval) |
+| **Accuracy** | 52.08% |
+| **Result** | ✅ COMPLETED — adapter **not persisted** (micro-run) |
+| **Artifact status** | Private adapter generated, not committed |
+| **Public release status** | None |
+| **Gate state** | 🔒 BLOCKED |
+| **Docs** | `docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md`, `docs/assets/results/sft_v1_run_summary.json` |
+
+> **Note**: This was a micro-run (10 steps) to validate the SFT v1 pipeline. Not a final model. No public weights, GGUF, or benchmarks. Gate remains BLOCKED.
+
 ## Status
 
 - **Gate**: 🔒 BLOCKED
 - **Kimari-4B**: Not released. No public weights, adapters, or GGUF.
-- **Next**: Subset30 evaluation (manual decision required before proceeding)
+- **Next**: Evaluation readiness (subset10 → subset30)

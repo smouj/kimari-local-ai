@@ -1,0 +1,44 @@
+# KimariEval v1 — SFT v1 Adapter vs Baseline Evaluation (Subset 10)
+# Small subset for pipeline validation before larger runs.
+# SFT v1 micro-run adapter (10 steps, QLoRA, Qwen2.5-1.5B-Instruct)
+
+base_model: "Qwen/Qwen2.5-1.5B-Instruct"
+# Adapter from SFT v1 real micro-run (Job 6a0501dae48bea4538b9c17a)
+# Note: adapter was generated but NOT persisted to HF. This config is for
+# local evaluation readiness validation. Actual adapter must be loaded from
+# the training output directory or re-generated if needed.
+adapter_path: "training/output/kimari-runtime-15b-sft-v1/adapter"
+adapter_repo_private: null  # Not persisted to HF
+dataset_dir: "eval/kimari_private_v1"
+
+# Small subset for first pipeline validation
+subset_size: 10
+
+# Generation parameters
+temperature: 0.2
+max_tokens: 256
+top_p: 0.9
+seed: 42
+
+# Comparison mode
+comparison_mode: "baseline_vs_adapter"
+metrics:
+  - accuracy
+  - exact_match
+  - containment
+
+# Safety flags — ALL must be false/correct
+manual_review_required: true
+public_benchmark_allowed: false
+raw_outputs_commit_allowed: false
+gate_state: "BLOCKED"
+
+# Metadata
+version: "0.1.64-alpha"
+created_at: "2026-05-14"
+notes: |
+  SFT v1 adapter subset10 evaluation readiness config.
+  Adapter from micro-run (10 steps, loss 2.753→2.652).
+  If subset10 passes, proceed to subset30.
+  No public benchmark claims. No raw outputs committed.
+  Gate BLOCKED. Adapter not persisted to HF.

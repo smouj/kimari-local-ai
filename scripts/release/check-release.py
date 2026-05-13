@@ -4256,15 +4256,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.63--alpha" in readme_text_current
+            "version-0.1.64--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.63-alpha",
+            "README badge URL must match 0.1.64-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.63-alpha" in docs_index_text
+            "Kimari Local AI v0.1.64-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.63-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.64-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6790,15 +6790,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.63--alpha" in readme_text_current
+            "version-0.1.64--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.63-alpha",
+            "README badge URL must match 0.1.64-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.63-alpha" in docs_index_text
+            "Kimari Local AI v0.1.64-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.63-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.64-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7364,29 +7364,52 @@ def main() -> None:
 
     check("v0.1.62 result doc exists", result_doc.exists(), "missing docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md")
 
-    # Result doc placeholder must NOT claim training success
+    # Result doc checks are conditional on status:
+    # - If PENDING: must NOT claim training/adapter success, must have placeholder warning
+    # - If COMPLETED: must claim training_performed=true, adapter_generated=true, gate BLOCKED
     if result_doc.exists():
         result_text = result_doc.read_text().lower()
-        check(
-            "v0.1.62 result placeholder does not claim training_performed=true",
-            "training_performed=true" not in result_text,
-            "result doc must not claim training_performed=true before real run",
-        )
-        check(
-            "v0.1.62 result placeholder does not claim adapter_generated=true",
-            "adapter_generated=true" not in result_text,
-            "result doc must not claim adapter_generated=true before real run",
-        )
-        check(
-            "v0.1.62 result placeholder status is PENDING",
-            "pending" in result_text,
-            "result doc must have PENDING status",
-        )
-        check(
-            "v0.1.62 result placeholder has warning",
-            "placeholder" in result_text,
-            "result doc must mention it is a placeholder",
-        )
+        result_completed = "completed" in result_text
+
+        if result_completed:
+            # v0.1.62 originally had placeholder; now real run completed (v0.1.63+)
+            check(
+                "v0.1.62 result doc has COMPLETED status (run completed)",
+                "completed" in result_text,
+                "result doc must have COMPLETED status when run is done",
+            )
+            check(
+                "v0.1.62 result doc confirms training_performed=true",
+                "training_performed" in result_text,
+                "result doc must reference training_performed when COMPLETED",
+            )
+            check(
+                "v0.1.62 result doc confirms gate BLOCKED",
+                "blocked" in result_text,
+                "result doc must show gate BLOCKED",
+            )
+        else:
+            # Placeholder mode: must NOT claim training success
+            check(
+                "v0.1.62 result placeholder does not claim training_performed=true",
+                "training_performed=true" not in result_text,
+                "result doc must not claim training_performed=true before real run",
+            )
+            check(
+                "v0.1.62 result placeholder does not claim adapter_generated=true",
+                "adapter_generated=true" not in result_text,
+                "result doc must not claim adapter_generated=true before real run",
+            )
+            check(
+                "v0.1.62 result placeholder status is PENDING",
+                "pending" in result_text,
+                "result doc must have PENDING status",
+            )
+            check(
+                "v0.1.62 result placeholder has warning",
+                "placeholder" in result_text,
+                "result doc must mention it is a placeholder",
+            )
 
     # HF Jobs wrapper must run preflight before training
     if hf_wrapper_v162.exists():
@@ -7508,6 +7531,116 @@ def main() -> None:
 
     check(
         "v0.1.63 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
+
+    # ── v0.1.64 SFT v1 result reconciliation + eval readiness ───────
+    print("\n[84/84] v0.1.64 SFT v1 result reconciliation + eval readiness")
+
+    # Result doc must be COMPLETED (not PENDING)
+    check(
+        "v0.1.64 result doc is COMPLETED",
+        result_doc.exists() and "completed" in result_doc.read_text().lower(),
+        "result doc must have COMPLETED status",
+    )
+
+    # Run summary must be valid
+    summary_v164 = PROJECT_ROOT / "docs" / "assets" / "results" / "sft_v1_run_summary.json"
+    check("v0.1.64 summary JSON exists", summary_v164.exists(), "missing docs/assets/results/sft_v1_run_summary.json")
+    if summary_v164.exists():
+        sft_data = json.loads(summary_v164.read_text())
+        check(
+            "v0.1.64 summary training_performed=true",
+            sft_data.get("training_performed") is True,
+            "training_performed must be true",
+        )
+        check(
+            "v0.1.64 summary adapter_generated=true",
+            sft_data.get("adapter_generated") is True,
+            "adapter_generated must be true",
+        )
+        check(
+            "v0.1.64 summary adapter_committed_public=false",
+            sft_data.get("adapter_committed_public") is False or sft_data.get("adapter_committed") is False,
+            "no adapter committed publicly",
+        )
+        check(
+            "v0.1.64 summary gate BLOCKED",
+            sft_data.get("gate_state") == "BLOCKED",
+            "gate must remain BLOCKED",
+        )
+        check(
+            "v0.1.64 summary micro_run=true",
+            sft_data.get("micro_run") is True,
+            "summary must record micro_run=true (10 steps, not final model)",
+        )
+
+    # Run history doc must exist and contain the micro-run entry
+    run_history = PROJECT_ROOT / "docs" / "KIMARI4B_RUN_HISTORY.md"
+    check("v0.1.64 run history exists", run_history.exists(), "missing docs/KIMARI4B_RUN_HISTORY.md")
+    if run_history.exists():
+        rh_text = run_history.read_text()
+        check(
+            "v0.1.64 run history has micro-run entry",
+            "6a0501dae48bea4538b9c17a" in rh_text,
+            "run history must contain job ID 6a0501dae48bea4538b9c17a",
+        )
+        check(
+            "v0.1.64 run history says COMPLETED",
+            "COMPLETED" in rh_text,
+            "run history must show COMPLETED status",
+        )
+
+    # Eval subset10 config must exist
+    eval_config = PROJECT_ROOT / "eval" / "configs" / "kimari_runtime_15b_sft_v1_eval_subset10.yaml"
+    check(
+        "v0.1.64 eval subset10 config exists",
+        eval_config.exists(),
+        "missing eval/configs/kimari_runtime_15b_sft_v1_eval_subset10.yaml",
+    )
+    if eval_config.exists():
+        eval_text = eval_config.read_text()
+        check(
+            "v0.1.64 eval config has base_model",
+            "Qwen/Qwen2.5-1.5B-Instruct" in eval_text or "base_model" in eval_text,
+            "eval config must specify base_model",
+        )
+        check(
+            "v0.1.64 eval config gate BLOCKED",
+            "BLOCKED" in eval_text,
+            "eval config must specify gate_state: BLOCKED",
+        )
+        check(
+            "v0.1.64 eval config no public benchmark",
+            "public_benchmark_allowed" in eval_text,
+            "eval config must specify public_benchmark_allowed",
+        )
+
+    # Eval readiness validator must exist
+    eval_readiness = PROJECT_ROOT / "eval" / "scripts" / "validate_sft_v1_eval_readiness.py"
+    check(
+        "v0.1.64 eval readiness validator exists",
+        eval_readiness.exists(),
+        "missing eval/scripts/validate_sft_v1_eval_readiness.py",
+    )
+
+    # Eval plan doc must exist
+    eval_plan = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_EVAL_PLAN.md"
+    check("v0.1.64 eval plan doc exists", eval_plan.exists(), "missing docs/KIMARI_RUNTIME_15B_SFT_V1_EVAL_PLAN.md")
+    if eval_plan.exists():
+        ep_text = eval_plan.read_text()
+        check(
+            "v0.1.64 eval plan says no public benchmark",
+            "public" not in ep_text.lower()
+            or "no public benchmark" in ep_text.lower()
+            or "public_benchmark_allowed" in ep_text.lower(),
+            "eval plan must explicitly address no public benchmark",
+        )
+
+    # Gate remains BLOCKED
+    check(
+        "v0.1.64 gate BLOCKED",
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )
