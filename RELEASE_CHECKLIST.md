@@ -2,6 +2,28 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+## v0.1.60 Checks — SFT v1 training configuration + dry-run
+
+- [ ] `training/configs/kimari_runtime_15b_sft_v1.yaml` exists
+- [ ] Base model is Apache-2.0 (Qwen/Qwen2.5-1.5B-Instruct)
+- [ ] `training/scripts/preflight_sft_v1.py` exists
+- [ ] `training/scripts/sft_v1_command_preview.py` exists
+- [ ] `training/scripts/hf_jobs_sft_v1.py` exists
+- [ ] `training/templates/sft_v1_run_summary.template.json` exists
+- [ ] Preflight passes with --strict
+- [ ] Command preview generates local + HF Jobs dry-run commands
+- [ ] HF Jobs wrapper defaults to dry-run
+- [ ] No --token arg in any training script
+- [ ] No shell=True or .split() in subprocess calls
+- [ ] Dataset train/validation files exist and are valid
+- [ ] Config has push_to_hub=false, report_to=none, gate_state=BLOCKED
+- [ ] Config has public_release_allowed=false, hf_public_upload_allowed=false
+- [ ] Config has gguf_export_allowed=false
+- [ ] No training performed
+- [ ] No adapter or GGUF files committed or uploaded
+- [ ] No HF Jobs submitted
+- [ ] Gate BLOCKED
+
 ## v0.1.59 Checks — Kimari SFT v1 dataset
 
 - [ ] `dataset/sft_v1/` exists

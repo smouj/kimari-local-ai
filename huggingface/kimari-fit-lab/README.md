@@ -16,7 +16,7 @@ Static compatibility helper for Kimari Local AI.
 
 This Space does **not** run models, does **not** download models, and does **not** use API keys. It estimates compatibility from GPU/VRAM/RAM and suggests safe local commands.
 
-## Current Status (v0.1.59-alpha)
+## Current Status (v0.1.60-alpha)
 
 | Milestone | Status |
 |---|---|

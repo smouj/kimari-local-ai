@@ -4255,16 +4255,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.59-alpha",
-            "version-0.1.59--alpha" in readme_text_current
+            "README version badge is 0.1.60-alpha",
+            "version-0.1.60--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.59-alpha",
+            "README badge URL must match 0.1.60-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.59-alpha",
-            "Kimari Local AI v0.1.59-alpha" in docs_index_text
+            "docs/index current status is current version",
+            "Kimari Local AI v0.1.60-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.59 appears in public surfaces", "v0.1.59-alpha" in public_text, "current version missing")
+    check("v0.1.60 appears in public surfaces", "v0.1.60-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6789,16 +6789,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.59-alpha",
-            "version-0.1.59--alpha" in readme_text_current
+            "README version badge is 0.1.60-alpha",
+            "version-0.1.60--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.59-alpha",
+            "README badge URL must match 0.1.60-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.59-alpha",
-            "Kimari Local AI v0.1.59-alpha" in docs_index_text
+            "docs/index current status is current version",
+            "Kimari Local AI v0.1.60-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.59 appears in public surfaces", "v0.1.59-alpha" in public_text, "current version missing")
+    check("v0.1.60 appears in public surfaces", "v0.1.60-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7128,6 +7128,131 @@ def main() -> None:
     )
     check(
         "v0.1.59 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
+
+    # ── v0.1.60 SFT v1 training config + dry-run ────────────────
+    print("\n[80/80] v0.1.60 SFT v1 training config + dry-run")
+    sft_config = PROJECT_ROOT / "training" / "configs" / "kimari_runtime_15b_sft_v1.yaml"
+    preflight_script = PROJECT_ROOT / "training" / "scripts" / "preflight_sft_v1.py"
+    command_preview_script = PROJECT_ROOT / "training" / "scripts" / "sft_v1_command_preview.py"
+    hf_jobs_wrapper = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_sft_v1.py"
+    summary_template = PROJECT_ROOT / "training" / "templates" / "sft_v1_run_summary.template.json"
+    plan_doc = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_PLAN.md"
+    artifact_policy = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_ARTIFACT_POLICY.md"
+
+    check("v0.1.60 config exists", sft_config.exists(), "missing training/configs/kimari_runtime_15b_sft_v1.yaml")
+    check("v0.1.60 preflight exists", preflight_script.exists(), "missing training/scripts/preflight_sft_v1.py")
+    check(
+        "v0.1.60 command preview exists",
+        command_preview_script.exists(),
+        "missing training/scripts/sft_v1_command_preview.py",
+    )
+    check("v0.1.60 HF Jobs wrapper exists", hf_jobs_wrapper.exists(), "missing training/scripts/hf_jobs_sft_v1.py")
+    check(
+        "v0.1.60 summary template exists",
+        summary_template.exists(),
+        "missing training/templates/sft_v1_run_summary.template.json",
+    )
+    check("v0.1.60 plan doc exists", plan_doc.exists(), "missing docs/KIMARI_RUNTIME_15B_SFT_V1_PLAN.md")
+    check(
+        "v0.1.60 artifact policy exists",
+        artifact_policy.exists(),
+        "missing docs/KIMARI_RUNTIME_15B_SFT_V1_ARTIFACT_POLICY.md",
+    )
+
+    # Config safety checks
+    if sft_config.exists():
+        config_text = sft_config.read_text()
+        check(
+            "v0.1.60 config base is Apache-2.0",
+            "Apache-2.0" in config_text and "Qwen/Qwen2.5-1.5B-Instruct" in config_text,
+            "config must use Apache-2.0 licensed base model",
+        )
+        check("v0.1.60 config push_to_hub=false", "push_to_hub: false" in config_text, "push_to_hub must be false")
+        check("v0.1.60 config report_to=none", "report_to: none" in config_text, "report_to must be none")
+        check("v0.1.60 config gate BLOCKED", "gate_state: BLOCKED" in config_text, "gate_state must be BLOCKED")
+        check(
+            "v0.1.60 config no public release",
+            "public_release_allowed: false" in config_text and "hf_public_upload_allowed: false" in config_text,
+            "public release must be disabled",
+        )
+        check(
+            "v0.1.60 config no GGUF export",
+            "gguf_export_allowed: false" in config_text,
+            "gguf_export_allowed must be false",
+        )
+
+    # Script safety checks
+    for script_name, script_path in [
+        ("preflight", preflight_script),
+        ("command preview", command_preview_script),
+        ("HF Jobs wrapper", hf_jobs_wrapper),
+    ]:
+        if script_path.exists():
+            script_text = script_path.read_text()
+            check(
+                f"v0.1.60 {script_name} no shell=True",
+                "shell=True" not in script_text,
+                f"{script_name} must not use shell=True",
+            )
+            check(
+                f"v0.1.60 {script_name} no --token arg",
+                "--token" not in script_text,
+                f"{script_name} must not accept --token argument",
+            )
+
+    # Summary template safety
+    if summary_template.exists():
+        try:
+            summary = json.loads(summary_template.read_text())
+            check(
+                "v0.1.60 summary training_performed=false",
+                summary.get("training_performed") is False,
+                "training_performed must default to false",
+            )
+            check(
+                "v0.1.60 summary gate BLOCKED",
+                summary.get("gate_state") == "BLOCKED",
+                "gate_state must default to BLOCKED",
+            )
+            check(
+                "v0.1.60 summary no public upload",
+                summary.get("hf_public_upload_performed") is False,
+                "hf_public_upload_performed must default to false",
+            )
+            check(
+                "v0.1.60 summary no GGUF",
+                summary.get("gguf_generated") is False,
+                "gguf_generated must default to false",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.60 summary template valid JSON", False, "summary template is not valid JSON")
+
+    # No training artifacts
+    runs_dir = PROJECT_ROOT / "training" / "runs"
+    if runs_dir.exists():
+        real_files = [f for f in runs_dir.iterdir() if f.name != ".gitkeep"]
+        check("v0.1.60 no training runs", len(real_files) == 0, f"training runs directory has files: {real_files}")
+    else:
+        check("v0.1.60 no training runs", True, "")
+
+    # No adapters/GGUF
+    public_model_artifacts = [
+        path
+        for pattern in ("*.safetensors", "*.gguf", "adapter_model.bin")
+        for path in PROJECT_ROOT.rglob(pattern)
+        if ".venv" not in path.parts and "deps" not in path.parts
+    ]
+    check(
+        "v0.1.60 no public weights/adapters/GGUF",
+        len(public_model_artifacts) == 0,
+        f"found: {[str(path.relative_to(PROJECT_ROOT)) for path in public_model_artifacts[:5]]}",
+    )
+
+    check(
+        "v0.1.60 gate BLOCKED",
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )

@@ -1,6 +1,6 @@
 # Kimari AI
 
-> Current framework version: v0.1.59-alpha
+> Current framework version: v0.1.60-alpha
 > Status: alpha framework, public model gate BLOCKED
 
 ## Kimari Local AI — Local AI for older NVIDIA GPUs.

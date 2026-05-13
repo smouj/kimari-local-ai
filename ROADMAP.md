@@ -494,7 +494,22 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.59-alpha (Current)
+## v0.1.60-alpha (Current)
+
+- ✅ SFT v1 training config (`training/configs/kimari_runtime_15b_sft_v1.yaml`)
+- ✅ Preflight script (`training/scripts/preflight_sft_v1.py`)
+- ✅ Command preview (`training/scripts/sft_v1_command_preview.py`)
+- ✅ HF Jobs dry-run wrapper (`training/scripts/hf_jobs_sft_v1.py`)
+- ✅ Run summary template (`training/templates/sft_v1_run_summary.template.json`)
+- ✅ Runtime 1.5B SFT v1 plan (`docs/KIMARI_RUNTIME_15B_SFT_V1_PLAN.md`)
+- ✅ Artifact policy (`docs/KIMARI_RUNTIME_15B_SFT_V1_ARTIFACT_POLICY.md`)
+- ✅ check-release.py v0.1.60 checks
+- No training executed — dry-run configuration only
+- No HF Jobs submitted
+- No adapters or GGUF generated
+- Gate BLOCKED
+
+## v0.1.59-alpha (Released)
 
 - ✅ Kimari SFT v1 dataset structure (8 categories, 320+ examples)
 - ✅ Dataset schema (`dataset/schema/kimari_sft_item.schema.json`)

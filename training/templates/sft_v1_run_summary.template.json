@@ -1,0 +1,17 @@
+{
+  "run_id": "",
+  "base_model": "",
+  "base_license": "",
+  "dataset_train_sha256": "",
+  "dataset_validation_sha256": "",
+  "training_performed": false,
+  "adapter_generated": false,
+  "adapter_persisted_private": false,
+  "adapter_committed_public": false,
+  "hf_public_upload_performed": false,
+  "gguf_generated": false,
+  "gate_state": "BLOCKED",
+  "manual_review_required": true,
+  "dry_run_only": true,
+  "notes": ""
+}

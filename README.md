@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-0.1.59--alpha-9b59b6.svg" alt="v0.1.59-alpha">
+  <img src="https://img.shields.io/badge/version-0.1.60--alpha-9b59b6.svg" alt="v0.1.60-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.59-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.60-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.59-alpha**
+> **Kimari Local AI v0.1.60-alpha**
 
 ### 🔗 Public Resources
 
@@ -284,6 +284,20 @@ Kimari SFT v1 is the current dataset seed for the next training lane. It is stru
 - License manifest: `license_manifest.yaml` + `license_manifest.json` with per-source attribution
 
 **Status:** built with validate + build scripts. No training has been executed yet; gate **BLOCKED**.
+
+## Kimari Runtime 1.5B SFT v1 Plan
+
+Training configuration for the first SFT v1 run on Qwen2.5-1.5B-Instruct (Apache-2.0). The dataset seed is ready; training is **not executed yet** — only dry-run configuration and preflight tooling.
+
+- Config: [`training/configs/kimari_runtime_15b_sft_v1.yaml`](training/configs/kimari_runtime_15b_sft_v1.yaml)
+- Plan: [`docs/KIMARI_RUNTIME_15B_SFT_V1_PLAN.md`](docs/KIMARI_RUNTIME_15B_SFT_V1_PLAN.md)
+- Artifact policy: [`docs/KIMARI_RUNTIME_15B_SFT_V1_ARTIFACT_POLICY.md`](docs/KIMARI_RUNTIME_15B_SFT_V1_ARTIFACT_POLICY.md)
+- Preflight: [`training/scripts/preflight_sft_v1.py`](training/scripts/preflight_sft_v1.py)
+- Command preview: [`training/scripts/sft_v1_command_preview.py`](training/scripts/sft_v1_command_preview.py)
+- HF Jobs wrapper: [`training/scripts/hf_jobs_sft_v1.py`](training/scripts/hf_jobs_sft_v1.py)
+- Summary template: [`training/templates/sft_v1_run_summary.template.json`](training/templates/sft_v1_run_summary.template.json)
+
+**Status:** dry-run configuration only. No training executed. Gate **BLOCKED**.
 
 ---
 

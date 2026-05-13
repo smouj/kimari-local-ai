@@ -5,6 +5,42 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.60-alpha] - 2026-05-13
+
+### Added
+
+- **SFT v1 training configuration**: `training/configs/kimari_runtime_15b_sft_v1.yaml`
+  - Base: Qwen/Qwen2.5-1.5B-Instruct (Apache-2.0)
+  - Method: QLoRA, r=16, alpha=32, dropout=0.05
+  - Dataset: Kimari SFT v1 seed (288 train / 32 validation)
+  - Max steps: 100 (seed-appropriate)
+  - Safety: push_to_hub=false, report_to=none, gate BLOCKED
+- **Preflight script**: `training/scripts/preflight_sft_v1.py`
+  - Validates config, base model license, dataset integrity, safety flags
+  - --strict mode for CI checks
+- **Command preview script**: `training/scripts/sft_v1_command_preview.py`
+  - Generates local dry-run, HF Jobs dry-run, and blocked real commands
+  - Shows expected/forbidden artifacts, estimated cost, security warnings
+- **HF Jobs dry-run wrapper**: `training/scripts/hf_jobs_sft_v1.py`
+  - Safe subprocess arg building (no shell=True, no .split())
+  - Dry-run by default, real submit blocked in v0.1.60
+- **SFT v1 run summary template**: `training/templates/sft_v1_run_summary.template.json`
+- **KIMARI_RUNTIME_15B_SFT_V1_PLAN.md**: training plan, cost estimate, validation criteria
+- **KIMARI_RUNTIME_15B_SFT_V1_ARTIFACT_POLICY.md**: adapter privacy, no public release, gate BLOCKED
+
+### Changed
+
+- Version bump: 0.1.59-alpha → 0.1.60-alpha
+- check-release.py: v0.1.60 SFT training config checks
+
+### Safety
+
+- No training executed
+- No HF Jobs submitted
+- No adapters or GGUF generated
+- No public weights or model artifacts
+- Gate: BLOCKED
+
 ## [0.1.59-alpha] - 2026-05-13
 
 ### Added
