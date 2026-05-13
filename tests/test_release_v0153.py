@@ -150,7 +150,7 @@ def test_roadmap_has_v0153():
 
 def test_org_card_has_current_version():
     org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text()
-    assert "v0.1.53-alpha" in org_card or "v0.1.54-alpha" in org_card or "v0.1.55-alpha" in org_card
+    assert "v0.1.56-alpha" in org_card or "v0.1.55-alpha" in org_card
 
 
 def test_org_card_no_stale_version():
@@ -170,7 +170,7 @@ def test_org_card_gate_blocked():
 
 def test_deployment_status_has_current_version():
     deploy = (PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md").read_text()
-    assert "v0.1.53-alpha" in deploy or "v0.1.54-alpha" in deploy or "v0.1.55-alpha" in deploy
+    assert "v0.1.56-alpha" in deploy or "v0.1.55-alpha" in deploy
 
 
 def test_readme_links_hf_space():

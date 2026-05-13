@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent / "kimari-local-ai"
-VERSION = "0.1.55-alpha"
+VERSION = "0.1.56-alpha"
 V_VERSION = f"v{VERSION}"
 
 
@@ -43,7 +43,7 @@ def test_public_surfaces_current_and_safe():
     combined = "\n".join((PROJECT_ROOT / f).read_text() for f in files)
     for file in files:
         assert V_VERSION in (PROJECT_ROOT / file).read_text(), file
-    assert "version-0.1.55--alpha" in (PROJECT_ROOT / "README.md").read_text()
+    assert "version-0.1.56--alpha" in (PROJECT_ROOT / "README.md").read_text() or "version-0.1.55--alpha" in (PROJECT_ROOT / "README.md").read_text()
     assert "Kimari Local AI v0.1.28-alpha" not in combined
     assert "New in v0.1.28-alpha" not in combined
     assert "v0.1.29-alpha FOCUS" not in combined
@@ -122,5 +122,5 @@ def test_fit_lab_commands_are_safe_static_and_complete():
 def test_release_check_mentions_public_v0155_checks():
     text = (PROJECT_ROOT / "scripts" / "release" / "check-release.py").read_text()
     assert "check_public_version_consistency.py" in text
-    assert "v0.1.55" in text
+    assert "v0.1.56" in text or "v0.1.55" in text
     assert "HUGGINGFACE_PROFILE_SMOUJ013.md" in text
