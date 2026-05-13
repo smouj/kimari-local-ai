@@ -4,7 +4,7 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [0.1.55-alpha] - 2026-05-13
+## [0.1.56-alpha] - 2026-05-13
 
 ### Added
 - Public version consistency checker: `scripts/release/check_public_version_consistency.py`
@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Release tests for public HF/GitHub consistency
 
 ### Changed
-- Version bump: 0.1.54-alpha → 0.1.55-alpha
+- Version bump: 0.1.54-alpha → 0.1.56-alpha
 - README, docs site, HF org card, Space README, and deployment status synced from package version
 - ROADMAP clarifies Kimari-4B as private pipeline / not released with gate BLOCKED
 - CHANGELOG future placeholder dates corrected to date unknown where exact release date is unclear

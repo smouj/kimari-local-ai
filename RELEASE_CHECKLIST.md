@@ -2,7 +2,7 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
-## v0.1.55 Checks — Hugging Face public polish + consistency hardening
+## v0.1.56 Checks — Hugging Face public polish + consistency hardening
 
 - [x] `scripts/release/check_public_version_consistency.py` exists
 - [x] public version consistency reads version from `pyproject.toml`

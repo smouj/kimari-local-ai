@@ -463,7 +463,7 @@
 - ✅ Private adapter persisted; no public weights, no GGUF
 - Gate BLOCKED — no benchmark claims
 
-## v0.1.55-alpha (Current)
+## v0.1.56-alpha (Current)
 
 - ✅ Hugging Face public polish and consistency hardening
 - ✅ Public version consistency script

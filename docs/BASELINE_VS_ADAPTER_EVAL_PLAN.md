@@ -62,7 +62,7 @@ Measure whether a LoRA adapter improves the base model on KimariEval Private v1 
 - **v0.1.52**: Create eval infrastructure (this document)
 - **v0.1.53**: Run baseline evaluation
 - **v0.1.54**: Run adapter evaluation (after persistent adapter)
-- **v0.1.55+**: Compare and document findings (internal only)
+- **v0.1.56+**: Compare and document findings (internal only)
 
 ## Gate
 

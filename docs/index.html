@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.55-alpha — HF public polish, consistency hardening, gate BLOCKED
+      v0.1.56-alpha — Public state reconciliation, CI & pages cleanup, gate BLOCKED
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -478,130 +478,110 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <!-- ═══════ CURRENT ALPHA FOCUS ═══════ -->
 <div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.55-alpha</span>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.56-alpha</span>
+      <span style="font-size:1.1rem;font-weight:800;">What's New</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+
       <!-- GTX 1060 Local Validation -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
+      <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🖥️ GTX 1060 Local Runtime Validated</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           Real inference tested on NVIDIA GeForce GTX 1060 6GB (WSL2) with llama-server CUDA.
         </p>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:.8rem;">
           <div style="text-align:center;padding:8px;background:rgba(16,185,129,.1);border-radius:8px;">
             <div style="font-weight:700;color:#10b981;">228 tok/s</div>
-            <div style="color:var(--kimari-text-secondary);">Prompt (CUDA)</div>
+            <div style="color:var(--kimari-text-muted);">Prompt (CUDA)</div>
           </div>
           <div style="text-align:center;padding:8px;background:rgba(16,185,129,.1);border-radius:8px;">
             <div style="font-weight:700;color:#10b981;">73 tok/s</div>
-            <div style="color:var(--kimari-text-secondary);">Generation (CUDA)</div>
+            <div style="color:var(--kimari-text-muted);">Generation (CUDA)</div>
           </div>
           <div style="text-align:center;padding:8px;background:rgba(16,185,129,.1);border-radius:8px;">
             <div style="font-weight:700;color:#10b981;">~2.2×</div>
-            <div style="color:var(--kimari-text-secondary);">vs CPU-only</div>
+            <div style="color:var(--kimari-text-muted);">vs CPU-only</div>
           </div>
         </div>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">⚠️ TinyLlama test model — NOT Kimari-4B. Local validation only.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">⚠️ TinyLlama test model — NOT Kimari-4B. Local validation only.</p>
       </div>
 
       <!-- OpenAI-Compatible Endpoint -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
+      <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🔌 OpenAI-Compatible Local Endpoint</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           Validated locally with TinyLlama on GTX 1060. Exposes /v1/chat/completions, /v1/models, /health.
         </p>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Use <code>--profile test</code> for TinyLlama validation until Kimari-4B is available.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Use <code>--profile test</code> for TinyLlama validation until Kimari-4B is available.</p>
       </div>
 
       <!-- Works with local AI tools -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
+      <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🛠️ Works with Local AI Tools</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           Open WebUI · OpenClaw · Continue.dev · curl · OpenAI-compatible clients
         </p>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">See <a href="docs/LOCAL_INTEGRATION_VALIDATION.md" style="color:var(--kimari-teal);">integration docs</a> for setup guides.</p>
-      </div>
-
-      <!-- Validation Badges -->
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;">
-        <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ GTX 1060 Validated</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ OpenAI Endpoint</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ Local Integrations</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);font-size:.75rem;font-weight:600;color:#ef4444;">🚫 Kimari-4B Not Released</span>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">See <a href="docs/LOCAL_INTEGRATION_VALIDATION.md" style="color:var(--kimari-teal);">integration docs</a> for setup guides.</p>
       </div>
 
       <!-- Hugging Face Space -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
+      <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🤗 Hugging Face Space Live</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           GPU compatibility checker — no model execution, no API keys.
         </p>
         <a href="https://huggingface.co/spaces/kimari-ai/kimari-fit-lab" style="color:var(--kimari-teal);font-size:.9rem;font-weight:600;">kimari-ai/kimari-fit-lab →</a>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">The Space does not run models. Kimari-4B is not yet released.</p>
-      </div>
-
-      <!-- Public Launch Pack -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
-        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">📢 Public Launch Pack Ready</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
-          Ready-to-use posts for X, Reddit, and Hugging Face community.
-        </p>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <a href="https://huggingface.co/spaces/kimari-ai/kimari-fit-lab" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Space →</a>
-          <a href="https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Collection →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/GTX1060_SHOWCASE.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Showcase →</a>
-        </div>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">The Space does not run models. Kimari-4B is not yet released.</p>
       </div>
 
       <!-- Kimari-4B Private Adapter Pipeline -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
-        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🧪 Kimari-4B Private Adapter + Eval Pipeline</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+      <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🧪 Kimari-4B Private Adapter + Eval</h4>
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           Private adapter persisted. KimariEval Private v1 ready. No public weights. Gate BLOCKED.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Adapter Run →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_ADAPTER_PERSISTENCE_STRATEGY.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Persistence Strategy →</a>
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_RELEASE_GATE.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Release Gate →</a>
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">KimariEval →</a>
         </div>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Kimari-4B is not released. No public weights, adapters, or GGUF.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Kimari-4B is not released. No public weights, adapters, or GGUF.</p>
       </div>
 
       <!-- Micro SFT Real (HF Jobs) -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
-        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🔬 Micro SFT + Private Adapter Persisted</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+      <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🔬 Micro SFT + Private Adapter</h4>
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           First real LoRA training on A10G. Private adapter persisted to Smouj013/kimari4b-micro-sft-adapter-v0.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/HF_JOBS_MICRO_SFT_REAL_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Run Doc →</a>
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Persisted Result →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_MICRO_SFT_RESULT.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">First SFT Result →</a>
         </div>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Private adapter persisted. Not public. Gate BLOCKED.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Private adapter persisted. Not public. Gate BLOCKED.</p>
       </div>
 
       <!-- KimariEval Private v1 -->
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;margin-top:16px;">
+      <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">📊 KimariEval Private v1</h4>
-        <p style="font-size:.85rem;color:var(--kimari-text-secondary);margin-bottom:8px;">
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           104 evaluation cases across 7 categories. Baseline vs adapter eval infrastructure ready.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Eval Docs →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_BASELINE_VS_ADAPTER_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Baseline vs Adapter →</a>
           <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_REVIEW_PROTOCOL.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Review Protocol →</a>
         </div>
-        <p style="font-size:.75rem;color:var(--kimari-text-secondary);margin-top:8px;">Private eval. No benchmark claims. No raw outputs committed. Gate BLOCKED.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Private eval. No benchmark claims. No raw outputs committed. Gate BLOCKED.</p>
       </div>
-
-      <span style="font-size:1.1rem;font-weight:800;">What's New</span>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-microchip" style="color:var(--kimari-teal);"></i> Micro SFT training — train_sft_lora.py --micro-run --yes</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-shield-halved" style="color:var(--kimari-teal);"></i> CI guard + --yes required + no push_to_hub</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);font-size:.85rem;font-weight:600;color:var(--kimari-text);"><i class="fa-solid fa-clipboard-check" style="color:var(--kimari-cyan);"></i> validate_micro_sft_readiness.py + MICRO_SFT_IMPLEMENTATION.md</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.85rem;font-weight:600;color:#f87171;"><i class="fa-solid fa-ban" style="color:#f87171;"></i> No weights, no GGUF, no HF upload, gate BLOCKED</span>
+
+    <!-- Validation Badges -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;">
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ GTX 1060 Validated</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ OpenAI Endpoint</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ Local Integrations</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);font-size:.75rem;font-weight:600;color:#ef4444;">🚫 Kimari-4B Not Released</span>
     </div>
   </div>
 </div>
@@ -1046,7 +1026,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.21-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.56-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -1083,7 +1063,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.16-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.56-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -1505,7 +1485,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.55-alpha — Hugging Face public polish and consistency hardening. Gate BLOCKED; no public weights released.</p>
+    <p class="section-desc">Kimari Local AI v0.1.56-alpha — Public state reconciliation and CI/pages cleanup. Gate BLOCKED; no public weights released.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
@@ -1517,75 +1497,34 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>llama.cpp runtime</td><td>✅ Works with any GGUF model</td></tr>
         <tr><td>Open WebUI integration</td><td>✅ Functional via Docker</td></tr>
         <tr><td>Continue IDE integration</td><td>✅ Configuration ready</td></tr>
-        <tr><td><code>kimari logs</code> / <code>--json</code> flags</td><td>✅ Implemented in v0.1.1-alpha</td></tr>
+        <tr><td>GTX 1060 local validation</td><td>✅ CUDA + endpoint tested</td></tr>
+        <tr><td>OpenAI-compatible endpoint</td><td>✅ Validated locally</td></tr>
+        <tr><td>Local tool integrations</td><td>✅ Open WebUI, OpenClaw, Continue.dev, curl</td></tr>
+        <tr><td>Config management (<code>kimari config</code>)</td><td>✅ path/show/validate/migrate</td></tr>
+        <tr><td>Model pull + SHA256 verify</td><td>✅ <code>kimari pull</code> + hash pinning</td></tr>
+        <tr><td>Doctor diagnostics</td><td>✅ 14 checks, <code>--deep</code>, <code>--json</code></td></tr>
+        <tr><td>Release validation</td><td>✅ <code>check-release.py</code> + CI guard</td></tr>
+        <tr><td>Secret scanner</td><td>✅ Line-by-line, no file skips</td></tr>
+        <tr><td>Benchmark & tune CLI</td><td>✅ Dry-run by default</td></tr>
+        <tr><td>Integration config generator</td><td>✅ <code>kimari integrations generate</code></td></tr>
+        <tr><td>HF Space (kimari-fit-lab)</td><td>✅ Live, GPU compat checker</td></tr>
+        <tr><td>HF Jobs access</td><td>✅ Smouj013, a10g-small verified</td></tr>
+        <tr><td>Private micro SFT</td><td>✅ A10G training run completed</td></tr>
+        <tr><td>Private adapter persisted</td><td>✅ Smouj013/kimari4b-micro-sft-adapter-v0</td></tr>
+        <tr><td>KimariEval Private v1</td><td>✅ 104 cases, 7 categories</td></tr>
+        <tr><td>Baseline vs adapter eval (subset10)</td><td>✅ Completion/integrity check</td></tr>
+        <tr><td>WSL2 installation guide</td><td>✅ Documented</td></tr>
+        <tr><td>Windows packaging</td><td>✅ Helper scripts</td></tr>
+        <tr style="border-left:3px solid var(--kimari-teal);"><td colspan="2" style="font-weight:700;color:var(--kimari-teal);padding-top:20px;">🔒 Not Yet Available</td></tr>
         <tr><td>Kimari-4B model</td><td>🔨 Planned — weights not yet available</td></tr>
-        <tr><td>Real GPU benchmarks</td><td>📋 Pending — need measured data</td></tr>
-        <tr><td><code>kimari pull</code> (model download)</td><td>✅ Implemented in v0.1.2-alpha</td></tr>
-        <tr><td><code>kimari info</code> / <code>kimari config</code></td><td>✅ Implemented in v0.1.4-alpha</td></tr>
-        <tr><td>Modular package (<code>pip install -e .</code>)</td><td>✅ Implemented in v0.1.4-alpha</td></tr>
-        <tr><td>Release validation (<code>check-release.py</code>)</td><td>✅ Implemented in v0.1.8-alpha</td></tr>
-        <tr><td>WSL2 Installation Guide</td><td>✅ Implemented in v0.1.10-alpha</td></tr>
-        <tr><td><code>kimari setup --write</code> (persist config)</td><td>✅ Implemented in v0.1.14-alpha</td></tr>
-        <tr><td>SHA256 model hash/verify (<code>kimari models hash/verify</code>)</td><td>✅ Implemented in v0.1.14-alpha</td></tr>
-        <tr><td>Reverse proxy auth guide</td><td>✅ Documented in v0.1.14-alpha</td></tr>
-        <tr><td>API plan for v0.2</td><td>✅ Designed in v0.1.14-alpha</td></tr>
-        <tr><td><code>resolve_model_path()</code> (model path resolution)</td><td>✅ Implemented in v0.1.15-alpha</td></tr>
-        <tr><td><code>kimari setup --write --yes</code> (non-interactive)</td><td>✅ Implemented in v0.1.15-alpha</td></tr>
-        <tr><td><code>kimari models pin-hash --dry-run/--yes</code></td><td>✅ Implemented in v0.1.15-alpha</td></tr>
-        <tr><td>Benchmark result sharing (<code>benchmarks/RESULT_FORMAT.md</code>)</td><td>✅ Documented in v0.1.15-alpha</td></tr>
-        <tr><td>Windows wheel install scripts</td><td>✅ Added in v0.1.15-alpha</td></tr>
-        <tr><td>API OpenAPI draft</td><td>📋 Drafted in v0.1.15-alpha</td></tr>
-        <tr><td>Experimental API (<code>kimari api --experimental</code>, port 11436)</td><td>🧪 Experimental in v0.1.16-alpha</td></tr>
-        <tr><td>PyPI release gate</td><td>📋 Status: PENDING in v0.1.16-alpha</td></tr>
-        <tr><td>Model hashing docs (<code>docs/MODEL_HASHING.md</code>)</td><td>✅ Documented in v0.1.16-alpha</td></tr>
-        <tr><td>Community benchmark submissions (<code>docs/BENCHMARK_SUBMISSIONS.md</code>)</td><td>✅ Documented in v0.1.16-alpha</td></tr>
-        <tr><td>Windows packaging (<code>scripts/windows/</code>)</td><td>✅ Packaged in v0.1.16-alpha</td></tr>
-        <tr><td>MODEL_CARD rewrite</td><td>✅ Rewritten in v0.1.17-alpha</td></tr>
-        <tr><td>Training plan (<code>docs/MODEL_TRAINING_PLAN.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
-        <tr><td>Base selection (<code>docs/MODEL_BASE_SELECTION.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
-        <tr><td>Dataset schemas</td><td>✅ Defined in v0.1.17-alpha</td></tr>
-        <tr><td>Hugging Face release plan (<code>docs/HUGGINGFACE_RELEASE.md</code>)</td><td>✅ Documented in v0.1.17-alpha</td></tr>
-        <tr><td>Base decision record (ADR-001)</td><td>✅ Accepted for private training</td></tr>
-        <tr><td>SmolLM3-3B accepted for private SFT</td><td>✅ Accepted</td></tr>
-        <tr><td>Dataset v0 (SFT + preference + holdout)</td><td>✅ Prepared</td></tr>
-        <tr><td>Training readiness validation</td><td>✅ Implemented</td></tr>
-        <tr><td>KimariFit scoring dimensions</td><td>✅ Defined</td></tr>
-        <tr><td>v0 training configs (SFT LoRA + ORPO)</td><td>✅ Created</td></tr>
-        <tr><td>HF placeholder plan</td><td>✅ Planned</td></tr>
-        <tr><td>Baseline eval plan</td><td>✅ Documented in v0.1.20-alpha</td></tr>
-        <tr><td>Adapter artifact policy</td><td>✅ Defined in v0.1.20-alpha</td></tr>
-        <tr><td>Private training runbook</td><td>✅ Created in v0.1.20-alpha</td></tr>
-        <tr><td>Remote GPU execution guide</td><td>📄 Documented in v0.1.22-alpha</td></tr>
-        <tr><td>Preflight / postrun scripts</td><td>✅ Implemented in v0.1.22-alpha</td></tr>
-        <tr><td>Training requirements (separated)</td><td>📄 Documented in v0.1.22-alpha</td></tr>
-        <tr><td>Private run artifacts policy</td><td>📄 Documented in v0.1.22-alpha</td></tr>
-        <tr><td>Postrun --json fix</td><td>✅ Fixed in v0.1.23-alpha</td></tr>
-        <tr><td>Preflight config-aware dataset_build_dir</td><td>✅ Improved in v0.1.23-alpha</td></tr>
-        <tr><td>Screenshots documentation</td><td>📄 Documented in v0.1.23-alpha</td></tr>
-        <tr><td>HF token safety guide</td><td>🔐 Created in v0.1.25-alpha</td></tr>
-        <tr><td>Secret scanner</td><td>🛡️ Created in v0.1.25-alpha</td></tr>
-        <tr><td>Private run record hardening</td><td>🔒 Improved in v0.1.25-alpha</td></tr>
-        <tr><td>Secure local result handoff</td><td>📋 Documented in v0.1.25-alpha</td></tr>
-        <tr><td>Measured benchmark (<code>kimari benchmark --measure</code>)</td><td>🧪 Experimental in v0.1.26-alpha</td></tr>
-        <tr><td>Doctor deep (<code>kimari doctor --deep</code>)</td><td>✅ Implemented in v0.1.26-alpha</td></tr>
-        <tr><td>Secret scanner hardening (line-by-line, no file skips)</td><td>🛡️ Hardened in v0.1.26-alpha</td></tr>
-        <tr><td>Benchmark prompts</td><td>✅ Added in v0.1.26-alpha</td></tr>
-        <tr><td>Console polish (structured PASS/WARN/FAIL tables)</td><td>✅ Completed in v0.1.27-alpha</td></tr>
-        <tr><td>Integration config generator (<code>kimari integrations generate</code>)</td><td>✅ Completed in v0.1.27-alpha</td></tr>
-        <tr><td>Gateway prototype plan</td><td>📄 Documented in v0.1.27-alpha</td></tr>
-        <tr><td>Safe screenshots plan</td><td>📋 Planned in v0.1.27-alpha</td></tr>
-        <tr><td>Kimari-4B private SFT run preparation</td><td>✅ Added in v0.1.28-alpha</td></tr>
-        <tr><td>Kimari-4B first run checklist + eval criteria</td><td>✅ Added in v0.1.28-alpha</td></tr>
-        <tr><td>Private SFT command generator script</td><td>✅ Added in v0.1.28-alpha</td></tr>
-        <tr><td>Eval plan script (baseline + adapter)</td><td>✅ Added in v0.1.28-alpha</td></tr>
-        <tr><td>Adapter preview gate</td><td>🔒 BLOCKED in v0.1.21-alpha</td></tr>
-        <tr><td>Adapter manifest template</td><td>📄 Created in v0.1.21-alpha</td></tr>
-        <tr><td>Eval summary policy</td><td>📋 Defined in v0.1.21-alpha</td></tr>
-        <tr><td>SFT→ORPO decision</td><td>🔀 Framework in v0.1.21-alpha</td></tr>
-        <tr><td>First private SFT</td><td>❌ Not started</td></tr>
-        <tr><td>Real benchmarks</td><td>❌ Not measured</td></tr>
-        <tr><td>Public weights</td><td>❌ Not released</td></tr>
-        <tr><td>TestPyPI publishing</td><td>📋 Manual workflow documented</td></tr>
+        <tr><td>Real benchmarks</td><td>📋 Pending — need measured data</td></tr>
+        <tr><td>Public weights / GGUF</td><td>❌ Not released</td></tr>
+        <tr><td>Public benchmarks</td><td>❌ No public claims</td></tr>
+        <tr><td>Gate</td><td>🔒 BLOCKED</td></tr>
+        <tr style="border-left:3px solid var(--kimari-teal);"><td colspan="2" style="font-weight:700;color:var(--kimari-teal);padding-top:20px;">📋 Planned / Experimental</td></tr>
+        <tr><td>Experimental API (port 11436)</td><td>🧪 Experimental</td></tr>
+        <tr><td>PyPI release</td><td>📋 Gate PENDING</td></tr>
+        <tr><td>Gateway (FastAPI)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>
       </tbody>

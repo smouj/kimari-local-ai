@@ -2910,9 +2910,9 @@ def main() -> None:
             "'integration config generator' not found in docs/index.html",
         )
         check(
-            "docs/index.html contains current version v0.1.27",
-            "0.1.27" in index_text,
-            "Version 0.1.27 not found in docs/index.html",
+            "docs/index.html contains current version",
+            "0.1.56" in index_text,
+            "Version 0.1.56 not found in docs/index.html",
         )
 
     # ── v0.1.29 HF Jobs checks ────────────────────────────────────
@@ -4255,17 +4255,17 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.55-alpha",
-            "version-0.1.55--alpha" in readme_text_current
-            and "version-0.1.55--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.55-alpha",
+            "README version badge is 0.1.56-alpha",
+            "version-0.1.56--alpha" in readme_text_current
+            and "version-0.1.56--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.56-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.55-alpha",
-            "Kimari Local AI v0.1.55-alpha" in docs_index_text
-            and "Kimari Local AI v0.1.55--alpha" not in docs_index_text
+            "docs/index current status is 0.1.56-alpha",
+            "Kimari Local AI v0.1.56-alpha" in docs_index_text
+            and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
         )
@@ -4282,8 +4282,8 @@ def main() -> None:
             f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
         )
 
-    # ── [76/76] v0.1.55 public HF/GitHub polish ─────────────────
-    print("\n[76/76] v0.1.55 public HF/GitHub polish")
+    # ── [76/76] v0.1.56 public HF/GitHub polish ─────────────────
+    print("\n[76/76] v0.1.56 public HF/GitHub polish")
     consistency_script = PROJECT_ROOT / "scripts" / "release" / "check_public_version_consistency.py"
     check(
         "public version consistency script exists",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.55 appears in public surfaces", "v0.1.55-alpha" in public_text, "current version missing")
+    check("v0.1.56 appears in public surfaces", "v0.1.56-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6706,17 +6706,17 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.55-alpha",
-            "version-0.1.55--alpha" in readme_text_current
-            and "version-0.1.55--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.55-alpha",
+            "README version badge is 0.1.56-alpha",
+            "version-0.1.56--alpha" in readme_text_current
+            and "version-0.1.56--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.56-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.55-alpha",
-            "Kimari Local AI v0.1.55-alpha" in docs_index_text
-            and "Kimari Local AI v0.1.55--alpha" not in docs_index_text
+            "docs/index current status is 0.1.56-alpha",
+            "Kimari Local AI v0.1.56-alpha" in docs_index_text
+            and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
         )
@@ -6733,8 +6733,8 @@ def main() -> None:
             f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
         )
 
-    # ── [76/76] v0.1.55 public HF/GitHub polish ─────────────────
-    print("\n[76/76] v0.1.55 public HF/GitHub polish")
+    # ── [76/76] v0.1.56 public HF/GitHub polish ─────────────────
+    print("\n[76/76] v0.1.56 public HF/GitHub polish")
     consistency_script = PROJECT_ROOT / "scripts" / "release" / "check_public_version_consistency.py"
     check(
         "public version consistency script exists",
@@ -6779,7 +6779,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.55 appears in public surfaces", "v0.1.55-alpha" in public_text, "current version missing")
+    check("v0.1.56 appears in public surfaces", "v0.1.56-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
