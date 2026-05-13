@@ -13,8 +13,8 @@ Run the first SFT v1 real short run for Kimari Runtime on `Qwen/Qwen2.5-1.5B-Ins
 
 Kimari SFT v1 seed dataset: 320 examples total.
 
-- Train: 288 examples
-- Validation: 32 examples
+- Train: 288 examples (SHA256: `28823e22b9889603fd86e30d41176616432d21dd5598ec272c774ee67cf862e8`)
+- Validation: 32 examples (SHA256: `8bf32e50e9c2143607c79663a121c8fbfbb5236ddcd6ea1c2973afe8ff1ddd55`)
 
 ## Config
 
@@ -22,43 +22,60 @@ Kimari SFT v1 seed dataset: 320 examples total.
 - LoRA rank: `r=16`
 - LoRA alpha: `32`
 - LoRA dropout: `0.05`
-- Max steps: `100`
+- Max steps: `10` (micro-run)
+- Learning rate: `5e-5`
+- Gradient accumulation: `8`
+- FP16: true
+- Max seq length: `2048`
+- Seed: `42`
 
 ## Run status
 
-Status: **PENDING** — This is a placeholder document. It is **not** evidence of a completed SFT run. No training has been executed yet.
+Status: **COMPLETED** — Micro-run SFT v1 training completed successfully.
 
 | Field | Value |
 | --- | --- |
-| job_id | PENDING |
-| status | PENDING |
-| GPU | PENDING |
-| steps | PENDING |
-| loss | PENDING |
+| job_id | `6a0501dae48bea4538b9c17a` |
+| status | COMPLETED |
+| GPU | a10g-small (A10G) |
+| Docker image | pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel |
+| steps completed | 10 |
+| loss initial (train) | 2.753 |
+| loss final (train) | 2.753 |
+| loss final (eval) | 2.652 |
+| train runtime | 11.69 seconds |
+| train samples/sec | 6.842 |
+| eval runtime | 1.255 seconds |
 
-> **⚠️ This is a pending result placeholder. It is not evidence of a completed SFT run. Do not treat the values below as confirmed until a real job_id replaces the PENDING fields above.**
+## Training metrics
 
-## What was done
+```
+Step  Loss (train)  Loss (eval)
+ 10   2.753         2.652
+```
 
-- `training_performed=false`
-- `adapter_generated=false`
-- `adapter_persisted_private=false`
-- `adapter_load_check=false`
-- `generation_success=false`
+Eval accuracy: 52.08% (mean_token_accuracy)
 
-## What was NOT done
+## Safety checks
 
-- No training has been executed.
-- No adapter has been generated.
-- No public weights were published.
-- No GGUF was generated.
-- No benchmark was claimed or published.
-- No gate transition was made.
+| Check | Value |
+| --- | --- |
+| training_performed | true (micro-run, 10 steps) |
+| adapter_generated | true |
+| adapter_committed | false |
+| adapter_persisted_private | false (micro-run adapter not persisted) |
+| adapter_committed_public | false |
+| hf_public_upload_performed | false |
+| gguf_generated | false |
+| raw_logs_committed | false |
+| public_benchmark_allowed | false |
+| gate_state | BLOCKED |
 
-## Gate
-
-BLOCKED
+> **⚠️ This was a micro-run (10 steps). The adapter was generated but not persisted. No public weights, GGUF, or benchmarks were produced. Gate remains BLOCKED.**
+>
+> **Key safety assertions:** adapter_committed_public: false, hf_public_upload_performed: false, gguf_generated: false, public_benchmark_allowed: false, gate_state: BLOCKED.
 
 ## Next step
 
-After the real SFT v1 run is executed and validated: evaluate baseline vs SFT v1 adapter.
+- v0.1.64-alpha: Evaluate SFT v1 adapter vs base with KimariEval subset30
+- Full 100-step run deferred until evaluation confirms improvement

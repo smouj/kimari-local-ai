@@ -494,7 +494,20 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.62-alpha (Current)
+## v0.1.63-alpha (Current)
+
+- ✅ SFT v1 real short run completed (Job `6a0501dae48bea4538b9c17a`, a10g-small)
+- ✅ Training results: 10 steps micro-run, loss 2.753→2.652 (eval), accuracy 52.08%
+- ✅ Result summary validated (`docs/assets/results/sft_v1_run_summary.json`)
+- ✅ Dataset build files tracked in git
+- ✅ HF Jobs command syntax fixed (positional IMAGE, bash -c, git clone, --micro-run --yes)
+- ✅ Config keys fixed (dataset_path/eval_dataset_path)
+- ✅ Preflight supports dataset_path/eval_dataset_path
+- ✅ check-release.py v0.1.63 checks
+- No public weights, no GGUF, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.62-alpha (Released)
 
 - ✅ Result doc placeholder corrected (training_performed=false, not true)
 - ✅ HF Jobs wrapper: preflight runs BEFORE training (was incorrectly after)

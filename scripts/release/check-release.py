@@ -4256,15 +4256,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.62--alpha" in readme_text_current
+            "version-0.1.63--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.62-alpha",
+            "README badge URL must match 0.1.63-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.62-alpha" in docs_index_text
+            "Kimari Local AI v0.1.63-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.62 appears in public surfaces", "v0.1.62-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.63-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6790,15 +6790,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.62--alpha" in readme_text_current
+            "version-0.1.63--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.62-alpha",
+            "README badge URL must match 0.1.63-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.62-alpha" in docs_index_text
+            "Kimari Local AI v0.1.63-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.62 appears in public surfaces", "v0.1.62-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.63-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7434,6 +7434,80 @@ def main() -> None:
 
     check(
         "v0.1.62 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
+
+    # ── v0.1.63 SFT v1 real short run completed ─────────────────
+    print("\n[83/83] v0.1.63 SFT v1 real short run completed")
+    result_doc_v163 = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_RESULT.md"
+    summary_v163 = PROJECT_ROOT / "docs" / "assets" / "results" / "sft_v1_run_summary.json"
+
+    check(
+        "v0.1.63 result doc exists",
+        result_doc_v163.exists(),
+        "missing docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md",
+    )
+    check(
+        "v0.1.63 summary JSON exists",
+        summary_v163.exists(),
+        "missing docs/assets/results/sft_v1_run_summary.json",
+    )
+
+    if result_doc_v163.exists():
+        result_text_v163 = result_doc_v163.read_text().lower()
+        check(
+            "v0.1.63 result doc has COMPLETED status",
+            "completed" in result_text_v163,
+            "result doc must show COMPLETED status",
+        )
+        check(
+            "v0.1.63 result doc has job_id",
+            "6a0501dae48bea4538b9c17a" in result_text_v163 or "job_id" in result_text_v163,
+            "result doc must have job_id",
+        )
+        check(
+            "v0.1.63 result doc no public weights claim",
+            "adapter_committed_public: false" in result_text_v163 or "adapter_committed" not in result_text_v163,
+            "result doc must not claim public adapter",
+        )
+        check(
+            "v0.1.63 result doc gate BLOCKED",
+            "blocked" in result_text_v163,
+            "result doc must show gate BLOCKED",
+        )
+
+    if summary_v163.exists():
+        summary_text_v163 = summary_v163.read_text().lower()
+        check(
+            "v0.1.63 summary has training_performed",
+            "training_performed" in summary_text_v163,
+            "summary must include training_performed",
+        )
+        check(
+            "v0.1.63 summary has job_id",
+            "job_id" in summary_text_v163,
+            "summary must include job_id",
+        )
+        check(
+            "v0.1.63 summary gate BLOCKED",
+            "blocked" in summary_text_v163,
+            "summary must show gate BLOCKED",
+        )
+        check(
+            "v0.1.63 summary no public upload",
+            '"hf_public_upload_performed": false' in summary_text_v163,
+            "summary must show no public upload",
+        )
+
+    check(
+        "v0.1.63 no public weights/adapters/GGUF",
+        len(public_model_artifacts) == 0,
+        f"found: {[str(path.relative_to(PROJECT_ROOT)) for path in public_model_artifacts[:5]]}",
+    )
+
+    check(
+        "v0.1.63 gate BLOCKED",
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )

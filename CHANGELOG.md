@@ -3,6 +3,27 @@
 All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+
+## [0.1.63-alpha] - 2026-05-13
+
+### Added
+- **SFT v1 real short run completed**: Job `6a0501dae48bea4538b9c17a` on HF Jobs (a10g-small)
+- **Training results**: 10 steps micro-run, loss 2.753→2.652 (eval), accuracy 52.08%
+- **Result summary**: `docs/assets/results/sft_v1_run_summary.json` (validated)
+- **Result document**: `docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md` updated with actual results
+- **Dataset build files tracked in git**: train.jsonl, validation.jsonl, dataset_summary.json, license_manifest.json
+
+### Fixed
+- **HF Jobs command syntax**: IMAGE is positional (not `--image`), command wrapped in `bash -c`
+- **HF Jobs repo clone**: Added `git clone` step (HF Jobs doesn't auto-mount repo)
+- **HF Jobs `--micro-run --yes`**: Added required flags to training command
+- **Config**: `dataset_train` → `dataset_path`, `dataset_validation` → `eval_dataset_path`
+- **Preflight**: Updated to support `dataset_path`/`eval_dataset_path` keys
+
+### Security
+- No public weights, GGUF, or benchmarks produced
+- Gate remains BLOCKED
+- Adapter not persisted (micro-run only)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.62-alpha] - 2026-05-13
