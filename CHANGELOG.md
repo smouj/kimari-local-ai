@@ -4,6 +4,27 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.1.55-alpha] - 2026-05-13
+
+### Added
+- Public version consistency checker: `scripts/release/check_public_version_consistency.py`
+- Hugging Face public polish docs and placeholder safeguards
+- Improved Kimari Fit Lab inputs for OS, RAM, user level, and workflow goal
+- Release tests for public HF/GitHub consistency
+
+### Changed
+- Version bump: 0.1.54-alpha → 0.1.55-alpha
+- README, docs site, HF org card, Space README, and deployment status synced from package version
+- ROADMAP clarifies Kimari-4B as private pipeline / not released with gate BLOCKED
+- CHANGELOG future placeholder dates corrected to date unknown where exact release date is unclear
+
+### Safety
+- No training executed
+- No HF Jobs executed
+- No public weights, adapters, or GGUF files
+- No public benchmark claims
+- Gate: BLOCKED
+
 ## [0.1.54-alpha] - 2026-05-13
 
 ### Added
@@ -428,7 +449,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Safety
 - Gate remains BLOCKED
 
-## [0.1.37-alpha] - 2026-06-03
+## [0.1.37-alpha] - Date unknown
 
 ### Added
 - `check_gpu_compute_capability()` in `kimari/doctor/deep.py` — Detects GPU compute capability and warns about Pascal GPUs (sm_61) with incompatible PyTorch cu128/cu130 builds
@@ -449,7 +470,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pascal GPU (GTX 1060/1070/1080) users now get automatic warning when running `kimari doctor --deep` or `check_training_stack.py --json` with incompatible PyTorch cu128/cu130 builds
 - No training in CI. No adapters committed. No HF upload. Gate still BLOCKED.
 
-## [0.1.36-alpha] - 2026-06-03
+## [0.1.36-alpha] - Date unknown
 
 ### Added
 - `resolve_smoke_gate()` function in `hf_jobs_micro_sft.py` — unified smoke gate resolution from explicit path, default /tmp, or override
@@ -470,7 +491,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Submit path no longer checks smoke gate twice (was checking both `check_smoke_summary_validated()` and `--require-smoke-summary`)
 - No training in CI. No adapters committed. No HF upload. Gate still BLOCKED.
 
-## [0.1.35-alpha] - 2026-06-03
+## [0.1.35-alpha] - Date unknown
 
 ### Added
 - `training/scripts/create_micro_sft_execution_record.py` — Generates sanitized micro SFT execution records
@@ -485,7 +506,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - No training in CI. No adapters committed. No HF upload. No raw logs. Gate still BLOCKED. Execution record ensures safe capture of micro SFT results.
 
-## [0.1.34-alpha] - 2026-06-03
+## [0.1.34-alpha] - Date unknown
 
 ### Added
 - `training/scripts/check_training_stack.py` — Training stack compatibility checker (no downloads, no training, no network calls)
@@ -516,7 +537,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dataset with "messages" column now properly converted to text for SFTTrainer
 - No training in CI. No adapters committed. No HF upload. Gate still BLOCKED. Training stack compatibility hardened before first real micro SFT.
 
-## [0.1.33-alpha] - 2026-06-02
+## [0.1.33-alpha] - Date unknown
 
 ### Added
 - `training/scripts/train_sft_lora.py` now supports real micro SFT training with LoRA/QLoRA
@@ -543,7 +564,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Training loop is no longer a skeleton — real LoRA SFT training is implemented
 - No training performed in CI. No adapters committed. No HF upload. Gate still BLOCKED. Micro SFT pipeline ready for real execution.
 
-## [0.1.32-alpha] - 2026-06-02
+## [0.1.32-alpha] - Date unknown
 
 ### Added
 - `docs/HF_JOBS_MICRO_SFT_RUN.md` — Guide for running micro SFT on HF Jobs (pipeline validation, not release)
@@ -566,7 +587,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - No training performed in this version. No adapters committed. No HF upload. Gate still BLOCKED. Micro SFT pipeline prepared but not executed.
 
-## [0.1.31-alpha] - 2026-06-02
+## [0.1.31-alpha] - Date unknown
 
 ### Added
 - `docs/HF_JOBS_SMOKE_EXECUTION_RECORD.md` — Smoke test execution record template and result (status: pending)
@@ -586,7 +607,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - No training performed. No adapters generated. No HF upload. Gate still BLOCKED.
 
-## [0.1.30-alpha] - 2026-06-01
+## [0.1.30-alpha] - Date unknown
 
 ### Added
 - `docs/HF_JOBS_SMOKE_RESULT.md` — Smoke test result template and sanitized summary
@@ -604,7 +625,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - No training performed. No adapters generated. No HF upload. Gate still BLOCKED.
 
-## [0.1.29-alpha] — 2026-05-31
+## [0.1.29-alpha] — Date unknown
 
 ### Added
 - **docs/HF_JOBS_PRIVATE_RUN.md** — Guide for running Kimari-4B smoke tests on Hugging Face Jobs; HF login requirements, budget guidance ($10), recommended flavors (A10G/L4 for smoke, A100 for training only), forbidden actions, security checklist; no training, no upload, no export, gate BLOCKED
@@ -632,7 +653,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **tests/test_release_v0129.py** — Comprehensive tests for v0.1.29 artifacts
 
-## [0.1.28-alpha] — 2026-05-30
+## [0.1.28-alpha] — Date unknown
 
 ### Added
 - **docs/KIMARI4B_PRIVATE_SFT_RUN.md** — Full execution guide for the first private SFT run of Kimari-4B; base model (SmolLM3-3B), dataset (v0), method (LoRA/QLoRA), hardware recommendations, exact commands, what stays local, what summaries can be committed, gate stays BLOCKED, no HF upload
@@ -674,7 +695,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **scripts/release/check-release.py** — Extended with v0.1.27 checks (console render.py, integrations config_generator.py, INTEGRATION_CONFIG_GENERATOR.md, GATEWAY_PROTOTYPE_PLAN.md, CONSOLE_UX.md, generate_safe_cli_screenshots_plan.py, gateway wording, integration configs contain no tokens, no weights/GGUF/adapters, gate BLOCKED)
 - **ROADMAP.md** — v0.1.26-alpha marked as Released; v0.1.27-alpha marked as Current; v0.1.28-alpha Planned
 
-## [0.1.26-alpha] — 2026-05-28
+## [0.1.26-alpha] — Date unknown
 
 ### Added
 - **Secret scanner hardening** — `scripts/security/scan_for_secrets.py` no longer skips security guide files entirely; instead scans them line-by-line allowing safe placeholders (hf_..., hf_your_token_here, <HF_TOKEN>, your-api-key, sk-..., <token>, <API_KEY>); added `--include-history-note` flag for git history check reminder; version 1.1.0
@@ -714,7 +735,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **scripts/release/check-release.py** — Added v0.1.26 checks (SECRET_SCAN_POLICY, MEASURED_BENCHMARKS, DOCTOR_DEEP, measured_benchmark.py, doctor/deep.py, benchmark prompts, results gitignored, tune --apply blocked, gate BLOCKED)
 - **ROADMAP.md** — v0.1.25-alpha marked as Released; v0.1.26-alpha marked as Current; v0.1.27-alpha Planned
 
-## [0.1.25-alpha] — 2026-05-27
+## [0.1.25-alpha] — Date unknown
 
 ### Added
 - **docs/HF_TOKEN_SAFETY.md** — Comprehensive guide for safe Hugging Face token handling; never paste tokens in chat/issues/commits/logs/screenshots; use environment variables; tokens of minimum privilege; revoke exposed tokens immediately; use `huggingface-cli login` only in secure local environment; don't save tokens in the repo; don't include tokens in screenshots; don't upload anything to HF until preview gate allows; detecting committed tokens via scan_for_secrets.py; what to do if a token is accidentally committed
@@ -755,7 +776,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **scripts/release/check-release.py** — Expanded with v0.1.24 checks (FIRST_PRIVATE_SFT_RECORD, run record template JSON/gate/public_release/hf_upload, create_private_run_record, SAFE_SCREENSHOT_CAPTURE, generate_cli_screenshot_text, 5 screenshot example txt files, no secrets in examples, SCREENSHOTS.md references, README links, no oversized screenshots, no adapter/weights/GGUF, preview gate BLOCKED, no false claims)
 - **ROADMAP.md** — v0.1.23-alpha marked as Released; v0.1.24-alpha marked as Current; v0.1.25-alpha Planned (first private SFT execution, adapter manifest, sanitized eval summary, ORPO/DPO decision, reviewed screenshots)
 
-## [0.1.23-alpha] — 2026-05-25
+## [0.1.23-alpha] — Date unknown
 
 ### Fixed
 - **training/scripts/postrun_private_sft.py** — `step_create_eval_summary` now passes `--json` to the `create_eval_summary.py` subprocess directly in the command list, instead of appending `--json` to the command string after execution
@@ -774,7 +795,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **docs/assets/screenshots/PLACEHOLDER.md** — Checklist of 7 planned screenshots with capture guidelines; no fake data, no invented UI
 - **New tests** (`tests/test_release_v0123.py`) — Tests for postrun --json fix, preflight dataset_build_dir from run_config, preflight fallback, screenshots docs existence/content, README screenshots section, index.html screenshots section, release-check, no tracked artifacts, version consistency
 
-## [0.1.22-alpha] — 2026-05-24
+## [0.1.22-alpha] — Date unknown
 
 ### Added
 - **docs/REMOTE_GPU_RUNPOD_GUIDE.md** — Guide for running first private SFT on RunPod or similar GPU cloud; GPU recommendations (RTX 4090, L40S, A100), VRAM estimates, step-by-step setup, safety reminders, cost/storage estimates
@@ -802,7 +823,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **docs/index.html** — Updated hero badge and What's New section for v0.1.22-alpha; remote GPU execution, preflight/postrun, training requirements, private run artifacts, no public weights, preview gate BLOCKED
 - **ROADMAP.md** — v0.1.21-alpha marked as Released; v0.1.22-alpha marked as Current; v0.1.23-alpha Planned
 
-## [0.1.21-alpha] — 2026-05-23
+## [0.1.21-alpha] — Date unknown
 
 ### Added
 - **training/templates/adapter_manifest.template.yaml** — Template for adapter manifest files; includes adapter_name, run_id, base_model, dataset_id, training_config, LoRA parameters, training timestamps, adapter files/hashes, eval_results, baseline_results, preview_gate_state (BLOCKED), public_release_allowed (false), hf_upload_allowed (false), state_history, notes
@@ -828,7 +849,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **docs/index.html** — Updated hero badge and What's New section for v0.1.21-alpha; added adapter manifest, execution checklist, SFT→ORPO decision, eval summary policy, preview gate BLOCKED chips
 - **ROADMAP.md** — v0.1.20-alpha marked as Released; v0.1.21-alpha marked as Current; v0.1.22-alpha Planned
 
-## [0.1.20-alpha] — 2026-05-22
+## [0.1.20-alpha] — Date unknown
 
 ### Added
 - **MODEL_CARD.md checklist fix** — "Training data curated" split into "Seed dataset v0 prepared and documented → In Progress" and "Full training dataset curated → Not started"; version history updated for v0.1.19-alpha
@@ -888,7 +909,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **docs/HUGGINGFACE_RELEASE.md** — Added placeholder repo rules
 - **ROADMAP.md** — v0.1.18-alpha marked as Released; v0.1.19-alpha marked as Current; v0.1.20-alpha Planned
 
-## [0.1.18-alpha] — 2026-05-20
+## [0.1.18-alpha] — Date unknown
 
 ### Added
 - **docs/MODEL_DECISION_RECORD.md** — Architecture Decision Record (ADR-001) for base model selection; candidate shortlist (SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B); weighted scoring criteria (license clarity, redistribution compatibility, tokenizer stability, GGUF support, coding ability, Spanish technical, agent/JSON, inference viability, training cost); status "Proposed" (not Accepted); required validations before final choice
@@ -917,7 +938,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ROADMAP.md** — v0.1.17-alpha marked as Released; v0.1.18-alpha marked as Current; v0.1.19-alpha Planned section updated
 - **.gitignore** — Added `eval/results/*.json` and `dataset/build/`
 
-## [0.1.17-alpha] — 2026-05-19
+## [0.1.17-alpha] — Date unknown
 
 ### Added
 - **MODEL_CARD.md professional rewrite** — Status updated to "Planned / Training Design"; base model candidates table (SmolLM3-3B, Qwen2.5-3B-Instruct, Llama 3.2 3B); evaluation targets clearly marked "Not Achieved"; release checklist with all items "Not started"
@@ -946,7 +967,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **docs/index.html** — Updated hero badge to v0.1.17-alpha; added Kimari-4B Model Roadmap block with "PLANNED — NO WEIGHTS YET" badge; updated What's New chips; added Model Training Plan feature card; added 3 new doc cards
 - **ROADMAP.md** — v0.1.16-alpha marked as Released; v0.1.17-alpha marked as Current; v0.1.18-alpha Planned section added
 
-## [0.1.16-alpha] — 2026-05-18
+## [0.1.16-alpha] — Date unknown
 
 ### Added
 - **Experimental FastAPI API skeleton** (`kimari/api/`) — `app.py`, `schemas.py`, `server.py`; opt-in via `kimari api --experimental`; does NOT start a real server yet
@@ -972,7 +993,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **docs/API_PLAN.md** — Updated status note to reflect v0.1.16-alpha experimental implementation; added OpenAPI draft sync note; added security section mention
 - **docs/API_OPENAPI_DRAFT.yaml** — Synced server URL to `http://127.0.0.1:11436`; added `x-experimental: true` to BearerAuth; marked POST /server/start and POST /server/stop as returning 501; added operationId and descriptions
 
-## [0.1.15-alpha] — 2026-05-17
+## [0.1.15-alpha] — Date unknown
 
 ### Fixed
 - **P0: `start_server()` model path resolution** — Replaced `PROJECT_ROOT / effective_model` with `resolve_model_path()` in the real startup path. Previously, only `--dry-run` used the resolver; the real path assumed repo-root, breaking wheel installs
@@ -1000,7 +1021,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README.md** — Added sections: model path resolution, setup --write --yes, pin-hash workflow, benchmark sharing, Windows wheel install
 - **docs/index.html** — Updated for v0.1.15-alpha focus areas
 
-## [0.1.14-alpha] — 2026-05-16
+## [0.1.14-alpha] — Date unknown
 
 ### Added
 - **`kimari setup --write`** — Persists detected configuration to user config dir with automatic timestamped backup; `--json` output includes `would_write`, `written`, `config_path`, `backup_path`; no config written without explicit `--write` flag
@@ -1045,7 +1066,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`docs/index.html`** — Added "Community" section with cards linking to Code of Conduct, Contributing, Support, Security, Governance, GitHub Issues; added Community nav link
 - **`docs/PUBLISHING.md`** — Added "v0.1.13 TestPyPI Actual Validation" section with checklist, result table, and validation commands
 
-## [0.1.12-alpha] — 2026-05-14
+## [0.1.12-alpha] — Date unknown
 
 ### Added
 - **Packaged defaults** (`kimari/defaults/`) — Default profiles, schema, and models registry now ship inside the wheel as `package-data`; copied to user config dir on first use when no config exists

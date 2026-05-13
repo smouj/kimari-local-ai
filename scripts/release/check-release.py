@@ -4255,16 +4255,17 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is v0.1.54-alpha",
-            "version-v0.1.54--alpha" in readme_text_current and "version-v0.1.53--alpha" not in readme_text_current,
-            "README badge URL must match v0.1.54-alpha",
+            "README version badge is 0.1.55-alpha",
+            "version-0.1.55--alpha" in readme_text_current
+            and "version-0.1.55--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.55-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is v0.1.54-alpha",
-            "Kimari Local AI v0.1.54-alpha" in docs_index_text
-            and "Kimari Local AI v0.1.28-alpha" not in docs_index_text
+            "docs/index current status is 0.1.55-alpha",
+            "Kimari Local AI v0.1.55-alpha" in docs_index_text
+            and "Kimari Local AI v0.1.55--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
         )
@@ -4280,6 +4281,77 @@ def main() -> None:
             len(artifacts) == 0,
             f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
         )
+
+    # ── [76/76] v0.1.55 public HF/GitHub polish ─────────────────
+    print("\n[76/76] v0.1.55 public HF/GitHub polish")
+    consistency_script = PROJECT_ROOT / "scripts" / "release" / "check_public_version_consistency.py"
+    check(
+        "public version consistency script exists",
+        consistency_script.exists(),
+        "missing check_public_version_consistency.py",
+    )
+    if consistency_script.exists():
+        result = subprocess.run(
+            [sys.executable, str(consistency_script), "--json"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        check(
+            "public version consistency passes",
+            result.returncode == 0,
+            (result.stdout + result.stderr)[-500:],
+        )
+
+    expected_v0155_files = [
+        "docs/HUGGINGFACE_PROFILE_SMOUJ013.md",
+        "docs/BRAND_ASSETS_PLAN.md",
+        "docs/KIMARI_FLOW_DIAGRAM.md",
+        "docs/KIMARI4B_PLACEHOLDER_MODEL_CARD.md",
+        "docs/HUGGINGFACE_COLLECTIONS.md",
+        "tests/test_release_v0155.py",
+    ]
+    for rel_path in expected_v0155_files:
+        check(f"{rel_path} exists", (PROJECT_ROOT / rel_path).exists(), f"missing {rel_path}")
+
+    public_text = "\n".join(
+        (PROJECT_ROOT / rel).read_text()
+        for rel in [
+            "README.md",
+            "docs/index.html",
+            "docs/HUGGINGFACE_ORG_CARD.md",
+            "huggingface/kimari-fit-lab/README.md",
+            "docs/HUGGINGFACE_DEPLOYMENT_STATUS.md",
+            "docs/HUGGINGFACE_COLLECTIONS.md",
+            "docs/KIMARI4B_PLACEHOLDER_MODEL_CARD.md",
+        ]
+        if (PROJECT_ROOT / rel).exists()
+    ).lower()
+    check("v0.1.55 appears in public surfaces", "v0.1.55-alpha" in public_text, "current version missing")
+    check(
+        "Kimari-4B not released appears",
+        "kimari-4b is not released" in public_text or "not released" in public_text,
+        "missing not released warning",
+    )
+    check(
+        "Collection says not official Kimari models",
+        "not an official kimari model" in public_text,
+        "collection safety wording missing",
+    )
+    check(
+        "placeholder model card says no weights",
+        "no weights available" in public_text,
+        "placeholder must say no weights",
+    )
+    check(
+        "placeholder model card not auto-published",
+        "must not be published" in public_text,
+        "placeholder publication warning missing",
+    )
+    check("Gate BLOCKED in public docs", "blocked" in public_text, "gate must remain BLOCKED")
+    for forbidden in ["kimari-4b released", "public weights available", "production ready"]:
+        check(f"No forbidden public phrase: {forbidden}", forbidden not in public_text, f"found {forbidden}")
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
@@ -6632,16 +6704,17 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is v0.1.54-alpha",
-            "version-v0.1.54--alpha" in readme_text_current and "version-v0.1.53--alpha" not in readme_text_current,
-            "README badge URL must match v0.1.54-alpha",
+            "README version badge is 0.1.55-alpha",
+            "version-0.1.55--alpha" in readme_text_current
+            and "version-0.1.55--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.55-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is v0.1.54-alpha",
-            "Kimari Local AI v0.1.54-alpha" in docs_index_text
-            and "Kimari Local AI v0.1.28-alpha" not in docs_index_text
+            "docs/index current status is 0.1.55-alpha",
+            "Kimari Local AI v0.1.55-alpha" in docs_index_text
+            and "Kimari Local AI v0.1.55--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
         )
@@ -6657,6 +6730,77 @@ def main() -> None:
             len(artifacts) == 0,
             f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
         )
+
+    # ── [76/76] v0.1.55 public HF/GitHub polish ─────────────────
+    print("\n[76/76] v0.1.55 public HF/GitHub polish")
+    consistency_script = PROJECT_ROOT / "scripts" / "release" / "check_public_version_consistency.py"
+    check(
+        "public version consistency script exists",
+        consistency_script.exists(),
+        "missing check_public_version_consistency.py",
+    )
+    if consistency_script.exists():
+        result = subprocess.run(
+            [sys.executable, str(consistency_script), "--json"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        check(
+            "public version consistency passes",
+            result.returncode == 0,
+            (result.stdout + result.stderr)[-500:],
+        )
+
+    expected_v0155_files = [
+        "docs/HUGGINGFACE_PROFILE_SMOUJ013.md",
+        "docs/BRAND_ASSETS_PLAN.md",
+        "docs/KIMARI_FLOW_DIAGRAM.md",
+        "docs/KIMARI4B_PLACEHOLDER_MODEL_CARD.md",
+        "docs/HUGGINGFACE_COLLECTIONS.md",
+        "tests/test_release_v0155.py",
+    ]
+    for rel_path in expected_v0155_files:
+        check(f"{rel_path} exists", (PROJECT_ROOT / rel_path).exists(), f"missing {rel_path}")
+
+    public_text = "\n".join(
+        (PROJECT_ROOT / rel).read_text()
+        for rel in [
+            "README.md",
+            "docs/index.html",
+            "docs/HUGGINGFACE_ORG_CARD.md",
+            "huggingface/kimari-fit-lab/README.md",
+            "docs/HUGGINGFACE_DEPLOYMENT_STATUS.md",
+            "docs/HUGGINGFACE_COLLECTIONS.md",
+            "docs/KIMARI4B_PLACEHOLDER_MODEL_CARD.md",
+        ]
+        if (PROJECT_ROOT / rel).exists()
+    ).lower()
+    check("v0.1.55 appears in public surfaces", "v0.1.55-alpha" in public_text, "current version missing")
+    check(
+        "Kimari-4B not released appears",
+        "kimari-4b is not released" in public_text or "not released" in public_text,
+        "missing not released warning",
+    )
+    check(
+        "Collection says not official Kimari models",
+        "not an official kimari model" in public_text,
+        "collection safety wording missing",
+    )
+    check(
+        "placeholder model card says no weights",
+        "no weights available" in public_text,
+        "placeholder must say no weights",
+    )
+    check(
+        "placeholder model card not auto-published",
+        "must not be published" in public_text,
+        "placeholder publication warning missing",
+    )
+    check("Gate BLOCKED in public docs", "blocked" in public_text, "gate must remain BLOCKED")
+    for forbidden in ["kimari-4b released", "public weights available", "production ready"]:
+        check(f"No forbidden public phrase: {forbidden}", forbidden not in public_text, f"found {forbidden}")
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:

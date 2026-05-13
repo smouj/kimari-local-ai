@@ -2,6 +2,26 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+## v0.1.55 Checks — Hugging Face public polish + consistency hardening
+
+- [x] `scripts/release/check_public_version_consistency.py` exists
+- [x] public version consistency reads version from `pyproject.toml`
+- [x] no future dates remain in `CHANGELOG.md`
+- [x] README badge uses the current version
+- [x] `docs/index.html` visible status uses the current version
+- [x] `docs/HUGGINGFACE_ORG_CARD.md` has current version and professional positioning
+- [x] `huggingface/kimari-fit-lab/README.md` has current version
+- [x] Kimari-4B is clearly marked not released
+- [x] no public weights/adapters/GGUF claims
+- [x] no public benchmark claims
+- [x] Collection docs say reference/community models are not official Kimari models
+- [x] `docs/HUGGINGFACE_PROFILE_SMOUJ013.md` exists
+- [x] `docs/BRAND_ASSETS_PLAN.md` exists
+- [x] `docs/KIMARI_FLOW_DIAGRAM.md` exists
+- [x] `docs/KIMARI4B_PLACEHOLDER_MODEL_CARD.md` exists and is not published automatically
+- [x] Kimari Fit Lab remains static: no model execution, no downloads, no API keys
+- [x] Gate remains BLOCKED
+
 
 ## v0.1.54 Checks
 

@@ -1,56 +1,58 @@
-# Hugging Face Collections: kimari-compatible-gguf-models
+# Hugging Face Collections
 
-> **Collection URL**: https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66
+> Version: v0.1.55-alpha
+> Status: reference/community models only — no official Kimari model release
+
+Kimari currently maintains a reference collection under the user namespace because the existing collection was created before org-level collection ownership was finalized:
+
+https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66
 
 ## Purpose
 
-This collection lists **community/reference GGUF models** that Kimari Local AI can help run locally on consumer hardware. It is a convenience guide, not an official endorsement.
+The collection lists community/reference GGUF models that are useful for testing Kimari Local AI workflows. These models help users validate install, profile selection, llama.cpp CUDA, and local OpenAI-compatible endpoint integrations.
 
-## Important Disclaimers
+## Not official Kimari models
 
-⚠️ These are **NOT official Kimari models**.
-⚠️ Kimari-4B is **NOT included** — it is not released yet.
-⚠️ These models are listed for reference only.
-⚠️ Each model has its own license — check before using.
+Every item must be described as:
 
-## Current Collection
+> Reference/community GGUF model for Kimari testing. Not an official Kimari model.
 
-| Model | Size | VRAM (Q4_K_M) | Notes |
-|-------|------|---------------|-------|
-| TinyLlama 1.1B | 1.1B | ~1.5 GB | Test/validation model used by Kimari |
-| Qwen2.5 1.5B | 1.5B | ~2 GB | Good for 4GB+ GPUs |
-| Qwen2.5 3B | 3B | ~3 GB | Good for 6GB+ GPUs |
-| Llama 3.2 3B | 3B | ~3 GB | Good for 6GB+ GPUs |
+The collection does **not** contain:
 
-> More models will be added as they are tested with Kimari profiles.
+- Kimari-4B public weights
+- official Kimari-4B GGUF files
+- public Kimari adapters
+- benchmark claims
 
-## Criteria for Adding Models
+Gate: **BLOCKED**.
 
-Models added to this collection must meet:
+## Inclusion criteria
 
-1. **GGUF format** — compatible with llama.cpp/llama-server
-2. **Small to medium size** — 1B-8B parameters recommended for 6-8GB GPUs
-3. **Reasonable VRAM** — should fit in 6-8GB at Q4_K_M quantization
-4. **Clear license** — permissive or community license (Apache 2.0, MIT, etc.)
-5. **No false claims** — must not be listed as "official Kimari model"
+A model can be included if:
 
-## How to Add a Model
+- it has a clear license on Hugging Face;
+- it provides GGUF files suitable for llama.cpp;
+- it is small enough to be useful on consumer GPUs;
+- it has a practical Kimari profile recommendation;
+- it is clearly labelled as reference/community, not official Kimari.
 
-1. Find the model on Hugging Face
-2. Verify it meets the criteria above
-3. Add it via the HF Collections UI or CLI:
-   ```bash
-   hf collections add-item Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66 --item=<model-repo-id>
-   ```
-4. Update this document with the new entry
+## Recommended reference items
 
-## How NOT to Use This Collection
+| Model | Purpose | Suggested Kimari profile | VRAM guidance | Note |
+|---|---|---|---:|---|
+| TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF | Smoke test | `test` | 2 GB | Reference/community GGUF model for Kimari testing. Not an official Kimari model. |
+| bartowski/Qwen2.5-1.5B-Instruct-GGUF | Small chat/coding test | `test` / `gtx1060` | 3 GB | Reference/community GGUF model for Kimari testing. Not an official Kimari model. |
+| bartowski/SmolLM2-1.7B-Instruct-GGUF | Small instruction test | `test` / `gtx1060` | 3 GB | Reference/community GGUF model for Kimari testing. Not an official Kimari model. |
+| bartowski/Llama-3.2-1B-Instruct-GGUF | Small Meta-family test | `test` / `gtx1060` | 3 GB | Reference/community GGUF model for Kimari testing. Not an official Kimari model. |
+| bartowski/Qwen2.5-3B-Instruct-GGUF | GTX 1060/1080 practical test | `gtx1060` / `gtx1080` | 5 GB | Reference/community GGUF model for Kimari testing. Not an official Kimari model. |
 
-❌ Do not present these as Kimari official releases
-❌ Do not claim Kimari-4B is available
-❌ Do not use for benchmark claims about Kimari-4B
-❌ Do not add models without verifying their license
+## Maintenance checklist
 
-## Gate Status
+Before adding or updating collection items:
 
-**BLOCKED** — Kimari-4B is not released. This collection contains reference models only.
+- confirm the model page is public;
+- confirm license information exists;
+- use neutral wording;
+- do not claim official Kimari performance;
+- do not imply Kimari-4B is released;
+- do not add private adapters, weights, or raw eval outputs.

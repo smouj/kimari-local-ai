@@ -6,9 +6,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Repo version** | v0.1.54-alpha |
-| **HF org card version** | v0.1.54-alpha |
-| **Space version** | v0.1.54-alpha |
+| **Repo version** | v0.1.55-alpha |
+| **HF org card version** | v0.1.55-alpha |
+| **Space version** | v0.1.55-alpha |
 | **Gate** | BLOCKED |
 | **Kimari-4B** | NOT released |
 
@@ -18,7 +18,7 @@
 |----------|-----|--------|
 | **Space** | https://huggingface.co/spaces/kimari-ai/kimari-fit-lab | ✅ RUNNING |
 | **Organization Card** | https://huggingface.co/spaces/kimari-ai/README | ✅ Updated |
-| **Collection** | https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66 | ✅ Created |
+| **Collection** | https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66 | ✅ 5 reference/community models |
 
 ## Space Details
 
@@ -47,7 +47,7 @@
 
 The `kimari-ai` organization card at `kimari-ai/README` includes:
 
-- Framework version: v0.1.54-alpha
+- Framework version: v0.1.55-alpha
 - Kimari-4B: Not released yet
 - GTX 1060 validation: Completed
 - HF Jobs smoke: Completed
@@ -58,7 +58,7 @@ The `kimari-ai` organization card at `kimari-ai/README` includes:
 
 ## Collection
 
-The `kimari-compatible-gguf-models` collection contains reference/community GGUF models that Kimari can help run locally.
+The `kimari-compatible-gguf-models` collection contains 5 reference/community GGUF models that Kimari can help run locally.
 
 **Important**: These are NOT official Kimari models. They are community/reference models curated by Smouj013 for the Kimari project.
 
@@ -88,7 +88,7 @@ The `kimari-compatible-gguf-models` collection contains reference/community GGUF
 
 | Date | Version | Changes |
 |------|---------|---------|
-| 2026-05-13 | v0.1.54-alpha | Updated org card to reflect eval infrastructure, private adapter status |
+| 2026-05-13 | v0.1.55-alpha | Public HF/GitHub polish, consistency hardening, Space helper update |
 | 2026-05-12 | v0.1.45-alpha | Initial HF deployment (Space, Org Card, Collection) |
 
 ## Last Updated

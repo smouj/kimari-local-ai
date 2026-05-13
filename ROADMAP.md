@@ -463,21 +463,30 @@
 - ✅ Private adapter persisted; no public weights, no GGUF
 - Gate BLOCKED — no benchmark claims
 
-## v0.1.54-alpha (Current)
+## v0.1.55-alpha (Current)
+
+- ✅ Hugging Face public polish and consistency hardening
+- ✅ Public version consistency script
+- ✅ Org card and Space README synced from package version
+- ✅ Kimari Fit Lab improved as static compatibility helper
+- ✅ Collection docs clarify reference/community GGUF only
+- ✅ Kimari-4B placeholder card prepared but not published
+- ✅ Kimari-4B remains private pipeline / not released
+- Gate BLOCKED — no public weights, no public adapters, no GGUF, no benchmark claims
+
+## v0.1.54-alpha (Released)
+
 - ✅ Baseline vs adapter eval subset10 on HF Jobs
 - ✅ Eval result summary + validation
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
+## v0.1.56-alpha (Planned)
 
-- ✅ Eval config for baseline vs adapter comparison
-- ✅ HF Jobs eval runner (dry-run default, safe flags)
-- ✅ Compare script (baseline vs adapter summaries)
-- ✅ Summary validator + schema
-- ✅ Review protocol documentation
-- ✅ Result placeholders (pending)
-- ✅ No training, no HF Jobs submitted, no raw outputs committed
-- Gate BLOCKED — no benchmark claims
+- 📋 Baseline vs adapter eval subset30
+- 📋 Dry-run first; real HF Jobs only with explicit approval
+- 📋 No raw outputs committed
+- Gate BLOCKED
 
 ## v0.1.52-alpha
 

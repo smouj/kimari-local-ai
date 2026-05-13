@@ -1,80 +1,70 @@
-# Kimari Local AI
+# Kimari AI
 
-**Local AI for older NVIDIA GPUs.**
+> Current framework version: v0.1.55-alpha
+> Status: alpha framework, public model gate BLOCKED
 
-Kimari is an open-source framework for running local LLMs on consumer NVIDIA GPUs such as GTX 1060 6GB and GTX 1080 8GB.
+## Kimari Local AI — Local AI for older NVIDIA GPUs.
 
-It provides:
+Kimari Local AI is an open-source, local-first framework for running GGUF language models on consumer NVIDIA GPUs. It combines llama.cpp CUDA inference, a practical CLI, GPU profiles, local configuration helpers, and an OpenAI-compatible endpoint for tools such as Open WebUI, OpenClaw, and Continue.dev.
 
-- GGUF runtime workflows with llama.cpp
-- CUDA-aware setup and diagnostics
-- GPU-specific profiles
-- OpenAI-compatible local endpoint
-- Open WebUI / OpenClaw / Continue.dev integration docs
-- KimariFit evaluation tooling
-- Private training and evaluation pipeline for future Kimari models
-
-> Current framework version: v0.1.54-alpha
-> Status: usable alpha framework, not production-ready.
-
----
+Kimari is the framework. **Kimari-4B is not released yet.**
 
 ## What works today
 
-| Milestone | Status |
-|-----------|--------|
-| GTX 1060 6GB local runtime | ✅ Validated |
-| llama-server CUDA | ✅ Validated |
-| TinyLlama GGUF test model | ✅ Validated |
-| Local `/v1/chat/completions` endpoint | ✅ Validated |
+| Area | Status |
+|---|---|
+| GTX 1060 local runtime validation | ✅ Validated with a TinyLlama test model |
+| llama.cpp CUDA runtime | ✅ Validated locally |
+| Local OpenAI-compatible endpoint | ✅ `/v1/models` and `/v1/chat/completions` validated |
+| Open WebUI integration docs | ✅ Available |
+| OpenClaw integration docs | ✅ Available |
+| Continue.dev integration docs | ✅ Available |
 | HF Jobs GPU smoke | ✅ Completed |
-| First micro SFT | ✅ Completed (private, ephemeral) |
-| Private adapter persistence | ✅ Completed (private repo) |
-| Adapter load check | ✅ Completed |
-| KimariEval Private v1 | ✅ Created (104 cases, 7 categories) |
-| Baseline vs adapter eval infrastructure | ✅ Ready |
-| Kimari-4B public release | ❌ NOT released |
+| Private micro SFT pipeline | ✅ Completed privately |
+| Private adapter persistence | ✅ Completed in a private repo |
+| KimariEval Private v1 | ✅ Created, 104 private cases across 7 categories |
+| Subset10 private completion/integrity eval | ✅ Completed, not scored, manual review required |
 
----
+## What is not released
 
-## Kimari-4B status
+The following are **not** public:
 
-Kimari-4B is **not released yet**.
+- Kimari-4B public weights
+- public Kimari-4B adapters
+- official Kimari-4B GGUF files
+- public benchmark claims
+- production-ready guarantees
 
-Current model work is private and experimental:
+Any reference to Kimari-4B is a roadmap or private-pipeline reference unless explicitly stated otherwise.
 
-- Private micro SFT completed
-- Private adapter persisted to `Smouj013/kimari4b-micro-sft-adapter-v0`
-- Adapter load check completed
-- Private evaluation harness created (KimariEval Private v1)
-- Baseline vs adapter evaluation infrastructure ready
+## Quick start
 
-No public artifacts:
+```bash
+# Check local environment
+kimari doctor --deep
 
-- ❌ No public weights
-- ❌ No public adapters
-- ❌ No public GGUF
-- ❌ No public benchmark claims
+# Download the small test model
+kimari pull test
+
+# Start the local endpoint with the test profile
+kimari start --profile test
+```
+
+Then connect local tools to:
+
+```txt
+http://127.0.0.1:11435/v1
+```
+
+## Resources
+
+- GitHub: https://github.com/smouj/kimari-local-ai
+- Documentation: https://smouj.github.io/kimari-local-ai/
+- Space: https://huggingface.co/spaces/kimari-ai/kimari-fit-lab
+- Reference GGUF Collection: https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66
+
+## Gate
 
 Preview gate: **BLOCKED**
 
----
-
-## Hugging Face resources
-
-| Resource | Link |
-|----------|------|
-| **Space** | [kimari-ai/kimari-fit-lab](https://huggingface.co/spaces/kimari-ai/kimari-fit-lab) |
-| **Organization Card** | [kimari-ai/README](https://huggingface.co/spaces/kimari-ai/README) |
-| **Reference Collection** | [Smouj013/kimari-compatible-gguf-models](https://huggingface.co/collections/Smouj013/kimari-compatible-gguf-models-6a0352c75d2bfeff34d51e66) |
-
-The reference collection contains community/reference GGUF models that Kimari can help run locally. They are **not official Kimari models**.
-
----
-
-## Repository
-
-GitHub: https://github.com/smouj/kimari-local-ai
-
-License: MIT
-Status: active alpha development
+No public weights, adapters, GGUF files, or public benchmark claims are published from this project at this stage.
