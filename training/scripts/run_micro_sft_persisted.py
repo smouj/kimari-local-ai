@@ -5,6 +5,7 @@
 Runs inside HF Jobs container.
 Steps: install deps, verify stack, load model, train LoRA, save adapter, load check, upload private.
 """
+
 import hashlib
 import subprocess
 import sys
@@ -14,10 +15,23 @@ print("=== Kimari-4B Micro SFT Persisted v0 ===")
 
 # Step 1: Install dependencies
 print("Step 1: Install dependencies")
-subprocess.run([sys.executable, "-m", "pip", "install", "-q",
-    "transformers>=4.46", "peft>=0.13", "trl>=0.12",
-    "accelerate>=1.1", "datasets>=3.0", "safetensors>=0.4",
-    "huggingface_hub"], check=True)
+subprocess.run(
+    [
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "-q",
+        "transformers>=4.46",
+        "peft>=0.13",
+        "trl>=0.12",
+        "accelerate>=1.1",
+        "datasets>=3.0",
+        "safetensors>=0.4",
+        "huggingface_hub",
+    ],
+    check=True,
+)
 
 # Step 2: Verify stack
 print("Step 2: Verify stack")
@@ -65,16 +79,24 @@ model.print_trainable_parameters()
 print("Step 5: Create inline dataset (21 examples)")
 examples = [
     {"instruction": "Detecta si hay GPU disponible", "response": "Usa torch.cuda.is_available() para detectar GPU."},
-    {"instruction": "Lista modelos GGUF compatibles", "response": "Kimari detecta modelos .gguf en el directorio de modelos configurado."},
-    {"instruction": "Verifica estado del servidor local", "response": "Ejecuta kimari doctor para verificar el estado completo del servidor."},
+    {
+        "instruction": "Lista modelos GGUF compatibles",
+        "response": "Kimari detecta modelos .gguf en el directorio de modelos configurado.",
+    },
+    {
+        "instruction": "Verifica estado del servidor local",
+        "response": "Ejecuta kimari doctor para verificar el estado completo del servidor.",
+    },
 ]
 from datasets import Dataset
 
 train_data = Dataset.from_list(examples * 7)
 print(f"  Dataset size: {len(train_data)}")
 
+
 def format_example(example):
     return {"text": f"User: {example['instruction']}\nAssistant: {example['response']}"}
+
 
 train_data = train_data.map(format_example)
 
@@ -123,6 +145,7 @@ adapter_load_ok = False
 generation_ok = False
 try:
     from peft import PeftModel
+
     base_model_2 = AutoModelForCausalLM.from_pretrained(BASE_MODEL, torch_dtype=torch.float16, device_map="auto")
     loaded_model = PeftModel.from_pretrained(base_model_2, OUTPUT_DIR)
     print("  Adapter loaded successfully!")
@@ -144,6 +167,7 @@ print("Step 10: Upload to private repo")
 adapter_persisted = False
 try:
     from huggingface_hub import HfApi
+
     api = HfApi()
     api.create_repo(repo_id=PRIVATE_REPO, private=True, exist_ok=True)
     api.upload_folder(

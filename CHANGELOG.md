@@ -4,6 +4,21 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.1.54-alpha] - 2026-05-13
+
+### Added
+- `eval/configs/kimari_eval_v1_baseline_vs_adapter_subset10.yaml` — subset10 eval config
+- `reports/evals/kimari_v0154_baseline_vs_adapter_subset10/` — results directory
+- `docs/KIMARI_EVAL_V0154_RESULT.md` — eval result documentation
+- Real baseline vs adapter evaluation on HF Jobs (subset_size=10)
+- Version bump: 0.1.53-alpha → 0.1.54-alpha
+
+### Note
+- No training executed
+- No raw eval outputs committed
+- No public benchmark claims
+- Gate: BLOCKED
+
 ## [0.1.53-alpha] - 2026-05-13
 
 ### Added

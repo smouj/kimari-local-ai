@@ -45,8 +45,10 @@ def build_hf_jobs_command_args(image: str, command: str, flavor: str = "a10g-sma
     return [
         "jobs",
         "run",
-        "--flavor", flavor,
-        "--timeout", "30m",
+        "--flavor",
+        flavor,
+        "--timeout",
+        "30m",
         image,
         command,
     ]
@@ -76,6 +78,7 @@ def load_config(config_path: str) -> dict:
 def validate_config(config: dict) -> list[str]:
     """Validate config safety flags."""
     errors = []
+
     # Convert string booleans to actual booleans for comparison
     def is_false(val) -> bool:
         if isinstance(val, bool):
@@ -318,19 +321,24 @@ def main() -> None:
         print(f"  Public upload: {config.get('hf_public_upload_allowed', 'N/A')}")
         print(f"  Gate: {config.get('preview_gate_state', 'N/A')}")
         if args.json:
-            print(json.dumps({
-                "mode": "dry-run",
-                "flavor": flavor,
-                "image": image,
-                "base_model": config.get("base_model"),
-                "max_steps": config.get("max_steps"),
-                "private_adapter_repo": config.get("private_adapter_repo"),
-                "private_adapter_persistence_allowed": config.get("private_adapter_persistence_allowed"),
-                "public_release_allowed": config.get("public_release_allowed"),
-                "hf_public_upload_allowed": config.get("hf_public_upload_allowed"),
-                "gguf_export_allowed": config.get("gguf_export_allowed"),
-                "gate_state": config.get("preview_gate_state"),
-            }, indent=2))
+            print(
+                json.dumps(
+                    {
+                        "mode": "dry-run",
+                        "flavor": flavor,
+                        "image": image,
+                        "base_model": config.get("base_model"),
+                        "max_steps": config.get("max_steps"),
+                        "private_adapter_repo": config.get("private_adapter_repo"),
+                        "private_adapter_persistence_allowed": config.get("private_adapter_persistence_allowed"),
+                        "public_release_allowed": config.get("public_release_allowed"),
+                        "hf_public_upload_allowed": config.get("hf_public_upload_allowed"),
+                        "gguf_export_allowed": config.get("gguf_export_allowed"),
+                        "gate_state": config.get("preview_gate_state"),
+                    },
+                    indent=2,
+                )
+            )
         return
 
     # Real submission

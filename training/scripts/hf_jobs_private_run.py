@@ -82,7 +82,7 @@ def check_jobs_access() -> dict:
         return {"can_continue_to_smoke": False, "error": str(e)}
 
 
-def build_hf_jobs_command(config: dict) -> list[str]:
+def build_hf_jobs_command_args(config: dict) -> list[str]:
     """Build the hf jobs run command as a safe argument list."""
     flavor = config.get("flavor", "a10g-small")
     timeout = config.get("timeout_minutes", 5)
@@ -107,9 +107,14 @@ def build_hf_jobs_command(config: dict) -> list[str]:
     return args
 
 
+def build_hf_jobs_command(config: dict) -> list[str]:
+    """Backward-compatible wrapper for safe HF Jobs command args."""
+    return build_hf_jobs_command_args(config)
+
+
 def print_command(config: dict) -> None:
     """Print the command that would be executed."""
-    args = build_hf_jobs_command(config)
+    args = build_hf_jobs_command_args(config)
     # Safe: print each arg quoted
     cmd_str = " ".join(f'"{a}"' if " " in a else a for a in args)
     print(f"Command: {cmd_str}")
@@ -127,7 +132,7 @@ def dry_run(config: dict, json_output: bool = False) -> dict:
         "cost_estimate_usd": config.get("cost_estimate", {}).get("estimated_cost_usd", 0),
         "safety_flags": config.get("safety", {}),
         "safety_errors": safety_errors,
-        "command_preview": " ".join(build_hf_jobs_command(config)),
+        "command_preview": " ".join(build_hf_jobs_command_args(config)),
     }
 
     if json_output:
@@ -156,7 +161,7 @@ def submit_job(config: dict, json_output: bool = False) -> dict:
         return {"error": f"Jobs access denied: {access.get('reason', 'unknown')}", "submitted": False}
 
     # Build command
-    args = build_hf_jobs_command(config)
+    hf_cmd_args = build_hf_jobs_command_args(config)
     print("\nSubmitting HF Jobs smoke test...")
     print(f"  Flavor: {config.get('flavor', 'unknown')}")
     print(f"  Timeout: {config.get('timeout_minutes', 5)} min")
@@ -165,7 +170,7 @@ def submit_job(config: dict, json_output: bool = False) -> dict:
 
     try:
         result = subprocess.run(
-            args,
+            hf_cmd_args,
             capture_output=True,
             text=True,
             timeout=config.get("timeout_minutes", 5) * 60 + 30,

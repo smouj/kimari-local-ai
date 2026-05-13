@@ -64,9 +64,16 @@ def validate_item(item: dict, line_num: int, filename: str) -> list[str]:
     # No Kimari-4B release claims (allow questions that refute claims)
     if "kimari-4b" in content_lower:
         # Allow if the prompt refutes the claim
-        if any(phrase in content_lower for phrase in ["not been publicly released", "not been released", "has not been", "no benchmark"]):
+        if any(
+            phrase in content_lower
+            for phrase in ["not been publicly released", "not been released", "has not been", "no benchmark"]
+        ):
             pass  # OK - refuting the claim
-        elif any(phrase in content_lower for phrase in ["achieved", "scored", "better than"]) and "no " not in content_lower and "not " not in content_lower:
+        elif (
+            any(phrase in content_lower for phrase in ["achieved", "scored", "better than"])
+            and "no " not in content_lower
+            and "not " not in content_lower
+        ):
             errors.append(f"{filename}:{line_num}: Kimari-4B claim without refutation")
 
     return errors
@@ -142,13 +149,13 @@ def main() -> None:
     if args.json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
     else:
-        for e in result['errors']:
+        for e in result["errors"]:
             print(f"  FAIL: {e}")
         for w in result["warnings"]:
             print(f"  WARN: {w}")
         print(f"\nStats: {result['stats']}")
-        err_count = len(result['errors'])
-        print("RESULT: Valid!" if result['valid'] else f"RESULT: {err_count} error(s)")
+        err_count = len(result["errors"])
+        print("RESULT: Valid!" if result["valid"] else f"RESULT: {err_count} error(s)")
 
     sys.exit(0 if result["valid"] else 1)
 

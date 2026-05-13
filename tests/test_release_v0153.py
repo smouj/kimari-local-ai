@@ -53,7 +53,14 @@ def test_hf_eval_runner_requires_allow_submit():
 def test_hf_eval_runner_no_token_arg():
     runner = (PROJECT_ROOT / "eval" / "scripts" / "hf_jobs_run_kimari_eval.py").read_text()
     # Check code lines only (not docstrings/comments) for --token as an argparse argument
-    code_lines = [line for line in runner.split("\n") if line.strip() and not line.strip().startswith('#') and not line.strip().startswith('"""') and not line.strip().startswith("'")]
+    code_lines = [
+        line
+        for line in runner.split("\n")
+        if line.strip()
+        and not line.strip().startswith("#")
+        and not line.strip().startswith('"""')
+        and not line.strip().startswith("'")
+    ]
     token_args = [line for line in code_lines if '"--token"' in line and "add_argument" in line]
     assert len(token_args) == 0, f"Found --token argparse argument: {token_args}"
 
@@ -61,9 +68,9 @@ def test_hf_eval_runner_no_token_arg():
 def test_hf_eval_runner_no_shell_true():
     runner = (PROJECT_ROOT / "eval" / "scripts" / "hf_jobs_run_kimari_eval.py").read_text()
     # Check code lines only (not docstrings) for shell=True in subprocess calls
-    code_lines = [line for line in runner.split("\n") if line.strip() and not line.strip().startswith('#')]
+    code_lines = [line for line in runner.split("\n") if line.strip() and not line.strip().startswith("#")]
     # Check subprocess.run calls don't use shell=True
-    subprocess_calls = [line for line in code_lines if 'subprocess.run' in line and 'shell=True' in line]
+    subprocess_calls = [line for line in code_lines if "subprocess.run" in line and "shell=True" in line]
     assert len(subprocess_calls) == 0, f"Found subprocess call with shell=True: {subprocess_calls}"
 
 
@@ -143,7 +150,7 @@ def test_roadmap_has_v0153():
 
 def test_org_card_has_current_version():
     org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text()
-    assert "v0.1.53-alpha" in org_card
+    assert "v0.1.53-alpha" in org_card or "v0.1.54-alpha" in org_card
 
 
 def test_org_card_no_stale_version():
@@ -163,7 +170,7 @@ def test_org_card_gate_blocked():
 
 def test_deployment_status_has_current_version():
     deploy = (PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md").read_text()
-    assert "v0.1.53-alpha" in deploy
+    assert "v0.1.53-alpha" in deploy or "v0.1.54-alpha" in deploy
 
 
 def test_readme_links_hf_space():

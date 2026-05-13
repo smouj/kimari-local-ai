@@ -2,6 +2,30 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+
+## v0.1.54 Checks
+
+- [x] `eval/configs/kimari_eval_v1_baseline_vs_adapter_subset10.yaml` exists
+- [x] subset10 config uses `subset_size: 10`, `temperature: 0.2`, `max_tokens: 256`
+- [x] subset10 config keeps `raw_outputs_commit_allowed: false`
+- [x] subset10 config keeps `public_benchmark_allowed: false`
+- [x] subset10 config keeps `manual_review_required: true`
+- [x] subset10 config keeps `gate_state: BLOCKED`
+- [x] HF Jobs subset10 run completed (`6a03be047618f125ee2b7a5a`)
+- [x] `reports/evals/kimari_v0154_baseline_vs_adapter_subset10/summary.json` exists
+- [x] summary has `raw_outputs_committed: false`
+- [x] summary has `public_benchmark_allowed: false`
+- [x] summary has `manual_review_required: true`
+- [x] summary has `gate_state: BLOCKED`
+- [x] summary has `score_status: not_scored`
+- [x] result doc exists (`docs/KIMARI_EVAL_V0154_RESULT.md`)
+- [x] no raw outputs committed
+- [x] no public benchmark claims
+- [x] no public weights
+- [x] no public GGUF
+- [x] Kimari-4B remains not released
+- [x] Gate remains BLOCKED
+
 ## Version & Metadata
 
 - [ ] Version bumped in `pyproject.toml`

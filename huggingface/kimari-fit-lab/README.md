@@ -16,7 +16,7 @@ Check if your GPU is compatible with Kimari Local AI.
 
 This Space does **not** run any model. It is a static lookup tool that recommends profiles based on your GPU VRAM.
 
-## Current Status (v0.1.53-alpha)
+## Current Status (v0.1.54-alpha)
 
 | Milestone | Status |
 |-----------|--------|

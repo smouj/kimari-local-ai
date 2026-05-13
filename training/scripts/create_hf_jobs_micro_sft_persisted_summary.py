@@ -13,11 +13,12 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-TEMPLATE_PATH = Path(__file__).resolve().parent.parent / "templates" / "hf_jobs_micro_sft_persisted_summary.template.json"
+TEMPLATE_PATH = (
+    Path(__file__).resolve().parent.parent / "templates" / "hf_jobs_micro_sft_persisted_summary.template.json"
+)
 
 # Fields that must be false for safety
 MUST_BE_FALSE = [

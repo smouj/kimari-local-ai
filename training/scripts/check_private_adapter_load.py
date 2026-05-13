@@ -16,7 +16,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
 
 
 def check_adapter_load(base_model: str, adapter_dir: str | None = None, adapter_repo: str | None = None) -> dict:
@@ -46,10 +45,12 @@ def check_adapter_load(base_model: str, adapter_dir: str | None = None, adapter_
         if adapter_repo:
             print(f"Loading adapter from HF repo: {adapter_repo}")
             from peft import PeftModel
+
             model = PeftModel.from_pretrained(model, adapter_repo)
         elif adapter_dir:
             print(f"Loading adapter from local dir: {adapter_dir}")
             from peft import PeftModel
+
             model = PeftModel.from_pretrained(model, adapter_dir)
         else:
             result["error_sanitized"] = "No adapter source specified"

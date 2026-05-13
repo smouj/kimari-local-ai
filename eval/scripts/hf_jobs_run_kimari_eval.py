@@ -29,6 +29,7 @@ Safety:
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import sys
 from pathlib import Path
@@ -75,6 +76,19 @@ def build_eval_script(config: dict, subset_size: int | None = None) -> str:
     seed = config.get("seed", 42)
     effective_subset = subset_size or config.get("subset_size", 30)
 
+    # HF Jobs cannot see local eval/ files unless we pass them explicitly. Embed
+    # the private eval prompts into the inline job script so real runs are
+    # reproducible while still avoiding raw model outputs or public uploads.
+    dataset_dir = PROJECT_ROOT / config.get("dataset_dir", "eval/kimari_private_v1")
+    if not dataset_dir.exists():
+        raise FileNotFoundError(f"Dataset directory not found: {dataset_dir}")
+    eval_items = []
+    for jsonl_file in sorted(dataset_dir.glob("*.jsonl")):
+        for line in jsonl_file.read_text().strip().split("\n"):
+            if line.strip():
+                eval_items.append(json.loads(line))
+    embedded_dataset_b64 = base64.b64encode(json.dumps(eval_items, ensure_ascii=False).encode("utf-8")).decode("ascii")
+
     script = f'''# /// script
 # requires-python = ">=3.10"
 # dependencies = [
@@ -93,10 +107,12 @@ runs eval subset again, generates sanitized summary.
 Safety: no public upload, no raw outputs committed, no gate transition.
 """
 
+import base64
 import json
-import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
+
 
 def main():
     print("=" * 60)
@@ -111,23 +127,16 @@ def main():
     seed = {seed}
     subset_size = {effective_subset}
 
-    # Load eval dataset
-    print(f"\\nLoading dataset from eval/kimari_private_v1/...")
-    dataset_dir = Path("eval/kimari_private_v1")
-    if not dataset_dir.exists():
-        print("ERROR: Dataset directory not found", file=sys.stderr)
-        sys.exit(1)
-
-    items = []
-    for jsonl_file in sorted(dataset_dir.glob("*.jsonl")):
-        for line in jsonl_file.read_text().strip().split("\\n"):
-            if line.strip():
-                items.append(json.loads(line))
+    # Load embedded eval dataset. No raw model outputs are embedded or committed.
+    print("\\nLoading embedded KimariEval private v1 dataset...")
+    embedded_dataset_b64 = "{embedded_dataset_b64}"
+    items = json.loads(base64.b64decode(embedded_dataset_b64).decode("utf-8"))
 
     print(f"Total items: {{len(items)}}")
 
     # Subset
     import random
+
     random.seed(seed)
     if subset_size < len(items):
         items = random.sample(items, subset_size)
@@ -140,8 +149,8 @@ def main():
 
     # Load model
     print(f"\\nLoading base model: {{base_model}}")
-    from transformers import AutoModelForCausalLM, AutoTokenizer
     import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
@@ -172,15 +181,17 @@ def main():
                 seed=seed,
             )
 
-        generated = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
+        generated = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True)
 
-        baseline_results.append({{
-            "id": item["id"],
-            "tags": item.get("tags", []),
-            "difficulty": item.get("difficulty", "medium"),
-            "generated_length": len(generated),
-            "has_error": generated.startswith("ERROR"),
-        }})
+        baseline_results.append(
+            {{
+                "id": item["id"],
+                "tags": item.get("tags", []),
+                "difficulty": item.get("difficulty", "medium"),
+                "generated_length": len(generated),
+                "has_error": generated.startswith("ERROR"),
+            }}
+        )
 
         if (i + 1) % 10 == 0:
             print(f"  Baseline: {{i + 1}}/{{len(items)}} done")
@@ -214,15 +225,17 @@ def main():
                 seed=seed,
             )
 
-        generated = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
+        generated = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True)
 
-        adapter_results.append({{
-            "id": item["id"],
-            "tags": item.get("tags", []),
-            "difficulty": item.get("difficulty", "medium"),
-            "generated_length": len(generated),
-            "has_error": generated.startswith("ERROR"),
-        }})
+        adapter_results.append(
+            {{
+                "id": item["id"],
+                "tags": item.get("tags", []),
+                "difficulty": item.get("difficulty", "medium"),
+                "generated_length": len(generated),
+                "has_error": generated.startswith("ERROR"),
+            }}
+        )
 
         if (i + 1) % 10 == 0:
             print(f"  Adapter: {{i + 1}}/{{len(items)}} done")
@@ -272,9 +285,10 @@ def main():
     print(f"\\nSummary written to {{summary_path}}")
     print(f"Baseline completion: {{baseline_completion}}/{{len(items)}} ({{summary['baseline']['completion_rate']}})")
     print(f"Adapter completion: {{adapter_completion}}/{{len(items)}} ({{summary['adapter']['completion_rate']}})")
-    print(f"Score status: not_scored (manual review required)")
-    print(f"Gate: BLOCKED")
-    print(f"NO RAW OUTPUTS COMMITTED. NO BENCHMARK CLAIMS.")
+    print("Score status: not_scored (manual review required)")
+    print("Gate: BLOCKED")
+    print("NO RAW OUTPUTS COMMITTED. NO BENCHMARK CLAIMS.")
+
 
 if __name__ == "__main__":
     main()
@@ -297,10 +311,16 @@ def build_hf_jobs_command(config: dict, subset_size: int | None = None) -> list[
 
     # Build command using hf jobs uv run with PEP 723 inline script
     cmd = [
-        "hf", "jobs", "uv", "run",
-        "--flavor", flavor,
-        "--timeout", f"{timeout}m",
-        "--secrets", "HF_TOKEN",
+        "hf",
+        "jobs",
+        "uv",
+        "run",
+        "--flavor",
+        flavor,
+        "--timeout",
+        f"{timeout}m",
+        "--secrets",
+        "HF_TOKEN",
         str(script_path),
     ]
 
@@ -396,7 +416,7 @@ def main() -> None:
         print("Checking HF Jobs access...")
         import subprocess
 
-        result = subprocess.run(["hf", "jobs", "list"], capture_output=True, text=True)
+        result = subprocess.run(["hf", "jobs", "ps"], capture_output=True, text=True)
         if result.returncode != 0:
             print(f"ERROR: HF Jobs access check failed: {result.stderr}", file=sys.stderr)
             sys.exit(1)

@@ -1,0 +1,50 @@
+{
+  "run_id": "kimari-eval-1778630345",
+  "job_id": "6a03be047618f125ee2b7a5a",
+  "model_label": "qwen25-15b-base-vs-adapter",
+  "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "adapter_repo_private": "Smouj013/kimari4b-micro-sft-adapter-v0",
+  "dataset_id": "kimari_private_v1",
+  "item_count": 10,
+  "categories": {
+    "networking": 1,
+    "python": 3,
+    "style": 1,
+    "agents": 2,
+    "gguf": 1,
+    "llama-cpp": 1,
+    "linux": 1
+  },
+  "baseline": {
+    "completion_rate": 1.0,
+    "completed": 10,
+    "errors": 0,
+    "avg_len": 973.7
+  },
+  "adapter": {
+    "completion_rate": 1.0,
+    "completed": 10,
+    "errors": 0,
+    "avg_len": 959.6
+  },
+  "score_status": "not_scored",
+  "manual_review_required": true,
+  "raw_outputs_committed": false,
+  "public_benchmark_allowed": false,
+  "gate_state": "BLOCKED",
+  "temperature": 0.2,
+  "max_tokens": 256,
+  "top_p": 0.9,
+  "seed": 42,
+  "subset_size": 10,
+  "adapter_loaded": true,
+  "hf_jobs_flavor": "a10g-small",
+  "hf_job_status": "COMPLETED",
+  "created_at": "2026-05-13T01:00:00+0200",
+  "notes": "Subset10 pipeline validation completed successfully. Both baseline and adapter completed all 10 items with 0 errors. Adapter loaded from private repo. No raw outputs committed. No benchmark claims. Gate BLOCKED. Ready for subset30.",
+  "baseline_completion_rate": 1.0,
+  "adapter_completion_rate": 1.0,
+  "adapter_load_status": "loaded",
+  "ready_for_subset30": true,
+  "no_public_weights_or_gguf": true
+}

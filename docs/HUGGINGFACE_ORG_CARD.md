@@ -14,7 +14,7 @@ It provides:
 - KimariFit evaluation tooling
 - Private training and evaluation pipeline for future Kimari models
 
-> Current framework version: v0.1.53-alpha
+> Current framework version: v0.1.54-alpha
 > Status: usable alpha framework, not production-ready.
 
 ---

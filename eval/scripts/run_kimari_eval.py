@@ -105,16 +105,18 @@ def run_evaluation(
         except Exception as e:
             generated = f"ERROR: {type(e).__name__}"
 
-        results.append({
-            "id": item["id"],
-            "prompt": item["prompt"],
-            "ideal": item["ideal"],
-            "generated": generated,
-            "tags": item.get("tags", []),
-            "difficulty": item.get("difficulty", "medium"),
-            "score_status": "not_scored",
-            "manual_review_required": True,
-        })
+        results.append(
+            {
+                "id": item["id"],
+                "prompt": item["prompt"],
+                "ideal": item["ideal"],
+                "generated": generated,
+                "tags": item.get("tags", []),
+                "difficulty": item.get("difficulty", "medium"),
+                "score_status": "not_scored",
+                "manual_review_required": True,
+            }
+        )
 
     categories = {}
     for item in items:

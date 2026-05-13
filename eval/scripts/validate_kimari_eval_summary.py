@@ -15,10 +15,16 @@ import sys
 from pathlib import Path
 
 REQUIRED_FIELDS = [
-    "run_id", "model_label", "base_model", "dataset_id",
-    "item_count", "completion_rate", "score_status",
-    "manual_review_required", "raw_outputs_committed",
-    "public_benchmark_allowed", "gate_state",
+    "run_id",
+    "model_label",
+    "base_model",
+    "dataset_id",
+    "item_count",
+    "score_status",
+    "manual_review_required",
+    "raw_outputs_committed",
+    "public_benchmark_allowed",
+    "gate_state",
 ]
 
 FORBIDDEN_FIELDS = ["raw_outputs", "raw_responses", "generated_text", "model_responses"]
@@ -53,6 +59,20 @@ def validate_summary(summary: dict, filename: str = "") -> list[str]:
     if summary.get("item_count", 0) == 0 and summary.get("score_status") != "not_scored":
         errors.append(f"{filename}: item_count is 0 but score_status is not 'not_scored'")
 
+    # Check for completion_rate (top-level, explicit baseline/adapter, or nested)
+    has_completion = "completion_rate" in summary
+    if "baseline_completion_rate" in summary or "adapter_completion_rate" in summary:
+        has_completion = True
+    if not has_completion:
+        baseline = summary.get("baseline", {})
+        adapter = summary.get("adapter", {})
+        if isinstance(baseline, dict) and "completion_rate" in baseline:
+            has_completion = True
+        if isinstance(adapter, dict) and "completion_rate" in adapter:
+            has_completion = True
+    if not has_completion:
+        errors.append(f"{filename}: missing completion_rate, baseline_completion_rate, or adapter_completion_rate")
+
     # No forbidden fields (raw outputs)
     for field in FORBIDDEN_FIELDS:
         if field in summary:
@@ -65,7 +85,11 @@ def validate_summary(summary: dict, filename: str = "") -> list[str]:
             errors.append(f"{filename}: potential sensitive pattern: {pattern}")
 
     # No benchmark claims
-    if ("achieved" in content or "outperforms" in content or "beats" in content) and "no benchmark" not in content and "not scored" not in content:
+    if (
+        ("achieved" in content or "outperforms" in content or "beats" in content)
+        and "no benchmark" not in content
+        and "not scored" not in content
+    ):
         errors.append(f"{filename}: potential benchmark claim detected")
 
     return errors
@@ -107,8 +131,8 @@ def main() -> None:
         print(f"Items: {result['item_count']}")
         print(f"Gate: {result['gate_state']}")
         print(f"Score: {result['score_status']}")
-        err_count = len(result['errors'])
-        print("RESULT: Valid!" if result['valid'] else f"RESULT: {err_count} error(s)")
+        err_count = len(result["errors"])
+        print("RESULT: Valid!" if result["valid"] else f"RESULT: {err_count} error(s)")
 
     sys.exit(0 if result["valid"] else 1)
 

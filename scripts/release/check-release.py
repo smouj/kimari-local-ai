@@ -2957,10 +2957,11 @@ def main() -> None:
     hf_run_script = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_private_run.py"
     if hf_run_script.exists():
         hf_run_text = hf_run_script.read_text()
+        hf_run_argparse = hf_run_text[hf_run_text.find("add_argument") : hf_run_text.find("args = parser.parse_args()")]
         check(
             "hf_jobs_private_run.py does not accept --token",
-            '"--token"' not in hf_run_text and "'--token'" not in hf_run_text,
-            "--token flag found in hf_jobs_private_run.py — must not accept tokens as arguments",
+            '"--token"' not in hf_run_argparse and "'--token'" not in hf_run_argparse,
+            "--token argparse flag found in hf_jobs_private_run.py — must not accept tokens as arguments",
         )
         check(
             "hf_jobs_private_run.py requires --allow-submit",
@@ -4113,6 +4114,153 @@ def main() -> None:
         len(false_claims) == 0,
         "Kimari-4B false claim regression detected",
     )
+
+    # ── [75/75] v0.1.54 real subset10 private evaluation ─────────
+    print("\n[75/75] v0.1.54 real subset10 private evaluation")
+    subset10_config = PROJECT_ROOT / "eval" / "configs" / "kimari_eval_v1_baseline_vs_adapter_subset10.yaml"
+    subset10_summary = PROJECT_ROOT / "reports" / "evals" / "kimari_v0154_baseline_vs_adapter_subset10" / "summary.json"
+    subset10_report = PROJECT_ROOT / "reports" / "evals" / "kimari_v0154_baseline_vs_adapter_subset10" / "README.md"
+    v0154_doc = PROJECT_ROOT / "docs" / "KIMARI_EVAL_V0154_RESULT.md"
+
+    check(
+        "v0.1.54 subset10 config exists",
+        subset10_config.exists(),
+        "eval/configs/kimari_eval_v1_baseline_vs_adapter_subset10.yaml not found",
+    )
+    if subset10_config.exists():
+        config_text = subset10_config.read_text()
+        check("subset10 config uses subset_size: 10", "subset_size: 10" in config_text, "subset_size must be 10")
+        check("subset10 config uses temperature: 0.2", "temperature: 0.2" in config_text, "temperature must be 0.2")
+        check("subset10 config uses max_tokens: 256", "max_tokens: 256" in config_text, "max_tokens must be 256")
+        check(
+            "subset10 config blocks raw outputs commit",
+            "raw_outputs_commit_allowed: false" in config_text,
+            "raw outputs commit must be false",
+        )
+        check(
+            "subset10 config blocks public benchmark",
+            "public_benchmark_allowed: false" in config_text,
+            "public benchmark must be false",
+        )
+        check(
+            "subset10 config requires manual review",
+            "manual_review_required: true" in config_text,
+            "manual review must be true",
+        )
+        check(
+            "subset10 config gate BLOCKED",
+            'gate_state: "BLOCKED"' in config_text or "gate_state: BLOCKED" in config_text,
+            "gate must be BLOCKED",
+        )
+        check(
+            "subset10 config uses private adapter repo",
+            "Smouj013/kimari4b-micro-sft-adapter-v0" in config_text,
+            "private adapter repo missing",
+        )
+
+    check(
+        "v0.1.54 sanitized summary exists",
+        subset10_summary.exists(),
+        "reports/evals/kimari_v0154_baseline_vs_adapter_subset10/summary.json not found",
+    )
+    if subset10_summary.exists():
+        try:
+            summary = json.loads(subset10_summary.read_text())
+        except Exception as exc:
+            summary = {}
+            check("v0.1.54 summary parses as JSON", False, str(exc))
+        check(
+            "v0.1.54 summary job completed",
+            summary.get("hf_job_status") == "COMPLETED",
+            f"status={summary.get('hf_job_status')!r}",
+        )
+        check(
+            "v0.1.54 summary has job id",
+            summary.get("job_id") == "6a03be047618f125ee2b7a5a",
+            f"job_id={summary.get('job_id')!r}",
+        )
+        check(
+            "v0.1.54 summary subset_size == 10",
+            summary.get("subset_size") == 10,
+            f"subset_size={summary.get('subset_size')!r}",
+        )
+        check(
+            "v0.1.54 summary item_count == 10",
+            summary.get("item_count") == 10,
+            f"item_count={summary.get('item_count')!r}",
+        )
+        check(
+            "v0.1.54 baseline_completion_rate recorded",
+            summary.get("baseline_completion_rate") == 1.0,
+            f"baseline_completion_rate={summary.get('baseline_completion_rate')!r}",
+        )
+        check(
+            "v0.1.54 adapter_completion_rate recorded",
+            summary.get("adapter_completion_rate") == 1.0,
+            f"adapter_completion_rate={summary.get('adapter_completion_rate')!r}",
+        )
+        check(
+            "v0.1.54 adapter loaded",
+            summary.get("adapter_loaded") is True,
+            f"adapter_loaded={summary.get('adapter_loaded')!r}",
+        )
+        check(
+            "v0.1.54 score not_scored",
+            summary.get("score_status") == "not_scored",
+            f"score_status={summary.get('score_status')!r}",
+        )
+        check(
+            "v0.1.54 manual_review_required true",
+            summary.get("manual_review_required") is True,
+            "manual review must remain true",
+        )
+        check(
+            "v0.1.54 raw_outputs_committed false",
+            summary.get("raw_outputs_committed") is False,
+            "raw outputs must not be committed",
+        )
+        check(
+            "v0.1.54 public_benchmark_allowed false",
+            summary.get("public_benchmark_allowed") is False,
+            "public benchmark must be false",
+        )
+        check(
+            "v0.1.54 gate BLOCKED", summary.get("gate_state") == "BLOCKED", f"gate_state={summary.get('gate_state')!r}"
+        )
+        forbidden_summary_keys = {"raw_outputs", "raw_responses", "generated_text", "model_responses"}
+        check(
+            "v0.1.54 summary has no raw output fields",
+            not (forbidden_summary_keys & set(summary)),
+            "summary contains raw output fields",
+        )
+
+    check("v0.1.54 report README exists", subset10_report.exists(), "subset10 report README missing")
+    check("v0.1.54 result doc exists", v0154_doc.exists(), "docs/KIMARI_EVAL_V0154_RESULT.md missing")
+    if v0154_doc.exists() and subset10_report.exists():
+        result_text = (v0154_doc.read_text() + "\n" + subset10_report.read_text()).lower()
+        check(
+            "v0.1.54 docs mention completion/integrity",
+            "completion" in result_text and "integrity" in result_text,
+            "docs must frame run as completion/integrity check",
+        )
+        check(
+            "v0.1.54 docs do not make public benchmark claim",
+            "outperforms" not in result_text and "beats" not in result_text and "sota" not in result_text,
+            "docs contain benchmark-style claim",
+        )
+        check("v0.1.54 docs gate BLOCKED", "blocked" in result_text, "docs must mention gate BLOCKED")
+
+    for artifact_pattern in ("*.safetensors", "*.gguf"):
+        artifacts = [
+            path
+            for path in PROJECT_ROOT.rglob(artifact_pattern)
+            if ".venv" not in path.parts and "deps" not in path.parts
+        ]
+        check(
+            f"No public {artifact_pattern} artifacts committed",
+            len(artifacts) == 0,
+            f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
+        )
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
@@ -5550,7 +5698,9 @@ def main() -> None:
             "No --token/--api-key argparse parameter in runner",
             # Security guard code that rejects these args is fine.
             # Check only the argparse section, not the guard code.
-            '"--token"' not in runner_text[runner_text.find("add_argument"):runner_text.find("main()")] if "add_argument" in runner_text and "main()" in runner_text else runner_text,
+            '"--token"' not in runner_text[runner_text.find("add_argument") : runner_text.find("main()")]
+            if "add_argument" in runner_text and "main()" in runner_text
+            else runner_text,
             "Runner should not add --token/--api-key as argparse parameters",
         )
 
@@ -5610,8 +5760,10 @@ def main() -> None:
     summary = PROJECT_ROOT / "docs" / "KIMARI4B_MICRO_SFT_RESULT_SUMMARY.json"
     if config_path.exists() and summary.exists():
         import json as _json
+
         try:
             import yaml as _yaml
+
             config = _yaml.safe_load(config_path.read_text())
             config_hash = config.get("dataset", {}).get("hash", "")
         except ImportError:
@@ -5627,7 +5779,9 @@ def main() -> None:
         # Both should match (prefix at least)
         check(
             "No contradictory dataset hashes",
-            config_hash.startswith(summary_hash[:16]) or summary_hash.startswith(config_hash[:16]) or config_hash == summary_hash,
+            config_hash.startswith(summary_hash[:16])
+            or summary_hash.startswith(config_hash[:16])
+            or config_hash == summary_hash,
             f"Config hash {config_hash[:16]}... != summary hash {summary_hash[:16]}...",
         )
 
@@ -5776,7 +5930,11 @@ def main() -> None:
             "Runner must require --allow-submit --yes",
         )
         # Check for --token as argparse argument (not in docstring/comments)
-        runner_lines = [l for l in runner_text.split("\n") if not l.strip().startswith("#") and not l.strip().startswith('"""')]
+        runner_lines = [
+            line
+            for line in runner_text.split("\n")
+            if not line.strip().startswith("#") and not line.strip().startswith('"""')
+        ]
         runner_code = "\n".join(runner_lines)
         check(
             "No --token arg in runner",
@@ -5817,6 +5975,7 @@ def main() -> None:
     result_summary = PROJECT_ROOT / "docs" / "KIMARI4B_MICRO_SFT_PERSISTED_RESULT_SUMMARY.json"
     if result_summary.exists():
         import json as _json
+
         data = _json.loads(result_summary.read_text())
         check(
             "adapter_persisted_private in result summary",
@@ -6075,15 +6234,22 @@ def main() -> None:
             "HF eval runner must require --allow-submit --yes for real submission",
         )
         # Check for --token as argparse argument (not just in docstrings)
-        runner_code_lines = [line for line in runner_text.split('\n') if line.strip() and not line.strip().startswith('#') and not line.strip().startswith('"""') and not line.strip().startswith("'")]
-        token_argparse = [line for line in runner_code_lines if '"--token"' in line and 'add_argument' in line]
+        runner_code_lines = [
+            line
+            for line in runner_text.split("\n")
+            if line.strip()
+            and not line.strip().startswith("#")
+            and not line.strip().startswith('"""')
+            and not line.strip().startswith("'")
+        ]
+        token_argparse = [line for line in runner_code_lines if '"--token"' in line and "add_argument" in line]
         check(
             "HF eval runner: no --token argparse",
             len(token_argparse) == 0,
             f"HF eval runner has --token argparse argument: {token_argparse}",
         )
         # Check for shell=True in subprocess calls only
-        subprocess_shell = [line for line in runner_code_lines if 'subprocess.run' in line and 'shell=True' in line]
+        subprocess_shell = [line for line in runner_code_lines if "subprocess.run" in line and "shell=True" in line]
         check(
             "HF eval runner: no shell=True in subprocess",
             len(subprocess_shell) == 0,
@@ -6242,12 +6408,40 @@ def main() -> None:
             for line in doc_text.split("\n"):
                 if "kimari-4b" in line and "released" in line:
                     # Skip if line contains any negation
-                    negations = ["not released", "not yet released", "not available", "no public", "has not been", "is not released", "until.*released", "when.*released", "before.*released", "does not claim", "don't claim"]
+                    negations = [
+                        "not released",
+                        "not yet released",
+                        "not available",
+                        "no public",
+                        "has not been",
+                        "is not released",
+                        "until.*released",
+                        "when.*released",
+                        "before.*released",
+                        "does not claim",
+                        "don't claim",
+                    ]
                     if any(neg in line for neg in negations):
                         continue
                     # Only flag clearly positive claims
-                    negation_present = any(n in line for n in ["not released", "not yet", "no claim", "no ", "not ", "don't", "doesn't", "when ", "until ", "before ", "after ", "if "])
-                    if _re.search(r'kimari-4b (is |has been |was )?released', line) and not negation_present:
+                    negation_present = any(
+                        n in line
+                        for n in [
+                            "not released",
+                            "not yet",
+                            "no claim",
+                            "no ",
+                            "not ",
+                            "don't",
+                            "doesn't",
+                            "when ",
+                            "until ",
+                            "before ",
+                            "after ",
+                            "if ",
+                        ]
+                    )
+                    if _re.search(r"kimari-4b (is |has been |was )?released", line) and not negation_present:
                         check(
                             f"{doc_file.name}: no Kimari-4B released claim",
                             False,
@@ -6277,6 +6471,153 @@ def main() -> None:
             "index.html has KimariEval card",
             "KimariEval" in index_text,
             "docs/index.html must have KimariEval card",
+        )
+
+    # ── [75/75] v0.1.54 real subset10 private evaluation ─────────
+    print("\n[75/75] v0.1.54 real subset10 private evaluation")
+    subset10_config = PROJECT_ROOT / "eval" / "configs" / "kimari_eval_v1_baseline_vs_adapter_subset10.yaml"
+    subset10_summary = PROJECT_ROOT / "reports" / "evals" / "kimari_v0154_baseline_vs_adapter_subset10" / "summary.json"
+    subset10_report = PROJECT_ROOT / "reports" / "evals" / "kimari_v0154_baseline_vs_adapter_subset10" / "README.md"
+    v0154_doc = PROJECT_ROOT / "docs" / "KIMARI_EVAL_V0154_RESULT.md"
+
+    check(
+        "v0.1.54 subset10 config exists",
+        subset10_config.exists(),
+        "eval/configs/kimari_eval_v1_baseline_vs_adapter_subset10.yaml not found",
+    )
+    if subset10_config.exists():
+        config_text = subset10_config.read_text()
+        check("subset10 config uses subset_size: 10", "subset_size: 10" in config_text, "subset_size must be 10")
+        check("subset10 config uses temperature: 0.2", "temperature: 0.2" in config_text, "temperature must be 0.2")
+        check("subset10 config uses max_tokens: 256", "max_tokens: 256" in config_text, "max_tokens must be 256")
+        check(
+            "subset10 config blocks raw outputs commit",
+            "raw_outputs_commit_allowed: false" in config_text,
+            "raw outputs commit must be false",
+        )
+        check(
+            "subset10 config blocks public benchmark",
+            "public_benchmark_allowed: false" in config_text,
+            "public benchmark must be false",
+        )
+        check(
+            "subset10 config requires manual review",
+            "manual_review_required: true" in config_text,
+            "manual review must be true",
+        )
+        check(
+            "subset10 config gate BLOCKED",
+            'gate_state: "BLOCKED"' in config_text or "gate_state: BLOCKED" in config_text,
+            "gate must be BLOCKED",
+        )
+        check(
+            "subset10 config uses private adapter repo",
+            "Smouj013/kimari4b-micro-sft-adapter-v0" in config_text,
+            "private adapter repo missing",
+        )
+
+    check(
+        "v0.1.54 sanitized summary exists",
+        subset10_summary.exists(),
+        "reports/evals/kimari_v0154_baseline_vs_adapter_subset10/summary.json not found",
+    )
+    if subset10_summary.exists():
+        try:
+            summary = json.loads(subset10_summary.read_text())
+        except Exception as exc:
+            summary = {}
+            check("v0.1.54 summary parses as JSON", False, str(exc))
+        check(
+            "v0.1.54 summary job completed",
+            summary.get("hf_job_status") == "COMPLETED",
+            f"status={summary.get('hf_job_status')!r}",
+        )
+        check(
+            "v0.1.54 summary has job id",
+            summary.get("job_id") == "6a03be047618f125ee2b7a5a",
+            f"job_id={summary.get('job_id')!r}",
+        )
+        check(
+            "v0.1.54 summary subset_size == 10",
+            summary.get("subset_size") == 10,
+            f"subset_size={summary.get('subset_size')!r}",
+        )
+        check(
+            "v0.1.54 summary item_count == 10",
+            summary.get("item_count") == 10,
+            f"item_count={summary.get('item_count')!r}",
+        )
+        check(
+            "v0.1.54 baseline_completion_rate recorded",
+            summary.get("baseline_completion_rate") == 1.0,
+            f"baseline_completion_rate={summary.get('baseline_completion_rate')!r}",
+        )
+        check(
+            "v0.1.54 adapter_completion_rate recorded",
+            summary.get("adapter_completion_rate") == 1.0,
+            f"adapter_completion_rate={summary.get('adapter_completion_rate')!r}",
+        )
+        check(
+            "v0.1.54 adapter loaded",
+            summary.get("adapter_loaded") is True,
+            f"adapter_loaded={summary.get('adapter_loaded')!r}",
+        )
+        check(
+            "v0.1.54 score not_scored",
+            summary.get("score_status") == "not_scored",
+            f"score_status={summary.get('score_status')!r}",
+        )
+        check(
+            "v0.1.54 manual_review_required true",
+            summary.get("manual_review_required") is True,
+            "manual review must remain true",
+        )
+        check(
+            "v0.1.54 raw_outputs_committed false",
+            summary.get("raw_outputs_committed") is False,
+            "raw outputs must not be committed",
+        )
+        check(
+            "v0.1.54 public_benchmark_allowed false",
+            summary.get("public_benchmark_allowed") is False,
+            "public benchmark must be false",
+        )
+        check(
+            "v0.1.54 gate BLOCKED", summary.get("gate_state") == "BLOCKED", f"gate_state={summary.get('gate_state')!r}"
+        )
+        forbidden_summary_keys = {"raw_outputs", "raw_responses", "generated_text", "model_responses"}
+        check(
+            "v0.1.54 summary has no raw output fields",
+            not (forbidden_summary_keys & set(summary)),
+            "summary contains raw output fields",
+        )
+
+    check("v0.1.54 report README exists", subset10_report.exists(), "subset10 report README missing")
+    check("v0.1.54 result doc exists", v0154_doc.exists(), "docs/KIMARI_EVAL_V0154_RESULT.md missing")
+    if v0154_doc.exists() and subset10_report.exists():
+        result_text = (v0154_doc.read_text() + "\n" + subset10_report.read_text()).lower()
+        check(
+            "v0.1.54 docs mention completion/integrity",
+            "completion" in result_text and "integrity" in result_text,
+            "docs must frame run as completion/integrity check",
+        )
+        check(
+            "v0.1.54 docs do not make public benchmark claim",
+            "outperforms" not in result_text and "beats" not in result_text and "sota" not in result_text,
+            "docs contain benchmark-style claim",
+        )
+        check("v0.1.54 docs gate BLOCKED", "blocked" in result_text, "docs must mention gate BLOCKED")
+
+    for artifact_pattern in ("*.safetensors", "*.gguf"):
+        artifacts = [
+            path
+            for path in PROJECT_ROOT.rglob(artifact_pattern)
+            if ".venv" not in path.parts and "deps" not in path.parts
+        ]
+        check(
+            f"No public {artifact_pattern} artifacts committed",
+            len(artifacts) == 0,
+            f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
         )
 
     # ── Summary ──────────────────────────────────────────────────

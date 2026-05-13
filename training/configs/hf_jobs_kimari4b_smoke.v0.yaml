@@ -17,6 +17,8 @@ timeout_minutes: 5     # Maximum 5 minutes to limit cost
 
 # ── Safety Flags ────────────────────────────────────────────────
 # ALL of these must be false. No script should change them automatically.
+allow_training: false
+allow_hf_upload: false
 safety:
   training_performed: false
   adapter_generated: false

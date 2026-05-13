@@ -94,6 +94,7 @@ def package_adapter(source: str, write: bool = False) -> dict:
         dest = PRIVATE_REPO / "adapters" / "kimari4b-micro-sft-adapter-v0"
         dest.mkdir(parents=True, exist_ok=True)
         import shutil
+
         for f in src.rglob("*"):
             if f.is_file() and f.suffix in ALLOWED_EXTENSIONS:
                 shutil.copy2(f, dest / f.name)

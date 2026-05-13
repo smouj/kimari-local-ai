@@ -15,6 +15,15 @@ import json
 import sys
 
 
+def sanitize_error(message: object) -> str:
+    """Redact token-like values from error messages."""
+    text = str(message)
+    for marker in ("hf_", "sk-"):
+        if marker in text:
+            text = text.split(marker)[0] + marker + "[REDACTED]"
+    return text
+
+
 def check_access() -> dict:
     """Check HF Jobs access without submitting any job."""
     checks = {}
@@ -45,7 +54,7 @@ def check_access() -> dict:
         checks["authenticated"] = False
         checks["username"] = None
         checks["can_continue_to_smoke"] = False
-        checks["reason"] = f"Auth failed: {e}"
+        checks["reason"] = f"Auth failed: {sanitize_error(e)}"
         return checks
 
     # 3. Jobs access (try to list hardware without submitting)
@@ -58,7 +67,7 @@ def check_access() -> dict:
         checks["api_read_access"] = True
     except Exception as e:
         checks["api_read_access"] = False
-        checks["reason"] = f"API read failed: {e}"
+        checks["reason"] = f"API read failed: {sanitize_error(e)}"
 
     # 4. Try to check if jobs endpoint is accessible
     try:
@@ -77,7 +86,7 @@ def check_access() -> dict:
             checks["jobs_endpoint_accessible"] = e.code in (200, 403, 404)
     except Exception as e:
         checks["jobs_endpoint_accessible"] = False
-        checks["jobs_endpoint_error"] = str(e)
+        checks["jobs_endpoint_error"] = sanitize_error(e)
 
     # 5. Try `hf jobs hardware` as a simple read-only test
     try:
@@ -96,7 +105,7 @@ def check_access() -> dict:
             checks["hardware_error"] = result.stderr[:200]
     except Exception as e:
         checks["hf_jobs_hardware_works"] = False
-        checks["hardware_error"] = str(e)
+        checks["hardware_error"] = sanitize_error(e)
 
     # Decision
     can_continue = (

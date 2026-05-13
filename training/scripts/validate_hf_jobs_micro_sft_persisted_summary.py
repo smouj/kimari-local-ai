@@ -27,8 +27,14 @@ MUST_BE_VALUES = {
 }
 
 FORBIDDEN_PATTERNS = [
-    "sk-", "api_key", "password", "credential", "/home/",
-    "hf_", "ghp_", "glpat-",
+    "sk-",
+    "api_key",
+    "password",
+    "credential",
+    "/home/",
+    "hf_",
+    "ghp_",
+    "glpat-",
 ]
 
 
@@ -59,10 +65,16 @@ def validate_summary(summary_path: str) -> dict:
 
     # Required fields
     required = [
-        "run_id", "job_id", "status", "base_model",
-        "adapter_generated", "adapter_persisted_private",
-        "adapter_committed_public", "hf_public_upload_performed",
-        "gguf_generated", "gate_state",
+        "run_id",
+        "job_id",
+        "status",
+        "base_model",
+        "adapter_generated",
+        "adapter_persisted_private",
+        "adapter_committed_public",
+        "hf_public_upload_performed",
+        "gguf_generated",
+        "gate_state",
     ]
     for field in required:
         if field not in data:
