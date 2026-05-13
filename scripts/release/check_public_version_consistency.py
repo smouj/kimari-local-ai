@@ -15,7 +15,10 @@ import re
 import sys
 from pathlib import Path
 
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.10 compatibility
+    import tomli as tomllib
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 TODAY = dt.date(2026, 5, 13)
