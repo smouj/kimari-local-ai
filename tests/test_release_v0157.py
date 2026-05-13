@@ -1,6 +1,5 @@
 """Release validation tests for v0.1.57-alpha — Open-license policy checks."""
 
-import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
