@@ -26,14 +26,8 @@ JOB_ID = "6a03be047618f125ee2b7a5a"
 
 
 def test_version_bumped_to_v0154():
-    assert (
-        'version = "0.1.57-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
-        or 'version = "0.1.56-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
-    )
-    assert (
-        '__version__ = "0.1.57-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
-        or '__version__ = "0.1.56-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
-    )
+    assert 'version = "0.1.58-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
+    assert '__version__ = "0.1.58-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
 
 
 def test_subset10_config_exists_and_scope():
@@ -144,15 +138,15 @@ def test_public_docs_show_current_version_and_not_released():
     org_card = (PROJECT_ROOT / "docs" / "HUGGINGFACE_ORG_CARD.md").read_text()
     deploy = (PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md").read_text()
     space = (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md").read_text()
-    assert "v0.1.57-alpha" in readme or "v0.1.56-alpha" in readme
-    assert "version-0.1.57--alpha" in readme or "version-0.1.56--alpha" in readme
+    assert "v0.1.58-alpha" in readme or "0.1.58-alpha" in readme
+    assert "version-0.1.58--alpha" in readme or "0.1.58" in readme
     assert "version-v0.1.53--alpha" not in readme
-    assert "v0.1.57-alpha" in docs_index or "v0.1.56-alpha" in docs_index
+    assert "v0.1.58-alpha" in docs_index
     assert "Kimari Local AI v0.1.28-alpha" not in docs_index
     assert "New in v0.1.28-alpha" not in docs_index
-    assert "v0.1.57-alpha" in org_card or "v0.1.56-alpha" in org_card
-    assert "v0.1.57-alpha" in deploy or "v0.1.56-alpha" in deploy
-    assert "v0.1.57-alpha" in space or "v0.1.56-alpha" in space
+    assert "v0.1.58-alpha" in org_card or "0.1.58" in org_card
+    assert "v0.1.58" in deploy or "0.1.58-alpha" in deploy
+    assert "v0.1.58" in space or "0.1.58-alpha" in space
     combined = (readme + docs_index + org_card + deploy + space).lower()
     assert "not released" in combined
     assert "blocked" in combined

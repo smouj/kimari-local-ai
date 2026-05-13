@@ -1,0 +1,111 @@
+# Open License Base Bakeoff v1 — Config
+# Kimari Local AI v0.1.58-alpha
+#
+# Evaluate permissive-license base models for Kimari model lines.
+# Only Apache 2.0 / MIT / BSD bases are allowed.
+# Gate: BLOCKED. No public benchmark claims.
+
+candidates:
+  - id: qwen25-15b
+    model: Qwen/Qwen2.5-1.5B-Instruct
+    license: Apache-2.0
+    size: 1.5B
+    role: runtime
+    gguf_available: true
+    gguf_quant: Q4_K_M
+    estimated_vram_gb: 1.2
+    gtx1060_viable: true
+    gtx1080_viable: true
+    allowed: true
+    blocked: false
+    block_reason: null
+
+  - id: smollm2-17b
+    model: HuggingFaceTB/SmolLM2-1.7B-Instruct
+    license: Apache-2.0
+    size: 1.7B
+    role: runtime_alt
+    gguf_available: true
+    gguf_quant: Q4_K_M
+    estimated_vram_gb: 1.4
+    gtx1060_viable: true
+    gtx1080_viable: true
+    allowed: true
+    blocked: false
+    block_reason: null
+
+  - id: smollm3-3b
+    model: HuggingFaceTB/SmolLM3-3B
+    license: Apache-2.0
+    size: 3B
+    role: core
+    gguf_available: true
+    gguf_quant: Q4_K_M
+    estimated_vram_gb: 2.4
+    gtx1060_viable: true
+    gtx1080_viable: true
+    allowed: true
+    blocked: false
+    block_reason: null
+
+  - id: qwen3-4b
+    model: Qwen/Qwen3-4B-Instruct-2507
+    license: Apache-2.0
+    size: 4B
+    role: candidate_4b
+    gguf_available: true
+    gguf_quant: Q4_K_M
+    estimated_vram_gb: 3.0
+    gtx1060_viable: probable
+    gtx1080_viable: true
+    allowed: true
+    blocked: false
+    block_reason: null
+
+# Blocked candidates (NOT evaluated, documented for reference)
+blocked_candidates:
+  - model: Qwen/Qwen2.5-3B-Instruct
+    license: qwen-research
+    block_reason: Research-only license, not Apache/MIT/BSD
+    allowed: false
+    blocked: true
+
+  - model: google/gemma-3-4b-it
+    license: gemma
+    block_reason: Custom license, not standard permissive
+    allowed: false
+    blocked: true
+
+# Evaluation settings
+dataset_dir: eval/kimari_private_v1
+subset_size: 10
+temperature: 0.2
+max_tokens: 256
+seed: 42
+
+# Safety settings
+raw_outputs_commit_allowed: false
+public_benchmark_allowed: false
+manual_review_required: true
+gate_state: BLOCKED
+
+# Scoring
+score_status: not_scored
+scoring_method: manual_review
+
+# Phases
+phases:
+  - name: smoke
+    subset_size: 5
+    candidates: all
+    description: Quick smoke test with 5 prompts per model
+
+  - name: subset10
+    subset_size: 10
+    candidates: all
+    description: Subset10 evaluation for all 4 candidates
+
+  - name: subset30
+    subset_size: 30
+    candidates: top_2
+    description: Subset30 for top 2 candidates from subset10

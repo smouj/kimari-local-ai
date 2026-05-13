@@ -2,6 +2,21 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+## v0.1.58 Checks — Open-license base bakeoff
+
+- [ ] `eval/configs/open_base_bakeoff_v1.yaml` exists
+- [ ] `eval/scripts/run_open_base_bakeoff.py` exists
+- [ ] `eval/scripts/validate_open_base_bakeoff_summary.py` exists
+- [ ] `eval/templates/open_base_bakeoff_summary.template.json` exists
+- [ ] bakeoff runner --dry-run works
+- [ ] bakeoff summary validator passes on pending summary
+- [ ] only permissive-license candidates in allowed list
+- [ ] no blocked model marked as allowed
+- [ ] no public benchmark claim
+- [ ] no raw outputs committed
+- [ ] gate BLOCKED
+- [ ] Kimari-4B not released
+
 ## v0.1.57 Checks — Open-license policy + bakeoff readiness
 
 - [x] `docs/KIMARI_OPEN_LICENSE_POLICY.md` exists

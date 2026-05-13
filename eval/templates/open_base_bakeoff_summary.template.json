@@ -1,0 +1,86 @@
+{
+  "schema": "open_base_bakeoff_summary_v1",
+  "run_id": "",
+  "bakeoff_version": "v1",
+  "framework_version": "0.1.58-alpha",
+  "timestamp_utc": "",
+  "status": "pending",
+  "config_path": "eval/configs/open_base_bakeoff_v1.yaml",
+  "candidates": [
+    {
+      "id": "qwen25-15b",
+      "model": "Qwen/Qwen2.5-1.5B-Instruct",
+      "license": "Apache-2.0",
+      "size": "1.5B",
+      "role": "runtime",
+      "allowed": true,
+      "blocked": false
+    },
+    {
+      "id": "smollm2-17b",
+      "model": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+      "license": "Apache-2.0",
+      "size": "1.7B",
+      "role": "runtime_alt",
+      "allowed": true,
+      "blocked": false
+    },
+    {
+      "id": "smollm3-3b",
+      "model": "HuggingFaceTB/SmolLM3-3B",
+      "license": "Apache-2.0",
+      "size": "3B",
+      "role": "core",
+      "allowed": true,
+      "blocked": false
+    },
+    {
+      "id": "qwen3-4b",
+      "model": "Qwen/Qwen3-4B-Instruct-2507",
+      "license": "Apache-2.0",
+      "size": "4B",
+      "role": "candidate_4b",
+      "allowed": true,
+      "blocked": false
+    }
+  ],
+  "blocked_candidates": [
+    {
+      "model": "Qwen/Qwen2.5-3B-Instruct",
+      "license": "qwen-research",
+      "block_reason": "Research-only license",
+      "allowed": false,
+      "blocked": true
+    },
+    {
+      "model": "google/gemma-3-4b-it",
+      "license": "gemma",
+      "block_reason": "Custom license, not standard permissive",
+      "allowed": false,
+      "blocked": true
+    }
+  ],
+  "dataset_id": "kimari_private_v1",
+  "subset_size": 10,
+  "temperature": 0.2,
+  "max_tokens": 256,
+  "seed": 42,
+  "results_by_model": {},
+  "completion_rate_by_model": {},
+  "error_rate_by_model": {},
+  "vram_estimates_by_model": {},
+  "gguf_feasibility": {},
+  "cost_estimates": {},
+  "score_status": "not_scored",
+  "manual_review_required": true,
+  "public_benchmark_allowed": false,
+  "raw_outputs_committed": false,
+  "raw_outputs_commit_allowed": false,
+  "gate_state": "BLOCKED",
+  "recommended_runtime_base": null,
+  "recommended_core_base": null,
+  "recommended_4b_candidate": null,
+  "decision_notes": "Pending evaluation. No scores yet. Manual review required.",
+  "license_verified": true,
+  "all_candidates_permissive": true
+}

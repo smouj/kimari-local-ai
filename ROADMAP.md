@@ -474,7 +474,7 @@
 - ✅ Kimari-4B remains private pipeline / not released
 - Gate BLOCKED — no public weights, no public adapters, no GGUF, no benchmark claims
 
-## v0.1.57-alpha (Current)
+## v0.1.57-alpha (Released)
 
 - ✅ Open-license model policy (Apache 2.0 bases only)
 - ✅ Base model license matrix (approved + blocked)
@@ -494,14 +494,17 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.57-alpha (Planned)
+## v0.1.58-alpha (Current)
 
-- 📋 Open-base bakeoff baseline execution plan
-- 📋 Compare Qwen2.5-1.5B, SmolLM2-1.7B, SmolLM3-3B, and Qwen3-4B candidates
-- 📋 Dry-run first; real HF Jobs only with explicit approval
-- 📋 No raw outputs committed
-- 📋 No public benchmark claims until manual review and release approval
-- Gate BLOCKED
+- ✅ Open-license base bakeoff config (`eval/configs/open_base_bakeoff_v1.yaml`)
+- ✅ Bakeoff runner (`eval/scripts/run_open_base_bakeoff.py`)
+- ✅ Bakeoff summary template (`eval/templates/open_base_bakeoff_summary.template.json`)
+- ✅ Bakeoff summary validator (`eval/scripts/validate_open_base_bakeoff_summary.py`)
+- ✅ Bakeoff result doc (`docs/KIMARI_OPEN_BASE_BAKEOFF_RESULT.md`)
+- ✅ Base selection decision doc (`docs/KIMARI_BASE_SELECTION_DECISION.md`)
+- ✅ README bakeoff status section
+- ✅ docs/index.html bakeoff status card
+- Gate BLOCKED — no training, no HF Jobs, no public weights, no public benchmark claims
 
 ## v0.1.52-alpha
 

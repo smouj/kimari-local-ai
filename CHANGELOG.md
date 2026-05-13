@@ -4,6 +4,29 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.58-alpha] - 2026-05-13
+
+### Added
+- Open-license base model bakeoff config (`eval/configs/open_base_bakeoff_v1.yaml`)
+- Bakeoff runner (`eval/scripts/run_open_base_bakeoff.py`)
+- Bakeoff summary template (`eval/templates/open_base_bakeoff_summary.template.json`)
+- Bakeoff summary validator (`eval/scripts/validate_open_base_bakeoff_summary.py`)
+- Bakeoff result doc (`docs/KIMARI_OPEN_BASE_BAKEOFF_RESULT.md`)
+- Base selection decision doc (`docs/KIMARI_BASE_SELECTION_DECISION.md`)
+
+### Changed
+- Version bump: 0.1.57-alpha → 0.1.58-alpha
+- README: added bakeoff status section
+- docs/index.html: added bakeoff status card
+
+### Safety
+- No training executed
+- No HF Jobs executed
+- No public weights, adapters, or GGUF files
+- No public benchmark claims
+- Only permissive-license bases (Apache 2.0) evaluated
+- Gate: BLOCKED
 ## [0.1.57-alpha] - 2026-05-13
 
 ### Added

@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-0.1.57--alpha-9b59b6.svg" alt="v0.1.57-alpha">
+  <img src="https://img.shields.io/badge/version-0.1.58--alpha-9b59b6.svg" alt="v0.1.58-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.57-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.58-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.57-alpha**
+> **Kimari Local AI v0.1.58-alpha**
 
 ### 🔗 Public Resources
 
@@ -256,6 +256,19 @@ Kimari is committed to using **only permissive-license base models** for officia
 | Kimari-4B candidate | `Qwen/Qwen3-4B-Instruct-2507` | Apache 2.0 |
 
 **We do not use** non-commercial, research-only, or custom-restrictive bases for official public models. Full policy: [`KIMARI_OPEN_LICENSE_POLICY.md`](docs/KIMARI_OPEN_LICENSE_POLICY.md) · License matrix: [`KIMARI_BASE_MODEL_LICENSE_MATRIX.md`](docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md)
+
+## Open-License Base Bakeoff Status
+
+The v0.1.58-alpha bakeoff is a gated, open-license selection workflow for Kimari Runtime/Core/Kimari-4B base candidates.
+
+- Config: [`eval/configs/open_base_bakeoff_v1.yaml`](eval/configs/open_base_bakeoff_v1.yaml)
+- Runner: [`eval/scripts/run_open_base_bakeoff.py`](eval/scripts/run_open_base_bakeoff.py)
+- Summary template: [`eval/templates/open_base_bakeoff_summary.template.json`](eval/templates/open_base_bakeoff_summary.template.json)
+- Summary validator: [`eval/scripts/validate_open_base_bakeoff_summary.py`](eval/scripts/validate_open_base_bakeoff_summary.py)
+- Result doc: [`docs/KIMARI_OPEN_BASE_BAKEOFF_RESULT.md`](docs/KIMARI_OPEN_BASE_BAKEOFF_RESULT.md)
+- Decision doc: [`docs/KIMARI_BASE_SELECTION_DECISION.md`](docs/KIMARI_BASE_SELECTION_DECISION.md)
+
+**Safety status:** no training executed, no HF Jobs executed, no public weights/adapters/GGUF files, no public benchmark claims, only permissive-license bases evaluated, gate **BLOCKED**.
 
 ---
 

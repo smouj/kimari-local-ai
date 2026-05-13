@@ -4255,16 +4255,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.57-alpha",
-            "version-0.1.57--alpha" in readme_text_current
-            and "version-0.1.57--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.57-alpha",
+            "README version badge is 0.1.58-alpha",
+            "version-0.1.58--alpha" in readme_text_current
+            and "version-0.1.58--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.58-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.57-alpha",
-            "Kimari Local AI v0.1.57-alpha" in docs_index_text
+            "docs/index current status is 0.1.58-alpha",
+            "Kimari Local AI v0.1.58-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.57 appears in public surfaces", "v0.1.57-alpha" in public_text, "current version missing")
+    check("v0.1.58 appears in public surfaces", "v0.1.58-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6786,16 +6786,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.57-alpha",
-            "version-0.1.57--alpha" in readme_text_current
-            and "version-0.1.57--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.57-alpha",
+            "README version badge is 0.1.58-alpha",
+            "version-0.1.58--alpha" in readme_text_current
+            and "version-0.1.58--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.58-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.57-alpha",
-            "Kimari Local AI v0.1.57-alpha" in docs_index_text
+            "docs/index current status is 0.1.58-alpha",
+            "Kimari Local AI v0.1.58-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6859,7 +6859,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.57 appears in public surfaces", "v0.1.57-alpha" in public_text, "current version missing")
+    check("v0.1.58 appears in public surfaces", "v0.1.58-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6883,6 +6883,98 @@ def main() -> None:
     check("Gate BLOCKED in public docs", "blocked" in public_text, "gate must remain BLOCKED")
     for forbidden in ["kimari-4b released", "public weights available", "production ready"]:
         check(f"No forbidden public phrase: {forbidden}", forbidden not in public_text, f"found {forbidden}")
+
+    # ── v0.1.58 open-license base bakeoff ─────────────────────────
+    print("\n[78/78] v0.1.58 open-license base bakeoff")
+    bakeoff_config = PROJECT_ROOT / "eval" / "configs" / "open_base_bakeoff_v1.yaml"
+    bakeoff_runner = PROJECT_ROOT / "eval" / "scripts" / "run_open_base_bakeoff.py"
+    bakeoff_validator = PROJECT_ROOT / "eval" / "scripts" / "validate_open_base_bakeoff_summary.py"
+    bakeoff_template = PROJECT_ROOT / "eval" / "templates" / "open_base_bakeoff_summary.template.json"
+    bakeoff_pending_summary = PROJECT_ROOT / "reports" / "evals" / "open_base_bakeoff_v1" / "summary.pending.json"
+    bakeoff_result_summary = PROJECT_ROOT / "reports" / "evals" / "open_base_bakeoff_v1" / "summary.json"
+    bakeoff_result_doc = PROJECT_ROOT / "docs" / "KIMARI_OPEN_BASE_BAKEOFF_RESULT.md"
+    base_selection_doc = PROJECT_ROOT / "docs" / "KIMARI_BASE_SELECTION_DECISION.md"
+
+    check("v0.1.58 bakeoff config exists", bakeoff_config.exists(), "missing eval/configs/open_base_bakeoff_v1.yaml")
+    check("v0.1.58 bakeoff runner exists", bakeoff_runner.exists(), "missing eval/scripts/run_open_base_bakeoff.py")
+    check(
+        "v0.1.58 bakeoff validator exists",
+        bakeoff_validator.exists(),
+        "missing eval/scripts/validate_open_base_bakeoff_summary.py",
+    )
+    check(
+        "v0.1.58 bakeoff summary template exists",
+        bakeoff_template.exists(),
+        "missing eval/templates/open_base_bakeoff_summary.template.json",
+    )
+    check(
+        "v0.1.58 bakeoff pending/result summary exists",
+        bakeoff_pending_summary.exists() or bakeoff_result_summary.exists(),
+        "missing pending or final bakeoff summary",
+    )
+    check(
+        "v0.1.58 bakeoff result doc exists",
+        bakeoff_result_doc.exists(),
+        "missing docs/KIMARI_OPEN_BASE_BAKEOFF_RESULT.md",
+    )
+    check(
+        "v0.1.58 base selection decision doc exists",
+        base_selection_doc.exists(),
+        "missing docs/KIMARI_BASE_SELECTION_DECISION.md",
+    )
+
+    bakeoff_text = "\n".join(
+        path.read_text().lower()
+        for path in [bakeoff_config, bakeoff_template, bakeoff_result_doc, base_selection_doc]
+        if path.exists()
+    )
+    allowed_license_ok = "apache 2.0" in bakeoff_text and not any(
+        phrase in bakeoff_text
+        for phrase in [
+            "allowed: true\n  license: other",
+            "allowed: true\n  license: non-commercial",
+            "allowed: true\n  license: research",
+        ]
+    )
+    # Check blocked candidates section for any 'allowed: true'
+    blocked_section_has_allowed = False
+    if "blocked_candidates" in bakeoff_text:
+        sections = bakeoff_text.split("blocked_candidates")
+        if len(sections) > 1:
+            blocked_text = sections[1].split("\n\n")[0]
+            for line in blocked_text.split("\n"):
+                stripped = line.strip().lower()
+                if "allowed" in stripped and "true" in stripped:
+                    blocked_section_has_allowed = True
+    blocked_marked_allowed = (
+        any(
+            phrase in bakeoff_text
+            for phrase in [
+                "qwen2.5-3b: allowed",
+                "gemma: allowed",
+                "llama: allowed",
+                "non-commercial: allowed",
+                "research-only: allowed",
+            ]
+        )
+        or blocked_section_has_allowed
+    )
+    check(
+        "v0.1.58 only permissive allowed candidates",
+        allowed_license_ok,
+        "allowed list must remain permissive-license only",
+    )
+    check(
+        "v0.1.58 no blocked model marked allowed",
+        not blocked_marked_allowed,
+        "blocked/non-permissive candidate marked allowed",
+    )
+    check(
+        "v0.1.58 no public benchmark claim",
+        not any(phrase in bakeoff_text for phrase in ["outperforms", "beats", "sota", "state-of-the-art"]),
+        "benchmark-style public claim found",
+    )
+    check("v0.1.58 gate BLOCKED", "blocked" in bakeoff_text, "bakeoff docs/templates must keep gate BLOCKED")
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
