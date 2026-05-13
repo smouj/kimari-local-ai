@@ -100,27 +100,27 @@ def test_builder_exists():
 
 
 def test_all_source_files_exist():
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         assert filepath.exists(), f"Source file missing: {filename}"
 
 
 def test_source_files_are_valid_jsonl():
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         with open(filepath) as f:
             lines = [line.strip() for line in f if line.strip()]
         assert len(lines) >= 30, f"{filename}: expected >= 30 items, got {len(lines)}"
         for i, line in enumerate(lines):
             try:
-                item = json.loads(line)
+                json.loads(line)
             except json.JSONDecodeError as e:
-                raise AssertionError(f"{filename}:{i + 1}: invalid JSON: {e}")
+                raise AssertionError(f"{filename}:{i + 1}: invalid JSON: {e}") from None
 
 
 def test_source_items_have_required_fields():
     required_fields = {"id", "category", "language", "source", "license", "quality_score", "tags", "messages"}
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         with open(filepath) as f:
             for line_num, line in enumerate(f, 1):
@@ -133,7 +133,7 @@ def test_source_items_have_required_fields():
 
 
 def test_source_items_have_valid_categories():
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         with open(filepath) as f:
             for line in f:
@@ -145,7 +145,7 @@ def test_source_items_have_valid_categories():
 
 
 def test_source_items_have_allowed_licenses():
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         with open(filepath) as f:
             for line in f:
@@ -157,7 +157,7 @@ def test_source_items_have_allowed_licenses():
 
 
 def test_source_items_have_valid_messages():
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         with open(filepath) as f:
             for line in f:
@@ -173,7 +173,7 @@ def test_source_items_have_valid_messages():
 
 
 def test_source_items_have_quality_scores():
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         with open(filepath) as f:
             for line in f:
@@ -186,7 +186,7 @@ def test_source_items_have_quality_scores():
 
 
 def test_no_kimari4b_released_claims():
-    for category, filename in SOURCE_FILES.items():
+    for _category, filename in SOURCE_FILES.items():
         filepath = SOURCES_DIR / filename
         content = filepath.read_text().lower()
         assert "kimari-4b released" not in content, f"{filename}: Kimari-4B released claim"
