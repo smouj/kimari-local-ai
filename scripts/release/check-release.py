@@ -4256,15 +4256,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.65--alpha" in readme_text_current
+            "version-0.1.66--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.65-alpha",
+            "README badge URL must match 0.1.66-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.65-alpha" in docs_index_text
+            "Kimari Local AI v0.1.66-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.65-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.66-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6790,15 +6790,15 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.65--alpha" in readme_text_current
+            "version-0.1.66--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.65-alpha",
+            "README badge URL must match 0.1.66-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.65-alpha" in docs_index_text
+            "Kimari Local AI v0.1.66-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.65-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.66-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7741,6 +7741,51 @@ def main() -> None:
     # Gate BLOCKED
     check(
         "v0.1.65 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
+
+    # ── v0.1.66 SFT v1 eval subset10 ───────────────────────────────
+    print("\n[86/86] v0.1.66 SFT v1 eval subset10")
+
+    # Eval result doc must exist and document blocker
+    eval_result_v166 = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_EVAL_PLAN.md"
+    check("v0.1.66 eval plan exists", eval_result_v166.exists(), "missing docs/KIMARI_RUNTIME_15B_SFT_V1_EVAL_PLAN.md")
+    if eval_result_v166.exists():
+        ep_text = eval_result_v166.read_text().lower()
+        check(
+            "v0.1.66 eval plan mentions blocker",
+            "blocked" in ep_text or "persist" in ep_text or "adapter" in ep_text,
+            "eval plan must mention adapter availability blocker",
+        )
+
+    # Report summary must have status blocked
+    report_summary_v166 = PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_sft_v1_subset10" / "summary.json"
+    check("v0.1.66 report summary exists", report_summary_v166.exists(), "missing report summary.json")
+    if report_summary_v166.exists():
+        try:
+            rs_data = json.loads(report_summary_v166.read_text())
+            check(
+                "v0.1.66 report status is blocked",
+                rs_data.get("status") in ("blocked", "pending", "not_scored"),
+                "report status must be blocked/pending/not_scored",
+            )
+            check(
+                "v0.1.66 report gate BLOCKED",
+                rs_data.get("gate_state") == "BLOCKED",
+                "gate must remain BLOCKED",
+            )
+            check(
+                "v0.1.66 report no public benchmark",
+                rs_data.get("public_benchmark_allowed") is False,
+                "public_benchmark_allowed must be false",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.66 report summary valid JSON", False, "report summary.json is not valid JSON")
+
+    # Gate remains BLOCKED
+    check(
+        "v0.1.66 gate BLOCKED",
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )

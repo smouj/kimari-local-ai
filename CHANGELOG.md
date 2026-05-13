@@ -4,6 +4,21 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.66-alpha] - 2026-05-13
+
+### Added
+- **SFT v1 eval subset10 execution**: Load check, eval run, and results
+- **Adapter load check**: Real validation of base model and adapter loading
+- **Eval subset10 run**: Baseline vs adapter comparison on KimariEval subset10
+- **Summary template and validator for eval results**
+- **Eval result doc**: `docs/KIMARI_RUNTIME_15B_SFT_V1_EVAL_RESULT.md` (pending → completed/failed)
+
+### Security
+- No public weights, GGUF, or benchmarks
+- Gate remains BLOCKED
+- No raw outputs committed
+- No benchmark claims
+
 ## [0.1.65-alpha] - 2026-05-13
 
 ### Added

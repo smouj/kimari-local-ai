@@ -13,19 +13,26 @@ Evaluate the SFT v1 micro-run adapter (10 steps, QLoRA, Qwen2.5-1.5B-Instruct) a
 
 ## Evaluation Phases
 
-### Phase 1: Eval Readiness (v0.1.64-alpha)
+### Phase 1: Eval Readiness (v0.1.64-alpha) ✅
 - [x] SFT v1 run summary validated
 - [x] Result doc COMPLETED
 - [x] Eval subset10 config created
 - [x] Eval readiness validator created
-- [ ] Adapter load check (local)
-- [ ] Generation check (local)
+- [x] Eval infrastructure created (v0.1.65)
 
-### Phase 2: Subset10 Evaluation (v0.1.65-alpha)
-- Run KimariEval subset10: base vs adapter
-- Compare accuracy, exact_match, containment
-- Manual review of outputs
-- **No public benchmark claims**
+### Phase 1.5: Adapter Availability (v0.1.66-alpha) 🔒 BLOCKED
+- [ ] Adapter persisted to HF private repo
+- [x] Adapter load checker created (dry-run passes)
+- [x] Eval runner created (dry-run passes)
+- ⚠️ **Blocker**: SFT v1 micro-run did NOT persist the adapter. Must re-run with `--persist-adapter`.
+
+### Phase 2: Subset10 Evaluation (v0.1.66+ — blocked)
+- [ ] Re-run SFT v1 micro-run with --persist-adapter
+- [ ] Download adapter locally
+- [ ] Run KimariEval subset10: base vs adapter
+- [ ] Compare accuracy, exact_match, containment
+- [ ] Manual review of outputs
+- [ ] **No public benchmark claims**
 
 ### Phase 3: Subset30 Evaluation (v0.1.66-alpha, if subset10 passes)
 - Run KimariEval subset30: base vs adapter

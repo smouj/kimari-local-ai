@@ -1228,3 +1228,34 @@ twine upload dist/*
 - [x] Gate BLOCKED
 - [x] pyproject.toml version = 0.1.64-alpha
 - [x] kimari/__init__.py __version__ = 0.1.64-alpha
+
+## v0.1.65 Checks
+
+- [x] Eval subset10 infrastructure: load checker, eval runner, summary template/validator
+- [x] Adapter load checker dry-run passes
+- [x] Eval runner dry-run passes
+- [x] Summary validator passes
+- [x] Eval result doc exists (PENDING status)
+- [x] Report directory + summary exists
+- [x] check-release.py v0.1.65 checks
+- [x] tests/test_release_v0165.py
+- [x] No training executed, no HF Jobs submitted
+- [x] No public weights/GGUF
+- [x] Gate BLOCKED
+
+## v0.1.66 Checks
+
+- [x] SFT v1 eval subset10 — BLOCKED on adapter availability
+- [x] Adapter from micro-run NOT persisted (adapter_committed=false)
+- [x] Eval result doc documents blocker
+- [x] Eval plan documents blocker
+- [x] Report summary has status=blocked, ready_for_subset30=false
+- [x] Load checker exists (dry-run only)
+- [x] Eval runner exists (dry-run only)
+- [x] Summary validator passes
+- [x] check-release.py v0.1.66 checks
+- [x] tests/test_release_v0166.py
+- [x] No training executed
+- [x] No public weights/GGUF
+- [x] Gate BLOCKED
+- [x] ready_for_subset30=false

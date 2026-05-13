@@ -63,6 +63,19 @@
 
 > **Note**: This was a micro-run (10 steps) to validate the SFT v1 pipeline. Not a final model. No public weights, GGUF, or benchmarks. Gate remains BLOCKED.
 
+## Run 5: SFT v1 Eval Subset10 — BLOCKED
+
+| Field | Value |
+|-------|-------|
+| **Run ID** | kimari-runtime-15b-sft-v1-eval-subset10 |
+| **Type** | Baseline vs Adapter evaluation (subset10) |
+| **Status** | 🔒 BLOCKED — Adapter not persisted |
+| **Blocker** | SFT v1 micro-run did not persist adapter. Must re-run with --persist-adapter |
+| **Result** | ❌ BLOCKED — cannot evaluate without adapter |
+| **Docs** | `docs/KIMARI_RUNTIME_15B_SFT_V1_EVAL_RESULT.md` |
+
+> **Note**: The SFT v1 micro-run (Run 4) generated the adapter on the HF Jobs container but did not save it. To evaluate, the micro-run must be re-executed with adapter persistence enabled.
+
 ## Status
 
 - **Gate**: 🔒 BLOCKED

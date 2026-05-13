@@ -494,7 +494,17 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.65-alpha (Current)
+## v0.1.66-alpha (Current)
+
+- 🔧 SFT v1 eval subset10 execution (in progress)
+- Eval load check + generation check
+- Baseline vs adapter comparison on subset10
+- Summary sanitized results
+- Ready_for_subset30 determination
+- No public weights, no GGUF, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.65-alpha (Released)
 
 - ✅ Eval subset10 infrastructure: load checker, eval runner, summary template/validator
 - ✅ Adapter load checker: `eval/scripts/check_sft_v1_adapter_load.py`
