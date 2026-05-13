@@ -54,6 +54,7 @@ def build_training_command_args(config_path: Path) -> list[str]:
         "training/scripts/train_sft_lora.py",
         "--config",
         str(config_path),
+        "--micro-run",
     ]
 
 

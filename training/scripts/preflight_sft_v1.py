@@ -201,8 +201,7 @@ def validate(config_path: Path, strict: bool) -> dict[str, Any]:
         "run_id",
         "base_model",
         "base_license",
-        "dataset_train",
-        "dataset_validation",
+        "dataset_path",
         "dataset_summary",
         "method",
         "max_steps",
@@ -224,8 +223,8 @@ def validate(config_path: Path, strict: bool) -> dict[str, Any]:
     if not approved or config.get("base_license") != "Apache-2.0":
         errors.append("base model must be approved Apache-2.0")
 
-    train_path = project_path(str(config.get("dataset_train", "")))
-    validation_path = project_path(str(config.get("dataset_validation", "")))
+    train_path = project_path(str(config.get("dataset_path", "")))
+    validation_path = project_path(str(config.get("eval_dataset_path", "")))
     summary_path = project_path(str(config.get("dataset_summary", "")))
     manifest_path = summary_path.parent / "license_manifest.json"
 
