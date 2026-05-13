@@ -43,7 +43,10 @@ def test_public_surfaces_current_and_safe():
     combined = "\n".join((PROJECT_ROOT / f).read_text() for f in files)
     for file in files:
         assert V_VERSION in (PROJECT_ROOT / file).read_text(), file
-    assert "version-0.1.56--alpha" in (PROJECT_ROOT / "README.md").read_text() or "version-0.1.55--alpha" in (PROJECT_ROOT / "README.md").read_text()
+    assert (
+        "version-0.1.56--alpha" in (PROJECT_ROOT / "README.md").read_text()
+        or "version-0.1.55--alpha" in (PROJECT_ROOT / "README.md").read_text()
+    )
     assert "Kimari Local AI v0.1.28-alpha" not in combined
     assert "New in v0.1.28-alpha" not in combined
     assert "v0.1.29-alpha FOCUS" not in combined
