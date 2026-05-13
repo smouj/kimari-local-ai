@@ -110,10 +110,10 @@ jobs:
       - name: Run active release tests
         run: |
           python -m pytest \
-            tests/test_release_v0149.py \
-            tests/test_release_v0153.py \
-            tests/test_release_v0154.py \
-            tests/test_release_v0155.py \
+            tests/test_release_v0158.py \
+            tests/test_release_v0159.py \
+            tests/test_release_v0160.py \
+            tests/test_release_v0161.py \
             -q
 
   cli-smoke:
