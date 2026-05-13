@@ -1,0 +1,108 @@
+{
+  "dataset": "kimari_sft_v1",
+  "version": "0.1.59-alpha",
+  "built_at": "2026-05-13T16:22:35.510693+00:00",
+  "sources": [
+    {
+      "source_id": "spanish_technical",
+      "source_name": "Spanish Technical Q&A",
+      "source_file": "spanish_technical.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    },
+    {
+      "source_id": "coding_debug",
+      "source_name": "Coding & Debug Q&A",
+      "source_file": "coding_debug.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    },
+    {
+      "source_id": "server_ops",
+      "source_name": "Server Operations Q&A",
+      "source_file": "server_ops.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    },
+    {
+      "source_id": "local_llm_cuda_gguf",
+      "source_name": "Local LLM / CUDA / GGUF Q&A",
+      "source_file": "local_llm_cuda_gguf.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    },
+    {
+      "source_id": "openclaw_agents",
+      "source_name": "OpenClaw & Agents Q&A",
+      "source_file": "openclaw_agents.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    },
+    {
+      "source_id": "safety_refusal",
+      "source_name": "Safety & Refusal Q&A",
+      "source_file": "safety_refusal.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    },
+    {
+      "source_id": "json_tooling",
+      "source_name": "JSON & Tooling Q&A",
+      "source_file": "json_tooling.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    },
+    {
+      "source_id": "style_consistency",
+      "source_name": "Style Consistency Q&A",
+      "source_file": "style_consistency.jsonl",
+      "source_type": "kimari-authored",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "redistribution_allowed": true,
+      "commercial_use_allowed": true,
+      "attribution_required": true,
+      "notes": "Original content created for the Kimari project"
+    }
+  ],
+  "license_summary": {
+    "project-owned": 320
+  },
+  "all_permissive": true,
+  "blocked_found": false
+}

@@ -18,6 +18,7 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_FLAVOR = "a10g-small"
 DEFAULT_IMAGE = "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel"
+DEFAULT_REPO_URL = "https://github.com/smouj/kimari-local-ai.git"
 
 
 def parse_simple_yaml(path: Path) -> dict[str, Any]:
@@ -67,14 +68,15 @@ def shell_join(args: list[str]) -> str:
 
 
 def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path) -> list[str]:
-    run_id = str(config.get("run_id", "kimari-runtime-15b-sft-v1"))
     training_command = shell_join(build_training_command_args(config_path))
+    config_path_str = str(config_path)
     guarded_command = " && ".join(
         [
+            "apt-get update && apt-get install -y git",
+            f"git clone {DEFAULT_REPO_URL} /workspace",
+            "cd /workspace",
             "python -m pip install -r training/requirements-training.txt",
-            "python training/scripts/preflight_sft_v1.py --config "
-            + shell_join([str(config_path)])
-            + " --strict --json",
+            f"python training/scripts/preflight_sft_v1.py --config {config_path_str} --strict --json",
             training_command,
         ]
     )
@@ -84,11 +86,9 @@ def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path) -> lis
         "run",
         "--flavor",
         DEFAULT_FLAVOR,
-        "--image",
         DEFAULT_IMAGE,
-        "--name",
-        run_id,
-        "--command",
+        "bash",
+        "-c",
         guarded_command,
     ]
 
@@ -146,6 +146,10 @@ def check_jobs_access() -> tuple[bool, str]:
 
 def submit_hf_job(command_args: list[str]) -> tuple[bool, str, str | None]:
     """Submit an HF Jobs run. Returns (success, message, job_id)."""
+    # The hf jobs run CLI takes: --flavor FLAVOR IMAGE COMMAND
+    # We need to pass IMAGE and COMMAND as separate args after flags.
+    # command_args = ["hf", "jobs", "run", "--flavor", FLAVOR, IMAGE, COMMAND]
+    # But the command string can be very long, so we pass it as a single arg.
     try:
         proc = subprocess.run(
             command_args,
@@ -162,22 +166,17 @@ def submit_hf_job(command_args: list[str]) -> tuple[bool, str, str | None]:
 
     output = (proc.stdout or "") + (proc.stderr or "")
     job_id = None
+    # Parse job ID from output like "Job started with ID: xxx"
     for line in output.splitlines():
         line = line.strip()
-        # Try to extract job ID from output
-        if line.startswith("Job ") and "submitted" in line.lower():
-            # Format: "Job <id> submitted"
+        if "Job started with ID" in line or "job_id" in line.lower():
+            # Extract job ID
             parts = line.split()
-            if len(parts) >= 2:
-                job_id = parts[1]
-        elif "job_id" in line.lower() or "id:" in line.lower():
-            # Try JSON or key-value format
-            for token in line.split():
-                if token and len(token) >= 8 and not token.startswith("--"):
-                    candidate = token.rstrip(",;:")
-                    if len(candidate) >= 8 and any(c.isalnum() for c in candidate):
-                        job_id = candidate
-                        break
+            for part in parts:
+                # Job IDs are hex strings like 6a04fedbe48bea4538b9c149
+                if len(part) >= 24 and all(c in "0123456789abcdef" for c in part):
+                    job_id = part
+                    break
 
     if proc.returncode == 0:
         return True, f"Job submitted successfully{f' (job_id: {job_id})' if job_id else ''}", job_id

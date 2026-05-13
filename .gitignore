@@ -120,4 +120,9 @@ eval/raw/
 eval/results/
 *.log
 dataset/build/
+!dataset/build/kimari_sft_v1/
+!dataset/build/kimari_sft_v1/train.jsonl
+!dataset/build/kimari_sft_v1/validation.jsonl
+!dataset/build/kimari_sft_v1/dataset_summary.json
 dataset/kimari_sft_v1/build/
+!dataset/kimari_sft_v1/license_manifest.json

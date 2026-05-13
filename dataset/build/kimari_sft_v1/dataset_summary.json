@@ -1,0 +1,46 @@
+{
+  "dataset": "kimari_sft_v1",
+  "version": "0.1.59-alpha",
+  "stage": "seed",
+  "built_at": "2026-05-13T16:22:35.510420+00:00",
+  "total_items": 320,
+  "train_items": 288,
+  "validation_items": 32,
+  "train_ratio": 0.9,
+  "seed": 42,
+  "category_counts": {
+    "spanish_technical": 40,
+    "openclaw_agents": 40,
+    "json_tooling": 40,
+    "style_consistency": 40,
+    "coding_debug": 40,
+    "safety_refusal": 40,
+    "local_llm_cuda_gguf": 40,
+    "server_ops": 40
+  },
+  "language_counts": {
+    "es": 264,
+    "en": 33,
+    "mixed": 23
+  },
+  "files": {
+    "train.jsonl": {
+      "sha256": "28823e22b9889603fd86e30d41176616432d21dd5598ec272c774ee67cf862e8",
+      "count": 288
+    },
+    "validation.jsonl": {
+      "sha256": "8bf32e50e9c2143607c79663a121c8fbfbb5236ddcd6ea1c2973afe8ff1ddd55",
+      "count": 32
+    }
+  },
+  "safety": {
+    "no_training": true,
+    "no_hf_jobs": true,
+    "no_public_weights": true,
+    "no_public_benchmarks": true,
+    "no_pii": true,
+    "no_tokens": true,
+    "no_private_logs": true,
+    "gate": "BLOCKED"
+  }
+}
