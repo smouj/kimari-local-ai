@@ -2,6 +2,29 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+## v0.1.57 Checks — Open-license policy + bakeoff readiness
+
+- [x] `docs/KIMARI_OPEN_LICENSE_POLICY.md` exists
+- [x] open-license policy approves only permissive Apache 2.0 bases for official public models
+- [x] open-license policy blocks non-commercial, research-only, and custom-restrictive bases for public Kimari models
+- [x] `docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md` exists
+- [x] base model license matrix includes approved and blocked candidates
+- [x] `docs/KIMARI_OPEN_BASE_BAKEOFF_PLAN.md` exists
+- [x] bakeoff plan includes Qwen2.5-1.5B, SmolLM2-1.7B, SmolLM3-3B, and Qwen3-4B
+- [x] `docs/KIMARI_SFT_V1_DATASET_LICENSE_PLAN.md` exists
+- [x] SFT v1 dataset license plan requires permissive sources and 1,400–1,700 examples
+- [x] `docs/KIMARI_SFT_V1_TRAINING_PLAN.md` exists
+- [x] SFT v1 training plan covers Runtime 1.5B, Core 3B, and 4B candidate lanes
+- [x] `docs/ENVIRONMENT_STATUS.md` exists
+- [x] `docs/KIMARI4B_RUN_HISTORY.md` exists
+- [x] `scripts/release/check_public_pages_content.py` exists
+- [x] `scripts/release/check_state_consistency.py` exists
+- [x] Release gate remains BLOCKED
+- [x] No training executed
+- [x] No HF Jobs executed
+- [x] No public weights/adapters/GGUF files
+- [x] No public benchmark claims
+
 ## v0.1.56 Checks — Hugging Face public polish + consistency hardening
 
 - [x] `scripts/release/check_public_version_consistency.py` exists

@@ -4,6 +4,38 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.1.57-alpha] - 2026-05-13
+
+### Added
+- Open-license model policy (`docs/KIMARI_OPEN_LICENSE_POLICY.md`)
+- Base model license matrix (`docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md`)
+- Open base bakeoff plan (`docs/KIMARI_OPEN_BASE_BAKEOFF_PLAN.md`)
+- SFT v1 dataset license plan (`docs/KIMARI_SFT_V1_DATASET_LICENSE_PLAN.md`)
+- SFT v1 training plan (`docs/KIMARI_SFT_V1_TRAINING_PLAN.md`)
+- Environment status doc (`docs/ENVIRONMENT_STATUS.md`)
+- Kimari-4B run history doc (`docs/KIMARI4B_RUN_HISTORY.md`)
+- Smouj013 HF profile doc (`docs/HUGGINGFACE_PROFILE_SMOUJ013.md`)
+- Public pages content checker (`scripts/release/check_public_pages_content.py`)
+- State consistency checker (`scripts/release/check_state_consistency.py`)
+- Release tests v0.1.56 (15 checks) and v0.1.57
+
+### Changed
+- Version bump: 0.1.56-alpha → 0.1.57-alpha
+- Release gate updated: added license review requirements
+- README: added open-license model policy section
+- GitHub Pages: added open-license policy card, restructured status table
+- check-release.py: added v0.1.57 license/policy checks
+- CI: fixed ruff format, jsonschema/PyYAML/tomli dependencies
+
+### Safety
+- No training executed
+- No HF Jobs executed
+- No public weights, adapters, or GGUF files
+- No public benchmark claims
+- Only permissive-license bases (Apache 2.0) approved for official models
+- Non-commercial, research-only, and custom-restrictive bases blocked for public Kimari
+- Gate: BLOCKED
+
 ## [0.1.56-alpha] - 2026-05-13
 
 ### Added

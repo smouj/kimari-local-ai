@@ -6,9 +6,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Repo version** | v0.1.56-alpha |
-| **HF org card version** | v0.1.56-alpha |
-| **Space version** | v0.1.56-alpha |
+| **Repo version** | v0.1.57-alpha |
+| **HF org card version** | v0.1.57-alpha |
+| **Space version** | v0.1.57-alpha |
 | **Gate** | BLOCKED |
 | **Kimari-4B** | NOT released |
 
@@ -47,7 +47,7 @@
 
 The `kimari-ai` organization card at `kimari-ai/README` includes:
 
-- Framework version: v0.1.56-alpha
+- Framework version: v0.1.57-alpha
 - Kimari-4B: Not released yet
 - GTX 1060 validation: Completed
 - HF Jobs smoke: Completed
@@ -88,7 +88,7 @@ The `kimari-compatible-gguf-models` collection contains 5 reference/community GG
 
 | Date | Version | Changes |
 |------|---------|---------|
-| 2026-05-13 | v0.1.56-alpha | Public HF/GitHub polish, consistency hardening, Space helper update |
+| 2026-05-13 | v0.1.57-alpha | Public HF/GitHub polish, consistency hardening, Space helper update |
 | 2026-05-12 | v0.1.45-alpha | Initial HF deployment (Space, Org Card, Collection) |
 
 ## Last Updated

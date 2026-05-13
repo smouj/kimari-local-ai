@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-0.1.56--alpha-9b59b6.svg" alt="v0.1.56-alpha">
+  <img src="https://img.shields.io/badge/version-0.1.57--alpha-9b59b6.svg" alt="v0.1.57-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.56-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.57-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.56-alpha**
+> **Kimari Local AI v0.1.57-alpha**
 
 ### 🔗 Public Resources
 
@@ -244,6 +244,20 @@ See [docs/LOCAL_OPENAI_ENDPOINT_TEST.md](docs/LOCAL_OPENAI_ENDPOINT_TEST.md) for
 | **Dataset** | [dataset/build/kimari-fit-v0/sft_micro.jsonl](dataset/build/kimari-fit-v0/sft_micro.jsonl) |
 
 > **Note**: Adapter persisted to private HF repo `Smouj013/kimari4b-micro-sft-adapter-v0`. Not public. Gate BLOCKED.
+
+## Open-License Model Policy
+
+Kimari is committed to using **only permissive-license base models** for official releases. This means Apache 2.0, MIT, BSD, or equivalent.
+
+| Role | Base Model | License |
+|-----|-----------|--------|
+| Kimari Runtime 1.5B | `Qwen/Qwen2.5-1.5B-Instruct` | Apache 2.0 |
+| Kimari Core 3B | `HuggingFaceTB/SmolLM3-3B` | Apache 2.0 |
+| Kimari-4B candidate | `Qwen/Qwen3-4B-Instruct-2507` | Apache 2.0 |
+
+**We do not use** non-commercial, research-only, or custom-restrictive bases for official public models. Full policy: [`KIMARI_OPEN_LICENSE_POLICY.md`](docs/KIMARI_OPEN_LICENSE_POLICY.md) · License matrix: [`KIMARI_BASE_MODEL_LICENSE_MATRIX.md`](docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md)
+
+---
 
 ## HF Jobs Smoke Tests
 

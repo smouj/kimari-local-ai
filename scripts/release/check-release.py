@@ -2911,8 +2911,8 @@ def main() -> None:
         )
         check(
             "docs/index.html contains current version",
-            "0.1.56" in index_text,
-            "Version 0.1.56 not found in docs/index.html",
+            init_ver in index_text,
+            f"version {init_ver!r} not found in docs/index.html",
         )
 
     # ── v0.1.29 HF Jobs checks ────────────────────────────────────
@@ -4255,19 +4255,19 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.56-alpha",
-            "version-0.1.56--alpha" in readme_text_current
-            and "version-0.1.56--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.56-alpha",
+            "README version badge is 0.1.57-alpha",
+            "version-0.1.57--alpha" in readme_text_current
+            and "version-0.1.57--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.57-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.56-alpha",
-            "Kimari Local AI v0.1.56-alpha" in docs_index_text
+            "docs/index current status is 0.1.57-alpha",
+            "Kimari Local AI v0.1.57-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
-            "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
+            "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
         )
 
     for artifact_pattern in ("*.safetensors", "*.gguf"):
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.56 appears in public surfaces", "v0.1.56-alpha" in public_text, "current version missing")
+    check("v0.1.57 appears in public surfaces", "v0.1.57-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -4387,6 +4387,86 @@ def main() -> None:
         )
     else:
         check("writer.py exists", False, "writer.py not found")
+
+    # ── v0.1.57 open-license policy + bakeoff readiness ───────────────
+    print("\n[77/77] v0.1.57 open-license policy + bakeoff readiness")
+    expected_v0157_files = [
+        "docs/KIMARI_OPEN_LICENSE_POLICY.md",
+        "docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md",
+        "docs/KIMARI_OPEN_BASE_BAKEOFF_PLAN.md",
+        "docs/KIMARI_SFT_V1_DATASET_LICENSE_PLAN.md",
+        "docs/KIMARI_SFT_V1_TRAINING_PLAN.md",
+        "docs/ENVIRONMENT_STATUS.md",
+        "docs/KIMARI4B_RUN_HISTORY.md",
+        "scripts/release/check_public_pages_content.py",
+        "scripts/release/check_state_consistency.py",
+    ]
+    for rel_path in expected_v0157_files:
+        check(f"v0.1.57 required file exists: {rel_path}", (PROJECT_ROOT / rel_path).exists(), f"missing {rel_path}")
+
+    def read_rel(rel_path: str) -> str:
+        path = PROJECT_ROOT / rel_path
+        return path.read_text(encoding="utf-8").lower() if path.exists() else ""
+
+    open_license_policy = read_rel("docs/KIMARI_OPEN_LICENSE_POLICY.md")
+    license_matrix = read_rel("docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md")
+    bakeoff_plan = read_rel("docs/KIMARI_OPEN_BASE_BAKEOFF_PLAN.md")
+    dataset_plan = read_rel("docs/KIMARI_SFT_V1_DATASET_LICENSE_PLAN.md")
+    training_plan = read_rel("docs/KIMARI_SFT_V1_TRAINING_PLAN.md")
+    release_text = "\n".join([open_license_policy, license_matrix, bakeoff_plan, dataset_plan, training_plan])
+
+    check(
+        "open license policy requires Apache 2.0/permissive bases",
+        "apache" in open_license_policy and "permissive" in open_license_policy,
+        "policy must explicitly require permissive Apache-compatible bases",
+    )
+    check(
+        "open license policy blocks non-commercial/research/custom-restrictive bases",
+        all(term in open_license_policy for term in ["non-commercial", "research", "custom"]),
+        "policy must block non-commercial, research-only, and custom-restrictive bases",
+    )
+    check(
+        "base model license matrix includes approved and blocked statuses",
+        "approved" in license_matrix and "blocked" in license_matrix,
+        "matrix must include approved and blocked candidates",
+    )
+    for model_name in ["qwen2.5-1.5b", "smollm2-1.7b", "smollm3-3b", "qwen3-4b"]:
+        check(
+            f"bakeoff plan includes {model_name}",
+            model_name in bakeoff_plan,
+            "missing bakeoff candidate",
+        )
+    check(
+        "SFT dataset license plan is permissive",
+        "permissive" in dataset_plan
+        and ("1,400" in dataset_plan or "1400" in dataset_plan or "1,500" in dataset_plan or "1500" in dataset_plan)
+        and ("1,700" in dataset_plan or "1700" in dataset_plan),
+        "dataset plan must require permissive sources and the 1,400-1,700 example target range",
+    )
+    for lane in ["runtime 1.5b", "core 3b", "4b candidate"]:
+        check(f"SFT training plan includes {lane}", lane in training_plan, "missing SFT training lane")
+    check("release gate remains BLOCKED", "blocked" in release_text, "gate must remain BLOCKED")
+    check(
+        "no training executed in v0.1.57 docs",
+        "no training" in release_text,
+        "docs must preserve no-training safety state",
+    )
+    check(
+        "no HF Jobs executed in v0.1.57 docs",
+        "no hf jobs" in release_text,
+        "docs must preserve no-HF-Jobs safety state",
+    )
+    check(
+        "no public weights/adapters/GGUF in v0.1.57 docs",
+        ("no public" in release_text or "no weights" in release_text or "no public release" in release_text)
+        and "gguf" in release_text,
+        "docs must preserve no public weights/adapters/GGUF safety state",
+    )
+    check(
+        "no public benchmark claims in v0.1.57 docs",
+        "no public benchmark" in release_text,
+        "docs must forbid public benchmark claims",
+    )
 
     # CLI checks
     if main_py_path.exists():
@@ -6706,19 +6786,19 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.56-alpha",
-            "version-0.1.56--alpha" in readme_text_current
-            and "version-0.1.56--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.56-alpha",
+            "README version badge is 0.1.57-alpha",
+            "version-0.1.57--alpha" in readme_text_current
+            and "version-0.1.57--alpha--alpha" not in readme_text_current,
+            "README badge URL must match 0.1.57-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
-            "docs/index current status is 0.1.56-alpha",
-            "Kimari Local AI v0.1.56-alpha" in docs_index_text
+            "docs/index current status is 0.1.57-alpha",
+            "Kimari Local AI v0.1.57-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
-            "docs/index.html current visible status must not show stale v0.1.28-alpha copy",
+            "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
         )
 
     for artifact_pattern in ("*.safetensors", "*.gguf"):
@@ -6779,7 +6859,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.56 appears in public surfaces", "v0.1.56-alpha" in public_text, "current version missing")
+    check("v0.1.57 appears in public surfaces", "v0.1.57-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,

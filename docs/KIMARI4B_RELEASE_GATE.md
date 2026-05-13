@@ -52,6 +52,11 @@
 - [ ] Human review of all eval results
 - [ ] Safety review complete
 - [ ] Legal review (license compatibility)
+- [ ] **Base model license verified as permissive (Apache/MIT/BSD)**
+- [ ] **Dataset manifest clean (all sources documented with license)**
+- [ ] **Adapter license inheritance documented**
+- [ ] **GGUF license metadata included in model card**
+- [ ] **No public preview without license review**
 - [ ] Explicit written approval from project owner
 - [ ] GGUF conversion plan reviewed
 - [ ] HF upload plan reviewed
@@ -68,3 +73,17 @@ These must hold in **every** state:
 - No adapter files (`.safetensors`) committed to git
 - No GGUF files committed to git
 - No raw eval outputs committed to git
+- **Base model must have permissive license (Apache/MIT/BSD)**
+- **Dataset must have manifest documenting all source licenses**
+- **No model may use a non-commercial or research-only base**
+- **No public preview without explicit license review**
+
+## License Policy
+
+See `docs/KIMARI_OPEN_LICENSE_POLICY.md` for full details.
+
+- Official Kimari models MUST use permissive-license bases only
+- Approved bases are listed in `docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md`
+- Blocked models (research-only, NC, custom restrictive) are documented there
+- License inheritance must be documented before public release
+- GGUF exports must include license metadata

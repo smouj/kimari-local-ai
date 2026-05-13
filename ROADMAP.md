@@ -463,7 +463,7 @@
 - ✅ Private adapter persisted; no public weights, no GGUF
 - Gate BLOCKED — no benchmark claims
 
-## v0.1.56-alpha (Current)
+## v0.1.56-alpha (Released)
 
 - ✅ Hugging Face public polish and consistency hardening
 - ✅ Public version consistency script
@@ -474,6 +474,19 @@
 - ✅ Kimari-4B remains private pipeline / not released
 - Gate BLOCKED — no public weights, no public adapters, no GGUF, no benchmark claims
 
+## v0.1.57-alpha (Current)
+
+- ✅ Open-license model policy (Apache 2.0 bases only)
+- ✅ Base model license matrix (approved + blocked)
+- ✅ Open base bakeoff plan (Qwen2.5-1.5B, SmolLM2-1.7B, SmolLM3-3B, Qwen3-4B)
+- ✅ SFT v1 dataset license plan (1,400–1,700 examples, all permissive)
+- ✅ SFT v1 training plan (Runtime 1.5B, Core 3B, 4B candidate)
+- ✅ Release gate updated (license review required)
+- ✅ GitHub Pages reconciliation (no stale versions)
+- ✅ Environment status, run history, HF profile docs
+- ✅ Public pages and state consistency checkers
+- Gate BLOCKED — no training, no HF Jobs, no public weights
+
 ## v0.1.54-alpha (Released)
 
 - ✅ Baseline vs adapter eval subset10 on HF Jobs
@@ -481,11 +494,13 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.56-alpha (Planned)
+## v0.1.57-alpha (Planned)
 
-- 📋 Baseline vs adapter eval subset30
+- 📋 Open-base bakeoff baseline execution plan
+- 📋 Compare Qwen2.5-1.5B, SmolLM2-1.7B, SmolLM3-3B, and Qwen3-4B candidates
 - 📋 Dry-run first; real HF Jobs only with explicit approval
 - 📋 No raw outputs committed
+- 📋 No public benchmark claims until manual review and release approval
 - Gate BLOCKED
 
 ## v0.1.52-alpha

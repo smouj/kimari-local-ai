@@ -457,7 +457,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="hero-content reveal">
     <div class="hero-badge">
       <span class="dot"></span>
-      v0.1.56-alpha — Public state reconciliation, CI & pages cleanup, gate BLOCKED
+      v0.1.57-alpha — Public state reconciliation, CI & pages cleanup, gate BLOCKED
     </div>
     <h1>Local AI for<br><span class="gradient-text">Consumer GPUs</span></h1>
     <p>Run local LLMs on older NVIDIA GPUs — GTX 1060, GTX 1080 and other consumer cards. No cloud. No subscriptions. Your data stays on your machine.</p>
@@ -479,7 +479,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <div style="max-width:1280px;margin:0 auto;padding:48px 24px 0;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:28px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.56-alpha</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-size:.75rem;font-weight:700;letter-spacing:.05em;">v0.1.57-alpha</span>
       <span style="font-size:1.1rem;font-weight:800;">What's New</span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
@@ -586,6 +586,34 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
 </div>
 
+<!-- ═══════ OPEN-LICENSE MODEL POLICY ═══════ -->
+<div style="max-width:1280px;margin:0 auto;padding:0 24px 24px;">
+  <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px 32px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-size:.75rem;font-weight:700;letter-spacing:.05em;">⚖️ Open License</span>
+      <span style="font-size:1.05rem;font-weight:800;">Open-License Model Policy</span>
+    </div>
+    <p style="font-size:.88rem;color:var(--kimari-text-muted);margin-bottom:12px;">Official Kimari models will only use permissive-license bases. No non-commercial, research-only, or custom-restrictive bases for public releases.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;font-size:.85rem;">
+      <div style="background:var(--kimari-deep);border-radius:8px;padding:14px;border:1px solid rgba(16,185,129,.2);">
+        <div style="font-weight:700;color:#10b981;margin-bottom:6px;">✅ Approved Bases</div>
+        <div style="color:var(--kimari-text-muted);line-height:1.5;">Qwen2.5-1.5B · SmolLM3-3B<br>Qwen3-4B-Instruct · SmolLM2-1.7B</div>
+        <div style="margin-top:6px;font-size:.75rem;color:#10b981;">All Apache 2.0</div>
+      </div>
+      <div style="background:var(--kimari-deep);border-radius:8px;padding:14px;border:1px solid rgba(239,68,68,.2);">
+        <div style="font-weight:700;color:#f87171;margin-bottom:6px;">❌ Blocked for Public</div>
+        <div style="color:var(--kimari-text-muted);line-height:1.5;">Qwen2.5-3B (research)<br>Gemma · Llama · NC models</div>
+        <div style="margin-top:6px;font-size:.75rem;color:#f87171;">Non-permissive licenses</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;font-size:.8rem;color:var(--kimari-text-muted);">
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_OPEN_LICENSE_POLICY.md" style="color:var(--kimari-teal);">Full policy →</a> ·
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md" style="color:var(--kimari-teal);">License matrix →</a> ·
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_OPEN_BASE_BAKEOFF_PLAN.md" style="color:var(--kimari-teal);">Bakeoff plan →</a>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════ KIMARI-4B MODEL ROADMAP ═══════ -->
 <div style="max-width:1280px;margin:0 auto;padding:0 24px 24px;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px 32px;">
@@ -596,10 +624,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;font-size:.88rem;color:var(--kimari-text-muted);">
       <div><strong style="color:var(--kimari-text);">Status</strong><br>Private SFT candidate accepted</div>
-      <div><strong style="color:var(--kimari-text);">Base Selection</strong><br>SmolLM3-3B accepted (private only)</div>
+      <div><strong style="color:var(--kimari-text);">Base Selection</strong><br>Open-license bases only (Apache 2.0)</div>
       <div><strong style="color:var(--kimari-text);">Dataset</strong><br>v0 synthetic (SFT + preference + holdout)</div>
       <div><strong style="color:var(--kimari-text);">Weights</strong><br>Not released yet</div>
-      <div><strong style="color:var(--kimari-text);">HF Jobs</strong><br>Micro SFT training implementation (train_sft_lora.py --micro-run --yes, no upload, gate BLOCKED)</div>
+      <div><strong style="color:var(--kimari-text);">License Policy</strong><br>Permissive bases only — Apache 2.0</div>
     </div>
   </div>
 </div>
@@ -1026,7 +1054,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 ██╔═██╗ ██║██║╚██╔╝██║██╔══██║██╔══██╗██║
 ██║  ██╗██║██║ ╚═╝ ██║██║  ██║██║  ██║██║
 ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝
-   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.56-alpha</span>
+   Local AI for Consumer GPUs — <span class="terminal-highlight">v0.1.57-alpha</span>
 </span>
   <span class="terminal-ok">[OK]</span>   OS: Linux 6.5.0-44-generic (x86_64)
   <span class="terminal-ok">[OK]</span>   GPU: NVIDIA GeForce GTX 1080 (8192 MB)
@@ -1063,7 +1091,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="terminal-panel" id="tab-info" role="tabpanel">
         <span class="terminal-prompt">$ </span><span class="terminal-cmd">kimari info --json</span>
 <span class="terminal-output">{
-  "version": "<span class="terminal-highlight">0.1.56-alpha</span>",
+  "version": "<span class="terminal-highlight">0.1.57-alpha</span>",
   "python": "3.11.6",
   "install_method": "pip install -e .",
   "package": "kimari-local-ai",
@@ -1485,7 +1513,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal">
     <span class="section-label"><i class="fa-solid fa-signal"></i> Status</span>
     <h2 class="section-title">Project Status</h2>
-    <p class="section-desc">Kimari Local AI v0.1.56-alpha — Public state reconciliation and CI/pages cleanup. Gate BLOCKED; no public weights released.</p>
+    <p class="section-desc">Kimari Local AI v0.1.57-alpha — Public state reconciliation and CI/pages cleanup. Gate BLOCKED; no public weights released.</p>
   </div>
   <div class="reveal" style="overflow-x:auto;">
     <table class="status-table">
