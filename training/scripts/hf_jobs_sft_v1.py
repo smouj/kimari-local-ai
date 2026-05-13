@@ -55,6 +55,7 @@ def build_training_command_args(config_path: Path) -> list[str]:
         "--config",
         str(config_path),
         "--micro-run",
+        "--yes",
     ]
 
 
