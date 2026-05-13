@@ -5,6 +5,34 @@ All notable changes to Kimari Local AI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.61-alpha] - 2026-05-13
+
+### Added
+
+- **SFT v1 real short run execution**: first QLoRA training on Qwen2.5-1.5B-Instruct (Apache-2.0)
+  - 100 steps, QLoRA r=16, alpha=32, dropout=0.05
+  - Dataset: Kimari SFT v1 seed (288 train / 32 validation)
+  - HF Jobs `a10g-small` flavor, PyTorch 2.5.1 + CUDA 12.4
+- **Run summary creator**: `training/scripts/create_sft_v1_run_summary.py`
+- **Run summary validator**: `training/scripts/validate_sft_v1_run_summary.py`
+- **SFT v1 result doc**: `docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md`
+- **Completed summary template**: `training/templates/sft_v1_completed_summary.template.json`
+- **HF Jobs wrapper updated**: real submission now allowed with --allow-submit --yes --require-jobs-access
+
+### Changed
+
+- Version bump: 0.1.60-alpha → 0.1.61-alpha
+- HF Jobs wrapper: v0.1.60 blocked all submissions → v0.1.61 allows with safeguards
+- check-release.py: v0.1.61 SFT v1 run result checks
+
+### Safety
+
+- Adapter: private only, not committed to public repo
+- No GGUF generation
+- No public weights or benchmarks
+- No gate transition
+- Gate: BLOCKED
+
 ## [0.1.60-alpha] - 2026-05-13
 
 ### Added

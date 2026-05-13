@@ -494,7 +494,19 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.60-alpha (Current)
+## v0.1.61-alpha (Current)
+
+- ✅ SFT v1 real short run execution (100 steps, QLoRA, Qwen2.5-1.5B-Instruct)
+- ✅ Run summary creator (`training/scripts/create_sft_v1_run_summary.py`)
+- ✅ Run summary validator (`training/scripts/validate_sft_v1_run_summary.py`)
+- ✅ SFT v1 result doc (`docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md`)
+- ✅ Completed summary template (`training/templates/sft_v1_completed_summary.template.json`)
+- ✅ HF Jobs wrapper: real submission allowed with safeguards
+- Adapter: private only, not committed to public repo
+- No GGUF generation, no public weights, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.60-alpha (Released)
 
 - ✅ SFT v1 training config (`training/configs/kimari_runtime_15b_sft_v1.yaml`)
 - ✅ Preflight script (`training/scripts/preflight_sft_v1.py`)

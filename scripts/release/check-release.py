@@ -4255,16 +4255,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.60-alpha",
-            "version-0.1.60--alpha" in readme_text_current
+            "README version badge is 0.1.61-alpha",
+            "version-0.1.61--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.60-alpha",
+            "README badge URL must match 0.1.61-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.60-alpha" in docs_index_text
+            "Kimari Local AI v0.1.61-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.60 appears in public surfaces", "v0.1.60-alpha" in public_text, "current version missing")
+    check("v0.1.61 appears in public surfaces", "v0.1.61-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6789,16 +6789,16 @@ def main() -> None:
     if readme_path.exists():
         readme_text_current = readme_path.read_text()
         check(
-            "README version badge is 0.1.60-alpha",
-            "version-0.1.60--alpha" in readme_text_current
+            "README version badge is 0.1.61-alpha",
+            "version-0.1.61--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
-            "README badge URL must match 0.1.60-alpha",
+            "README badge URL must match 0.1.61-alpha",
         )
     if docs_index_path.exists():
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.60-alpha" in docs_index_text
+            "Kimari Local AI v0.1.61-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.60 appears in public surfaces", "v0.1.60-alpha" in public_text, "current version missing")
+    check("v0.1.61 appears in public surfaces", "v0.1.61-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7253,6 +7253,106 @@ def main() -> None:
 
     check(
         "v0.1.60 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
+
+    # ── v0.1.61 SFT v1 first real short run ──────────────────────────
+    print("\n[81/81] v0.1.61 SFT v1 first real short run")
+    result_doc = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_RESULT.md"
+    summary_creator = PROJECT_ROOT / "training" / "scripts" / "create_sft_v1_run_summary.py"
+    summary_validator = PROJECT_ROOT / "training" / "scripts" / "validate_sft_v1_run_summary.py"
+    completed_template = PROJECT_ROOT / "training" / "templates" / "sft_v1_completed_summary.template.json"
+    hf_jobs_wrapper_v161 = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_sft_v1.py"
+
+    check("v0.1.61 result doc exists", result_doc.exists(), "missing docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md")
+    check(
+        "v0.1.61 summary creator exists",
+        summary_creator.exists(),
+        "missing training/scripts/create_sft_v1_run_summary.py",
+    )
+    check(
+        "v0.1.61 summary validator exists",
+        summary_validator.exists(),
+        "missing training/scripts/validate_sft_v1_run_summary.py",
+    )
+    check(
+        "v0.1.61 completed template exists",
+        completed_template.exists(),
+        "missing training/templates/sft_v1_completed_summary.template.json",
+    )
+
+    # Result doc must mention gate BLOCKED and no public release
+    if result_doc.exists():
+        result_text = result_doc.read_text().lower()
+        check("v0.1.61 result doc mentions BLOCKED", "blocked" in result_text, "result doc must mention gate BLOCKED")
+        check(
+            "v0.1.61 result doc no public release",
+            "no public" in result_text or "not public" in result_text or "private" in result_text,
+            "result doc must mention no public release",
+        )
+
+    # Completed template safety defaults
+    if completed_template.exists():
+        try:
+            template = json.loads(completed_template.read_text())
+            check(
+                "v0.1.61 template adapter_committed_public=false",
+                template.get("adapter_committed_public") is False,
+                "adapter_committed_public must default to false",
+            )
+            check(
+                "v0.1.61 template hf_public_upload=false",
+                template.get("hf_public_upload_performed") is False,
+                "hf_public_upload_performed must default to false",
+            )
+            check(
+                "v0.1.61 template gguf_generated=false",
+                template.get("gguf_generated") is False,
+                "gguf_generated must default to false",
+            )
+            check(
+                "v0.1.61 template raw_logs_committed=false",
+                template.get("raw_logs_committed") is False,
+                "raw_logs_committed must default to false",
+            )
+            check(
+                "v0.1.61 template gate BLOCKED",
+                template.get("gate_state") == "BLOCKED",
+                "gate_state must default to BLOCKED",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.61 completed template valid JSON", False, "completed template is not valid JSON")
+
+    # HF Jobs wrapper must allow submission (v0.1.61+)
+    if hf_jobs_wrapper_v161.exists():
+        wrapper_text = hf_jobs_wrapper_v161.read_text()
+        check(
+            "v0.1.61 HF Jobs wrapper allows submit",
+            "--allow-submit" in wrapper_text,
+            "HF Jobs wrapper must support --allow-submit",
+        )
+        check(
+            "v0.1.61 HF Jobs wrapper no v0.1.60 block",
+            "v0.1.60-alpha" not in wrapper_text,
+            "HF Jobs wrapper must not contain v0.1.60-alpha block",
+        )
+
+    # No public model artifacts
+    public_model_artifacts = [
+        path
+        for pattern in ("*.safetensors", "*.gguf", "adapter_model.bin")
+        for path in PROJECT_ROOT.rglob(pattern)
+        if ".venv" not in path.parts and "deps" not in path.parts
+    ]
+    check(
+        "v0.1.61 no public weights/adapters/GGUF",
+        len(public_model_artifacts) == 0,
+        f"found: {[str(path.relative_to(PROJECT_ROOT)) for path in public_model_artifacts[:5]]}",
+    )
+
+    check(
+        "v0.1.61 gate BLOCKED",
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )

@@ -2,6 +2,26 @@
 
 Use this checklist before publishing any Kimari Local AI release.
 
+## v0.1.61 Checks — First SFT v1 real short run
+
+- [ ] SFT v1 run result doc exists (`docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md`)
+- [ ] Run summary validator exists (`training/scripts/validate_sft_v1_run_summary.py`)
+- [ ] Run summary creator exists (`training/scripts/create_sft_v1_run_summary.py`)
+- [ ] Completed summary template exists
+- [ ] training_performed=true in summary (if run completed)
+- [ ] adapter_committed_public=false
+- [ ] hf_public_upload_performed=false
+- [ ] gguf_generated=false
+- [ ] raw_logs_committed=false
+- [ ] public_benchmark_allowed=false
+- [ ] gate_state=BLOCKED
+- [ ] No safetensors/GGUF tracked in git
+- [ ] No raw logs committed
+- [ ] No public benchmark claims
+- [ ] Preflight passes
+- [ ] Summary validator passes
+- [ ] Gate BLOCKED
+
 ## v0.1.60 Checks — SFT v1 training configuration + dry-run
 
 - [ ] `training/configs/kimari_runtime_15b_sft_v1.yaml` exists

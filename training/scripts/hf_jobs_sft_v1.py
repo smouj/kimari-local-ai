@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""HF Jobs dry-run wrapper for Kimari Runtime 1.5B SFT v1.
+"""HF Jobs wrapper for Kimari Runtime 1.5B SFT v1.
 
-Dry-run by default. In v0.1.60-alpha, real submission is always blocked even
-when --allow-submit --yes are provided.
+Dry-run by default. Real submission requires --allow-submit --yes --require-jobs-access.
+In v0.1.61-alpha, real submission is allowed with all safeguards in place.
 """
 
 from __future__ import annotations
@@ -106,9 +106,8 @@ def validate_safety(config: dict[str, Any]) -> list[str]:
     return errors
 
 
-def maybe_check_jobs_access(require: bool) -> tuple[bool | None, str]:
-    if not require:
-        return None, "not requested"
+def check_jobs_access() -> tuple[bool, str]:
+    """Check HF Jobs access using HF_TOKEN from environment."""
     if not os.environ.get("HF_TOKEN"):
         return False, "HF_TOKEN is not set; set it in the environment, never as a CLI argument"
     try:
@@ -129,69 +128,59 @@ def maybe_check_jobs_access(require: bool) -> tuple[bool | None, str]:
     return False, "hf jobs access check failed; stderr redacted"
 
 
-def build_result(args: argparse.Namespace, config: dict[str, Any], command_args: list[str]) -> dict[str, Any]:
-    safety_errors = validate_safety(config)
-    access_ok, access_message = maybe_check_jobs_access(args.require_jobs_access)
-    wants_submit = bool(args.allow_submit and args.yes)
-    dry_run = args.dry_run or not wants_submit
-    return {
-        "run_id": config.get("run_id"),
-        "base_model": config.get("base_model"),
-        "mode": "dry-run" if dry_run else "blocked-real-submit",
-        "dry_run": dry_run,
-        "print_command": args.print_command,
-        "allow_submit_requested": args.allow_submit,
-        "yes_confirmed": args.yes,
-        "real_submit_allowed": False,
-        "message": "Real submit blocked in v0.1.60-alpha" if wants_submit else "Dry-run only. No job submitted.",
-        "hf_token_source": "env" if os.environ.get("HF_TOKEN") else "unset",
-        "jobs_access_ok": access_ok,
-        "jobs_access_message": access_message,
-        "safety_errors": safety_errors,
-        "hf_jobs_command_args": command_args if args.print_command else None,
-        "hf_jobs_command_preview": shell_join(command_args) if args.print_command else None,
-        "forbidden": [
-            "public upload",
-            "GGUF export",
-            "gate transition",
-            "public adapter repository",
-            "token CLI arguments",
-        ],
-    }
+def submit_hf_job(command_args: list[str]) -> tuple[bool, str, str | None]:
+    """Submit an HF Jobs run. Returns (success, message, job_id)."""
+    try:
+        proc = subprocess.run(
+            command_args,
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=120,
+            env=os.environ.copy(),
+        )
+    except FileNotFoundError:
+        return False, "hf CLI not found", None
+    except subprocess.TimeoutExpired:
+        return False, "hf jobs submit timed out", None
 
+    output = (proc.stdout or "") + (proc.stderr or "")
+    job_id = None
+    for line in output.splitlines():
+        line = line.strip()
+        # Try to extract job ID from output
+        if line.startswith("Job ") and "submitted" in line.lower():
+            # Format: "Job <id> submitted"
+            parts = line.split()
+            if len(parts) >= 2:
+                job_id = parts[1]
+        elif "job_id" in line.lower() or "id:" in line.lower():
+            # Try JSON or key-value format
+            for token in line.split():
+                if token and len(token) >= 8 and not token.startswith("--"):
+                    candidate = token.rstrip(",;:")
+                    if len(candidate) >= 8 and any(c.isalnum() for c in candidate):
+                        job_id = candidate
+                        break
 
-def print_text(result: dict[str, Any]) -> None:
-    print(f"HF Jobs SFT v1 wrapper: {result['mode']}")
-    print(f"Run: {result.get('run_id')}")
-    print(result["message"])
-    if result.get("hf_jobs_command_preview"):
-        print("\nCommand preview:")
-        print(result["hf_jobs_command_preview"])
-    if result.get("safety_errors"):
-        print("\nSafety errors:")
-        for error in result["safety_errors"]:
-            print(f"  ✗ {error}")
-    print("\nForbidden actions:")
-    for item in result["forbidden"]:
-        print(f"  ✗ {item}")
+    if proc.returncode == 0:
+        return True, f"Job submitted successfully{f' (job_id: {job_id})' if job_id else ''}", job_id
+    return False, f"hf jobs run failed (exit {proc.returncode}): {output[:500]}", job_id
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Dry-run HF Jobs wrapper for SFT v1; real submit blocked in v0.1.60-alpha."
+        description="HF Jobs wrapper for SFT v1. Dry-run by default; "
+        "real submission requires --allow-submit --yes --require-jobs-access."
     )
     parser.add_argument("--config", type=Path, required=True, help="Path to SFT v1 YAML config")
     parser.add_argument("--dry-run", action="store_true", help="Dry-run only; default when submit flags are absent")
     parser.add_argument("--json", action="store_true", dest="json_output", help="Emit JSON")
     parser.add_argument("--print-command", action="store_true", help="Include safe HF Jobs command preview")
+    parser.add_argument("--allow-submit", action="store_true", help="Request real submission")
+    parser.add_argument("--yes", action="store_true", help="Confirm real submission request")
     parser.add_argument(
-        "--allow-submit", action="store_true", help="Request real submission; still blocked in v0.1.60-alpha"
-    )
-    parser.add_argument(
-        "--yes", action="store_true", help="Confirm real submission request; still blocked in v0.1.60-alpha"
-    )
-    parser.add_argument(
-        "--require-jobs-access", action="store_true", help="Check hf jobs access using HF_TOKEN from environment"
+        "--require-jobs-access", action="store_true", help="Check HF jobs access (required for real submit)"
     )
     args = parser.parse_args()
 
@@ -205,18 +194,88 @@ def main() -> None:
 
     config = parse_simple_yaml(args.config)
     command_args = build_hf_jobs_command_args(config, args.config)
-    result = build_result(args, config, command_args)
-    status = "pass" if not result["safety_errors"] else "fail"
-    result["status"] = status
+    safety_errors = validate_safety(config)
+
+    wants_submit = bool(args.allow_submit and args.yes)
+    is_dry_run = args.dry_run or not wants_submit
+
+    # Check HF Jobs access if required
+    access_ok: bool | None = None
+    access_message: str = "not requested"
+    if args.require_jobs_access or wants_submit:
+        access_ok, access_message = check_jobs_access()
+
+    # Determine if real submit can proceed
+    submit_allowed = wants_submit and not is_dry_run and len(safety_errors) == 0 and access_ok is True
+
+    result: dict[str, Any] = {
+        "run_id": config.get("run_id"),
+        "base_model": config.get("base_model"),
+        "mode": "real-submit" if submit_allowed else ("blocked-real-submit" if wants_submit else "dry-run"),
+        "dry_run": is_dry_run,
+        "print_command": args.print_command,
+        "allow_submit_requested": args.allow_submit,
+        "yes_confirmed": args.yes,
+        "real_submit_allowed": submit_allowed,
+        "safety_errors": safety_errors,
+        "hf_token_source": "env" if os.environ.get("HF_TOKEN") else "unset",
+        "jobs_access_ok": access_ok,
+        "jobs_access_message": access_message,
+        "forbidden": [
+            "public upload",
+            "GGUF export",
+            "gate transition",
+            "public adapter repository",
+            "token CLI arguments",
+        ],
+    }
+
+    if args.print_command:
+        result["hf_jobs_command_args"] = command_args
+        result["hf_jobs_command_preview"] = shell_join(command_args)
+
+    # Submit if allowed
+    if submit_allowed:
+        success, msg, job_id = submit_hf_job(command_args)
+        result["submit_success"] = success
+        result["submit_message"] = msg
+        result["job_id"] = job_id
+        if not success:
+            result["status"] = "fail"
+            result["message"] = f"Submit failed: {msg}"
+        else:
+            result["status"] = "pass"
+            result["message"] = msg
+    else:
+        if wants_submit and not submit_allowed:
+            blockers = []
+            if safety_errors:
+                blockers.append(f"safety errors: {safety_errors}")
+            if access_ok is not True:
+                blockers.append(f"jobs access: {access_message}")
+            result["message"] = f"Real submit blocked: {'; '.join(blockers)}"
+            result["status"] = "fail"
+        else:
+            result["message"] = "Dry-run only. No job submitted."
+            result["status"] = "pass" if not safety_errors else "fail"
 
     if args.json_output:
         print(json.dumps(result, indent=2, sort_keys=True))
     else:
-        print_text(result)
+        print(f"HF Jobs SFT v1: {result['mode']}")
+        print(f"Run: {result.get('run_id')}")
+        print(result["message"])
+        if result.get("hf_jobs_command_preview"):
+            print(f"\nCommand preview:\n{result['hf_jobs_command_preview']}")
+        if safety_errors:
+            print("\nSafety errors:")
+            for error in safety_errors:
+                print(f"  ✗ {error}")
+        print("\nForbidden actions:")
+        for item in result["forbidden"]:
+            print(f"  ✗ {item}")
 
-    if args.allow_submit and args.yes:
-        sys.exit(1)
-    sys.exit(0 if status == "pass" else 1)
+    sys.exit(0 if result.get("status") == "pass" and not (wants_submit and not submit_allowed) else 1)
 
 
 if __name__ == "__main__":
