@@ -4,6 +4,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.65-alpha] - 2026-05-13
+
+### Added
+- **SFT v1 eval subset10 infrastructure**: Load checker, eval runner, summary template, summary validator
+- **Adapter load checker**: `eval/scripts/check_sft_v1_adapter_load.py` (--config, --dry-run, --json)
+- **Eval runner**: `eval/scripts/run_sft_v1_eval.py` (--config, --dry-run, --allow-submit, --yes)
+- **Eval summary template**: `eval/templates/sft_v1_eval_summary.template.json`
+- **Summary validator**: `eval/scripts/validate_sft_v1_eval_summary.py`
+- **Eval result doc**: `docs/KIMARI_RUNTIME_15B_SFT_V1_EVAL_RESULT.md`
+- **Report directory**: `reports/evals/kimari_runtime_15b_sft_v1_subset10/`
+- **check-release.py v0.1.65 checks**: Eval infrastructure validation
+- **test_release_v0165.py**: 20+ release tests for eval subset10
+
+### Security
+- No public weights, GGUF, or benchmarks
+- Gate remains BLOCKED
+- No raw outputs committed
+- No benchmark claims
+
 ## [0.1.64-alpha] - 2026-05-13
 
 ### Added

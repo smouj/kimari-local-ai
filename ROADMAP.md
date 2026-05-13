@@ -494,7 +494,20 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.64-alpha (Current)
+## v0.1.65-alpha (Current)
+
+- ✅ Eval subset10 infrastructure: load checker, eval runner, summary template/validator
+- ✅ Adapter load checker: `eval/scripts/check_sft_v1_adapter_load.py`
+- ✅ Eval runner: `eval/scripts/run_sft_v1_eval.py` (dry-run default, --allow-submit --yes required)
+- ✅ Summary template + validator for sanitized eval results
+- ✅ Eval result doc + report directory
+- ✅ check-release.py v0.1.65 checks
+- ✅ tests/test_release_v0165.py
+- No training executed, no HF Jobs submitted
+- No public weights, no GGUF, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.64-alpha (Released)
 
 - ✅ SFT v1 result reconciliation: run history updated
 - ✅ check-release.py v0.1.62 checks now conditional (PENDING vs COMPLETED)
