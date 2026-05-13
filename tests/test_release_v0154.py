@@ -145,10 +145,7 @@ def test_public_docs_show_current_version_and_not_released():
     deploy = (PROJECT_ROOT / "docs" / "HUGGINGFACE_DEPLOYMENT_STATUS.md").read_text()
     space = (PROJECT_ROOT / "huggingface" / "kimari-fit-lab" / "README.md").read_text()
     assert "v0.1.54-alpha" in readme or "v0.1.56-alpha" in readme
-    assert (
-        "version-0.1.54--alpha" in readme
-        or "version-0.1.56--alpha" in readme
-    )
+    assert "version-0.1.54--alpha" in readme or "version-0.1.56--alpha" in readme
     assert "version-v0.1.53--alpha" not in readme
     assert "v0.1.54-alpha" in docs_index or "v0.1.56-alpha" in docs_index
     assert "Kimari Local AI v0.1.28-alpha" not in docs_index
