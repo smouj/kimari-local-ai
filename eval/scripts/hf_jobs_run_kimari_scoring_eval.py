@@ -65,7 +65,8 @@ def build_scoring_script(config: dict[str, Any], subset_size: int | None = None)
     base_model = config["base_model"]
     adapter_repo = config["adapter_repo_private"]
     temperature = config.get("temperature", 0.2)
-    max_tokens = config.get("max_tokens", 256)
+    # Keep scoring bounded: this is a proxy eval, not a long-form benchmark.
+    max_tokens = min(int(config.get("max_tokens", 256)), 128)
     top_p = config.get("top_p", 0.9)
     seed = config.get("seed", 42)
     effective_subset = subset_size or config.get("subset_size", 30)
@@ -173,12 +174,10 @@ def generate_one(model, tokenizer, item, temperature, top_p, max_tokens):
         outputs = model.generate(
             **inputs,
             max_new_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            do_sample=True,
+            do_sample=False,
             eos_token_id=tokenizer.eos_token_id,
             pad_token_id=tokenizer.eos_token_id,
-            max_time=30,
+            max_time=8,
         )
     return tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
 

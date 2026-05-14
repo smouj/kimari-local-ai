@@ -98,12 +98,10 @@ def generate_one(model, tokenizer, item, temperature, top_p, max_tokens):
         outputs = model.generate(
             **inputs,
             max_new_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            do_sample=True,
+            do_sample=False,
             eos_token_id=tokenizer.eos_token_id,
             pad_token_id=tokenizer.eos_token_id,
-            max_time=30,
+            max_time=8,
         )
     return tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
 
@@ -116,7 +114,7 @@ def main():
     base_model = "Qwen/Qwen2.5-1.5B-Instruct"
     adapter_repo = "Smouj013/kimari-runtime-15b-sft-v1-adapter"
     temperature = 0.2
-    max_tokens = 256
+    max_tokens = 128
     top_p = 0.9
     seed = 42
     subset_size = 30
