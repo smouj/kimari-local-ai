@@ -62,6 +62,22 @@ Interpretation: the 100-step adapter is better than base on private lexical prox
 
 Safety: raw outputs are private HF Jobs artifacts only and are not committed. This is not a public benchmark claim. Gate remains BLOCKED.
 
+
+## 500-step Private Scoring Result
+
+| Metric | Baseline | 100-step Adapter | 500-step Adapter |
+| --- | ---: | ---: | ---: |
+| Proxy score | 0.3158 | 0.3286 | 0.3404 |
+| Delta vs baseline | — | +0.0128 | +0.0246 |
+| Token F1 | 0.1469 | 0.1691 | 0.1686 |
+| Keyword recall | 0.1816 | 0.1942 | 0.1968 |
+| Completion rate | 1.0 | 1.0 | 1.0 |
+| Wins vs baseline | — | 16 vs 12 | 17 vs 12 |
+
+Training job `6a052ce6e48bea4538b9c365` completed 500 guarded steps and uploaded the adapter privately. Scoring job `6a052f5ce48bea4538b9c37d` completed subset30 private proxy scoring.
+
+Interpretation: the 500-step adapter is better than base and improves over the 100-step adapter. The delta vs baseline is nearly 2x the 100-step delta, but this is still a modest private proxy improvement, not a public benchmark. Manual review of private raw outputs is required before GGUF or public release work.
+
 ## Safety Assertions
 
 - **score_status**: not_scored (requires judge model or manual review)
@@ -85,6 +101,7 @@ Safety: raw outputs are private HF Jobs artifacts only and are not committed. Th
 - [x] Phase 3: 100-step Full-run Training (v0.1.69)
 - [x] Phase 4: Subset30 Evaluation (v0.1.70)
 - [x] Phase 5: Private scoring/quality evaluation (v0.1.71/v0.1.72)
+- [x] Phase 6: 500-step full-run + private scoring eval (v0.1.73)
 
 ## No Release Claim
 

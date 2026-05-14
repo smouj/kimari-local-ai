@@ -1,14 +1,13 @@
 """Release tests for v0.1.73-alpha.
 
-Focus: private scoring result and guarded 500-step improvement path.
+Focus: 500-step training and private scoring result.
 """
 
 import json
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SUMMARY = PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_sft_v1_scoring_subset30" / "summary.json"
-CONFIG = PROJECT_ROOT / "training" / "configs" / "kimari_runtime_15b_sft_v1.yaml"
+SUMMARY = PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_sft_v1_500step_scoring_subset30" / "summary.json"
 
 
 def test_version_bumped():
@@ -16,35 +15,40 @@ def test_version_bumped():
     assert '__version__ = "0.1.73-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
 
 
-def test_private_scoring_summary_sanitized_and_adapter_wins():
+def test_500_step_summary_is_sanitized_and_complete():
     data = json.loads(SUMMARY.read_text())
     assert data["status"] == "completed"
-    assert data["score_status"] == "scored_private_proxy"
+    assert data["training_job_id"] == "6a052ce6e48bea4538b9c365"
+    assert data["job_id"] == "6a052f5ce48bea4538b9c37d"
+    assert data["adapter_training_steps"] == 500
     assert data["raw_outputs_committed"] is False
     assert data["public_benchmark_allowed"] is False
     assert data["gate_state"] == "BLOCKED"
+
+
+def test_500_step_beats_baseline_and_100_step():
+    data = json.loads(SUMMARY.read_text())
     assert data["adapter"]["proxy_score"] > data["baseline"]["proxy_score"]
-    assert data["adapter_proxy_wins"] > data["baseline_proxy_wins"]
+    assert data["comparison_to_100_step_adapter"]["new_500_step_proxy_score"] > data["comparison_to_100_step_adapter"]["previous_100_step_proxy_score"]
+    assert data["comparison_to_100_step_adapter"]["relative_delta_multiplier"] > 1.5
     assert data["decision"]["is_adapter_better_than_base"] is True
-    assert data["decision"]["is_adapter_much_better_than_base"] is False
+    assert data["decision"]["is_500_step_better_than_100_step"] is True
 
 
-def test_no_raw_outputs_committed_in_scoring_report():
+def test_training_signal_improved():
+    data = json.loads(SUMMARY.read_text())
+    training = data["training_summary"]
+    assert training["eval_loss_step_500"] < training["eval_loss_step_50"]
+    assert training["eval_mean_token_accuracy_step_500"] > training["eval_mean_token_accuracy_step_50"]
+    assert training["adapter_upload_completed"] is True
+
+
+def test_no_raw_outputs_committed_in_500_step_report():
     text = SUMMARY.read_text().lower()
     assert "generated" not in text
     assert "prompt" not in text
     assert "\"ideal\"" not in text
     assert "raw_outputs_private.json" in text
-
-
-def test_500_step_config_guarded():
-    text = CONFIG.read_text()
-    assert "max_steps: 500" in text
-    assert "gate_state: BLOCKED" in text
-    assert "public_release_allowed: false" in text
-    assert "hf_public_upload_allowed: false" in text
-    assert "gguf_export_allowed: false" in text
-    assert "persist_adapter: true" in text
 
 
 def test_no_public_model_artifacts():

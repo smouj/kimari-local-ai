@@ -4,6 +4,24 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.73-alpha] - 2026-05-14
+
+### Added
+- **500-step full-run result**: HF Job `6a052ce6e48bea4538b9c365` completed and persisted adapter privately.
+- **500-step private scoring result**: HF Job `6a052f5ce48bea4538b9c37d` completed subset30 proxy scoring.
+- Sanitized report: `reports/evals/kimari_runtime_15b_sft_v1_500step_scoring_subset30/summary.json`.
+
+### Results
+- Eval loss improved from 2.315 @50 to 1.757 @500.
+- Eval token accuracy improved from 0.5487 @50 to 0.6307 @500.
+- Private proxy score improved: baseline 0.3158 → 100-step 0.3286 → 500-step 0.3404.
+- 500-step delta vs baseline: +0.0246, nearly 2x the 100-step delta (+0.0128).
+
+### Safety
+- Gate remains BLOCKED.
+- Raw outputs remain private HF Jobs artifacts only.
+- No public benchmark claims, public weights, or GGUF artifacts.
+
 ## [0.1.72-alpha] - 2026-05-14
 
 ### Added

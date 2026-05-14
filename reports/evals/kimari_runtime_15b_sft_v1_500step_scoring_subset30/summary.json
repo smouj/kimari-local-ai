@@ -1,0 +1,82 @@
+{
+  "run_id": "kimari-scoring-1778724984",
+  "job_id": "6a052f5ce48bea4538b9c37d",
+  "training_job_id": "6a052ce6e48bea4538b9c365",
+  "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "adapter_repo_private": "Smouj013/kimari-runtime-15b-sft-v1-adapter",
+  "adapter_training_steps": 500,
+  "dataset_id": "kimari_private_v1",
+  "subset_size": 30,
+  "status": "completed",
+  "score_status": "scored_private_proxy",
+  "scoring_method": "private lexical proxy scoring against ideal answers; not a public benchmark; manual review required",
+  "training_summary": {
+    "train_runtime_seconds": 488.7,
+    "train_loss": 1.944,
+    "eval_loss_step_50": 2.315,
+    "eval_loss_step_500": 1.757,
+    "eval_mean_token_accuracy_step_50": 0.5487,
+    "eval_mean_token_accuracy_step_500": 0.6307,
+    "adapter_upload_completed": true
+  },
+  "generation_policy": {
+    "do_sample": false,
+    "max_tokens": 128,
+    "max_time_seconds_per_item": 8,
+    "seed": 42
+  },
+  "baseline": {
+    "token_precision": 0.1296,
+    "token_recall": 0.1764,
+    "token_f1": 0.1469,
+    "keyword_recall": 0.1816,
+    "length_ratio": 1.2808,
+    "proxy_score": 0.3158,
+    "exact_match_rate": 0.0,
+    "containment_rate": 0.0,
+    "completion_rate": 1.0,
+    "total_items": 30
+  },
+  "adapter": {
+    "token_precision": 0.1543,
+    "token_recall": 0.1933,
+    "token_f1": 0.1686,
+    "keyword_recall": 0.1968,
+    "length_ratio": 1.2767,
+    "proxy_score": 0.3404,
+    "exact_match_rate": 0.0,
+    "containment_rate": 0.0,
+    "completion_rate": 1.0,
+    "total_items": 30
+  },
+  "deltas_adapter_minus_baseline": {
+    "token_f1": 0.0217,
+    "keyword_recall": 0.0152,
+    "proxy_score": 0.0246,
+    "completion_rate": 0.0
+  },
+  "comparison_to_100_step_adapter": {
+    "previous_100_step_proxy_score": 0.3286,
+    "previous_100_step_delta_vs_baseline": 0.0128,
+    "new_500_step_proxy_score": 0.3404,
+    "new_500_step_delta_vs_baseline": 0.0246,
+    "delta_gain_vs_100_step": 0.0118,
+    "relative_delta_multiplier": 1.9219
+  },
+  "adapter_proxy_wins": 17,
+  "baseline_proxy_wins": 12,
+  "proxy_ties": 1,
+  "decision": {
+    "is_adapter_better_than_base": true,
+    "is_adapter_much_better_than_base": false,
+    "is_500_step_better_than_100_step": true,
+    "next_step": "manual review raw private outputs and improve dataset/hparams before GGUF/public release"
+  },
+  "raw_outputs_artifact": "private HF Jobs artifact: raw_outputs_private.json",
+  "raw_outputs_committed": false,
+  "public_benchmark_allowed": false,
+  "manual_review_required": true,
+  "gate_state": "BLOCKED",
+  "created_at": "2026-05-14T02:16:24.194947+00:00",
+  "notes": "500-step adapter improves over 100-step and baseline on private lexical proxy scoring. Improvement is real but still modest. No public benchmark claim. Gate remains BLOCKED."
+}
