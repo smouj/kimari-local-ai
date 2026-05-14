@@ -1,0 +1,81 @@
+{
+  "run_id": "kimari-scoring-1778723913",
+  "job_id": "6a052b32e48bea4538b9c34f",
+  "failed_or_cancelled_prior_jobs": [
+    {
+      "job_id": "6a0527573308d79117b8f3a7",
+      "status": "failed",
+      "reason": "inline scoring script missing import re"
+    },
+    {
+      "job_id": "6a05286b3308d79117b8f3a9",
+      "status": "cancelled",
+      "reason": "generation too slow/stalled after adapter 20/30"
+    },
+    {
+      "job_id": "6a052a7b3308d79117b8f3ae",
+      "status": "cancelled",
+      "reason": "generation still too slow with 30s per item guard"
+    }
+  ],
+  "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "adapter_repo_private": "Smouj013/kimari-runtime-15b-sft-v1-adapter",
+  "adapter_training_job_id": "6a052235e48bea4538b9c309",
+  "adapter_training_steps": 100,
+  "dataset_id": "kimari_private_v1",
+  "subset_size": 30,
+  "status": "completed",
+  "score_status": "scored_private_proxy",
+  "scoring_method": "private lexical proxy scoring against ideal answers; not a public benchmark; manual review required",
+  "generation_policy": {
+    "do_sample": false,
+    "max_tokens": 128,
+    "max_time_seconds_per_item": 8,
+    "seed": 42
+  },
+  "baseline": {
+    "token_precision": 0.1296,
+    "token_recall": 0.1764,
+    "token_f1": 0.1469,
+    "keyword_recall": 0.1816,
+    "length_ratio": 1.2808,
+    "proxy_score": 0.3158,
+    "exact_match_rate": 0.0,
+    "containment_rate": 0.0,
+    "completion_rate": 1.0,
+    "total_items": 30
+  },
+  "adapter": {
+    "token_precision": 0.153,
+    "token_recall": 0.194,
+    "token_f1": 0.1691,
+    "keyword_recall": 0.1942,
+    "length_ratio": 1.2189,
+    "proxy_score": 0.3286,
+    "exact_match_rate": 0.0,
+    "containment_rate": 0.0,
+    "completion_rate": 1.0,
+    "total_items": 30
+  },
+  "deltas_adapter_minus_baseline": {
+    "token_f1": 0.0222,
+    "keyword_recall": 0.0126,
+    "proxy_score": 0.0128,
+    "completion_rate": 0.0
+  },
+  "adapter_proxy_wins": 16,
+  "baseline_proxy_wins": 12,
+  "proxy_ties": 2,
+  "decision": {
+    "is_adapter_better_than_base": true,
+    "is_adapter_much_better_than_base": false,
+    "next_step": "run guarded 500-step full-run, then rerun private scoring subset30"
+  },
+  "raw_outputs_artifact": "private HF Jobs artifact: raw_outputs_private.json",
+  "raw_outputs_committed": false,
+  "public_benchmark_allowed": false,
+  "manual_review_required": true,
+  "gate_state": "BLOCKED",
+  "created_at": "2026-05-14T01:58:33.864036+00:00",
+  "notes": "Adapter beats baseline on private lexical proxy scoring, but the margin is modest. No public benchmark claim. Gate remains BLOCKED."
+}

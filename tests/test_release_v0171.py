@@ -1,4 +1,4 @@
-"""Release tests for v0.1.71-alpha.
+"""Release tests for v0.1.72-alpha.
 
 Focus: private scoring/quality eval infrastructure.
 """
@@ -14,8 +14,8 @@ CONFIG = PROJECT_ROOT / "eval" / "configs" / "kimari_runtime_15b_sft_v1_eval_sub
 
 
 def test_version_bumped():
-    assert 'version = "0.1.71-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
-    assert '__version__ = "0.1.71-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
+    assert 'version = "0.1.72-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
+    assert '__version__ = "0.1.72-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
 
 
 def test_scoring_script_exists_and_has_safety_markers():

@@ -1,6 +1,6 @@
 # Kimari Runtime 1.5B SFT v1 — Evaluation Result
 
-> ✅ **Status: SUBSET30 COMPLETED** — Baseline vs 100-step adapter completion evaluation completed on HF Jobs. Both models achieved 100% completion rate on 30-item subset.
+> ✅ **Status: PRIVATE SCORING COMPLETED** — Baseline vs 100-step adapter subset30 completion and private proxy scoring completed. Adapter beats baseline modestly; not enough to call it much better yet.
 
 ## Objective
 
@@ -46,6 +46,22 @@ Compare the SFT v1 100-step full-run adapter against the base model (Qwen/Qwen2.
 - Adapter loaded from private repo `Smouj013/kimari-runtime-15b-sft-v1-adapter`.
 - No generation errors for either model.
 
+
+## Private Scoring Result
+
+| Metric | Baseline | Adapter | Delta |
+| --- | ---: | ---: | ---: |
+| Proxy score | 0.3158 | 0.3286 | +0.0128 |
+| Token F1 | 0.1469 | 0.1691 | +0.0222 |
+| Keyword recall | 0.1816 | 0.1942 | +0.0126 |
+| Completion rate | 1.0 | 1.0 | 0.0 |
+
+Win counts: adapter 16, baseline 12, ties 2.
+
+Interpretation: the 100-step adapter is better than base on private lexical proxy scoring, but only modestly. The next correct step is a guarded 500-step full-run followed by the same private scoring eval.
+
+Safety: raw outputs are private HF Jobs artifacts only and are not committed. This is not a public benchmark claim. Gate remains BLOCKED.
+
 ## Safety Assertions
 
 - **score_status**: not_scored (requires judge model or manual review)
@@ -68,7 +84,7 @@ Compare the SFT v1 100-step full-run adapter against the base model (Qwen/Qwen2.
 - [x] Phase 2: Subset10 Evaluation (v0.1.68)
 - [x] Phase 3: 100-step Full-run Training (v0.1.69)
 - [x] Phase 4: Subset30 Evaluation (v0.1.70)
-- [ ] Phase 5: Scoring/quality evaluation
+- [x] Phase 5: Private scoring/quality evaluation (v0.1.71/v0.1.72)
 
 ## No Release Claim
 

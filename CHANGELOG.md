@@ -4,6 +4,22 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.72-alpha] - 2026-05-14
+
+### Added
+- **Private subset30 proxy scoring result** for 100-step adapter.
+- Sanitized report: `reports/evals/kimari_runtime_15b_sft_v1_scoring_subset30/summary.json`.
+- Adapter beats baseline modestly: proxy score 0.3286 vs 0.3158, adapter wins 16 vs baseline 12.
+
+### Changed
+- Training config now targets guarded 500-step full-run (`max_steps: 500`) for the next quality improvement run.
+- Private scoring eval is bounded/deterministic to avoid HF Jobs timeouts.
+
+### Safety
+- Gate remains BLOCKED.
+- Raw outputs remain private HF Jobs artifacts only.
+- No public benchmark claims, public weights, or GGUF artifacts.
+
 ## [0.1.71-alpha] - 2026-05-14
 
 ### Added

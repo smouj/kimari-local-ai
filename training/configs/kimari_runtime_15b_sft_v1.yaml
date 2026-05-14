@@ -6,7 +6,7 @@ eval_dataset_path: dataset/build/kimari_sft_v1/validation.jsonl
 dataset_summary: dataset/build/kimari_sft_v1/dataset_summary.json
 method: qlora
 max_seq_length: 2048
-max_steps: 100
+max_steps: 500
 epochs: 1
 learning_rate: 5.0e-5
 lora_r: 16
