@@ -8570,6 +8570,69 @@ def main() -> None:
         check("v0.1.82 default dashboard bind localhost", 'DEFAULT_HOST = "127.0.0.1"' in manager_text_v0182, "default bind changed")
         check("v0.1.82 gate remains BLOCKED", 'GATE_STATE = "BLOCKED"' in manager_text_v0182, "gate changed")
 
+    # ── README Reorganization Checks (v0.1.82) ────────────────────
+    print("\n[README Reorganization] v0.1.82 README structure")
+    check(
+        "README has compact structure (no stale version)",
+        init_ver in readme_text,
+        f"Current version {init_ver!r} not found in README.md",
+    )
+    check(
+        "README does not claim Kimari-4B released",
+        "Kimari-4B" in readme_text and "Not released" in readme_text,
+        "README must state Kimari-4B is not released",
+    )
+    check(
+        "README does not claim public GGUF available",
+        "public GGUF" not in readme_text.lower() or "not released" in readme_text.lower(),
+        "README must not claim public GGUF is available",
+    )
+    check(
+        "README links to CLI_REFERENCE.md",
+        "CLI_REFERENCE.md" in readme_text,
+        "CLI_REFERENCE.md link not found in README.md",
+    )
+    check(
+        "README has Screenshots section",
+        "## Screenshots" in readme_text,
+        "Screenshots section not found in README.md",
+    )
+    check(
+        "README says gate BLOCKED",
+        "BLOCKED" in readme_text,
+        "Gate BLOCKED not found in README.md",
+    )
+    check(
+        "README contains Gateway Dashboard section",
+        "## Gateway Dashboard" in readme_text,
+        "Gateway Dashboard section not found in README.md",
+    )
+    check(
+        "README contains Safety section",
+        "## Safety" in readme_text,
+        "Safety section not found in README.md",
+    )
+    check(
+        "docs/CLI_REFERENCE.md exists",
+        (PROJECT_ROOT / "docs" / "CLI_REFERENCE.md").exists(),
+        "CLI reference doc missing",
+    )
+    check(
+        "docs/README_CONTENT_MAP.md exists",
+        (PROJECT_ROOT / "docs" / "README_CONTENT_MAP.md").exists(),
+        "Content map doc missing",
+    )
+    check(
+        "docs/GATEWAY_DASHBOARD.md exists",
+        (PROJECT_ROOT / "docs" / "GATEWAY_DASHBOARD.md").exists(),
+        "Gateway dashboard doc missing",
+    )
+    check(
+        "npm is not primary user quickstart in README",
+        "npm" not in readme_text[:3000].lower() or "npm" not in readme_text.split("## Quick Start")[1].split("##")[0].lower() if "## Quick Start" in readme_text else True,
+        "npm should not appear in Quick Start section as primary flow",
+    )
+
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
         print(f"RESULT: {len(ERRORS)} error(s), {len(WARNINGS)} warning(s)")
