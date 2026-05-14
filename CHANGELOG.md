@@ -4,6 +4,18 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.71-alpha] - 2026-05-14
+
+### Added
+- **Private scoring/quality eval runner**: `eval/scripts/hf_jobs_run_kimari_scoring_eval.py`.
+- Writes `raw_outputs_private.json` and `scoring_summary.json` only inside private HF Jobs artifacts.
+- Logs sanitized aggregate scoring summary only.
+- Adds lexical proxy metrics: token precision/recall/F1, keyword recall, proxy score, adapter/base win counts.
+
+### Security
+- Raw outputs are explicitly marked private and must not be committed.
+- Gate remains BLOCKED — no public weights, GGUF, raw outputs, or benchmark claims.
+
 ## [0.1.70-alpha] - 2026-05-14
 
 ### Added
