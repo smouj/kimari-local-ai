@@ -1,0 +1,716 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-kimari: var(--kimari);
+  --color-kimari-foreground: var(--kimari-foreground);
+  --color-kimari-muted: var(--kimari-muted);
+  --color-kimari-dark: var(--kimari-dark);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --kimari: oklch(0.72 0.17 230);
+  --kimari-foreground: oklch(1 0 0);
+  --kimari-muted: oklch(0.85 0.08 230);
+  --kimari-dark: oklch(0.45 0.13 230);
+  --background: oklch(0.985 0.002 230);
+  --foreground: oklch(0.145 0.005 230);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0.005 230);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0.005 230);
+  --primary: oklch(0.55 0.17 230);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.95 0.03 230);
+  --secondary-foreground: oklch(0.25 0.05 230);
+  --muted: oklch(0.96 0.02 230);
+  --muted-foreground: oklch(0.5 0.04 230);
+  --accent: oklch(0.93 0.05 230);
+  --accent-foreground: oklch(0.25 0.05 230);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.91 0.02 230);
+  --input: oklch(0.91 0.02 230);
+  --ring: oklch(0.55 0.17 230);
+  --chart-1: oklch(0.55 0.17 230);
+  --chart-2: oklch(0.6 0.12 250);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.975 0.01 230);
+  --sidebar-foreground: oklch(0.145 0.005 230);
+  --sidebar-primary: oklch(0.55 0.17 230);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.93 0.05 230);
+  --sidebar-accent-foreground: oklch(0.25 0.05 230);
+  --sidebar-border: oklch(0.91 0.02 230);
+  --sidebar-ring: oklch(0.55 0.17 230);
+}
+
+.dark {
+  --kimari: oklch(0.72 0.17 230);
+  --kimari-foreground: oklch(1 0 0);
+  --kimari-muted: oklch(0.35 0.08 230);
+  --kimari-dark: oklch(0.45 0.13 230);
+  --background: oklch(0.13 0.01 230);
+  --foreground: oklch(0.96 0.01 230);
+  --card: oklch(0.18 0.015 230);
+  --card-foreground: oklch(0.96 0.01 230);
+  --popover: oklch(0.18 0.015 230);
+  --popover-foreground: oklch(0.96 0.01 230);
+  --primary: oklch(0.65 0.17 230);
+  --primary-foreground: oklch(0.13 0.01 230);
+  --secondary: oklch(0.25 0.03 230);
+  --secondary-foreground: oklch(0.96 0.01 230);
+  --muted: oklch(0.25 0.03 230);
+  --muted-foreground: oklch(0.65 0.04 230);
+  --accent: oklch(0.25 0.03 230);
+  --accent-foreground: oklch(0.96 0.01 230);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.65 0.17 230);
+  --chart-1: oklch(0.65 0.17 230);
+  --chart-2: oklch(0.696 0.17 250);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.16 0.015 230);
+  --sidebar-foreground: oklch(0.96 0.01 230);
+  --sidebar-primary: oklch(0.65 0.17 230);
+  --sidebar-primary-foreground: oklch(0.96 0.01 230);
+  --sidebar-accent: oklch(0.25 0.03 230);
+  --sidebar-accent-foreground: oklch(0.96 0.01 230);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.65 0.17 230);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ==============================
+   DEPTH CARD SHADOWS
+   ============================== */
+.depth-shadow {
+  box-shadow: 0 2px 6px oklch(0 0 0 / 8%), 0 1px 3px oklch(0 0 0 / 5%);
+}
+.dark .depth-shadow {
+  box-shadow: 0 2px 8px oklch(0 0 0 / 25%), 0 1px 4px oklch(0 0 0 / 15%);
+}
+
+/* ==============================
+   BUTTON MICRO-INTERACTIONS
+   ============================== */
+.btn-press {
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* ==============================
+   STATUS DOT LARGER
+   ============================== */
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: relative;
+}
+.status-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0;
+  animation: status-ring 2s ease-out infinite;
+}
+@keyframes status-ring {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ==============================
+   SMOOTH HOVER TRANSITIONS
+   ============================== */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+}
+
+/* ==============================
+   SUBTLE CARD SHINE
+   ============================== */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+.card-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, oklch(1 0 0 / 3%), transparent);
+  transition: left 0.5s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.card-shine:hover::before {
+  left: 100%;
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Pulse animation for status indicators */
+@keyframes pulse-kimari {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-kimari {
+  animation: pulse-kimari 2s ease-in-out infinite;
+}
+
+/* Glow effect for running status */
+@keyframes glow-kimari {
+  0%, 100% { box-shadow: 0 0 5px oklch(0.72 0.17 230 / 30%); }
+  50% { box-shadow: 0 0 20px oklch(0.72 0.17 230 / 60%); }
+}
+.animate-glow-kimari {
+  animation: glow-kimari 2s ease-in-out infinite;
+}
+
+/* ==============================
+   GLASS MORPHISM
+   ============================== */
+.glass-card {
+  background: oklch(1 0 0 / 55%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid oklch(1 0 0 / 22%);
+}
+.dark .glass-card {
+  background: oklch(0.22 0.025 230 / 60%);
+  border: 1px solid oklch(1 0 0 / 14%);
+}
+
+/* ==============================
+   ANIMATED GRADIENT BORDER
+   ============================== */
+.gradient-border {
+  position: relative;
+  overflow: hidden;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    oklch(0.72 0.17 230),
+    oklch(0.65 0.17 260),
+    oklch(0.55 0.17 230),
+    oklch(0.72 0.17 200),
+    oklch(0.72 0.17 230)
+  );
+  background-size: 300% 300%;
+  animation: gradient-rotate 4s ease infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+@keyframes gradient-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==============================
+   DOT GRID BACKGROUND
+   ============================== */
+.dot-grid-bg {
+  background-image: radial-gradient(circle, oklch(0.5 0.03 230 / 15%) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.dark .dot-grid-bg {
+  background-image: radial-gradient(circle, oklch(0.5 0.05 230 / 12%) 1px, transparent 1px);
+}
+
+/* ==============================
+   BLUE GLOW EFFECT
+   ============================== */
+.glow-blue {
+  box-shadow:
+    0 0 8px oklch(0.65 0.17 230 / 25%),
+    0 0 24px oklch(0.65 0.17 230 / 15%),
+    0 0 48px oklch(0.65 0.17 230 / 8%);
+}
+
+/* ==============================
+   SHIMMER LOADING ANIMATION
+   ============================== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.96 0.02 230) 25%,
+    oklch(0.93 0.04 230) 50%,
+    oklch(0.96 0.02 230) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+.dark .shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.2 0.02 230) 25%,
+    oklch(0.27 0.04 230) 50%,
+    oklch(0.2 0.02 230) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* ==============================
+   STATUS DOT PULSE
+   ============================== */
+@keyframes status-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.status-dot-pulse {
+  position: relative;
+}
+.status-dot-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: status-pulse 2s ease-out infinite;
+}
+
+/* ==============================
+   CARD HOVER LIFT
+   ============================== */
+.card-hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px oklch(0 0 0 / 8%), 0 0 0 1px oklch(0.72 0.17 230 / 10%);
+}
+.dark .card-hover-lift:hover {
+  box-shadow: 0 8px 24px oklch(0 0 0 / 20%), 0 0 0 1px oklch(0.72 0.17 230 / 15%);
+}
+
+/* ==============================
+   SIDEBAR GRADIENT
+   ============================== */
+.sidebar-gradient {
+  background: linear-gradient(180deg, oklch(0.16 0.02 230) 0%, oklch(0.12 0.015 230) 100%);
+}
+
+/* ==============================
+   METRIC CARD GRADIENTS
+   ============================== */
+.metric-gradient-status {
+  background: linear-gradient(135deg, oklch(0.2 0.04 230 / 60%) 0%, oklch(0.18 0.02 230 / 30%) 100%);
+}
+.metric-gradient-profile {
+  background: linear-gradient(135deg, oklch(0.22 0.05 255 / 50%) 0%, oklch(0.18 0.02 230 / 30%) 100%);
+}
+.metric-gradient-models {
+  background: linear-gradient(135deg, oklch(0.22 0.04 210 / 50%) 0%, oklch(0.18 0.02 230 / 30%) 100%);
+}
+.metric-gradient-memory {
+  background: linear-gradient(135deg, oklch(0.22 0.05 230 / 50%) 0%, oklch(0.18 0.02 230 / 30%) 100%);
+}
+:root .metric-gradient-status {
+  background: linear-gradient(135deg, oklch(0.92 0.05 230 / 80%) 0%, oklch(1 0 0 / 40%) 100%);
+}
+:root .metric-gradient-profile {
+  background: linear-gradient(135deg, oklch(0.92 0.06 255 / 80%) 0%, oklch(1 0 0 / 40%) 100%);
+}
+:root .metric-gradient-models {
+  background: linear-gradient(135deg, oklch(0.92 0.06 210 / 80%) 0%, oklch(1 0 0 / 40%) 100%);
+}
+:root .metric-gradient-memory {
+  background: linear-gradient(135deg, oklch(0.92 0.06 230 / 80%) 0%, oklch(1 0 0 / 40%) 100%);
+}
+
+/* ==============================
+   TOPO BORDER GRADIENT
+   ============================== */
+.top-border-gradient {
+  position: relative;
+}
+.top-border-gradient::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.72 0.17 230 / 50%),
+    oklch(0.65 0.17 260 / 50%),
+    oklch(0.72 0.17 230 / 50%),
+    transparent
+  );
+}
+
+/* ==============================
+   SPIN SLOW
+   ============================== */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* ==============================
+   RING PULSE
+   ============================== */
+@keyframes ring-pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+.animate-ring-pulse {
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+
+/* ==============================
+   GRADIENT TEXT
+   ============================== */
+.gradient-text {
+  background: linear-gradient(135deg, oklch(0.72 0.17 230), oklch(0.65 0.14 260), oklch(0.72 0.17 230));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-text-shift 3s ease infinite;
+}
+@keyframes gradient-text-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==============================
+   SUBTLE BORDER
+   ============================== */
+.subtle-border {
+  border: 1px solid oklch(0 0 0 / 6%);
+}
+.dark .subtle-border {
+  border: 1px solid oklch(1 0 0 / 8%);
+}
+
+/* ==============================
+   PULSE SUBTLE
+   ============================== */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+/* ==============================
+   PULSING BORDER (for offline/attention cards)
+   ============================== */
+@keyframes border-pulse {
+  0%, 100% { border-color: oklch(0.65 0.17 230 / 15%); }
+  50% { border-color: oklch(0.65 0.17 230 / 40%); }
+}
+.pulse-border {
+  animation: border-pulse 2.5s ease-in-out infinite;
+}
+
+/* ==============================
+   CARD PATTERN
+   ============================== */
+.card-pattern {
+  position: relative;
+}
+.card-pattern::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: radial-gradient(circle, oklch(0 0 0 / 3%) 0.5px, transparent 0.5px);
+  background-size: 12px 12px;
+}
+.dark .card-pattern::after {
+  background-image: radial-gradient(circle, oklch(1 0 0 / 2%) 0.5px, transparent 0.5px);
+}
+
+/* ==============================
+   DASHED LINE ANIMATION
+   ============================== */
+@keyframes dash-march {
+  to { stroke-dashoffset: -12; }
+}
+.animate-dash-march {
+  animation: dash-march 0.8s linear infinite;
+}
+
+/* ==============================
+   BELL RING ANIMATION
+   ============================== */
+@keyframes bell-ring {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-12deg); }
+  30% { transform: rotate(8deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-bell-ring {
+  animation: bell-ring 1s ease-in-out;
+  transform-origin: top center;
+}
+
+/* ==============================
+   KBD PULSE ANIMATION
+   ============================== */
+@keyframes kbd-pulse {
+  0% { box-shadow: 0 0 0 0 oklch(0.65 0.17 230 / 40%); }
+  70% { box-shadow: 0 0 0 6px oklch(0.65 0.17 230 / 0%); }
+  100% { box-shadow: 0 0 0 0 oklch(0.65 0.17 230 / 0%); }
+}
+.animate-kbd-pulse {
+  animation: kbd-pulse 2s ease-out 1s 3;
+}
+
+/* ==============================
+   FOOTER GRADIENT TOP BORDER
+   ============================== */
+.footer-gradient-border {
+  position: relative;
+}
+.footer-gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.72 0.17 230 / 30%),
+    oklch(0.65 0.17 260 / 40%),
+    oklch(0.72 0.17 230 / 30%),
+    transparent
+  );
+}
+
+/* ==============================
+   CARD GLOW EFFECT
+   ============================== */
+.card-glow {
+  box-shadow: 0 0 0 1px oklch(0.65 0.17 230 / 8%), 0 2px 8px oklch(0 0 0 / 6%);
+  transition: box-shadow 0.3s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 0 1px oklch(0.65 0.17 230 / 20%), 0 4px 20px oklch(0.65 0.17 230 / 12%), 0 2px 8px oklch(0 0 0 / 8%);
+}
+.dark .card-glow {
+  box-shadow: 0 0 0 1px oklch(0.65 0.17 230 / 5%), 0 2px 12px oklch(0 0 0 / 20%);
+}
+.dark .card-glow:hover {
+  box-shadow: 0 0 0 1px oklch(0.65 0.17 230 / 25%), 0 4px 24px oklch(0.65 0.17 230 / 15%), 0 2px 12px oklch(0 0 0 / 25%);
+}
+
+/* ==============================
+   GRADIENT TEXT EFFECT
+   ============================== */
+.text-gradient {
+  background: linear-gradient(135deg, oklch(0.72 0.17 230), oklch(0.8 0.12 255), oklch(0.72 0.17 230));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-text-shift 3s ease infinite;
+}
+
+/* ==============================
+   FADE-IN ANIMATION
+   ============================== */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* ==============================
+   SLIDE-UP ANIMATION
+   ============================== */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+/* ==============================
+   HOVER SCALE
+   ============================== */
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* ==============================
+   ACTIVE NAV BACKGROUND HIGHLIGHT
+   ============================== */
+.nav-active-bg {
+  background: linear-gradient(90deg, oklch(0.65 0.17 230 / 12%) 0%, oklch(0.65 0.17 230 / 4%) 100%);
+}
+.dark .nav-active-bg {
+  background: linear-gradient(90deg, oklch(0.65 0.17 230 / 15%) 0%, oklch(0.65 0.17 230 / 5%) 100%);
+}
+
+/* ==============================
+   METRIC CARD HOVER GRADIENT
+   ============================== */
+.metric-hover-gradient {
+  position: relative;
+  overflow: hidden;
+}
+.metric-hover-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.metric-hover-gradient:hover::before {
+  opacity: 1;
+  background: radial-gradient(ellipse at top right, oklch(0.65 0.17 230 / 8%), transparent 70%);
+}
+.dark .metric-hover-gradient:hover::before {
+  background: radial-gradient(ellipse at top right, oklch(0.65 0.17 230 / 10%), transparent 70%);
+}
+
+/* ==============================
+   CONNECTION LINE GLOW
+   ============================== */
+.connection-glow {
+  filter: drop-shadow(0 0 3px oklch(0.65 0.17 230 / 40%));
+}
+
+/* ==============================
+   IMPROVED STATUS BADGE CONTRAST
+   ============================== */
+.status-badge-ready {
+  border-color: oklch(0.65 0.17 230 / 50%);
+  color: oklch(0.72 0.17 230);
+  background: oklch(0.65 0.17 230 / 8%);
+}
+.dark .status-badge-ready {
+  border-color: oklch(0.72 0.17 230 / 40%);
+  color: oklch(0.8 0.14 230);
+  background: oklch(0.65 0.17 230 / 12%);
+}
+
+/* ==============================
+   BETTER SCROLLBAR FOR DARK MODE
+   ============================== */
+.dark *::-webkit-scrollbar-track {
+  background: oklch(0.15 0.01 230);
+}
+.dark *::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0.03 230);
+}
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.4 0.04 230);
+}

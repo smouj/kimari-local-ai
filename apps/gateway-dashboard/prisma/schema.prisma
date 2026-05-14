@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ServerState {
+  id        String   @id @default(cuid())
+  status    String   @default("stopped") // stopped, starting, running, stopping, error
+  pid       Int?
+  port      Int      @default(11435)
+  host      String   @default("127.0.0.1")
+  profile   String   @default("test")
+  model     String?
+  startedAt DateTime?
+  uptime    Int      @default(0) // seconds
+  lastError String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GpuProfile {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  displayName  String
+  gpu          String
+  vram         String   // e.g. "6 GB"
+  quantization String   // e.g. "Q4_K_M"
+  contextSize  Int      @default(4096)
+  host         String   @default("127.0.0.1")
+  cacheK       String   @default("q8_0")
+  cacheV       String   @default("q8_0")
+  mode         String   @default("safe") // safe, balanced, fast, ide, agent
+  useCase      String   @default("General")
+  modelFile    String?
+  isDefault    Boolean  @default(false)
+  status       String   @default("available") // available, requires_model, network_exposed
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ModelEntry {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  displayName    String
+  filename       String
+  size           String?  // e.g. "1.1B", "4B"
+  fileSizeMb     Float?
+  quantization   String   @default("Q4_K_M")
+  license        String   @default("Apache 2.0")
+  source         String?  // URL to source
+  sha256         String?
+  hashPinned     Boolean  @default(false)
+  downloaded     Boolean  @default(false)
+  downloadedAt   DateTime?
+  category       String   @default("community") // test, recommended, community, official
+  vramRequired   String?  // e.g. "6 GB"
+  compatibleProfiles String? // comma-separated profile names
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model BenchmarkResult {
+  id              String   @id @default(cuid())
+  profile         String
+  model           String
+  quantization    String
+  contextSize     Int
+  promptTokPerSec Float?
+  genTokPerSec    Float?
+  ttft            Float?   // time to first token in ms
+  vramUsedMb      Float?
+  totalTokens     Int?
+  duration        Float?   // seconds
+  mode            String   @default("standard") // standard, dry_run, measured
+  status          String   @default("completed") // completed, dry_run, failed
+  notes           String?
+  gpuInfo         String?
+  resultsJson     String?  // JSON string for full results
+  createdAt       DateTime @default(now())
+}
+
+model GatewayLog {
+  id        String   @id @default(cuid())
+  level     String   @default("info") // info, warn, error, debug
+  source    String   @default("gateway") // gateway, server, system
+  message   String
+  metadata  String?  // JSON string for extra data
+  createdAt DateTime @default(now())
+}
+
+model GatewayConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  valueType   String   @default("string") // string, number, boolean, json
+  description String?
+  isSecret    Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+}
+
+model Integration {
+  id          String   @id @default(cuid())
+  name        String   @unique // openwebui, openclaw, hermes, continue
+  displayName String
+  description String?
+  configJson  String?  // JSON string with integration config
+  baseUrl     String?
+  status      String   @default("available") // available, configured, running, error
+  icon        String?  // icon name or emoji
+  docsUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,12 @@
+{
+  "name": "kimari-log-stream",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun --hot index.ts"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.0",
+    "cors": "^2.8.5"
+  }
+}

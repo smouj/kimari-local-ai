@@ -899,6 +899,41 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 > Local GTX 1060/1080 is for inference/testing only. Training requires rented GPU (RTX 4090+, A100).
 > See [docs/MODEL_TRAINING_PLAN.md](docs/MODEL_TRAINING_PLAN.md) for details.
 
+
+---
+
+## 🖥️ Gateway Dashboard Preview
+
+Kimari now includes an experimental Gateway Dashboard as an isolated Next.js sub-app under [`apps/gateway-dashboard/`](apps/gateway-dashboard/). This keeps the existing Python CLI/runtime, documentation, benchmarks, and release flow intact while allowing dashboard work to evolve safely and incrementally.
+
+Current dashboard work includes:
+
+- Blue/gray professional palette rebrand.
+- Real Kimari logo integration.
+- Mobile responsive sidebar and compact header/footer.
+- Keyboard shortcuts help dialog (`?`).
+- Logs export to JSON/CSV.
+
+> **Safety note:** The dashboard is UI-only in this branch and should remain isolated from public benchmark/model claims. Gate state for model release remains **BLOCKED**.
+
+<p align="center">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-dashboard.png" alt="Kimari Gateway Dashboard — overview" width="47%">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-server.png" alt="Kimari Gateway Dashboard — server" width="47%">
+</p>
+
+<p align="center">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-analytics.png" alt="Kimari Gateway Dashboard — analytics" width="47%">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-profiles.png" alt="Kimari Gateway Dashboard — profiles" width="47%">
+</p>
+
+Run locally:
+
+```bash
+cd apps/gateway-dashboard
+bun install
+bun run dev
+```
+
 ---
 
 ## 📸 Screenshots & CLI Preview
@@ -1008,7 +1043,7 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | **Runtime Validation** | llama-server flag detection and compatibility checks | ✅ Available |
 | **ROCm** | AMD GPU support via HIP/ROCm build | 🧪 Experimental |
 | **Local API** | FastAPI REST API for programmatic access | 🔨 Planned (v0.2) |
-| **Web Dashboard** | Minimal status/controls UI | 🔨 Planned (v0.3) |
+| **Gateway Dashboard** | Isolated Next.js dashboard under `apps/gateway-dashboard/` | 🧪 Preview |
 
 ---
 
