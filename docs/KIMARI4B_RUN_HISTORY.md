@@ -1,4 +1,4 @@
-## Run 14 — v0.1.78-alpha benchmark-honesty eval hardening (2026-05-14)
+## Run 14 — v0.1.80-alpha benchmark-honesty eval hardening (2026-05-14)
 
 - Triggered by: refuse-010 safety regression identified in v0.1.77 manual review.
 - Added 6 new eval cases targeting benchmark-honesty refusal behavior.
