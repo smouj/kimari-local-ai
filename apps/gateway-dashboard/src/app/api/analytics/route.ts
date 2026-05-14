@@ -1,212 +1,87 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 
-function generateGpuMetrics(timeRange: string) {
-  const now = new Date()
-  let points: number
-  let intervalMs: number
-
-  switch (timeRange) {
-    case '7d':
-      points = 7
-      intervalMs = 24 * 60 * 60 * 1000
-      break
-    case '30d':
-      points = 30
-      intervalMs = 24 * 60 * 60 * 1000
-      break
-    default: // 24h
-      points = 24
-      intervalMs = 60 * 60 * 1000
-  }
-
-  const dataPoints = Array.from({ length: points }, (_, i) => {
-    const timestamp = new Date(now.getTime() - (points - 1 - i) * intervalMs)
-    // Simulate realistic patterns: higher load during business hours, lower at night
-    const hourOfDay = timestamp.getHours()
-    const isBusinessHour = hourOfDay >= 9 && hourOfDay <= 18
-    const loadMultiplier = isBusinessHour ? 1.3 : 0.7
-    const noise = () => 0.85 + Math.random() * 0.3
-
-    const vramBase = 4200
-    const vramUsed = Math.round(vramBase * loadMultiplier * noise())
-    const gpuTemp = Math.round((65 + (isBusinessHour ? 12 : -5) + (Math.random() * 8 - 4)) * 10) / 10
-    const powerDraw = Math.round((160 + (isBusinessHour ? 30 : -20) + (Math.random() * 20 - 10)) * 10) / 10
-
-    return {
-      timestamp: timestamp.toISOString(),
-      vramUsed: Math.min(vramUsed, 7800),
-      vramTotal: 8192,
-      gpuTemp: Math.max(Math.min(gpuTemp, 89), 42),
-      powerDraw: Math.max(Math.min(powerDraw, 250), 80),
-    }
-  })
-
-  return { timeRange, dataPoints }
-}
-
-function generateRequestHistory(timeRange: string) {
-  const now = new Date()
-  let hourlyData: { hour: string; requests: number; tokens: number; errors: number }[] = []
-
-  if (timeRange === '24h') {
-    hourlyData = Array.from({ length: 24 }, (_, i) => {
-      const hour = new Date(now.getTime() - (23 - i) * 60 * 60 * 1000)
-      const hourStr = `${String(hour.getHours()).padStart(2, '0')}:00`
-      const isBusinessHour = hour.getHours() >= 9 && hour.getHours() <= 18
-      const baseRequests = isBusinessHour ? 65 : 15
-      const requests = Math.round(baseRequests + Math.random() * (isBusinessHour ? 30 : 10))
-      const avgTokens = 300 + Math.random() * 150
-      const errors = Math.random() < 0.15 ? Math.round(Math.random() * 3) : 0
-
-      return {
-        hour: hourStr,
-        requests,
-        tokens: Math.round(requests * avgTokens),
-        errors,
-      }
-    })
-  } else if (timeRange === '7d') {
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    hourlyData = Array.from({ length: 7 }, (_, i) => {
-      const day = new Date(now.getTime() - (6 - i) * 24 * 60 * 60 * 1000)
-      const dayName = dayNames[day.getDay()]
-      const isWeekday = day.getDay() >= 1 && day.getDay() <= 5
-      const baseRequests = isWeekday ? 800 : 350
-      const requests = Math.round(baseRequests + Math.random() * (isWeekday ? 200 : 100))
-      const avgTokens = 320 + Math.random() * 80
-      const errors = Math.round(Math.random() * 5)
-
-      return {
-        hour: dayName,
-        requests,
-        tokens: Math.round(requests * avgTokens),
-        errors,
-      }
-    })
-  } else {
-    // 30d
-    hourlyData = Array.from({ length: 30 }, (_, i) => {
-      const day = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000)
-      const dateStr = `${String(day.getMonth() + 1).padStart(2, '0')}/${String(day.getDate()).padStart(2, '0')}`
-      const isWeekday = day.getDay() >= 1 && day.getDay() <= 5
-      const baseRequests = isWeekday ? 750 : 300
-      const requests = Math.round(baseRequests + Math.random() * (isWeekday ? 250 : 120))
-      const avgTokens = 310 + Math.random() * 100
-      const errors = Math.round(Math.random() * 6)
-
-      return {
-        hour: dateStr,
-        requests,
-        tokens: Math.round(requests * avgTokens),
-        errors,
-      }
-    })
-  }
-
-  const total = hourlyData.reduce((sum, d) => sum + d.requests, 0)
-  const totalTokens = hourlyData.reduce((sum, d) => sum + d.tokens, 0)
-
-  return {
-    total,
-    avgTokensPerRequest: Math.round(totalTokens / total),
-    hourlyData,
-  }
-}
-
-function generateLatency(timeRange: string) {
-  const now = new Date()
-  let points: number
-  let intervalMs: number
-
-  switch (timeRange) {
-    case '7d':
-      points = 7
-      intervalMs = 24 * 60 * 60 * 1000
-      break
-    case '30d':
-      points = 30
-      intervalMs = 24 * 60 * 60 * 1000
-      break
-    default:
-      points = 24
-      intervalMs = 60 * 60 * 1000
-  }
-
-  const trendData = Array.from({ length: points }, (_, i) => {
-    const timestamp = new Date(now.getTime() - (points - 1 - i) * intervalMs)
-    const hourOfDay = timestamp.getHours()
-    const isBusinessHour = hourOfDay >= 9 && hourOfDay <= 18
-    // Slightly higher latency during peak hours due to load
-    const loadFactor = isBusinessHour ? 1.15 : 0.9
-
-    const ttft = Math.round((140 * loadFactor + (Math.random() * 40 - 20)) * 10) / 10
-    const genTime = Math.round((2.3 * loadFactor + (Math.random() * 0.8 - 0.4)) * 100) / 100
-    const tokensPerSec = Math.round((28 * (2 - loadFactor) + (Math.random() * 6 - 3)) * 10) / 10
-
-    return {
-      timestamp: timestamp.toISOString(),
-      ttft: Math.max(ttft, 80),
-      genTime: Math.max(genTime, 1.0),
-      tokensPerSec: Math.max(tokensPerSec, 18),
-    }
-  })
-
-  const avgTtft = Math.round(trendData.reduce((sum, d) => sum + d.ttft, 0) / trendData.length * 10) / 10
-  const avgGenTime = Math.round(trendData.reduce((sum, d) => sum + d.genTime, 0) / trendData.length * 100) / 100
-
-  return { avgTtft, avgGenTime, trendData }
-}
-
-function generateErrorRate(timeRange: string) {
-  const now = new Date()
-  let days: number
-
-  switch (timeRange) {
-    case '7d':
-      days = 7
-      break
-    case '30d':
-      days = 30
-      break
-    default:
-      days = 7 // For 24h, still show daily breakdown
-  }
-
-  const dailyData = Array.from({ length: days }, (_, i) => {
-    const date = new Date(now.getTime() - (days - 1 - i) * 24 * 60 * 60 * 1000)
-    const dateStr = date.toISOString().split('T')[0]
-    const isWeekday = date.getDay() >= 1 && date.getDay() <= 5
-
-    const success = Math.round((isWeekday ? 180 : 80) + Math.random() * (isWeekday ? 40 : 20))
-    const errors = Math.random() < 0.3 ? Math.round(1 + Math.random() * 4) : Math.round(Math.random() * 2)
-
-    return { date: dateStr, success, errors }
-  })
-
-  const total = dailyData.reduce((sum, d) => sum + d.success + d.errors, 0)
-  const errors = dailyData.reduce((sum, d) => sum + d.errors, 0)
-
-  return {
-    total,
-    errors,
-    errorRatePercent: Math.round((errors / total) * 10000) / 100,
-    dailyData,
-  }
-}
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const timeRange = searchParams.get('range') || '24h'
+  const timeRange = request.nextUrl.searchParams.get('range') || '24h'
 
-  const validRanges = ['24h', '7d', '30d']
-  const range = validRanges.includes(timeRange) ? timeRange : '24h'
+  try {
+    // Real benchmark history from DB
+    const benchmarks = await db.benchmarkResult.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: timeRange === '30d' ? 30 : timeRange === '7d' ? 7 : 10,
+    })
 
-  const data = {
-    gpuMetrics: generateGpuMetrics(range),
-    requestHistory: generateRequestHistory(range),
-    latency: generateLatency(range),
-    errorRate: generateErrorRate(range),
+    const gpuMetrics = benchmarks.map((b) => ({
+      timestamp: b.createdAt,
+      model: b.model,
+      profile: b.profile,
+      promptTokPerSec: b.promptTokPerSec,
+      genTokPerSec: b.genTokPerSec,
+      ttft: b.ttft,
+      vramUsedMb: b.vramUsedMb,
+      status: b.status,
+    }))
+
+    // Real request history from logs (count by hour)
+    const logs = await db.gatewayLog.findMany({ orderBy: { createdAt: 'desc' }, take: 100 })
+    const requestHistory = aggregateLogsByTime(logs, timeRange)
+
+    // Real model usage from benchmarks
+    const modelUsage = benchmarks.reduce((acc, b) => {
+      const key = b.model
+      if (!acc[key]) acc[key] = { model: key, runs: 0, avgPrompt: 0, avgGen: 0 }
+      acc[key].runs++
+      acc[key].avgPrompt += b.promptTokPerSec || 0
+      acc[key].avgGen += b.genTokPerSec || 0
+      return acc
+    }, {} as Record<string, { model: string; runs: number; avgPrompt: number; avgGen: number }>)
+
+    // Finalize averages
+    const modelUsageArray = Object.values(modelUsage).map(m => ({
+      ...m,
+      avgPrompt: m.runs > 0 ? Math.round(m.avgPrompt / m.runs * 10) / 10 : 0,
+      avgGen: m.runs > 0 ? Math.round(m.avgGen / m.runs * 10) / 10 : 0,
+    }))
+
+    return NextResponse.json({
+      timeRange,
+      gpuMetrics,
+      requestHistory,
+      modelUsage: modelUsageArray,
+      summary: {
+        totalBenchmarks: benchmarks.length,
+        totalLogEntries: logs.length,
+        latestBenchmark: benchmarks[0]?.createdAt || null,
+      },
+    })
+  } catch (error) {
+    console.error('Failed to get analytics:', error)
+    return NextResponse.json({
+      timeRange,
+      gpuMetrics: [],
+      requestHistory: [],
+      modelUsage: [],
+      summary: { totalBenchmarks: 0, totalLogEntries: 0, latestBenchmark: null },
+    })
+  }
+}
+
+function aggregateLogsByTime(logs: { level: string; createdAt: string }[], _timeRange: string) {
+  // Group logs by hour
+  const byHour: Record<string, { hour: string; total: number; errors: number }> = {}
+
+  for (const log of logs) {
+    const date = new Date(log.createdAt)
+    const hourKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:00`
+
+    if (!byHour[hourKey]) {
+      byHour[hourKey] = { hour: hourKey, total: 0, errors: 0 }
+    }
+    byHour[hourKey].total++
+    if (log.level === 'error') byHour[hourKey].errors++
   }
 
-  return NextResponse.json(data)
+  return Object.values(byHour).sort((a, b) => a.hour.localeCompare(b.hour))
 }
