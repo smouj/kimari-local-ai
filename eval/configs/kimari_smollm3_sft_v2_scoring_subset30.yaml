@@ -1,0 +1,29 @@
+# KimariEval Scoring — SmolLM3-3B SFT v2 Adapter (Private Outputs)
+# Generates raw outputs into private HF bucket for manual review.
+
+base_model: "HuggingFaceTB/SmolLM3-3B"
+adapter_repo_private: "Smouj013/kimari4b-smollm3-sft-v2-adapter"
+dataset_dir: "eval/kimari_private_v1"
+
+subset_size: 30
+temperature: 0.2
+max_tokens: 384
+top_p: 0.9
+seed: 42
+
+hf_jobs_flavor: "a10g-small"
+hf_jobs_timeout_minutes: 30
+hf_jobs_docker_image: "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel"
+
+# Private scoring requirements
+manual_review_required: true
+public_benchmark_allowed: false
+raw_outputs_commit_allowed: false
+raw_outputs_private_required: true
+private_artifact_repo_id: "Smouj013/jobs-artifacts"
+private_artifact_path: "kimari-evals/v0179/smollm3_sft_v2/subset30"
+gate_state: "BLOCKED"
+
+version: "0.1.79-alpha"
+created_at: "2026-05-14"
+notes: "SmolLM3-3B SFT v2 adapter scoring. Raw outputs to private bucket only. Gate BLOCKED."
