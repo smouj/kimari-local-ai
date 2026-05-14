@@ -68,3 +68,8 @@ sentencepiece>=0.1.99
 # Protobuf: Required by SentencePiece and some Transformers internals.
 # Separated because: dependency of tokenizer loading, not CLI runtime.
 protobuf>=4.24.0
+
+# ─── Hub Upload ──────────────────────────────────────────────────────
+# huggingface_hub: Required for uploading adapter to private repo after training.
+# Separated because: only needed when persist_adapter is enabled.
+huggingface_hub>=0.20.0

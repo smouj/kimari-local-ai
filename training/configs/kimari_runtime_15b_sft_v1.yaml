@@ -15,6 +15,8 @@ lora_dropout: 0.05
 batch_size: 1
 gradient_accumulation_steps: 8
 save_adapter: true
+persist_adapter: true
+adapter_repo: Smouj013/kimari-runtime-15b-sft-v1-adapter
 push_to_hub: false
 report_to: none
 public_release_allowed: false

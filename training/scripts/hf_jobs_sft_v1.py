@@ -19,6 +19,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_FLAVOR = "a10g-small"
 DEFAULT_IMAGE = "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel"
 DEFAULT_REPO_URL = "https://github.com/smouj/kimari-local-ai.git"
+DEFAULT_ADAPTER_REPO = "Smouj013/kimari-runtime-15b-sft-v1-adapter"
 
 
 def parse_simple_yaml(path: Path) -> dict[str, Any]:
@@ -69,19 +70,29 @@ def shell_join(args: list[str]) -> str:
     return " ".join(quoted)
 
 
-def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path) -> list[str]:
+def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path, persist_adapter: bool = False, adapter_repo: str = "") -> list[str]:
     training_command = shell_join(build_training_command_args(config_path))
     config_path_str = str(config_path)
-    guarded_command = " && ".join(
-        [
-            "apt-get update && apt-get install -y git",
-            f"git clone {DEFAULT_REPO_URL} /workspace",
-            "cd /workspace",
-            "python -m pip install -r training/requirements-training.txt",
-            f"python training/scripts/preflight_sft_v1.py --config {config_path_str} --strict --json",
-            training_command,
-        ]
-    )
+    output_dir = config.get("output_dir", "training/runs/kimari-runtime-15b-sft-v1")
+
+    steps = [
+        "apt-get update && apt-get install -y git",
+        f"git clone {DEFAULT_REPO_URL} /workspace",
+        "cd /workspace",
+        "python -m pip install -r training/requirements-training.txt",
+        f"python training/scripts/preflight_sft_v1.py --config {config_path_str} --strict --json",
+        training_command,
+    ]
+
+    if persist_adapter and adapter_repo:
+        # Upload adapter to private repo after training
+        # Note: repo must already exist (created manually as private)
+        # upload_folder doesn't need private=True if repo is already private
+        steps.extend([
+            f"python -c \"from huggingface_hub import HfApi; HfApi().upload_folder(folder_path='{output_dir}', repo_id='{adapter_repo}', repo_type='model')\"",
+        ])
+
+    guarded_command = " && ".join(steps)
     return [
         "hf",
         "jobs",
@@ -199,6 +210,8 @@ def main() -> None:
     parser.add_argument(
         "--require-jobs-access", action="store_true", help="Check HF jobs access (required for real submit)"
     )
+    parser.add_argument("--persist-adapter", action="store_true", help="Upload adapter to private HF repo after training")
+    parser.add_argument("--adapter-repo", type=str, default=DEFAULT_ADAPTER_REPO, help="Private HF repo for adapter upload")
     args = parser.parse_args()
 
     if not args.config.exists():
@@ -210,7 +223,7 @@ def main() -> None:
         sys.exit(1)
 
     config = parse_simple_yaml(args.config)
-    command_args = build_hf_jobs_command_args(config, args.config)
+    command_args = build_hf_jobs_command_args(config, args.config, persist_adapter=args.persist_adapter, adapter_repo=args.adapter_repo)
     safety_errors = validate_safety(config)
     command_str = shell_join(command_args) if args.print_command else ""
     execution_order_errors = validate_execution_order(command_str) if command_str else []
