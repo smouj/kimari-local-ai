@@ -4,6 +4,27 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.68-alpha] - 2026-05-14
+
+### Added
+- **HF Jobs eval submission** for subset10 baseline vs adapter evaluation
+- **Eval config v0.1.68-alpha**: adapter_repo_private field pointing to Smouj013/kimari-runtime-15b-sft-v1-adapter
+- **hf_jobs_run_kimari_eval.py**: --detach flag for background job submission
+- **HF Jobs eval job** `6a05163be48bea4538b9c287` (subset10, a10g-small)
+
+### Changed
+- **Eval result doc**: BLOCKED → READY FOR EVALUATION (adapter now available)
+- **Eval plan**: Phase 1.5 COMPLETED
+- **check-release.py**: v0.1.66 report status allows 'ready' in addition to blocked/pending
+- **sft_v1_run_summary.json**: adapter_persisted_private=true, job 6a0512bd3308d79117b8f367
+
+### Fixed
+- **hf_jobs_sft_v1.py**: Added --secrets HF_TOKEN when persist-adapter is enabled
+
+### Security
+- Gate remains BLOCKED — no public weights, GGUF, or benchmark claims
+- Adapter repo is private (Smouj013/kimari-runtime-15b-sft-v1-adapter)
+
 ## [0.1.67-alpha] - 2026-05-13
 
 ### Added

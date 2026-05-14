@@ -3,12 +3,10 @@
 # SFT v1 micro-run adapter (10 steps, QLoRA, Qwen2.5-1.5B-Instruct)
 
 base_model: "Qwen/Qwen2.5-1.5B-Instruct"
-# Adapter from SFT v1 real micro-run (Job 6a0501dae48bea4538b9c17a)
-# Note: adapter was generated but NOT persisted to HF. This config is for
-# local evaluation readiness validation. Actual adapter must be loaded from
-# the training output directory or re-generated if needed.
+# Adapter from SFT v1 real micro-run, persisted to private HF repo in v0.1.67-alpha
+# Job 6a0512bd3308d79117b8f367, loss 2.753→2.653 (10 steps)
 adapter_path: "training/output/kimari-runtime-15b-sft-v1/adapter"
-adapter_repo_private: null  # Not persisted to HF
+adapter_repo_private: "Smouj013/kimari-runtime-15b-sft-v1-adapter"
 dataset_dir: "eval/kimari_private_v1"
 
 # Small subset for first pipeline validation
@@ -27,6 +25,11 @@ metrics:
   - exact_match
   - containment
 
+# HF Jobs config
+hf_jobs_flavor: "a10g-small"
+hf_jobs_timeout_minutes: 30
+hf_jobs_docker_image: "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel"
+
 # Safety flags — ALL must be false/correct
 manual_review_required: true
 public_benchmark_allowed: false
@@ -34,11 +37,12 @@ raw_outputs_commit_allowed: false
 gate_state: "BLOCKED"
 
 # Metadata
-version: "0.1.64-alpha"
+version: "0.1.68-alpha"
 created_at: "2026-05-14"
 notes: |
-  SFT v1 adapter subset10 evaluation readiness config.
-  Adapter from micro-run (10 steps, loss 2.753→2.652).
+  SFT v1 adapter subset10 evaluation config.
+  Adapter from micro-run (10 steps, loss 2.753→2.653).
+  Adapter persisted to Smouj013/kimari-runtime-15b-sft-v1-adapter (private).
   If subset10 passes, proceed to subset30.
   No public benchmark claims. No raw outputs committed.
-  Gate BLOCKED. Adapter not persisted to HF.
+  Gate BLOCKED.

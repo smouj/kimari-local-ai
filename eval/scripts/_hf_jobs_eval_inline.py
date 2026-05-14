@@ -29,7 +29,7 @@ def main():
     print("=" * 60)
 
     base_model = "Qwen/Qwen2.5-1.5B-Instruct"
-    adapter_repo = "Smouj013/kimari4b-micro-sft-adapter-v0"
+    adapter_repo = "Smouj013/kimari-runtime-15b-sft-v1-adapter"
     temperature = 0.2
     max_tokens = 256
     top_p = 0.9

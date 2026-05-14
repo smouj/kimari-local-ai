@@ -321,6 +321,7 @@ def build_hf_jobs_command(config: dict, subset_size: int | None = None) -> list[
         f"{timeout}m",
         "--secrets",
         "HF_TOKEN",
+        "--detach",
         str(script_path),
     ]
 

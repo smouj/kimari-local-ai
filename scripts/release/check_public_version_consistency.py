@@ -21,7 +21,7 @@ except ModuleNotFoundError:  # Python 3.10 compatibility
     import tomli as tomllib
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-TODAY = dt.date(2026, 5, 13)
+TODAY = dt.date(2026, 5, 14)
 PUBLIC_FILES = [
     Path("README.md"),
     Path("docs/index.html"),
