@@ -4,6 +4,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.70-alpha] - 2026-05-14
+
+### Added
+- **Subset30 completion evaluation** for the 100-step SFT v1 adapter.
+- **Subset30 report** at `reports/evals/kimari_runtime_15b_sft_v1_subset30/`.
+
+### Results
+- **Eval job** `6a05236ee48bea4538b9c315` completed on `a10g-small`.
+- **Baseline**: 30/30 completed (100%).
+- **Adapter**: 30/30 completed (100%).
+- **Both models** loaded and generated successfully.
+
+### Changed
+- Eval result doc now reflects subset30 completion.
+- Eval plan marks subset30 complete and recommends scoring/quality eval next.
+
+### Security
+- Gate remains BLOCKED — no public weights, GGUF, raw outputs, or benchmark claims.
+
 ## [0.1.69-alpha] - 2026-05-14
 
 ### Added

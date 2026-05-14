@@ -34,7 +34,7 @@ def main():
     max_tokens = 256
     top_p = 0.9
     seed = 42
-    subset_size = 10
+    subset_size = 30
 
     # Load embedded eval dataset. No raw model outputs are embedded or committed.
     print("\nLoading embedded KimariEval private v1 dataset...")
