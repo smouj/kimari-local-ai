@@ -572,7 +572,22 @@ def build_training_arguments(config: dict, output_dir: str, eval_dataset_exists:
         "fp16": config.get("fp16", False),
         "gradient_checkpointing": config.get("gradient_checkpointing", False),
         "seed": config.get("seed", 42),
+        "weight_decay": config.get("weight_decay", 0.0),
+        "lr_scheduler_type": config.get("lr_scheduler_type", "cosine"),
+        "warmup_steps": config.get("warmup_steps", 0),
     }
+
+    # Best model selection (v0.1.79: early stopping support)
+    if config.get("load_best_model_at_end"):
+        kwargs["load_best_model_at_end"] = True
+        if config.get("metric_for_best_model"):
+            kwargs["metric_for_best_model"] = config["metric_for_best_model"]
+        if config.get("greater_is_better") is not None:
+            kwargs["greater_is_better"] = config["greater_is_better"]
+    if config.get("save_total_limit"):
+        kwargs["save_total_limit"] = config["save_total_limit"]
+    if config.get("save_strategy"):
+        kwargs["save_strategy"] = config["save_strategy"]
 
     # Add eval-related args only when an eval dataset exists
     if eval_dataset_exists:

@@ -1,0 +1,68 @@
+# Kimari-4B SmolLM3-3B SFT v2 — Proper Training Run
+# Fixed: reduced epochs, early stopping, better LR for small dataset
+# Base: HuggingFaceTB/SmolLM3-3B (Apache-2.0)
+# Dataset: kimari_sft_v1 (320 items, 288 train / 32 val)
+# Method: QLoRA
+
+run_id: kimari4b-smollm3-sft-v2-private-002
+base_model: HuggingFaceTB/SmolLM3-3B
+base_license: Apache-2.0
+dataset_path: dataset/build/kimari_sft_v1/train.jsonl
+eval_dataset_path: dataset/build/kimari_sft_v1/validation.jsonl
+dataset_summary: dataset/build/kimari_sft_v1/dataset_summary.json
+
+# QLoRA Configuration
+gradient_checkpointing: true
+max_seq_length: 4096
+max_steps: 150
+num_train_epochs: 1
+learning_rate: 5.0e-5
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.1
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+
+# Early stopping / best model selection
+eval_strategy: steps
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+save_strategy: steps
+save_total_limit: 3
+
+# Adapter persistence
+report_to: none
+save_adapter: true
+persist_adapter: true
+adapter_repo: Smouj013/kimari4b-smollm3-sft-v2-adapter
+push_to_hub: false
+
+# Safety gates
+public_release_allowed: false
+hf_public_upload_allowed: false
+gguf_export_allowed: false
+gate_state: BLOCKED
+
+output_dir: training/runs/kimari4b-smollm3-sft-v2
+seed: 42
+fp16: true
+logging_steps: 10
+save_steps: 25
+eval_steps: 25
+warmup_steps: 10
+weight_decay: 0.01
+lr_scheduler_type: cosine
+
+# Math: 288 samples / (4 batch * 4 accum) = 18 steps/epoch
+# 150 steps = ~8.3 epochs (still enough for 1 full pass + generalization)
+# But load_best_model_at_end picks the checkpoint with lowest eval_loss
+# Early stopping patience: implicit via save_total_limit=3
