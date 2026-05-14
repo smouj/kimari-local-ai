@@ -1,0 +1,36 @@
+# KimariEval — SmolLM3-3B SFT v2 Adapter Evaluation
+# Evaluates the v2 adapter (anti-overfitting) against SmolLM3-3B baseline
+# ALL safety flags must be false. No automatic gate transitions.
+
+base_model: "HuggingFaceTB/SmolLM3-3B"
+adapter_repo_private: "Smouj013/kimari4b-smollm3-sft-v2-adapter"
+dataset_dir: "eval/kimari_private_v1"
+
+# First run: subset of 30 cases. Increase after validation.
+subset_size: 30
+
+# Generation parameters
+temperature: 0.2
+max_tokens: 384
+top_p: 0.9
+seed: 42
+
+# HF Jobs configuration
+hf_jobs_flavor: "a10g-small"
+hf_jobs_timeout_minutes: 30
+hf_jobs_docker_image: "pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel"
+
+# Stack verified
+stack_verified: true
+stack_notes: "SmolLM3-3B + QLoRA adapter v2. PyTorch 2.5.1 on A10G."
+
+# Safety flags — ALL must be false
+manual_review_required: true
+public_benchmark_allowed: false
+raw_outputs_commit_allowed: false
+gate_state: "BLOCKED"
+
+# Metadata
+version: "0.1.79-alpha"
+created_at: "2026-05-14"
+notes: "SmolLM3-3B SFT v2 adapter eval. v1 overfitted (eval_loss 2.81), v2 healthy (eval_loss 1.41). Subset 30 first. No benchmark claims. Gate BLOCKED."
