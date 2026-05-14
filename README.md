@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-0.1.78--alpha-9b59b6.svg" alt="v0.1.78-alpha">
+  <img src="https://img.shields.io/badge/version-0.1.79--alpha-9b59b6.svg" alt="v0.1.79-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.78-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.79-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.78-alpha**
+> **Kimari Local AI v0.1.79-alpha**
 
 ### 🔗 Public Resources
 
@@ -899,6 +899,41 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 > Local GTX 1060/1080 is for inference/testing only. Training requires rented GPU (RTX 4090+, A100).
 > See [docs/MODEL_TRAINING_PLAN.md](docs/MODEL_TRAINING_PLAN.md) for details.
 
+
+---
+
+## 🖥️ Gateway Dashboard Preview
+
+Kimari now includes an experimental Gateway Dashboard as an isolated Next.js sub-app under [`apps/gateway-dashboard/`](apps/gateway-dashboard/). This keeps the existing Python CLI/runtime, documentation, benchmarks, and release flow intact while allowing dashboard work to evolve safely and incrementally.
+
+Current dashboard work includes:
+
+- Blue/gray professional palette rebrand.
+- Real Kimari logo integration.
+- Mobile responsive sidebar and compact header/footer.
+- Keyboard shortcuts help dialog (`?`).
+- Logs export to JSON/CSV.
+
+> **Safety note:** The dashboard is UI-only in this branch and should remain isolated from public benchmark/model claims. Gate state for model release remains **BLOCKED**.
+
+<p align="center">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-dashboard.png" alt="Kimari Gateway Dashboard — overview" width="47%">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-server.png" alt="Kimari Gateway Dashboard — server" width="47%">
+</p>
+
+<p align="center">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-analytics.png" alt="Kimari Gateway Dashboard — analytics" width="47%">
+  <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-profiles.png" alt="Kimari Gateway Dashboard — profiles" width="47%">
+</p>
+
+Run locally:
+
+```bash
+cd apps/gateway-dashboard
+bun install
+bun run dev
+```
+
 ---
 
 ## 📸 Screenshots & CLI Preview
@@ -1008,7 +1043,7 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | **Runtime Validation** | llama-server flag detection and compatibility checks | ✅ Available |
 | **ROCm** | AMD GPU support via HIP/ROCm build | 🧪 Experimental |
 | **Local API** | FastAPI REST API for programmatic access | 🔨 Planned (v0.2) |
-| **Web Dashboard** | Minimal status/controls UI | 🔨 Planned (v0.3) |
+| **Gateway Dashboard** | Isolated Next.js dashboard under `apps/gateway-dashboard/` | 🧪 Preview |
 
 ---
 

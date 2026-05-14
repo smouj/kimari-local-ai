@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4aa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a88a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0c0;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#00d4aa;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+  <!-- Background rounded square -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#grad1)"/>
+  <!-- Glow effect -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#grad2)"/>
+  <!-- K letter with geometric style -->
+  <path d="M160 140 L160 372 L200 372 L200 270 L240 270 L320 372 L370 372 L280 258 L360 140 L310 140 L240 248 L200 248 L200 140 Z" fill="white" opacity="0.95"/>
+  <!-- Accent dots -->
+  <circle cx="380" cy="140" r="16" fill="white" opacity="0.8"/>
+  <circle cx="380" cy="372" r="12" fill="white" opacity="0.5"/>
+  <!-- Circuit-like lines -->
+  <path d="M400 180 L430 180 L430 220" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+  <path d="M400 340 L420 340 L420 310" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.3"/>
+  <path d="M100 180 L70 180 L70 220" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.2"/>
+</svg>
