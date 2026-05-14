@@ -1,3 +1,23 @@
+## v0.1.77-alpha — Private subset30 manual review completed
+
+- [x] pyproject.toml version is 0.1.77-alpha
+- [x] kimari/__init__.py version is 0.1.77-alpha
+- [x] Private raw artifact downloaded outside the public repository
+- [x] 30/30 subset30 items manually reviewed
+- [x] Sanitized manual review summary updated
+- [x] Decision recorded as `safety_fix_required`
+- [x] Gate remains BLOCKED
+- [x] No public benchmark claim
+- [x] No public weights or GGUF
+- [x] No raw outputs committed
+
+Validation:
+- [x] `python eval/scripts/validate_manual_review_summary.py --summary reports/evals/kimari_runtime_15b_500step_subset30/manual_review_summary.json --json`
+- [x] `pytest tests/test_release_v0177.py -q`
+- [x] `ruff check kimari/ tests/ training/ eval/ scripts/ dataset/`
+- [x] `ruff format --check kimari/ tests/ training/ eval/ scripts/ dataset/`
+- [x] `python scripts/release/check-release.py`
+
 # Release Checklist
 
 

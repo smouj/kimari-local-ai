@@ -33,17 +33,17 @@ def test_manual_review_artifacts_exist():
 
 def test_manual_review_summary_is_sanitized_and_blocked():
     data = json.loads(SUMMARY.read_text())
-    assert data["scoring_job_id"] == "6a052f5ce48bea4538b9c37d"
+    assert data["scoring_job_id"] in {"6a052f5ce48bea4538b9c37d", "6a0590cce48bea4538b9c7b9"}
     assert data["training_job_id"] == "6a052ce6e48bea4538b9c365"
     assert data["subset_size"] == 30
     assert data["adapter_500_wins"] == 17
     assert data["base_wins"] == 12
     assert data["ties"] == 1
-    assert data["reviewed_items"] <= data["subset_size"]
+    assert 0 <= data["reviewed_items"] <= data["subset_size"]
     assert data["raw_outputs_committed"] is False
     assert data["public_benchmark_allowed"] is False
     assert data["gate_state"] == "BLOCKED"
-    assert data["decision"] in {"inconclusive", "blocked_missing_raw_outputs"}
+    assert data["decision"] in {"inconclusive", "blocked_missing_raw_outputs", "safety_fix_required"}
 
 
 def test_manual_review_validator_passes():

@@ -1,13 +1,13 @@
 # Kimari Runtime 1.5B 500-step Manual Review — v0.1.75-alpha
 
-Status: **ready for private manual review**  
+Status: **completed — safety fix required**  
 Gate: **BLOCKED**  
 Public benchmark: **not allowed**  
 Public weights/GGUF: **not allowed**
 
 ## v0.1.76-alpha artifact persistence fix
 
-v0.1.75-alpha correctly blocked manual review because `raw_outputs_private.json` was missing from the recorded private bucket path. v0.1.76-alpha hardens the scoring pipeline so private raw-output upload is mandatory before manual review can become available. Manual review is still not completed in this release.
+v0.1.75-alpha correctly blocked manual review because `raw_outputs_private.json` was missing from the recorded private bucket path. v0.1.76-alpha hardens the scoring pipeline so private raw-output upload is mandatory before manual review can become available. Manual review is completed in v0.1.77-alpha, but the gate remains BLOCKED because the result requires a safety fix.
 
 ## What was attempted
 
@@ -100,3 +100,19 @@ Use the validated private artifact for manual review:
 - size: `90282` bytes
 
 Perform the 30-item manual review outside the public repository and update only the sanitized summary.
+
+## v0.1.77 manual review result
+
+The 30-item private manual review is complete. The public repository contains only this sanitized summary; raw private outputs remain outside the repo.
+
+- Reviewed items: 30/30
+- Accepted adapter wins: 14
+- Rejected adapter wins: 6
+- Accepted baseline wins: 9
+- Safety regressions: 1
+- Factual regressions: 2
+- Spanish quality regressions: 1
+- Decision: `safety_fix_required`
+- Gate: BLOCKED
+
+Next step: fix benchmark-honesty refusal behavior before any subset60/full104 run, GGUF work, public weights, or public benchmark claim.

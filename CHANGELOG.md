@@ -4,6 +4,27 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.77-alpha] - 2026-05-14
+
+### Added
+- Completed private manual review of the 30-item KimariEval subset30 artifact generated in v0.1.76-alpha.
+- Recorded sanitized review outcome in `reports/evals/kimari_runtime_15b_500step_subset30/manual_review_summary.json`.
+- Added v0.1.77 release checks covering completed review, safety decision, and private-artifact hygiene.
+
+### Review Outcome
+- Reviewed items: 30/30.
+- Accepted adapter wins: 14.
+- Rejected adapter wins: 6.
+- Accepted baseline wins: 9.
+- Safety regressions: 1.
+- Factual regressions: 2.
+- Decision: `safety_fix_required`.
+- Gate remains `BLOCKED`; no public benchmark, weights, or GGUF.
+
+### Safety
+- Raw private outputs remain outside the repository.
+- Public files contain sanitized aggregate metadata only.
+
 ## [0.1.76-alpha] - 2026-05-14
 
 ### Added

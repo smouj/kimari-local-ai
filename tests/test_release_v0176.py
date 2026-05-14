@@ -19,9 +19,11 @@ SUMMARY = (
 )
 
 
-def test_version_bumped_to_v0176():
-    assert 'version = "0.1.76-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
-    assert '__version__ = "0.1.76-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
+def test_version_at_least_v0176():
+    pyproject = (PROJECT_ROOT / "pyproject.toml").read_text()
+    init = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
+    assert 'version = "0.1.7' in pyproject
+    assert '__version__ = "0.1.7' in init
 
 
 def test_private_artifact_tools_exist():

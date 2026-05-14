@@ -29,5 +29,8 @@
   "adapter_500_delta_vs_base": 0.0246,
   "adapter_500_wins": 17,
   "base_wins": 12,
-  "ties": 1
+  "ties": 1,
+  "manual_review_completed": true,
+  "manual_review_status": "completed",
+  "manual_review_decision": "safety_fix_required"
 }

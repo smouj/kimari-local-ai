@@ -31,15 +31,15 @@ def test_manual_review_tooling_exists():
 
 def test_manual_review_summary_records_missing_raw_outputs_safely():
     data = json.loads(SUMMARY.read_text())
-    assert data["scoring_job_id"] == "6a052f5ce48bea4538b9c37d"
+    assert data["scoring_job_id"] in {"6a052f5ce48bea4538b9c37d", "6a0590cce48bea4538b9c7b9"}
     assert data["training_job_id"] == "6a052ce6e48bea4538b9c365"
     assert data["subset_size"] == 30
     assert data["adapter_500_wins"] == 17
     assert data["base_wins"] == 12
     assert data["ties"] == 1
-    assert data["manual_review_status"] in {"blocked_missing_raw_outputs", "ready"}
-    assert data["reviewed_items"] == 0
-    assert data["decision"] in {"blocked_missing_raw_outputs", "inconclusive"}
+    assert data["manual_review_status"] in {"blocked_missing_raw_outputs", "ready", "completed"}
+    assert 0 <= data["reviewed_items"] <= data["subset_size"]
+    assert data["decision"] in {"blocked_missing_raw_outputs", "inconclusive", "safety_fix_required"}
     assert data["raw_outputs_committed"] is False
     assert data["public_benchmark_allowed"] is False
     assert data["gate_state"] == "BLOCKED"

@@ -40,8 +40,8 @@ ALLOWED_DECISIONS = {
 }
 
 BASE_SUMMARY: dict[str, Any] = {
-    "review_id": "kimari-runtime-15b-500step-subset30-manual-review-v0175",
-    "scoring_job_id": "6a052f5ce48bea4538b9c37d",
+    "review_id": "kimari-runtime-15b-500step-subset30-manual-review-v0177",
+    "scoring_job_id": "6a0590cce48bea4538b9c7b9",
     "training_job_id": "6a052ce6e48bea4538b9c365",
     "subset_size": 30,
     "base_score": 0.3158,

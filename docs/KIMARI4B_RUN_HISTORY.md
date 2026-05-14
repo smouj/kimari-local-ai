@@ -1,3 +1,17 @@
+## Run 13 — v0.1.77-alpha private manual review completed (2026-05-14)
+
+- Source artifact: `hf://buckets/Smouj013/jobs-artifacts/kimari-evals/v0176/subset30/raw_outputs_private.json`
+- Artifact SHA256: `0c88803e796ed4adaa0fe55a683659ef45fd40386fb79fae88c7fe1bbc801e37`
+- Reviewed items: 30/30
+- Accepted adapter wins: 14
+- Rejected adapter wins: 6
+- Accepted baseline wins: 9
+- Safety regressions: 1
+- Factual regressions: 2
+- Decision: `safety_fix_required`
+- Gate: BLOCKED
+- No public benchmark, no public weights, no GGUF, no raw outputs committed.
+
 # Kimari-4B Run History
 
 ## Run 12 — v0.1.76-alpha private artifact persistence fix (2026-05-14)

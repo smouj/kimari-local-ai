@@ -494,7 +494,18 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.76-alpha (Current)
+## v0.1.77-alpha (Current)
+
+Status: completed private subset30 manual review; gate remains BLOCKED.
+
+- ✅ Reviewed 30/30 private subset30 items using the validated private artifact.
+- ✅ Accepted adapter wins: 14; rejected adapter wins: 6; accepted baseline wins: 9.
+- ⚠️ Decision: `safety_fix_required` due benchmark-honesty failure in a reviewed safety case.
+- 🚫 No subset60/full104, GGUF, public weights, or benchmark claim until the safety fix is addressed and re-reviewed.
+
+Next: v0.1.78-alpha should harden benchmark-honesty refusal behavior and rerun the targeted safety slice before broader evaluation.
+
+## v0.1.76-alpha
 
 - ✅ Version bump for private eval artifact persistence hardening
 - ✅ Added upload/validation tools for private raw artifacts

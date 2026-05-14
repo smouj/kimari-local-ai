@@ -4256,7 +4256,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.76--alpha" in readme_text_current
+            "version-0.1.77--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -4264,7 +4264,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.76-alpha" in docs_index_text
+            "Kimari Local AI v0.1.77-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.76-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.77-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -4440,6 +4440,94 @@ def main() -> None:
             len(artifacts) == 0,
             f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
         )
+
+    # ── [91/91] v0.1.77 private manual review completed ───────────────
+    print("\n[91/91] v0.1.77 private manual review completed")
+    manual_summary = (
+        PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_500step_subset30" / "manual_review_summary.json"
+    )
+    artifact_summary = (
+        PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_500step_subset30" / "artifact_persistence_summary.json"
+    )
+    check("v0.1.77 manual review summary exists", manual_summary.exists(), "missing manual review summary")
+    if manual_summary.exists():
+        try:
+            review_data = json.loads(manual_summary.read_text())
+            check(
+                "v0.1.77 manual review completed",
+                review_data.get("manual_review_status") == "completed",
+                "manual review must be completed",
+            )
+            check(
+                "v0.1.77 reviewed all subset30 items",
+                review_data.get("reviewed_items") == 30,
+                "reviewed_items must be 30",
+            )
+            check(
+                "v0.1.77 decision safety_fix_required",
+                review_data.get("decision") == "safety_fix_required",
+                "decision must be safety_fix_required",
+            )
+            check("v0.1.77 gate BLOCKED", review_data.get("gate_state") == "BLOCKED", "gate must remain BLOCKED")
+            check(
+                "v0.1.77 no public benchmark",
+                review_data.get("public_benchmark_allowed") is False,
+                "public benchmark must remain false",
+            )
+            check(
+                "v0.1.77 raw outputs not committed",
+                review_data.get("raw_outputs_committed") is False,
+                "raw outputs must not be committed",
+            )
+            check(
+                "v0.1.77 accepted adapter wins recorded",
+                review_data.get("accepted_adapter_wins") == 14,
+                "accepted adapter wins changed",
+            )
+            check(
+                "v0.1.77 rejected adapter wins recorded",
+                review_data.get("rejected_adapter_wins") == 6,
+                "rejected adapter wins changed",
+            )
+            check(
+                "v0.1.77 safety regression recorded",
+                review_data.get("safety_regressions") == 1,
+                "safety regression must be recorded",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.77 manual summary valid JSON", False, "manual summary is not valid JSON")
+    check("v0.1.77 artifact summary exists", artifact_summary.exists(), "missing artifact summary")
+    if artifact_summary.exists():
+        try:
+            artifact_data = json.loads(artifact_summary.read_text())
+            check(
+                "v0.1.77 manual review completed in artifact summary",
+                artifact_data.get("manual_review_completed") is True,
+                "artifact summary must mark manual review completed",
+            )
+            check(
+                "v0.1.77 artifact decision safety_fix_required",
+                artifact_data.get("manual_review_decision") == "safety_fix_required",
+                "artifact decision mismatch",
+            )
+            check(
+                "v0.1.77 artifact gate BLOCKED",
+                artifact_data.get("gate_state") == "BLOCKED",
+                "artifact gate must remain BLOCKED",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.77 artifact summary valid JSON", False, "artifact summary is not valid JSON")
+    try:
+        tracked = subprocess.run(["git", "ls-files"], cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30)
+        tracked_files = tracked.stdout.splitlines() if tracked.returncode == 0 else []
+    except Exception:
+        tracked_files = []
+    tracked_raw_v0177 = [line for line in tracked_files if Path(line).name == "raw_outputs_private.json"]
+    check(
+        "v0.1.77 no raw_outputs_private.json tracked",
+        not tracked_raw_v0177,
+        f"tracked raw outputs: {tracked_raw_v0177}",
+    )
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
@@ -6878,7 +6966,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.76--alpha" in readme_text_current
+            "version-0.1.77--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -6886,7 +6974,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.76-alpha" in docs_index_text
+            "Kimari Local AI v0.1.77-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6950,7 +7038,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.76-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.77-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -8166,6 +8254,94 @@ def main() -> None:
             len(artifacts) == 0,
             f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
         )
+
+    # ── [91/91] v0.1.77 private manual review completed ───────────────
+    print("\n[91/91] v0.1.77 private manual review completed")
+    manual_summary = (
+        PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_500step_subset30" / "manual_review_summary.json"
+    )
+    artifact_summary = (
+        PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_500step_subset30" / "artifact_persistence_summary.json"
+    )
+    check("v0.1.77 manual review summary exists", manual_summary.exists(), "missing manual review summary")
+    if manual_summary.exists():
+        try:
+            review_data = json.loads(manual_summary.read_text())
+            check(
+                "v0.1.77 manual review completed",
+                review_data.get("manual_review_status") == "completed",
+                "manual review must be completed",
+            )
+            check(
+                "v0.1.77 reviewed all subset30 items",
+                review_data.get("reviewed_items") == 30,
+                "reviewed_items must be 30",
+            )
+            check(
+                "v0.1.77 decision safety_fix_required",
+                review_data.get("decision") == "safety_fix_required",
+                "decision must be safety_fix_required",
+            )
+            check("v0.1.77 gate BLOCKED", review_data.get("gate_state") == "BLOCKED", "gate must remain BLOCKED")
+            check(
+                "v0.1.77 no public benchmark",
+                review_data.get("public_benchmark_allowed") is False,
+                "public benchmark must remain false",
+            )
+            check(
+                "v0.1.77 raw outputs not committed",
+                review_data.get("raw_outputs_committed") is False,
+                "raw outputs must not be committed",
+            )
+            check(
+                "v0.1.77 accepted adapter wins recorded",
+                review_data.get("accepted_adapter_wins") == 14,
+                "accepted adapter wins changed",
+            )
+            check(
+                "v0.1.77 rejected adapter wins recorded",
+                review_data.get("rejected_adapter_wins") == 6,
+                "rejected adapter wins changed",
+            )
+            check(
+                "v0.1.77 safety regression recorded",
+                review_data.get("safety_regressions") == 1,
+                "safety regression must be recorded",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.77 manual summary valid JSON", False, "manual summary is not valid JSON")
+    check("v0.1.77 artifact summary exists", artifact_summary.exists(), "missing artifact summary")
+    if artifact_summary.exists():
+        try:
+            artifact_data = json.loads(artifact_summary.read_text())
+            check(
+                "v0.1.77 manual review completed in artifact summary",
+                artifact_data.get("manual_review_completed") is True,
+                "artifact summary must mark manual review completed",
+            )
+            check(
+                "v0.1.77 artifact decision safety_fix_required",
+                artifact_data.get("manual_review_decision") == "safety_fix_required",
+                "artifact decision mismatch",
+            )
+            check(
+                "v0.1.77 artifact gate BLOCKED",
+                artifact_data.get("gate_state") == "BLOCKED",
+                "artifact gate must remain BLOCKED",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.77 artifact summary valid JSON", False, "artifact summary is not valid JSON")
+    try:
+        tracked = subprocess.run(["git", "ls-files"], cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30)
+        tracked_files = tracked.stdout.splitlines() if tracked.returncode == 0 else []
+    except Exception:
+        tracked_files = []
+    tracked_raw_v0177 = [line for line in tracked_files if Path(line).name == "raw_outputs_private.json"]
+    check(
+        "v0.1.77 no raw_outputs_private.json tracked",
+        not tracked_raw_v0177,
+        f"tracked raw outputs: {tracked_raw_v0177}",
+    )
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:
