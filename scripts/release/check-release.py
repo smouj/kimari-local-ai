@@ -7571,9 +7571,9 @@ def main() -> None:
             "gate must remain BLOCKED",
         )
         check(
-            "v0.1.64 summary micro_run=true",
-            sft_data.get("micro_run") is True,
-            "summary must record micro_run=true (10 steps, not final model)",
+            "v0.1.64+ summary has valid run mode",
+            sft_data.get("micro_run") is True or sft_data.get("full_run") is True,
+            "summary must record micro_run=true or full_run=true",
         )
 
     # Run history doc must exist and contain the micro-run entry

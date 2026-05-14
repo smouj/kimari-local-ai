@@ -83,6 +83,16 @@ def test_training_config_guarded_for_first_full_run():
     assert "gguf_export_allowed: false" in config
 
 
+def test_full_run_summary_completed():
+    summary = json.loads((PROJECT_ROOT / "docs" / "assets" / "results" / "sft_v1_run_summary.json").read_text())
+    assert summary["job_id"] == "6a052235e48bea4538b9c309"
+    assert summary["full_run"] is True
+    assert summary["micro_run"] is False
+    assert summary["steps_completed"] == 100
+    assert summary["adapter_persisted_private"] is True
+    assert summary["gate_state"] == "BLOCKED"
+
+
 def test_no_public_model_artifacts():
     dangerous = []
     for pattern in ("*.safetensors", "*.gguf", "adapter_model.bin"):
