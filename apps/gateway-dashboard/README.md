@@ -17,18 +17,28 @@ Experimental Next.js dashboard for managing and observing a local Kimari gateway
 - Mobile responsive sidebar using sheet overlay.
 - Logs export to JSON/CSV from currently loaded log entries.
 - Blue/gray rebrand replacing the previous teal/green accent system.
+- Round 13 polish: standardized blue/sky/amber/emerald badges, larger status chip, profile/model/integration card consistency, doctor view polish, animated metric cards, gradient welcome banner, breathing architecture arrows.
+- System resources monitor: four circular SVG gauges for CPU, RAM, VRAM, and GPU temperature with 5s refresh and threshold colors.
+- QuickLauncher widget: Start Server, Run Benchmark, System Check, and Download Model action cards.
 
 ## Local development
 
 ```bash
 cd apps/gateway-dashboard
-bun install
-bun run lint
-bun run build
-bun run dev
+npm install
+npm run lint
+npm run build
+npm run dev
 ```
 
 The app runs on Next.js and is intentionally isolated from the root Python package. Do not move root Kimari CLI files into this app.
+
+For API routes backed by Prisma during local smoke tests:
+
+```bash
+DATABASE_URL='file:./dev.db' npx prisma db push
+DATABASE_URL='file:./dev.db' npx prisma db seed
+```
 
 ## Screenshots
 

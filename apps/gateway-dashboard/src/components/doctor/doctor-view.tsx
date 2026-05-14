@@ -77,12 +77,19 @@ function ExpandableRow({ check, index }: { check: DiagnosticCheck; index: number
     FAIL: 'bg-red-500/[0.03] dark:bg-red-500/[0.05]',
   }
 
+  const rowBorder: Record<string, string> = {
+    PASS: 'border-l-[3px] border-l-emerald-500',
+    WARN: 'border-l-[3px] border-l-amber-500',
+    FAIL: 'border-l-[3px] border-l-red-500',
+  }
+
   return (
     <>
       <TableRow
         className={cn(
           'cursor-pointer transition-colors hover:bg-muted/50',
-          rowBg[check.status]
+          rowBg[check.status],
+          rowBorder[check.status]
         )}
         onClick={() => setExpanded(!expanded)}
       >
@@ -231,7 +238,7 @@ export function DoctorView() {
                 </Badge>
               </div>
               <Button
-                className="gap-2 btn-press"
+                className="gap-2 btn-press bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg shadow-primary/20 font-semibold"
                 onClick={handleRun}
                 disabled={runDoctor.isPending}
               >
@@ -256,12 +263,12 @@ export function DoctorView() {
             </div>
             <div
               className={cn(
-                'h-3.5 w-full rounded-full overflow-hidden bg-muted/40',
+                'h-4 w-full rounded-full overflow-hidden bg-muted/40 relative',
               )}
             >
               <motion.div
                 className={cn(
-                  'h-full rounded-full',
+                  'h-full rounded-full relative',
                   (data?.healthScore ?? 0) > 70
                     ? 'bg-gradient-to-r from-emerald-600 via-emerald-400 to-emerald-500'
                     : (data?.healthScore ?? 0) > 40
@@ -271,7 +278,10 @@ export function DoctorView() {
                 initial={{ width: 0 }}
                 animate={{ width: `${data?.healthScore ?? 0}%` }}
                 transition={{ duration: 1, ease: 'easeOut' }}
-              />
+              >
+                {/* Shine overlay on progress bar */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-gradient-shift" />
+              </motion.div>
             </div>
             <div className="flex justify-between mt-1.5">
               <span className="text-[10px] text-muted-foreground">
@@ -289,8 +299,10 @@ export function DoctorView() {
       {Object.entries(groupedChecks).map(([category, checks]) => (
         <Card key={category} className="depth-shadow">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-bold flex items-center gap-2">
-              {categoryIcons[category] ?? <Activity className="h-3.5 w-3.5" />}
+            <CardTitle className="text-base font-bold flex items-center gap-2.5">
+              <span className="flex items-center justify-center h-6 w-6 rounded-md bg-primary/10 text-primary">
+                {categoryIcons[category] ?? <Activity className="h-3.5 w-3.5" />}
+              </span>
               {category}
               <Badge variant="outline" className="font-mono text-[10px] ml-1">
                 {checks.length}

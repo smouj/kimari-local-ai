@@ -714,3 +714,27 @@
 .dark *::-webkit-scrollbar-thumb:hover {
   background: oklch(0.4 0.04 230);
 }
+
+/* ==============================
+   BREATHING ANIMATION (for arrows)
+   ============================== */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.animate-breathe {
+  animation: breathe 2.5s ease-in-out infinite;
+}
+
+/* ==============================
+   SLOW GRADIENT SHIFT (for welcome banner)
+   ============================== */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}

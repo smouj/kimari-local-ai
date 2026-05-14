@@ -834,11 +834,21 @@ export interface NetworkResources {
   latency: string
 }
 
+export interface GpuResources {
+  vramUsed: number
+  vramTotal: number
+  vramPercent: number
+  temperature: number
+  powerDraw: number
+}
+
 export interface SystemResourcesData {
   cpu: CpuResources
   memory: MemoryResources
   disk: DiskResources
   network: NetworkResources
+  gpu: GpuResources
+  uptime: number
 }
 
 export function useSystemResources() {

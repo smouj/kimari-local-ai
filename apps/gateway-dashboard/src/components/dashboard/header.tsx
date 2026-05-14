@@ -164,15 +164,17 @@ export function Header() {
             <Badge
               variant="outline"
               className={cn(
-                'flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 font-semibold text-[11px] sm:text-xs transition-all',
+                'flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 font-bold text-xs sm:text-sm transition-all border-l-[3px] rounded-md',
                 isRunning
-                  ? 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/8'
+                  ? 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-l-emerald-500'
                   : isStarting
-                  ? 'border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/8'
-                  : 'border-border/70 text-foreground/75 bg-muted/30'
+                  ? 'border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 border-l-amber-500'
+                  : serverStatus?.status === 'error'
+                  ? 'border-red-500/40 text-red-600 dark:text-red-400 bg-red-500/10 border-l-red-500'
+                  : 'border-border/70 text-foreground/70 bg-muted/30 border-l-muted-foreground/40'
               )}
             >
-              <span className="relative flex h-2 sm:h-2.5 w-2 sm:w-2.5">
+              <span className="relative flex h-2.5 sm:h-3 w-2.5 sm:w-3">
                 {(isRunning || isStarting) && (
                   <span className={cn(
                     'animate-ping absolute inline-flex h-full w-full rounded-full opacity-75',
@@ -180,13 +182,13 @@ export function Header() {
                   )} />
                 )}
                 <span className={cn(
-                  'relative inline-flex rounded-full h-2 sm:h-2.5 w-2 sm:w-2.5',
-                  isRunning ? 'bg-emerald-500' : isStarting ? 'bg-amber-500' : 'bg-foreground/40'
+                  'relative inline-flex rounded-full h-2.5 sm:h-3 w-2.5 sm:w-3',
+                  isRunning ? 'bg-emerald-500' : isStarting ? 'bg-amber-500' : serverStatus?.status === 'error' ? 'bg-red-500' : 'bg-foreground/40'
                 )} />
               </span>
-              <Server className="h-3 w-3 hidden sm:block" />
-              <span className="hidden sm:inline">{isRunning ? 'Running' : isStarting ? 'Starting' : 'Stopped'}</span>
-              <span className="sm:hidden">{isRunning ? 'Live' : isStarting ? '...' : 'Off'}</span>
+              <Server className="h-3.5 w-3.5 hidden sm:block" />
+              <span className="hidden sm:inline">{isRunning ? 'Running' : isStarting ? 'Starting' : serverStatus?.status === 'error' ? 'Error' : 'Stopped'}</span>
+              <span className="sm:hidden">{isRunning ? 'Live' : isStarting ? '...' : serverStatus?.status === 'error' ? 'Err' : 'Off'}</span>
             </Badge>
           </motion.div>
         </div>

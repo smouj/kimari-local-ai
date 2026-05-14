@@ -22,10 +22,10 @@ const iconMap: Record<string, React.ReactNode> = {
 }
 
 const statusColors: Record<string, string> = {
-  available: 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
-  configured: 'border-blue-500/30 text-blue-600 dark:text-blue-400',
-  running: 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
-  error: 'border-red-500/30 text-red-600 dark:text-red-400',
+  available: 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
+  configured: 'border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/5',
+  running: 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
+  error: 'border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/5',
 }
 
 const statusBgColors: Record<string, string> = {
