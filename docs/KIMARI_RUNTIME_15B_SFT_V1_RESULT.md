@@ -63,7 +63,7 @@ Eval accuracy: 52.08% (mean_token_accuracy)
 | training_performed | true (micro-run, 10 steps) |
 | adapter_generated | true |
 | adapter_committed | false |
-| adapter_persisted_private | false (micro-run adapter not persisted) |
+| adapter_persisted_private | **IN PROGRESS** (re-running with --persist-adapter to Smouj013/kimari-runtime-15b-sft-v1-adapter) |
 | adapter_committed_public | false |
 | hf_public_upload_performed | false |
 | gguf_generated | false |
@@ -71,11 +71,12 @@ Eval accuracy: 52.08% (mean_token_accuracy)
 | public_benchmark_allowed | false |
 | gate_state | BLOCKED |
 
-> **⚠️ This was a micro-run (10 steps). The adapter was generated but not persisted. No public weights, GGUF, or benchmarks were produced. Gate remains BLOCKED.**
+> **⚠️ This was a micro-run (10 steps). The adapter was generated but not persisted in the first run (Job `6a0501dae48bea4538b9c17a`). v0.1.67-alpha re-runs the micro-run with `--persist-adapter` to save the adapter to `Smouj013/kimari-runtime-15b-sft-v1-adapter` (private repo). No public weights, GGUF, or benchmarks were produced. Gate remains BLOCKED.**
 >
 > **Key safety assertions:** adapter_committed_public: false, hf_public_upload_performed: false, gguf_generated: false, public_benchmark_allowed: false, gate_state: BLOCKED.
 
 ## Next step
 
-- v0.1.64-alpha: Evaluate SFT v1 adapter vs base with KimariEval subset30
+- v0.1.67-alpha: Re-run SFT v1 micro-run with --persist-adapter → persist adapter to private HF repo
+- v0.1.68-alpha: Evaluate SFT v1 adapter vs base with KimariEval subset10
 - Full 100-step run deferred until evaluation confirms improvement

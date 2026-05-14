@@ -4256,7 +4256,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.66--alpha" in readme_text_current
+            "version-0.1.67--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match 0.1.66-alpha",
         )
@@ -4264,7 +4264,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.66-alpha" in docs_index_text
+            "Kimari Local AI v0.1.67-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.66-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.67-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -6790,7 +6790,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge is 0.1.61-alpha",
-            "version-0.1.66--alpha" in readme_text_current
+            "version-0.1.67--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match 0.1.66-alpha",
         )
@@ -6798,7 +6798,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.66-alpha" in docs_index_text
+            "Kimari Local AI v0.1.67-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6862,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.66-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.67-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7786,6 +7786,70 @@ def main() -> None:
     # Gate remains BLOCKED
     check(
         "v0.1.66 gate BLOCKED",
+        "gate blocked" in release_text or "gate: blocked" in release_text,
+        "gate must remain BLOCKED",
+    )
+
+    # ── [87/87] v0.1.67 SFT v1 persist-adapter ────────────────────────────────
+    print("\n[87/87] v0.1.67 SFT v1 persist-adapter")
+
+    # hf_jobs_sft_v1.py persist-adapter support
+    hf_jobs_script = PROJECT_ROOT / "training" / "scripts" / "hf_jobs_sft_v1.py"
+    if hf_jobs_script.exists():
+        hf_text = hf_jobs_script.read_text()
+        check(
+            "v0.1.67 --persist-adapter flag",
+            "--persist-adapter" in hf_text,
+            "hf_jobs_sft_v1.py missing --persist-adapter flag",
+        )
+        check(
+            "v0.1.67 --adapter-repo flag",
+            "--adapter-repo" in hf_text,
+            "hf_jobs_sft_v1.py missing --adapter-repo flag",
+        )
+        check(
+            "v0.1.67 no private=True in upload",
+            'private=True"' not in hf_text,
+            "upload_folder should not use private=True",
+        )
+
+    # Training config
+    training_config = PROJECT_ROOT / "training" / "configs" / "kimari_runtime_15b_sft_v1.yaml"
+    if training_config.exists():
+        tc_text = training_config.read_text()
+        check(
+            "v0.1.67 config persist_adapter",
+            "persist_adapter" in tc_text,
+            "training config missing persist_adapter",
+        )
+        check(
+            "v0.1.67 config adapter_repo",
+            "adapter_repo" in tc_text,
+            "training config missing adapter_repo",
+        )
+
+    # Training requirements
+    training_reqs = PROJECT_ROOT / "training" / "requirements-training.txt"
+    if training_reqs.exists():
+        check(
+            "v0.1.67 huggingface_hub in requirements",
+            "huggingface_hub" in training_reqs.read_text(),
+            "huggingface_hub must be in training requirements",
+        )
+
+    # Run history
+    run_history = PROJECT_ROOT / "docs" / "KIMARI4B_RUN_HISTORY.md"
+    if run_history.exists():
+        rh_text = run_history.read_text()
+        check(
+            "v0.1.67 run history has Run 6",
+            "Run 6" in rh_text,
+            "Run history missing Run 6",
+        )
+
+    # Gate still BLOCKED
+    check(
+        "v0.1.67 gate BLOCKED",
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )

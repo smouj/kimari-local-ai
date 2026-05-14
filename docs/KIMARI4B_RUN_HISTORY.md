@@ -76,8 +76,27 @@
 
 > **Note**: The SFT v1 micro-run (Run 4) generated the adapter on the HF Jobs container but did not save it. To evaluate, the micro-run must be re-executed with adapter persistence enabled.
 
+## Run 6: SFT v1 Micro-Run with --persist-adapter
+
+| Field | Value |
+|-------|-------|
+| **Job ID** | `6a05123b3308d79117b8f356` |
+| **Run ID** | kimari-runtime-15b-sft-v1 |
+| **Type** | SFT v1 micro-run (10 steps) with adapter persistence |
+| **Base model** | Qwen/Qwen2.5-1.5B-Instruct |
+| **Hardware** | A10G (small) |
+| **Steps** | 10 |
+| **Loss** | 2.753 → 2.652 (eval) |
+| **Accuracy** | 52.08% |
+| **Adapter repo** | `Smouj013/kimari-runtime-15b-sft-v1-adapter` (private) |
+| **Result** | ⏳ IN PROGRESS — adapter upload pending |
+| **Gate state** | 🔒 BLOCKED |
+| **Docs** | `docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md` |
+
+> **Note**: Re-run of the SFT v1 micro-run with `--persist-adapter` flag to save the adapter to a private HuggingFace repo. If upload succeeds, enables eval subset10.
+
 ## Status
 
 - **Gate**: 🔒 BLOCKED
 - **Kimari-4B**: Not released. No public weights, adapters, or GGUF.
-- **Next**: Evaluation readiness (subset10 → subset30)
+- **Next**: If adapter upload succeeds → eval subset10 → subset30

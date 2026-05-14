@@ -4,6 +4,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.67-alpha] - 2026-05-13
+
+### Added
+- **--persist-adapter and --adapter-repo flags** for hf_jobs_sft_v1.py
+- **huggingface_hub>=0.20.0** added to training/requirements-training.txt
+- **Private HF repo** `Smouj013/kimari-runtime-15b-sft-v1-adapter` created for adapter persistence
+- **Adapter upload step** in HF Jobs command (post-training huggingface_hub upload)
+- **Config fields**: persist_adapter and adapter_repo in training config
+
+### Fixed
+- **upload_folder private=True error**: Removed unsupported `private` kwarg (repo already private)
+- **HF Jobs command**: Added adapter upload as final step after training
+
+### Security
+- No public weights, GGUF, or benchmarks
+- Gate remains BLOCKED
+- Adapter repo is private
+- No raw outputs committed
+
 ## [0.1.66-alpha] - 2026-05-13
 
 ### Added
