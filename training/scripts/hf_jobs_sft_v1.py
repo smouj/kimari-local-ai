@@ -49,13 +49,14 @@ def parse_simple_yaml(path: Path) -> dict[str, Any]:
     return data
 
 
-def build_training_command_args(config_path: Path) -> list[str]:
+def build_training_command_args(config_path: Path, full_run: bool = False) -> list[str]:
+    mode_flag = "--full-run" if full_run else "--micro-run"
     return [
         "python",
         "training/scripts/train_sft_lora.py",
         "--config",
         str(config_path),
-        "--micro-run",
+        mode_flag,
         "--yes",
     ]
 
@@ -70,8 +71,8 @@ def shell_join(args: list[str]) -> str:
     return " ".join(quoted)
 
 
-def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path, persist_adapter: bool = False, adapter_repo: str = "") -> list[str]:
-    training_command = shell_join(build_training_command_args(config_path))
+def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path, persist_adapter: bool = False, adapter_repo: str = "", full_run: bool = False) -> list[str]:
+    training_command = shell_join(build_training_command_args(config_path, full_run=full_run))
     config_path_str = str(config_path)
     output_dir = config.get("output_dir", "training/runs/kimari-runtime-15b-sft-v1")
 
@@ -220,6 +221,7 @@ def main() -> None:
     )
     parser.add_argument("--persist-adapter", action="store_true", help="Upload adapter to private HF repo after training")
     parser.add_argument("--adapter-repo", type=str, default=DEFAULT_ADAPTER_REPO, help="Private HF repo for adapter upload")
+    parser.add_argument("--full-run", action="store_true", help="Submit guarded full-run instead of micro-run")
     args = parser.parse_args()
 
     if not args.config.exists():
@@ -231,7 +233,7 @@ def main() -> None:
         sys.exit(1)
 
     config = parse_simple_yaml(args.config)
-    command_args = build_hf_jobs_command_args(config, args.config, persist_adapter=args.persist_adapter, adapter_repo=args.adapter_repo)
+    command_args = build_hf_jobs_command_args(config, args.config, persist_adapter=args.persist_adapter, adapter_repo=args.adapter_repo, full_run=args.full_run)
     safety_errors = validate_safety(config)
     command_str = shell_join(command_args) if args.print_command else ""
     execution_order_errors = validate_execution_order(command_str) if command_str else []
@@ -276,6 +278,8 @@ def main() -> None:
         ],
         "preflight_before_training": True,
         "training_after_preflight": True,
+        "full_run": args.full_run,
+        "max_steps": config.get("max_steps"),
     }
 
     if args.print_command:

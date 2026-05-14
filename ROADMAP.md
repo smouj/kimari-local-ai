@@ -494,7 +494,7 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.68-alpha (Current)
+## v0.1.69-alpha (Current)
 
 - 🔧 SFT v1 eval subset10 execution (in progress)
 - Eval load check + generation check

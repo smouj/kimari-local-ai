@@ -4,6 +4,22 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.69-alpha] - 2026-05-14
+
+### Added
+- **Guarded full-run mode** for `training/scripts/train_sft_lora.py` via `--full-run`.
+- **HF Jobs full-run submission support** in `training/scripts/hf_jobs_sft_v1.py` via `--full-run`.
+- **Release tests** for v0.1.69-alpha full-run safeguards.
+
+### Changed
+- Training script now requires exactly one mode: `--micro-run` or `--full-run`.
+- Full-run is capped at `max_steps <= 500` for alpha safety.
+- First real Kimari base adapter target remains `max_steps: 100` on A10G.
+
+### Security
+- Gate remains BLOCKED — no public weights, GGUF, or benchmark claims.
+- Adapter persistence still uses private HF repo with `--secrets HF_TOKEN`.
+
 ## [0.1.68-alpha] - 2026-05-14
 
 ### Added

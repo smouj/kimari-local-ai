@@ -891,7 +891,8 @@ def run_sft_training(config: dict, micro_run: bool = True) -> dict:
         "gguf_generated": False,
         "gate_state": "BLOCKED",
         "output_dir": output_dir,
-        "micro_run": True,
+        "micro_run": micro_run,
+        "full_run": not micro_run,
         "steps_completed": steps_completed,
         "base_model": base_model,
     }
@@ -1030,7 +1031,13 @@ def main() -> None:
         "--micro-run",
         dest="micro_run",
         action="store_true",
-        help="Enable micro-run mode (required for v0.1.34)",
+        help="Enable micro-run mode (caps max_steps at 10)",
+    )
+    parser.add_argument(
+        "--full-run",
+        dest="full_run",
+        action="store_true",
+        help="Enable guarded full-run mode (uses config max_steps, capped by safety checks)",
     )
     parser.add_argument(
         "--yes",
@@ -1064,6 +1071,7 @@ def main() -> None:
                 "--learning-rate",
                 "--max-seq-length",
                 "--micro-run",
+                "--full-run",
                 "--yes",
             ],
             "note": "No training is performed by this script. --show-supported-flags does not import torch/transformers.",
@@ -1117,14 +1125,17 @@ def main() -> None:
         ]
         if config.get("output_dir"):
             cmd_parts.append(f"# output_dir: {config['output_dir']}")
-        cmd_parts.append("--micro-run")
+        if config.get("max_steps", 10) <= 10:
+            cmd_parts.append("--micro-run")
+        else:
+            cmd_parts.append("--full-run")
         cmd_parts.append("--yes")
         print("# Recommended training command:")
         print(" \\\n  ".join(cmd_parts))
         print()
         print("# IMPORTANT: Real training must not run in CI.")
         print("# Run manually on a GPU machine only.")
-        print("# v0.1.34-alpha: micro-run mode required (--micro-run).")
+        print("# Use --micro-run for <=10 steps, --full-run for guarded longer runs.")
         sys.exit(0)
 
     # --estimate-only: print step estimation and exit
@@ -1207,14 +1218,18 @@ def main() -> None:
         )
         sys.exit(1)
 
-    # --micro-run required: v0.1.34 only supports micro-run
-    if not args.micro_run:
+    # Exactly one training mode required
+    if args.micro_run == args.full_run:
         print(
-            "\nERROR: --micro-run is required. v0.1.34-alpha only supports micro-run mode.",
+            "\nERROR: choose exactly one training mode: --micro-run or --full-run.",
             file=sys.stderr,
         )
+        sys.exit(1)
+
+    # Guard full-run with an explicit max_steps cap. Larger runs need a new release gate.
+    if args.full_run and int(config.get("max_steps", 999999)) > 500:
         print(
-            "   Add --micro-run to your command to enable micro-run training.",
+            "\nERROR: --full-run is capped at max_steps <= 500 for this alpha.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -1292,7 +1307,7 @@ def main() -> None:
     config = apply_cli_overrides(config, args)
 
     # Step 8: Run SFT training
-    summary = run_sft_training(config, micro_run=True)
+    summary = run_sft_training(config, micro_run=args.micro_run)
 
     # Step 9: Print sanitized summary
     print()
