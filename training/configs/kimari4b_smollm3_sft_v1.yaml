@@ -1,0 +1,62 @@
+# Kimari-4B SmolLM3-3B SFT v1 — First Real Training Run
+# Base: HuggingFaceTB/SmolLM3-3B (Apache-2.0, accepted candidate)
+# Dataset: kimari_sft_v1 (320 items, 8 categories, 82.5% Spanish)
+# Method: QLoRA (4-bit quantization + LoRA adapters)
+# Hardware: HF Jobs a10g-small (24GB VRAM)
+# Status: ready-for-training
+
+run_id: kimari4b-smollm3-sft-v1-private-001
+base_model: HuggingFaceTB/SmolLM3-3B
+base_license: Apache-2.0
+dataset_path: dataset/build/kimari_sft_v1/train.jsonl
+eval_dataset_path: dataset/build/kimari_sft_v1/validation.jsonl
+dataset_summary: dataset/build/kimari_sft_v1/dataset_summary.json
+
+# QLoRA Configuration
+method: qlora
+max_seq_length: 4096
+max_steps: 1000
+epochs: 3
+learning_rate: 2.0e-4
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+batch_size: 2
+gradient_accumulation_steps: 4
+
+# Adapter persistence
+save_adapter: true
+persist_adapter: true
+adapter_repo: Smouj013/kimari4b-smollm3-sft-v1-adapter
+push_to_hub: false
+
+# Safety gates
+public_release_allowed: false
+hf_public_upload_allowed: false
+gguf_export_allowed: false
+gate_state: BLOCKED
+
+output_dir: training/runs/kimari4b-smollm3-sft-v1
+seed: 42
+fp16: true
+logging_steps: 25
+save_steps: 100
+eval_steps: 100
+warmup_steps: 50
+weight_decay: 0.01
+lr_scheduler_type: cosine
+
+# Resource estimates
+# SmolLM3-3B Q4: ~2.2GB VRAM for model
+# LoRA adapters r=32: ~50MB
+# Activations + gradients with batch=2, seq=4096: ~12GB
+# Total estimated: ~16GB (fits a10g-small 24GB)
+# Training time estimate: ~45-60 min for 1000 steps on A10G
