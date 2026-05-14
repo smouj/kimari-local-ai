@@ -13,15 +13,15 @@ eval_dataset_path: dataset/build/kimari_sft_v1/validation.jsonl
 dataset_summary: dataset/build/kimari_sft_v1/dataset_summary.json
 
 # QLoRA Configuration
-method: qlora
+gradient_checkpointing: true
 max_seq_length: 4096
 max_steps: 1000
-epochs: 3
+num_train_epochs: 3
 learning_rate: 2.0e-4
 lora_r: 32
 lora_alpha: 64
 lora_dropout: 0.05
-target_modules:
+lora_target_modules:
   - q_proj
   - k_proj
   - v_proj
@@ -29,10 +29,11 @@ target_modules:
   - gate_proj
   - up_proj
   - down_proj
-batch_size: 2
+per_device_train_batch_size: 2
 gradient_accumulation_steps: 4
 
 # Adapter persistence
+report_to: none
 save_adapter: true
 persist_adapter: true
 adapter_repo: Smouj013/kimari4b-smollm3-sft-v1-adapter

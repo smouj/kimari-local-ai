@@ -1227,9 +1227,11 @@ def main() -> None:
         sys.exit(1)
 
     # Guard full-run with an explicit max_steps cap. Larger runs need a new release gate.
-    if args.full_run and int(config.get("max_steps", 999999)) > 500:
+    # v0.1.79-alpha: raised from 500 to 2000 for SmolLM3-3B real training runs.
+    FULL_RUN_MAX_STEPS = 2000
+    if args.full_run and int(config.get("max_steps", 999999)) > FULL_RUN_MAX_STEPS:
         print(
-            "\nERROR: --full-run is capped at max_steps <= 500 for this alpha.",
+            f"\nERROR: --full-run is capped at max_steps <= {FULL_RUN_MAX_STEPS} for this alpha.",
             file=sys.stderr,
         )
         sys.exit(1)
