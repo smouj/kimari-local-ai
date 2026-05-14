@@ -50,6 +50,8 @@ def validate_config(config: dict[str, Any]) -> list[str]:
         errors.append("raw_outputs_private_required must be true")
     if not config.get("private_artifact_repo_id"):
         errors.append("private_artifact_repo_id is required")
+    if not (config.get("private_artifact_bucket_path") or config.get("private_artifact_path")):
+        errors.append("private_artifact_bucket_path/private_artifact_path is required")
     return errors
 
 
@@ -75,7 +77,11 @@ def build_scoring_script(config: dict[str, Any], subset_size: int | None = None)
     seed = config.get("seed", 42)
     effective_subset = subset_size or config.get("subset_size", 30)
     private_artifact_repo_id = config.get("private_artifact_repo_id", "Smouj013/jobs-artifacts")
-    private_artifact_bucket_path = config.get("private_artifact_bucket_path", "kimari-evals/v0176/subset30")
+    private_artifact_bucket_path = (
+        config.get("private_artifact_bucket_path")
+        or config.get("private_artifact_path")
+        or "kimari-evals/v0176/subset30"
+    )
 
     items = load_eval_items(config)
     embedded_dataset_b64 = base64.b64encode(json.dumps(items, ensure_ascii=False).encode("utf-8")).decode("ascii")
@@ -405,7 +411,7 @@ def dry_run(config: dict[str, Any], subset_size: int | None = None) -> dict[str,
         "command": " ".join(cmd),
         "raw_outputs_private_required": config.get("raw_outputs_private_required") is True,
         "private_artifact_repo_id": config.get("private_artifact_repo_id"),
-        "private_artifact_bucket_path": config.get("private_artifact_bucket_path"),
+        "private_artifact_bucket_path": config.get("private_artifact_bucket_path") or config.get("private_artifact_path"),
         "raw_outputs_committed": False,
         "public_benchmark_allowed": False,
         "gate_state": "BLOCKED",

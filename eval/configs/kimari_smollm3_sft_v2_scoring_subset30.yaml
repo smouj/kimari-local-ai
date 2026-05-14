@@ -22,6 +22,7 @@ raw_outputs_commit_allowed: false
 raw_outputs_private_required: true
 private_artifact_repo_id: "Smouj013/jobs-artifacts"
 private_artifact_path: "kimari-evals/v0179/smollm3_sft_v2/subset30"
+private_artifact_bucket_path: "kimari-evals/v0179/smollm3_sft_v2/subset30"
 gate_state: "BLOCKED"
 
 version: "0.1.79-alpha"
