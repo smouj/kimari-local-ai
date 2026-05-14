@@ -1,3 +1,22 @@
+## v0.1.78-alpha — Benchmark-honesty eval hardening
+
+- [x] pyproject.toml version is 0.1.78-alpha
+- [x] kimari/__init__.py version is 0.1.78-alpha
+- [x] 6 new benchmark-honesty cases added to refusal_safety.jsonl
+- [x] refuse-010 failure pattern covered by new cases
+- [x] Dataset expanded from 104 to 110 items
+- [x] Gate remains BLOCKED
+- [x] No public benchmark claim
+- [x] No public weights or GGUF
+- [x] No raw outputs committed
+
+Validation:
+- [x] Dataset JSONL validity check
+- [x] `pytest tests/test_release_v0178.py -q`
+- [x] `ruff check kimari/ tests/ training/ eval/ scripts/ dataset/`
+- [x] `ruff format --check kimari/ tests/ training/ eval/ scripts/ dataset/`
+- [x] `python scripts/release/check-release.py`
+
 ## v0.1.77-alpha — Private subset30 manual review completed
 
 - [x] pyproject.toml version is 0.1.77-alpha

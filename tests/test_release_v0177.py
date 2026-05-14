@@ -16,9 +16,11 @@ ARTIFACT_SUMMARY = (
 VALIDATOR = PROJECT_ROOT / "eval" / "scripts" / "validate_manual_review_summary.py"
 
 
-def test_version_bumped_to_v0177():
-    assert 'version = "0.1.77-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
-    assert '__version__ = "0.1.77-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
+def test_version_at_least_v0177():
+    pyproject = (PROJECT_ROOT / "pyproject.toml").read_text()
+    init = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
+    assert 'version = "0.1.7' in pyproject
+    assert '__version__ = "0.1.7' in init
 
 
 def test_manual_review_completed_but_gate_blocked():

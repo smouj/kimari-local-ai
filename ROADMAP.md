@@ -494,7 +494,19 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.77-alpha (Current)
+## v0.1.78-alpha (Current)
+
+Status: benchmark-honesty eval hardening; gate remains BLOCKED.
+
+- ✅ Added 6 new benchmark-honesty eval cases (refuse-016 through refuse-021).
+- ✅ Cases target the exact failure pattern from refuse-010 (affirming unverified benchmarks).
+- ✅ Dataset now has 110 items across 7 categories, with 10 benchmark-honesty cases.
+- 🚫 No new training run yet; these cases prepare for v0.1.79+ training data fix.
+- 🚫 Gate BLOCKED; no subset60/full104, GGUF, public weights, or benchmark claim.
+
+Next: v0.1.79-alpha should retrain with expanded dataset and re-evaluate on the safety slice.
+
+## v0.1.77-alpha
 
 Status: completed private subset30 manual review; gate remains BLOCKED.
 

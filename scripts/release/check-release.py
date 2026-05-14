@@ -4256,7 +4256,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.77--alpha" in readme_text_current
+            "version-0.1.78--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -4264,7 +4264,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.77-alpha" in docs_index_text
+            "Kimari Local AI v0.1.78-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.77-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.78-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -4528,6 +4528,42 @@ def main() -> None:
         not tracked_raw_v0177,
         f"tracked raw outputs: {tracked_raw_v0177}",
     )
+
+    # ── [92/92] v0.1.78 benchmark-honesty eval hardening ───────────────
+    print("\n[92/92] v0.1.78 benchmark-honesty eval hardening")
+    refusal_jsonl = PROJECT_ROOT / "eval" / "kimari_private_v1" / "refusal_safety.jsonl"
+    dataset_dir = PROJECT_ROOT / "eval" / "kimari_private_v1"
+    check("v0.1.78 refusal_safety.jsonl exists", refusal_jsonl.exists(), "missing refusal_safety.jsonl")
+    if refusal_jsonl.exists():
+        refusal_lines = [line for line in refusal_jsonl.read_text().strip().split("\n") if line.strip()]
+        check(
+            "v0.1.78 refusal_safety has >= 21 items",
+            len(refusal_lines) >= 21,
+            f"expected >=21, got {len(refusal_lines)}",
+        )
+        refusal_items = []
+        parse_ok = True
+        for line in refusal_lines:
+            try:
+                refusal_items.append(json.loads(line))
+            except json.JSONDecodeError:
+                parse_ok = False
+        check("v0.1.78 refusal_safety valid JSONL", parse_ok, "JSONL parse error in refusal_safety")
+        by_id = {item["id"]: item for item in refusal_items}
+        for new_id in ["refuse-016", "refuse-017", "refuse-018", "refuse-019", "refuse-020", "refuse-021"]:
+            check(f"v0.1.78 {new_id} exists", new_id in by_id, f"missing {new_id}")
+            if new_id in by_id:
+                item = by_id[new_id]
+                check(
+                    f"v0.1.78 {new_id} has honesty tag",
+                    "honesty" in item.get("tags", []),
+                    f"{new_id} missing honesty tag",
+                )
+    total_eval = 0
+    if dataset_dir.exists():
+        for jsonl_file in sorted(dataset_dir.glob("*.jsonl")):
+            total_eval += len([line for line in jsonl_file.read_text().strip().split("\n") if line.strip()])
+    check("v0.1.78 dataset expanded to >= 110", total_eval >= 110, f"expected >=110, got {total_eval}")
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
@@ -6966,7 +7002,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.77--alpha" in readme_text_current
+            "version-0.1.78--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -6974,7 +7010,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.77-alpha" in docs_index_text
+            "Kimari Local AI v0.1.78-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -7038,7 +7074,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.77-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.78-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -8342,6 +8378,42 @@ def main() -> None:
         not tracked_raw_v0177,
         f"tracked raw outputs: {tracked_raw_v0177}",
     )
+
+    # ── [92/92] v0.1.78 benchmark-honesty eval hardening ───────────────
+    print("\n[92/92] v0.1.78 benchmark-honesty eval hardening")
+    refusal_jsonl = PROJECT_ROOT / "eval" / "kimari_private_v1" / "refusal_safety.jsonl"
+    dataset_dir = PROJECT_ROOT / "eval" / "kimari_private_v1"
+    check("v0.1.78 refusal_safety.jsonl exists", refusal_jsonl.exists(), "missing refusal_safety.jsonl")
+    if refusal_jsonl.exists():
+        refusal_lines = [line for line in refusal_jsonl.read_text().strip().split("\n") if line.strip()]
+        check(
+            "v0.1.78 refusal_safety has >= 21 items",
+            len(refusal_lines) >= 21,
+            f"expected >=21, got {len(refusal_lines)}",
+        )
+        refusal_items = []
+        parse_ok = True
+        for line in refusal_lines:
+            try:
+                refusal_items.append(json.loads(line))
+            except json.JSONDecodeError:
+                parse_ok = False
+        check("v0.1.78 refusal_safety valid JSONL", parse_ok, "JSONL parse error in refusal_safety")
+        by_id = {item["id"]: item for item in refusal_items}
+        for new_id in ["refuse-016", "refuse-017", "refuse-018", "refuse-019", "refuse-020", "refuse-021"]:
+            check(f"v0.1.78 {new_id} exists", new_id in by_id, f"missing {new_id}")
+            if new_id in by_id:
+                item = by_id[new_id]
+                check(
+                    f"v0.1.78 {new_id} has honesty tag",
+                    "honesty" in item.get("tags", []),
+                    f"{new_id} missing honesty tag",
+                )
+    total_eval = 0
+    if dataset_dir.exists():
+        for jsonl_file in sorted(dataset_dir.glob("*.jsonl")):
+            total_eval += len([line for line in jsonl_file.read_text().strip().split("\n") if line.strip()])
+    check("v0.1.78 dataset expanded to >= 110", total_eval >= 110, f"expected >=110, got {total_eval}")
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:

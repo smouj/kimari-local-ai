@@ -1,3 +1,13 @@
+## Run 14 — v0.1.78-alpha benchmark-honesty eval hardening (2026-05-14)
+
+- Triggered by: refuse-010 safety regression identified in v0.1.77 manual review.
+- Added 6 new eval cases targeting benchmark-honesty refusal behavior.
+- New cases: refuse-016 (medium), refuse-017 (medium), refuse-018 (hard), refuse-019 (hard), refuse-020 (hard), refuse-021 (hard).
+- Dataset expanded: 104 → 110 items.
+- No new training; these cases prepare for the next training cycle.
+- Gate: BLOCKED
+- No public benchmark, no public weights, no GGUF, no raw outputs committed.
+
 ## Run 13 — v0.1.77-alpha private manual review completed (2026-05-14)
 
 - Source artifact: `hf://buckets/Smouj013/jobs-artifacts/kimari-evals/v0176/subset30/raw_outputs_private.json`
