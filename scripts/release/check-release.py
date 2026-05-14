@@ -8133,12 +8133,30 @@ def main() -> None:
     private_review_dir = Path.home() / "kimari-private-review" / "v0175"
     bucket_listing = private_review_dir / "bucket_listing.txt"
     check("v0.1.75 manual review generator exists", manual_generator.exists(), "missing manual review generator")
-    check(
-        "v0.1.75 private review dir outside repo",
-        private_review_dir.exists() and PROJECT_ROOT not in private_review_dir.parents,
-        "private review dir missing or inside repo",
-    )
-    check("v0.1.75 bucket listing captured", bucket_listing.exists(), "missing private bucket listing evidence")
+    private_review_evidence_ok = private_review_dir.exists() and PROJECT_ROOT not in private_review_dir.parents
+    bucket_listing_ok = bucket_listing.exists()
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        if not private_review_evidence_ok:
+            warn(
+                "v0.1.75 private review dir outside repo",
+                "private $HOME review evidence is intentionally unavailable in public CI",
+            )
+        else:
+            check("v0.1.75 private review dir outside repo", True)
+        if not bucket_listing_ok:
+            warn(
+                "v0.1.75 bucket listing captured",
+                "private bucket listing evidence is intentionally unavailable in public CI",
+            )
+        else:
+            check("v0.1.75 bucket listing captured", True)
+    else:
+        check(
+            "v0.1.75 private review dir outside repo",
+            private_review_evidence_ok,
+            "private review dir missing or inside repo",
+        )
+        check("v0.1.75 bucket listing captured", bucket_listing_ok, "missing private bucket listing evidence")
     if manual_summary.exists():
         try:
             manual_data = json.loads(manual_summary.read_text())
