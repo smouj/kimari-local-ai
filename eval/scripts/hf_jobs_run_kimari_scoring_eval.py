@@ -176,6 +176,9 @@ def generate_one(model, tokenizer, item, temperature, top_p, max_tokens):
             temperature=temperature,
             top_p=top_p,
             do_sample=True,
+            eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=tokenizer.eos_token_id,
+            max_time=30,
         )
     return tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
 
