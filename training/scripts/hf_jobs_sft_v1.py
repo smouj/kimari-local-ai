@@ -93,17 +93,25 @@ def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path, persis
         ])
 
     guarded_command = " && ".join(steps)
-    return [
+    cmd = [
         "hf",
         "jobs",
         "run",
         "--flavor",
         DEFAULT_FLAVOR,
+    ]
+
+    # When persisting adapter to HF repo, we need HF_TOKEN with write access
+    if persist_adapter:
+        cmd.extend(["--secrets", "HF_TOKEN"])
+
+    cmd.extend([
         DEFAULT_IMAGE,
         "bash",
         "-c",
         guarded_command,
-    ]
+    ])
+    return cmd
 
 
 def validate_safety(config: dict[str, Any]) -> list[str]:
