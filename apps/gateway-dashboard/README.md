@@ -1,57 +1,81 @@
 # Kimari Gateway Dashboard
 
-Experimental Next.js dashboard for managing and observing a local Kimari gateway.
+Real-time dashboard for managing and monitoring a local Kimari AI gateway — GPU profiles, models, benchmarks, system resources, and integrations.
 
-## Status
-
-- Scope: dashboard UI only; the Python Kimari CLI/runtime remains in the repository root.
-- Integration strategy: isolated sub-app under `apps/gateway-dashboard/` to avoid replacing or breaking the existing Kimari package, docs, CI, benchmarks, or release workflow.
-- Theme: blue/gray professional palette using OKLCH hue 230.
-- Branding: uses real Kimari logos from `docs/assets/` / `public/`.
-
-## Features
-
-- Dashboard overview, server status, profiles, models, logs, analytics, benchmarks, settings.
-- Real Kimari logo in layout/sidebar/setup wizard.
-- Keyboard shortcuts help dialog (`?`).
-- Mobile responsive sidebar using sheet overlay.
-- Logs export to JSON/CSV from currently loaded log entries.
-- Blue/gray rebrand replacing the previous teal/green accent system.
-- Round 13 polish: standardized blue/sky/amber/emerald badges, larger status chip, profile/model/integration card consistency, doctor view polish, animated metric cards, gradient welcome banner, breathing architecture arrows.
-- System resources monitor: four circular SVG gauges for CPU, RAM, VRAM, and GPU temperature with 5s refresh and threshold colors.
-- QuickLauncher widget: Start Server, Run Benchmark, System Check, and Download Model action cards.
-
-## Local development
+## Quick Start
 
 ```bash
 cd apps/gateway-dashboard
-npm install
-npm run lint
-npm run build
-npm run dev
+
+# One-command setup (install + DB + build)
+npm run setup
+
+# Start the dashboard
+npm start
 ```
 
-The app runs on Next.js and is intentionally isolated from the root Python package. Do not move root Kimari CLI files into this app.
+Open **http://localhost:3105** in your browser.
 
-For API routes backed by Prisma during local smoke tests:
+## Manual Setup
 
 ```bash
-DATABASE_URL='file:./dev.db' npx prisma db push
-DATABASE_URL='file:./dev.db' npx prisma db seed
+# 1. Install dependencies
+npm install
+
+# 2. Set up the database (SQLite, no external DB needed)
+npm run db:setup
+
+# 3. Build for production
+npm run build
+
+# 4. Start
+npm start
 ```
 
-## Screenshots
+## Development
 
-Screenshots for the current blue/gray UI pass are stored in:
-
-```text
-docs/assets/screenshots/gateway-dashboard/
+```bash
+npm run dev        # Hot-reload dev server on port 3105
+npm run lint       # ESLint check
+npm run build      # Production build
 ```
 
-They are referenced from the root `README.md` so project visitors can preview the dashboard without changing the existing CLI-first documentation structure.
+## What You'll See
 
-## Safety notes
+- **Dashboard** — Server status, metrics, resource gauges (CPU/RAM/VRAM/GPU Temp), quick launcher
+- **Profiles** — GPU profiles optimized for your hardware
+- **Models** — Available GGUF models with download status
+- **Doctor** — System diagnostic checks (Python, GPU, llama-server, Ollama)
+- **Integrations** — Live status of connected services
+- **Analytics** — Benchmark history and logs
+- **Chat** — Direct chat via Ollama or llama-server backend
 
-- Do not commit `.env`, `.next/`, `node_modules/`, or runtime DB dumps.
-- Keep this app behind localhost/auth when connected to a real gateway.
-- Public benchmark or model-performance claims still require verified KimariEval/benchmark evidence.
+## Requirements
+
+- **Node.js** 18+ and npm
+- **Ollama** (optional, for chat — runs on port 11434)
+- **llama-server** from llama.cpp (optional, for direct inference — port 11435)
+- **NVIDIA GPU** with CUDA (for GPU-accelerated inference)
+
+The dashboard works standalone — it reads real system data and probes services automatically. No gateway needs to be running to explore the UI.
+
+## Project Structure
+
+```
+apps/gateway-dashboard/
+├── prisma/           # SQLite database schema + seed
+├── src/
+│   ├── app/          # Next.js App Router (pages + API routes)
+│   ├── components/   # React UI components
+│   ├── hooks/        # Data fetching hooks (use-api.ts)
+│   └── lib/          # Prisma client, Zustand store, utils
+├── public/           # Static assets (logos)
+└── package.json
+```
+
+## Notes
+
+- This is an isolated Next.js sub-app. The Kimari Python CLI lives in the repository root.
+- Database is SQLite (`prisma/dev.db`) — created automatically on `npm run db:setup`.
+- Do not commit `.env`, `.next/`, `node_modules/`, or DB files.
+- Model gate is **BLOCKED** until public release — no weights, GGUF, or benchmark claims.
