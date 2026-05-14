@@ -4256,7 +4256,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.81--alpha" in readme_text_current
+            "version-0.1.82--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -4264,7 +4264,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.81-alpha" in docs_index_text
+            "Kimari Local AI v0.1.82-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.81-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.82-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -4593,6 +4593,46 @@ def main() -> None:
         check("v0.1.81 UI shows Kimari-4B not released", "Kimari-4B not released" in overview_text)
         check("v0.1.81 UI shows Gate BLOCKED", "Gate: BLOCKED" in overview_text)
         check("v0.1.81 UI shows Local only", "Local only" in overview_text)
+
+    # ── [94/94] v0.1.82 one-command installer and console ───────────────
+    print("\n[94/94] v0.1.82 one-command installer and console")
+    install_sh = PROJECT_ROOT / "install.sh"
+    install_ps1 = PROJECT_ROOT / "install.ps1"
+    console_cmd = PROJECT_ROOT / "kimari" / "cli" / "console_cmd.py"
+    cli_main = PROJECT_ROOT / "kimari" / "cli" / "main.py"
+    readme = PROJECT_ROOT / "README.md"
+    dashboard_manager = PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py"
+    check("v0.1.82 install.sh exists", install_sh.exists(), "missing install.sh")
+    if install_sh.exists():
+        install_text = install_sh.read_text()
+        check("v0.1.82 install.sh is strict bash", "set -euo pipefail" in install_text, "missing strict mode")
+        check("v0.1.82 install.sh has dry-run", "--dry-run" in install_text, "missing --dry-run")
+        check("v0.1.82 install.sh avoids default model download", "WITH_TEST_MODEL" in install_text, "missing model gate")
+        check("v0.1.82 install.sh avoids default dashboard setup", "WITH_DASHBOARD" in install_text, "missing dashboard gate")
+    check("v0.1.82 install.ps1 exists", install_ps1.exists(), "missing install.ps1")
+    if install_ps1.exists():
+        ps1_text = install_ps1.read_text()
+        check("v0.1.82 install.ps1 avoids policy changes", "Set-ExecutionPolicy" not in ps1_text, "must not alter policy")
+    check("v0.1.82 console command exists", console_cmd.exists(), "missing console_cmd.py")
+    if console_cmd.exists():
+        console_text = console_cmd.read_text()
+        for token in ["collect_console_status", "MENU_ITEMS", "BLOCKED", "kimari_4b_released"]:
+            check(f"v0.1.82 console contains {token}", token in console_text, f"missing {token}")
+    if cli_main.exists():
+        cli_text = cli_main.read_text()
+        check("v0.1.82 CLI registers console", 'add_parser("console"' in cli_text, "missing console parser")
+        check("v0.1.82 CLI registers gateway setup flags", "start_dashboard" in cli_text and "open_browser_after" in cli_text, "missing gateway setup flags")
+        check("v0.1.82 CLI registers update apply", "run_update_apply" in cli_text, "missing update apply")
+    if readme.exists():
+        readme_text = readme.read_text()
+        check("v0.1.82 README quickstart uses install.sh", "install.sh | bash" in readme_text, "missing one-command install")
+        check("v0.1.82 README quickstart uses kimari console", "kimari console" in readme_text, "missing console quickstart")
+        check("v0.1.82 README not npm-first", "npm install" not in readme_text[:5000], "npm appears too early in README")
+    if dashboard_manager.exists():
+        manager_text = dashboard_manager.read_text()
+        check("v0.1.82 default dashboard bind localhost", 'DEFAULT_HOST = "127.0.0.1"' in manager_text, "default bind changed")
+        check("v0.1.82 gate remains BLOCKED", 'GATE_STATE = "BLOCKED"' in manager_text, "gate changed")
+
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
@@ -7031,7 +7071,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.81--alpha" in readme_text_current
+            "version-0.1.82--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -7039,7 +7079,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.81-alpha" in docs_index_text
+            "Kimari Local AI v0.1.82-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -7103,7 +7143,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.81-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.82-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -8490,6 +8530,45 @@ def main() -> None:
         check("v0.1.81 UI shows Kimari-4B not released", "Kimari-4B not released" in overview_text)
         check("v0.1.81 UI shows Gate BLOCKED", "Gate: BLOCKED" in overview_text)
         check("v0.1.81 UI shows Local only", "Local only" in overview_text)
+
+    # ── [94/94] v0.1.82 one-command installer and console ───────────────
+    print("\n[94/94] v0.1.82 one-command installer and console")
+    install_sh = PROJECT_ROOT / "install.sh"
+    install_ps1 = PROJECT_ROOT / "install.ps1"
+    console_cmd = PROJECT_ROOT / "kimari" / "cli" / "console_cmd.py"
+    cli_main_v0182 = PROJECT_ROOT / "kimari" / "cli" / "main.py"
+    readme_v0182 = PROJECT_ROOT / "README.md"
+    dashboard_manager_v0182 = PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py"
+    check("v0.1.82 install.sh exists", install_sh.exists(), "missing install.sh")
+    if install_sh.exists():
+        install_text = install_sh.read_text()
+        check("v0.1.82 install.sh is strict bash", "set -euo pipefail" in install_text, "missing strict mode")
+        check("v0.1.82 install.sh has dry-run", "--dry-run" in install_text, "missing --dry-run")
+        check("v0.1.82 install.sh avoids default model download", "WITH_TEST_MODEL" in install_text, "missing model gate")
+        check("v0.1.82 install.sh avoids default dashboard setup", "WITH_DASHBOARD" in install_text, "missing dashboard gate")
+    check("v0.1.82 install.ps1 exists", install_ps1.exists(), "missing install.ps1")
+    if install_ps1.exists():
+        ps1_text = install_ps1.read_text()
+        check("v0.1.82 install.ps1 avoids policy changes", "Set-ExecutionPolicy" not in ps1_text, "must not alter policy")
+    check("v0.1.82 console command exists", console_cmd.exists(), "missing console_cmd.py")
+    if console_cmd.exists():
+        console_text = console_cmd.read_text()
+        for token in ["collect_console_status", "MENU_ITEMS", "BLOCKED", "kimari_4b_released"]:
+            check(f"v0.1.82 console contains {token}", token in console_text, f"missing {token}")
+    if cli_main_v0182.exists():
+        cli_text_v0182 = cli_main_v0182.read_text()
+        check("v0.1.82 CLI registers console", 'add_parser("console"' in cli_text_v0182, "missing console parser")
+        check("v0.1.82 CLI registers gateway setup flags", "start_dashboard" in cli_text_v0182 and "open_browser_after" in cli_text_v0182, "missing gateway setup flags")
+        check("v0.1.82 CLI registers update apply", "run_update_apply" in cli_text_v0182, "missing update apply")
+    if readme_v0182.exists():
+        readme_text_v0182 = readme_v0182.read_text()
+        check("v0.1.82 README quickstart uses install.sh", "install.sh | bash" in readme_text_v0182, "missing one-command install")
+        check("v0.1.82 README quickstart uses kimari console", "kimari console" in readme_text_v0182, "missing console quickstart")
+        check("v0.1.82 README not npm-first", "npm install" not in readme_text_v0182[:5000], "npm appears too early in README")
+    if dashboard_manager_v0182.exists():
+        manager_text_v0182 = dashboard_manager_v0182.read_text()
+        check("v0.1.82 default dashboard bind localhost", 'DEFAULT_HOST = "127.0.0.1"' in manager_text_v0182, "default bind changed")
+        check("v0.1.82 gate remains BLOCKED", 'GATE_STATE = "BLOCKED"' in manager_text_v0182, "gate changed")
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:

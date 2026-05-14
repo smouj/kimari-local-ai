@@ -108,10 +108,14 @@ jobs:
           python -m py_compile kimari/benchmarks/kimarifit.py
           python -m py_compile kimari/benchmarks/bench.py
           python -m py_compile kimari/gateway/dashboard_manager.py
+          python -m py_compile kimari/cli/console_cmd.py
       - name: Run active release tests
         run: |
           python -m pytest \
-            tests/test_release_v0181.py \
+            tests/test_release_v0182.py \
+            tests/test_install_scripts.py \
+            tests/test_console_cli.py \
+            tests/test_gateway_setup_cli.py \
             tests/test_gateway_cli.py \
             -q
 
@@ -147,6 +151,8 @@ jobs:
         run: python -m kimari gateway start --dry-run --json
       - name: Gateway dashboard status
         run: python -m kimari gateway status --json
+      - name: Console JSON
+        run: python -m kimari console --json
 
   installed-cli-smoke:
     name: Installed CLI Smoke Tests

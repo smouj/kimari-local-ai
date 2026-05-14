@@ -2494,7 +2494,12 @@ def run_gateway_dashboard(action: str, json_output: bool = False, **kwargs):
                 _print_dashboard_result("Kimari Gateway Dashboard Reset", result)
             return
         if action == "setup":
-            result = dashboard_setup()
+            result = dashboard_setup(
+                dry_run=kwargs.get("dry_run", False),
+                start_dashboard=kwargs.get("start_dashboard", False),
+                open_browser_after=kwargs.get("open_browser_after", False),
+                yes=kwargs.get("yes", False),
+            )
             if json_output:
                 _print_json(result)
             else:
@@ -2545,6 +2550,22 @@ def run_update_check(json_output: bool = False, online: bool = False):
     print()
 
 
+def run_update_apply(json_output: bool = False, yes: bool = False, dry_run: bool = False):
+    """Conservative alpha update entry point; currently planned only."""
+    result = {
+        "status": "planned",
+        "enabled": False,
+        "message": "Update apply is planned / not enabled yet in alpha. Use git pull && pip install -e . manually.",
+        "confirmed": yes,
+        "dry_run": dry_run,
+    }
+    if json_output:
+        _print_json(result)
+        return
+    print(f"\n{Color.YELLOW}Update apply is planned / not enabled yet in alpha.{Color.RESET}")
+    print("  Manual conservative path: git pull && pip install -e .\n")
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 
@@ -2556,6 +2577,11 @@ def main():
     parser.add_argument("-v", "--version", action="version", version=f"Kimari CLI v{KIMARI_VERSION}")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # console
+    console_parser = subparsers.add_parser("console", help="Open Kimari interactive console")
+    console_parser.add_argument("--json", action="store_true", dest="json_output", help="Output console status as JSON")
+    console_parser.add_argument("--no-interactive", action="store_true", help="Print status without opening the menu")
 
     # doctor
     doctor_parser = subparsers.add_parser("doctor", help="Run system diagnostics")
@@ -2569,6 +2595,11 @@ def main():
         action="store_true",
         dest="json_output",
         help="Output diagnostics as JSON",
+    )
+    doctor_parser.add_argument(
+        "--quick",
+        action="store_true",
+        help="Run quick diagnostics (default; included for installer readability)",
     )
 
     # info
@@ -2852,15 +2883,21 @@ def main():
     # Gateway command
     gateway_parser = subparsers.add_parser("gateway", help="Manage the local Gateway Dashboard")
     gateway_parser.add_argument("--dry-run", action="store_true", help="Legacy: show gateway API dry-run summary")
-    gateway_parser.add_argument("--status", action="store_true", dest="gateway_status", help="Legacy: show gateway API status")
-    gateway_parser.add_argument("--plan", action="store_true", dest="gateway_plan", help="Legacy: show gateway API plan")
+    gateway_parser.add_argument(
+        "--status", action="store_true", dest="gateway_status", help="Legacy: show gateway API status"
+    )
+    gateway_parser.add_argument(
+        "--plan", action="store_true", dest="gateway_plan", help="Legacy: show gateway API plan"
+    )
     gateway_parser.add_argument("--json", action="store_true", help="JSON output")
     gateway_sub = gateway_parser.add_subparsers(dest="gateway_command", help="Gateway Dashboard subcommands")
 
     gateway_start = gateway_sub.add_parser("start", help="Start the Gateway Dashboard")
     gateway_start.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
     gateway_start.add_argument("--port", type=int, default=3105, help="Port (default: 3105)")
-    gateway_start.add_argument("--open", action="store_true", dest="open_browser", help="Open the dashboard in a browser")
+    gateway_start.add_argument(
+        "--open", action="store_true", dest="open_browser", help="Open the dashboard in a browser"
+    )
     gateway_start.add_argument("--dev", action="store_true", help="Run next dev instead of production start")
     gateway_start.add_argument("--dry-run", action="store_true", help="Show command without starting")
     gateway_start.add_argument("--json", action="store_true", help="JSON output")
@@ -2872,7 +2909,9 @@ def main():
     gateway_restart = gateway_sub.add_parser("restart", help="Restart the Gateway Dashboard")
     gateway_restart.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
     gateway_restart.add_argument("--port", type=int, default=3105, help="Port (default: 3105)")
-    gateway_restart.add_argument("--open", action="store_true", dest="open_browser", help="Open the dashboard in a browser")
+    gateway_restart.add_argument(
+        "--open", action="store_true", dest="open_browser", help="Open the dashboard in a browser"
+    )
     gateway_restart.add_argument("--dev", action="store_true", help="Run next dev instead of production start")
     gateway_restart.add_argument("--dry-run", action="store_true", help="Show command without starting")
     gateway_restart.add_argument("--json", action="store_true", help="JSON output")
@@ -2896,6 +2935,10 @@ def main():
     gateway_reset.add_argument("--json", action="store_true", help="JSON output")
 
     gateway_setup = gateway_sub.add_parser("setup", help="Install dependencies, setup DB, and build dashboard")
+    gateway_setup.add_argument("--yes", action="store_true", help="Confirm setup steps in non-interactive mode")
+    gateway_setup.add_argument("--dry-run", action="store_true", help="Show setup commands without executing")
+    gateway_setup.add_argument("--start", action="store_true", help="Start dashboard after setup")
+    gateway_setup.add_argument("--open", action="store_true", dest="open_browser", help="Open dashboard after starting")
     gateway_setup.add_argument("--json", action="store_true", help="JSON output")
 
     # Update command
@@ -2906,6 +2949,10 @@ def main():
     update_check_parser.add_argument(
         "--online", action="store_true", help="Check GitHub for latest release (requires network)"
     )
+    update_apply_parser = update_sub.add_parser("apply", help="Apply an update (planned / alpha-disabled)")
+    update_apply_parser.add_argument("--json", action="store_true", help="JSON output")
+    update_apply_parser.add_argument("--yes", action="store_true", help="Confirm update if enabled in future")
+    update_apply_parser.add_argument("--dry-run", action="store_true", help="Show what would happen")
 
     # Integrations command
     integrations_parser = subparsers.add_parser("integrations", help="Generate integration configs for local AI tools")
@@ -2972,7 +3019,14 @@ def main():
         parser.print_help()
         return
 
-    if args.command == "doctor":
+    if args.command == "console":
+        from kimari.cli.console_cmd import run_console
+
+        run_console(
+            json_output=getattr(args, "json_output", False),
+            no_interactive=getattr(args, "no_interactive", False),
+        )
+    elif args.command == "doctor":
         if getattr(args, "deep", False):
             run_doctor_deep(json_output=getattr(args, "json_output", False))
         else:
@@ -3222,7 +3276,14 @@ def main():
                 clean_deps=args.clean_deps,
             )
         elif gateway_command == "setup":
-            run_gateway_dashboard("setup", json_output=getattr(args, "json", False))
+            run_gateway_dashboard(
+                "setup",
+                json_output=getattr(args, "json", False),
+                dry_run=getattr(args, "dry_run", False),
+                start_dashboard=getattr(args, "start", False),
+                open_browser_after=getattr(args, "open_browser", False),
+                yes=getattr(args, "yes", False),
+            )
         else:
             run_gateway(
                 config,
@@ -3236,6 +3297,12 @@ def main():
             run_update_check(
                 json_output=args.json if hasattr(args, "json") else False,
                 online=args.online if hasattr(args, "online") else False,
+            )
+        elif args.update_command == "apply":
+            run_update_apply(
+                json_output=args.json if hasattr(args, "json") else False,
+                yes=args.yes if hasattr(args, "yes") else False,
+                dry_run=args.dry_run if hasattr(args, "dry_run") else False,
             )
         else:
             # Default: show update check offline

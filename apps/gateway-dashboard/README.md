@@ -4,9 +4,11 @@ Real-time dashboard for managing and monitoring a local Kimari AI gateway — GP
 
 ## Quick Start (CLI-first)
 
-From the Kimari repository or an editable install:
+Install Kimari and manage the dashboard through the CLI:
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/smouj/kimari-local-ai/main/install.sh | bash
+kimari console
 kimari gateway setup
 kimari gateway start --open
 ```

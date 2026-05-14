@@ -4,7 +4,7 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
-## [0.1.81-alpha] - 2026-05-14
+## [0.1.82-alpha] - 2026-05-14
 
 ### Added
 - `kimari gateway` Dashboard lifecycle commands: `setup`, `start`, `stop`, `restart`, `status`, `logs`, `open`, and `reset`.

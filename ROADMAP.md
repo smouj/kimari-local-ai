@@ -494,7 +494,7 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.81-alpha (Current)
+## v0.1.82-alpha (Current)
 
 Status: Gateway Dashboard CLI integration; gate remains BLOCKED.
 

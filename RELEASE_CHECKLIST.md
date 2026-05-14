@@ -1,8 +1,8 @@
-## v0.1.81-alpha — Gateway Dashboard CLI integration
+## v0.1.82-alpha — Gateway Dashboard CLI integration
 
-- [x] pyproject.toml version is 0.1.81-alpha
-- [x] kimari/__init__.py version is 0.1.81-alpha
-- [x] apps/gateway-dashboard/package.json version is 0.1.81-alpha
+- [x] pyproject.toml version is 0.1.82-alpha
+- [x] kimari/__init__.py version is 0.1.82-alpha
+- [x] apps/gateway-dashboard/package.json version is 0.1.82-alpha
 - [x] `kimari gateway setup/start/stop/restart/status/logs/open/reset` implemented
 - [x] Dashboard manager stores runtime state under `~/.local/state/kimari/gateway-dashboard/`
 - [x] Default dashboard bind is `127.0.0.1:3105`

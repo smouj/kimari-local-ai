@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-0.1.81--alpha-9b59b6.svg" alt="v0.1.81-alpha">
+  <img src="https://img.shields.io/badge/version-0.1.82--alpha-9b59b6.svg" alt="v0.1.82-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.81-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.82-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.81-alpha**
+> **Kimari Local AI v0.1.82-alpha**
 
 ### 🔗 Public Resources
 
@@ -327,23 +327,18 @@ python training/scripts/check_hf_jobs_access.py --json
 ### Installation
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/smouj/kimari-local-ai.git
-cd kimari-local-ai
+curl -fsSL https://raw.githubusercontent.com/smouj/kimari-local-ai/main/install.sh | bash
+kimari console
+```
 
-# 2. Install the package
-pip install -e .
+Optional next steps from the console or CLI:
 
-# 3. Run system diagnostics
-kimari doctor
-
-# 4. Download a test model
+```bash
+kimari doctor --deep
 kimari pull test
-
-# 5. Start the server (uses 'test' profile by default)
 kimari start
-
-# 6. Chat with the model
+kimari gateway setup
+kimari gateway start --open
 kimari chat "Hello, Kimari!"
 ```
 
@@ -366,7 +361,9 @@ pip install -e .
 kimari doctor
 ```
 
-### Development Setup
+### Developer dashboard development only
+
+Normal users should use `install.sh`, `kimari console`, and `kimari gateway ...` commands. Direct Python/package commands are for contributors working on Kimari itself.
 
 ```bash
 # Install with dev dependencies
@@ -377,17 +374,6 @@ bash scripts/linux/install-dev.sh
 
 # Verify environment
 python scripts/common/check-env.py
-```
-
-### Manual Install (no pip)
-
-If you prefer not to use `pip install -e .`, you can run Kimari directly:
-
-```bash
-pip install -r cli/requirements.txt
-python -m kimari.cli.main doctor
-python -m kimari.cli.main pull test
-python -m kimari.cli.main start
 ```
 
 ---

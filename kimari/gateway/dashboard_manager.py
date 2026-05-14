@@ -152,20 +152,42 @@ def _base_status(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> dict[str
     }
 
 
-def setup() -> dict[str, Any]:
-    """Install dashboard dependencies, initialize the DB, and build the app."""
-    _require_node()
+def setup(
+    dry_run: bool = False,
+    start_dashboard: bool = False,
+    open_browser_after: bool = False,
+    yes: bool = False,
+) -> dict[str, Any]:
+    """Install dashboard dependencies, initialize the DB, and build the app.
+
+    Node/npm are required, but Kimari never installs them globally. In dry-run
+    mode this only reports the commands that would run.
+    """
     dashboard = _require_dashboard_dir()
-    _ensure_state_dir()
     commands = [["npm", "install"], ["npm", "run", "db:setup"], ["npm", "run", "build"]]
+    if dry_run:
+        return {
+            "status": "dry-run",
+            "dashboard_dir": str(dashboard),
+            "commands": commands,
+            "would_start": start_dashboard,
+            "gate_state": GATE_STATE,
+        }
+
+    _require_node()
+    _ensure_state_dir()
     with LOG_FILE.open("a", encoding="utf-8") as log:
         for command in commands:
             log.write(f"\n[{_now()}] $ {' '.join(command)}\n")
-            result = subprocess.run(command, cwd=dashboard, stdout=log, stderr=subprocess.STDOUT, text=True, check=False)
+            result = subprocess.run(
+                command, cwd=dashboard, stdout=log, stderr=subprocess.STDOUT, text=True, check=False
+            )
             if result.returncode != 0:
                 raise DashboardError(f"Dashboard setup failed during: {' '.join(command)}. See {LOG_FILE}")
-    result = {"status": "ok", "dashboard_dir": str(dashboard), "log_file": str(LOG_FILE)}
+    result = {"status": "ok", "dashboard_dir": str(dashboard), "log_file": str(LOG_FILE), "confirmed": yes}
     _write_state({"last_setup": result})
+    if start_dashboard:
+        result["start"] = start(open_browser=open_browser_after)
     return result
 
 
@@ -186,9 +208,10 @@ def start(
     dashboard = _require_dashboard_dir()
 
     if setup and not dry_run:
-        globals()["setup"]()
+        globals()["setup"](yes=True)
 
-    _require_node_modules(dashboard)
+    if not dry_run:
+        _require_node_modules(dashboard)
     _ensure_state_dir()
 
     script = "dev" if dev else "start"
