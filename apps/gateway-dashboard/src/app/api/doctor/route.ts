@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server';
+import { execSync } from 'child_process';
+import { existsSync, readFileSync } from 'fs';
+
+export const dynamic = 'force-dynamic'
 
 interface DiagnosticCheck {
   name: string;
@@ -8,128 +12,227 @@ interface DiagnosticCheck {
   details?: string;
 }
 
-export async function GET() {
+function safeExec(cmd: string): string {
+  try { return execSync(cmd, { timeout: 5000, encoding: 'utf-8' }).trim() } catch { return '' }
+}
+
+async function checkUrl(url: string, timeout = 2000): Promise<{ ok: boolean; status?: number; body?: string }> {
   try {
-    const checks: DiagnosticCheck[] = [
-      {
-        name: 'Python Runtime',
-        category: 'Runtime',
-        status: 'PASS',
-        message: 'Python 3.11.8 found at /usr/bin/python3',
-        details: 'Python 3.11+ is recommended. Found version meets minimum requirements for all Kimari features.',
-      },
-      {
-        name: 'Kimari Version',
-        category: 'Core',
-        status: 'PASS',
-        message: 'Running Kimari v0.1.73-alpha (latest)',
-        details: 'Current version matches the latest release on GitHub. No update available.',
-      },
-      {
-        name: 'Config Paths',
-        category: 'Core',
-        status: 'PASS',
-        message: 'Config directory exists at ~/.kimari/',
-        details: 'All required directories are present: config/, models/, benchmarks/, logs/.',
-      },
-      {
-        name: 'Config Validity',
-        category: 'Core',
-        status: 'PASS',
-        message: 'Configuration schema is valid',
-        details: 'All config keys pass JSON schema validation. No missing required fields detected.',
-      },
-      {
-        name: 'Model Files',
-        category: 'Models',
-        status: 'WARN',
-        message: '2 of 5 configured models are downloaded',
-        details: 'Missing models: kimari-4b-v2-Q4_K_M.gguf, llama-3.1-8b-Q5_K_M.gguf, mistral-7b-Q4_K_M.gguf. Use "kimari model pull" to download.',
-      },
-      {
-        name: 'Packaged Defaults',
-        category: 'Core',
-        status: 'PASS',
-        message: 'All 11 default profiles are intact',
-        details: 'Checksum validation passed for all packaged default configurations.',
-      },
-      {
-        name: 'llama-server Binary',
-        category: 'Runtime',
-        status: 'PASS',
-        message: 'llama-server binary found at ~/.kimari/bin/llama-server',
-        details: 'Version: llama.cpp b-3228. Supports GGUF format, Flash Attention, and KV cache quantization.',
-      },
-      {
-        name: 'CUDA/NVIDIA',
+    const res = await fetch(url, { signal: AbortSignal.timeout(timeout) })
+    const body = await res.text()
+    return { ok: res.ok, status: res.status, body }
+  } catch {
+    return { ok: false }
+  }
+}
+
+export async function GET() {
+  const checks: DiagnosticCheck[] = [];
+
+  // ── Python Runtime ──
+  const pyVer = safeExec('python3 --version 2>&1')
+  const pyPath = safeExec('which python3 2>/dev/null')
+  if (pyVer) {
+    checks.push({
+      name: 'Python Runtime',
+      category: 'Runtime',
+      status: 'PASS',
+      message: `${pyVer} found at ${pyPath || 'unknown'}`,
+      details: 'Python 3.11+ recommended for all Kimari features.',
+    })
+  } else {
+    checks.push({
+      name: 'Python Runtime',
+      category: 'Runtime',
+      status: 'FAIL',
+      message: 'Python 3 not found in PATH',
+      details: 'Kimari CLI requires Python 3.10+.',
+    })
+  }
+
+  // ── Kimari Version ──
+  const kimariInit = '/home/smouj/.openclaw/workspace/kimari-local-ai/kimari/__init__.py'
+  if (existsSync(kimariInit)) {
+    const content = readFileSync(kimariInit, 'utf-8')
+    const match = content.match(/__version__\s*=\s*["']([^"']+)["']/)
+    const ver = match ? match[1] : 'unknown'
+    checks.push({
+      name: 'Kimari Version',
+      category: 'Core',
+      status: 'PASS',
+      message: `Running Kimari ${ver}`,
+      details: `Package version from ${kimariInit}`,
+    })
+  } else {
+    checks.push({
+      name: 'Kimari Version',
+      category: 'Core',
+      status: 'WARN',
+      message: 'Kimari package not found at expected path',
+      details: 'Dashboard may be running standalone without the Kimari CLI.',
+    })
+  }
+
+  // ── llama-server Binary ──
+  const llamaPath = safeExec('which llama-server 2>/dev/null') || '/home/smouj/.local/bin/llama-server'
+  if (existsSync(llamaPath)) {
+    const verOutput = safeExec(`${llamaPath} --version 2>&1`)
+    const verMatch = verOutput.match(/version:\s*(\S+)/)
+    const cudaMatch = verOutput.match(/CUDA/)
+    const gpuMatch = verOutput.match(/Device 0: (.+?),/)
+    checks.push({
+      name: 'llama-server Binary',
+      category: 'Runtime',
+      status: 'PASS',
+      message: `Found at ${llamaPath}${verMatch ? ` (v${verMatch[1]})` : ''}${cudaMatch ? ', CUDA enabled' : ''}`,
+      details: gpuMatch ? `GPU: ${gpuMatch[1]}` : 'No GPU detected by llama-server',
+    })
+  } else {
+    checks.push({
+      name: 'llama-server Binary',
+      category: 'Runtime',
+      status: 'FAIL',
+      message: `Not found at ${llamaPath}`,
+      details: 'Required for local LLM inference. Install llama.cpp.',
+    })
+  }
+
+  // ── GPU Detection ──
+  const smi = safeExec('nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader 2>/dev/null')
+  if (smi) {
+    const parts = smi.split(',').map(s => s.trim())
+    checks.push({
+      name: 'GPU (nvidia-smi)',
+      category: 'Hardware',
+      status: 'PASS',
+      message: `${parts[0]} — ${parts[1]} VRAM — driver ${parts[2]}`,
+      details: 'GPU available for CUDA inference.',
+    })
+  } else {
+    // Fallback via llama-server
+    const llamaVer = safeExec('~/.local/bin/llama-server --version 2>&1')
+    const gpuMatch = llamaVer.match(/Device 0: (.+)/)
+    if (gpuMatch) {
+      checks.push({
+        name: 'GPU (llama-server)',
         category: 'Hardware',
         status: 'WARN',
-        message: 'NVIDIA driver detected but CUDA toolkit not found',
-        details: 'Driver: NVIDIA 535.129.03. CUDA toolkit is recommended for GPU acceleration. Install CUDA 12.x toolkit for optimal performance.',
-      },
-      {
-        name: 'Default Profile',
-        category: 'Core',
-        status: 'PASS',
-        message: 'Default profile "gtx1060-6gb" is configured',
-        details: 'Profile uses Q4_K_M quantization with 4096 context size. Compatible with detected hardware.',
-      },
-      {
-        name: 'Secret Scanner',
-        category: 'Security',
-        status: 'PASS',
-        message: 'No exposed secrets detected in configuration',
-        details: 'Scanned all config files for API keys, tokens, and credentials. All secrets are properly masked in storage.',
-      },
-      {
-        name: 'Benchmark Prompts',
-        category: 'Models',
-        status: 'FAIL',
-        message: 'Benchmark prompt files are missing',
-        details: 'Expected prompt files not found in ~/.kimari/benchmarks/prompts/. Run "kimari benchmark init" to generate default prompts.',
-      },
-      {
-        name: 'Gateway Module',
-        category: 'Gateway',
-        status: 'PASS',
-        message: 'Gateway module is operational',
-        details: 'OpenAI-compatible API gateway is ready. Supports /v1/chat/completions and /v1/models endpoints.',
-      },
-      {
-        name: 'Integration Docs',
-        category: 'Gateway',
+        message: `${gpuMatch[1]} (detected by llama-server, nvidia-smi unavailable)`,
+        details: 'nvidia-smi not found. GPU stats (temp, power) may be unavailable.',
+      })
+    } else {
+      checks.push({
+        name: 'GPU',
+        category: 'Hardware',
         status: 'WARN',
-        message: '3 of 5 integration docs are available',
-        details: 'Missing documentation for: Continue.dev, Open Interpreter. Basic setup guides are available for all integrations.',
-      },
-      {
-        name: 'Preview Gate',
-        category: 'Models',
-        status: 'PASS',
-        message: 'Kimari-4B preview gate is open',
-        details: 'Preview model access is enabled. Kimari-4B-v2 is available for testing with reduced context window.',
-      },
-    ];
-
-    const summary = {
-      total: checks.length,
-      pass: checks.filter((c) => c.status === 'PASS').length,
-      warn: checks.filter((c) => c.status === 'WARN').length,
-      fail: checks.filter((c) => c.status === 'FAIL').length,
-    };
-
-    const healthScore = Math.round((summary.pass / summary.total) * 100);
-
-    return NextResponse.json({
-      checks,
-      summary,
-      healthScore,
-      checkedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Diagnostic check failed', message: String(error) },
-      { status: 500 }
-    );
+        message: 'No GPU detected via nvidia-smi or llama-server',
+        details: 'CPU-only inference will be significantly slower.',
+      })
+    }
   }
+
+  // ── Model Files ──
+  const modelsDir = '/home/smouj/.local/share/kimari/models'
+  if (existsSync(modelsDir)) {
+    const ggufFiles = safeExec(`find ${modelsDir} -name '*.gguf' -exec ls -lh {} \\;`)
+    const count = ggufFiles ? ggufFiles.split('\n').filter(Boolean).length : 0
+    checks.push({
+      name: 'Model Files',
+      category: 'Models',
+      status: count > 0 ? 'PASS' : 'WARN',
+      message: `${count} GGUF model${count !== 1 ? 's' : ''} in ${modelsDir}`,
+      details: ggufFiles || 'No GGUF files found.',
+    })
+  } else {
+    checks.push({
+      name: 'Model Files',
+      category: 'Models',
+      status: 'WARN',
+      message: `Models directory not found: ${modelsDir}`,
+      details: 'Create the directory and download models.',
+    })
+  }
+
+  // ── llama-server Status (live check) ──
+  const llamaHealth = await checkUrl('http://127.0.0.1:11435/health')
+  if (llamaHealth.ok) {
+    checks.push({
+      name: 'llama-server Status',
+      category: 'Services',
+      status: 'PASS',
+      message: 'llama-server running on port 11435',
+      details: `Health response: ${llamaHealth.body?.substring(0, 100)}`,
+    })
+  } else {
+    checks.push({
+      name: 'llama-server Status',
+      category: 'Services',
+      status: 'WARN',
+      message: 'llama-server not running on port 11435',
+      details: 'Start with: kimari start --profile test',
+    })
+  }
+
+  // ── Ollama Status ──
+  const ollamaHealth = await checkUrl('http://127.0.0.1:11434/api/tags')
+  if (ollamaHealth.ok) {
+    try {
+      const data = JSON.parse(ollamaHealth.body || '{}')
+      const modelCount = data.models?.length || 0
+      checks.push({
+        name: 'Ollama',
+        category: 'Services',
+        status: 'PASS',
+        message: `Ollama running on port 11434 — ${modelCount} model${modelCount !== 1 ? 's' : ''} loaded`,
+        details: data.models?.map((m: { name: string }) => m.name).join(', ') || '',
+      })
+    } catch {
+      checks.push({
+        name: 'Ollama',
+        category: 'Services',
+        status: 'PASS',
+        message: 'Ollama running on port 11434',
+      })
+    }
+  } else {
+    checks.push({
+      name: 'Ollama',
+      category: 'Services',
+      status: 'WARN',
+      message: 'Ollama not running on port 11434',
+      details: 'Optional — start with: ollama serve',
+    })
+  }
+
+  // ── System Resources ──
+  const memInfo = safeExec("free -h | grep Mem | awk '{print $2, $3, $7}'")
+  const diskInfo = safeExec("df -h / | tail -1 | awk '{print $2, $3, $5}'")
+  checks.push({
+    name: 'System Memory',
+    category: 'System',
+    status: 'PASS',
+    message: `RAM: ${memInfo.replace(/\s+/g, ' ')}`,
+    details: 'Total / Used / Available',
+  })
+  checks.push({
+    name: 'Disk Space',
+    category: 'System',
+    status: 'PASS',
+    message: `Disk: ${diskInfo.replace(/\s+/g, ' ')}`,
+    details: 'Total / Used / Use%',
+  })
+
+  // ── WSL Detection ──
+  const procVer = safeExec('cat /proc/version 2>/dev/null')
+  if (procVer.includes('microsoft-standard')) {
+    checks.push({
+      name: 'WSL Environment',
+      category: 'System',
+      status: 'PASS',
+      message: 'Running under WSL2 (Windows Subsystem for Linux)',
+      details: procVer.split(' ').slice(0, 3).join(' '),
+    })
+  }
+
+  return NextResponse.json({ checks, timestamp: new Date().toISOString() });
 }

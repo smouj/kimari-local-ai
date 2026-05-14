@@ -51,4 +51,7 @@ prompt
 
 server.log
 # Skills directory
-/skills/
+/skills/prisma/dev.db
+package-lock.json
+db/
+custom.db

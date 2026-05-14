@@ -1,148 +1,164 @@
 import { NextResponse } from 'next/server'
+import { execSync } from 'child_process'
+import { readFileSync } from 'fs'
 
-// Persistent state for realistic fluctuation
-let cpuBases = Array.from({ length: 8 }, () => 15 + Math.random() * 30)
-let memUsedBase = 14 + Math.random() * 4
-let memCachedBase = 6 + Math.random() * 3
-let memFreeBase = 5 + Math.random() * 3
-let swapUsedBase = 0.3 + Math.random() * 1.2
-let vramUsedBase = 3.2 + Math.random() * 4
-let vramHistory: number[] = Array.from({ length: 60 }, (_, i) =>
-  30 + Math.sin(i * 0.15) * 10 + Math.random() * 5
-)
-let diskReadBase = 85 + Math.random() * 60
-let diskWriteBase = 45 + Math.random() * 40
-let netInBase = 25 + Math.random() * 30
-let netOutBase = 8 + Math.random() * 15
-let cpuTempBase = 42 + Math.random() * 12
-let gpuHotspotBase = 48 + Math.random() * 15
-let uptimeSeconds = Math.floor(3600 + Math.random() * 7200)
+export const dynamic = 'force-dynamic'
 
-function jitter(base: number, range: number, min = 0, max = 1000) {
-  const val = base + (Math.random() - 0.5) * range
-  return Math.min(max, Math.max(min, val))
+interface SystemResources {
+  cpu: { usage: number; cores: number; model: string }
+  memory: { used: number; total: number; percent: number; available: number }
+  disk: { used: number; total: number; percent: number }
+  gpu: {
+    name: string
+    vramTotalMb: number
+    vramUsedMb: number
+    vramPercent: number
+    temperature: number | null
+    powerDraw: number | null
+    driverVersion: string | null
+  } | null
+  llamaServer: {
+    running: boolean
+    url: string
+    models: string[]
+  }
+  ollama: {
+    running: boolean
+    url: string
+    models: { id: string; size: string }[]
+  }
+  uptime: number
+}
+
+function safeExec(cmd: string): string {
+  try { return execSync(cmd, { timeout: 5000, encoding: 'utf-8' }).trim() } catch { return '' }
+}
+
+function parseProcMeminfo(): { total: number; used: number; available: number; percent: number } {
+  try {
+    const content = readFileSync('/proc/meminfo', 'utf-8')
+    const get = (key: string) => {
+      const m = content.match(new RegExp(`${key}:\\s+(\\d+)`))
+      return m ? parseInt(m[1], 10) / 1024 : 0 // kB → MB → GB (/1024 twice, but we want GB)
+    }
+    const total = get('MemTotal') / 1024
+    const available = get('MemAvailable') / 1024
+    const used = total - available
+    return { total: Math.round(total * 10) / 10, used: Math.round(used * 10) / 10, available: Math.round(available * 10) / 10, percent: Math.round((used / total) * 100) }
+  } catch {
+    return { total: 0, used: 0, available: 0, percent: 0 }
+  }
+}
+
+function parseProcStat(): number {
+  try {
+    // Read cumulative CPU time
+    const lines = readFileSync('/proc/stat', 'utf-8').split('\n')
+    const cpuLine = lines[0]
+    const vals = cpuLine.split(/\s+/).slice(1).map(Number)
+    const idle = vals[3] + vals[4]
+    const total = vals.reduce((a, b) => a + b, 0)
+    return total > 0 ? Math.round(((total - idle) / total) * 100) : 0
+  } catch {
+    return 0
+  }
+}
+
+function getGpuInfo(): SystemResources['gpu'] {
+  // Try nvidia-smi first (real hardware)
+  const smi = safeExec('nvidia-smi --query-gpu=name,memory.total,memory.used,temperature.gpu,power.draw,driver_version --format=csv,noheader,nounits 2>/dev/null')
+  if (smi) {
+    const parts = smi.split(',').map(s => s.trim())
+    if (parts.length >= 4) {
+      return {
+        name: parts[0] || 'Unknown GPU',
+        vramTotalMb: parseInt(parts[1]) || 0,
+        vramUsedMb: parseInt(parts[2]) || 0,
+        vramPercent: parseInt(parts[1]) > 0 ? Math.round((parseInt(parts[2]) / parseInt(parts[1])) * 100) : 0,
+        temperature: parts[3] && parts[3] !== '[N/A]' ? parseFloat(parts[3]) : null,
+        powerDraw: parts[4] && parts[4] !== '[N/A]' ? parseFloat(parts[4]) : null,
+        driverVersion: parts[5] || null,
+      }
+    }
+  }
+
+  // Fallback: check via llama-server --version output (shows GPU detection)
+  const llamaVer = safeExec('~/.local/bin/llama-server --version 2>&1')
+  const gpuMatch = llamaVer.match(/Device 0: (.+?),/)
+  const vramMatch = llamaVer.match(/VRAM: (\d+) MiB/)
+  if (gpuMatch) {
+    return {
+      name: gpuMatch[1],
+      vramTotalMb: vramMatch ? parseInt(vramMatch[1]) : 0,
+      vramUsedMb: 0,
+      vramPercent: 0,
+      temperature: null,
+      powerDraw: null,
+      driverVersion: null,
+    }
+  }
+
+  return null
+}
+
+async function checkLlamaServer(): Promise<SystemResources['llamaServer']> {
+  const url = 'http://127.0.0.1:11435'
+  try {
+    const res = await fetch(`${url}/v1/models`, { signal: AbortSignal.timeout(2000) })
+    if (res.ok) {
+      const data = await res.json()
+      return { running: true, url, models: (data.data || []).map((m: { id: string }) => m.id) }
+    }
+  } catch { /* not running */ }
+  return { running: false, url, models: [] }
+}
+
+async function checkOllama(): Promise<SystemResources['ollama']> {
+  const url = 'http://127.0.0.1:11434'
+  try {
+    const res = await fetch(`${url}/v1/models`, { signal: AbortSignal.timeout(2000) })
+    if (res.ok) {
+      const data = await res.json()
+      return {
+        running: true,
+        url,
+        models: (data.data || []).map((m: { id: string; created?: number }) => ({ id: m.id, size: '' })),
+      }
+    }
+  } catch { /* not running */ }
+  return { running: false, url, models: [] }
 }
 
 export async function GET() {
-  // Update CPU per-core
-  cpuBases = cpuBases.map((b) => jitter(b, 8, 3, 97))
-  const cpuCores = cpuBases.map((usage, i) => ({
-    core: i,
-    usage: Math.round(usage),
-    frequency: +(2.4 + usage * 0.018 + Math.random() * 0.3).toFixed(2),
-  }))
+  const cores = parseInt(safeExec('nproc')) || 8
+  const cpuModel = safeExec("lscpu | grep 'Model name' | head -1 | sed 's/Model name:\\s*//'") || 'Unknown CPU'
+  const cpuUsage = parseProcStat()
+  const memory = parseProcMeminfo()
 
-  // CPU package temp
-  cpuTempBase = jitter(cpuTempBase, 3, 35, 95)
-  const cpuPackageTemp = Math.round(cpuTempBase)
-
-  // CPU avg
-  const cpuAvgUsage = Math.round(cpuBases.reduce((a, b) => a + b, 0) / cpuBases.length)
-  const cpuFreq = +(cpuCores.reduce((a, c) => a + c.frequency, 0) / cpuCores.length).toFixed(2)
-
-  // Memory breakdown (total 32 GB)
-  const memTotal = 32
-  memUsedBase = jitter(memUsedBase, 0.8, 8, 22)
-  memCachedBase = jitter(memCachedBase, 0.5, 3, 10)
-  memFreeBase = memTotal - memUsedBase - memCachedBase
-  swapUsedBase = jitter(swapUsedBase, 0.2, 0.1, 4)
-  const swapTotal = 8
-
-  const memUsed = +memUsedBase.toFixed(1)
-  const memCached = +memCachedBase.toFixed(1)
-  const memFree = +Math.max(0, memFreeBase).toFixed(1)
-  const memPercent = Math.round((memUsed / memTotal) * 100)
-  const swapPercent = Math.round((swapUsedBase / swapTotal) * 100)
-
-  // GPU VRAM (12 GB total)
-  const vramTotal = 12
-  vramUsedBase = jitter(vramUsedBase, 0.4, 1, 11)
-  const vramUsed = +vramUsedBase.toFixed(1)
-  const vramPercent = Math.round((vramUsed / vramTotal) * 100)
-
-  // VRAM history (shift and add new point)
-  vramHistory = [...vramHistory.slice(1), vramPercent]
-  const vramHistoryPoints = vramHistory.map((v, i) => ({
-    tick: i,
-    value: v,
-  }))
-
-  // GPU temperature & hotspot
-  gpuHotspotBase = jitter(gpuHotspotBase, 2, 40, 95)
-  const gpuTemp = Math.round(vramPercent * 0.5 + 35 + Math.random() * 3)
-  const gpuHotspot = Math.round(gpuHotspotBase)
-  const gpuPowerDraw = Math.round(80 + vramPercent * 1.8 + Math.random() * 10)
-
-  // Disk I/O
-  diskReadBase = jitter(diskReadBase, 20, 10, 300)
-  diskWriteBase = jitter(diskWriteBase, 15, 5, 200)
-  const diskReadMbps = +diskReadBase.toFixed(1)
-  const diskWriteMbps = +diskWriteBase.toFixed(1)
-
-  const diskTotal = 512
-  const diskPercent = 42
-  const diskUsed = +(diskTotal * diskPercent / 100).toFixed(1)
-
-  // Network throughput
-  netInBase = jitter(netInBase, 12, 2, 120)
-  netOutBase = jitter(netOutBase, 6, 1, 60)
-  const netInMbps = +netInBase.toFixed(1)
-  const netOutMbps = +netOutBase.toFixed(1)
-  const connections = Math.round(12 + Math.random() * 40)
-  const latency = +(1 + Math.random() * 4).toFixed(1)
-
-  // Temperature readings
-  const cpuTemp = cpuPackageTemp
-  const gpuTempReading = gpuTemp
+  // Disk
+  const diskInfo = safeExec("df -h / | tail -1 | awk '{print $3,$2,$5}'")
+  const diskParts = diskInfo.split(/\s+/)
+  const diskUsed = parseFloat(diskParts[0]) || 0
+  const diskTotal = parseFloat(diskParts[1]) || 0
+  const diskPercent = parseInt(diskParts[2]) || 0
 
   // Uptime
-  uptimeSeconds += 3
+  const uptimeSec = parseInt(safeExec("cat /proc/uptime | cut -d. -f1")) || 0
+
+  // GPU + services (async)
+  const [gpu, llamaServer, ollama] = await Promise.all([
+    Promise.resolve(getGpuInfo()),
+    checkLlamaServer(),
+    checkOllama(),
+  ])
 
   return NextResponse.json({
-    cpu: {
-      usage: cpuAvgUsage,
-      cores: cpuCores,
-      coreCount: 8,
-      temperature: cpuTemp,
-      frequency: `${cpuFreq} GHz`,
-    },
-    memory: {
-      used: memUsed,
-      cached: memCached,
-      free: memFree,
-      total: memTotal,
-      percent: memPercent,
-      swapUsed: +swapUsedBase.toFixed(1),
-      swapTotal: swapTotal,
-      swapPercent: swapPercent,
-    },
-    gpu: {
-      vramUsed,
-      vramTotal,
-      vramPercent,
-      vramHistory: vramHistoryPoints,
-      temperature: gpuTempReading,
-      hotspot: gpuHotspot,
-      powerDraw: gpuPowerDraw,
-    },
-    disk: {
-      used: diskUsed,
-      total: diskTotal,
-      percent: diskPercent,
-      readMbps: diskReadMbps,
-      writeMbps: diskWriteMbps,
-    },
-    network: {
-      inMbps: netInMbps,
-      outMbps: netOutMbps,
-      connections,
-      latency,
-    },
-    temperatures: {
-      cpuPackage: cpuTemp,
-      gpuHotspot: gpuHotspot,
-      gpuCore: gpuTempReading,
-    },
-    uptime: uptimeSeconds,
+    cpu: { usage: cpuUsage, cores, model: cpuModel },
+    memory,
+    disk: { used: diskUsed, total: diskTotal, percent: diskPercent },
+    gpu,
+    llamaServer,
+    ollama,
+    uptime: uptimeSec,
   })
 }
