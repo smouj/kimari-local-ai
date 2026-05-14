@@ -87,7 +87,7 @@ def main():
                 temperature=temperature,
                 top_p=top_p,
                 do_sample=True,
-                seed=seed,
+
             )
 
         generated = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True)
@@ -131,7 +131,7 @@ def main():
                 temperature=temperature,
                 top_p=top_p,
                 do_sample=True,
-                seed=seed,
+
             )
 
         generated = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True)
