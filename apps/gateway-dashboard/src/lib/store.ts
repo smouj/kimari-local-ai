@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 
-export type ViewType = 'dashboard' | 'profiles' | 'models' | 'server' | 'stats' | 'analytics' | 'doctor' | 'benchmarks' | 'kimarifit' | 'config' | 'logs' | 'integrations' | 'chat' | 'modelCompare' | 'settings'
+export type ViewType = 'dashboard' | 'profiles' | 'models' | 'server' | 'stats' | 'analytics' | 'doctor' | 'benchmarks' | 'kimarifit' | 'config' | 'logs' | 'integrations' | 'chat' | 'modelCompare' | 'system' | 'settings'
 
 interface ServerStatus {
   status: string

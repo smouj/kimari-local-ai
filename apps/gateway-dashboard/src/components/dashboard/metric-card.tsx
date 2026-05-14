@@ -21,42 +21,42 @@ interface MetricCardProps {
 const variantStyles: Record<CardVariant, { gradient: string; iconBg: string; iconText: string; borderAccent: string; leftBorder: string; barColor: string }> = {
   status: {
     gradient: 'metric-gradient-status',
-    iconBg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-600/10',
-    iconText: 'text-emerald-500 dark:text-emerald-400',
-    borderAccent: 'hover:border-emerald-500/30',
-    leftBorder: 'border-l-emerald-500',
-    barColor: 'from-emerald-500/60 via-emerald-400/80 to-emerald-500/60',
+    iconBg: 'bg-gradient-to-br from-primary/20 to-primary/10',
+    iconText: 'text-primary',
+    borderAccent: 'hover:border-primary/40',
+    leftBorder: 'border-l-primary',
+    barColor: 'from-primary/60 via-primary/80 to-primary/60',
   },
   profile: {
     gradient: 'metric-gradient-profile',
-    iconBg: 'bg-gradient-to-br from-cyan-500/20 to-cyan-600/10',
-    iconText: 'text-cyan-500 dark:text-cyan-400',
-    borderAccent: 'hover:border-cyan-500/30',
-    leftBorder: 'border-l-cyan-500',
-    barColor: 'from-cyan-500/60 via-cyan-400/80 to-cyan-500/60',
+    iconBg: 'bg-gradient-to-br from-sky-500/20 to-sky-600/10',
+    iconText: 'text-sky-500 dark:text-sky-400',
+    borderAccent: 'hover:border-sky-500/40',
+    leftBorder: 'border-l-sky-500',
+    barColor: 'from-sky-500/60 via-sky-400/80 to-sky-500/60',
   },
   models: {
     gradient: 'metric-gradient-models',
-    iconBg: 'bg-gradient-to-br from-teal-500/20 to-teal-600/10',
-    iconText: 'text-teal-500 dark:text-teal-400',
-    borderAccent: 'hover:border-teal-500/30',
-    leftBorder: 'border-l-teal-500',
-    barColor: 'from-teal-500/60 via-teal-400/80 to-teal-500/60',
+    iconBg: 'bg-gradient-to-br from-blue-500/20 to-blue-600/10',
+    iconText: 'text-blue-500 dark:text-blue-400',
+    borderAccent: 'hover:border-blue-500/40',
+    leftBorder: 'border-l-blue-500',
+    barColor: 'from-blue-500/60 via-blue-400/80 to-blue-500/60',
   },
   memory: {
     gradient: 'metric-gradient-memory',
-    iconBg: 'bg-gradient-to-br from-primary/20 to-primary/10',
-    iconText: 'text-primary',
-    borderAccent: 'hover:border-primary/30',
-    leftBorder: 'border-l-primary',
-    barColor: 'from-primary/60 via-primary/80 to-primary/60',
+    iconBg: 'bg-gradient-to-br from-indigo-500/20 to-indigo-600/10',
+    iconText: 'text-indigo-500 dark:text-indigo-400',
+    borderAccent: 'hover:border-indigo-500/40',
+    leftBorder: 'border-l-indigo-500',
+    barColor: 'from-indigo-500/60 via-indigo-400/80 to-indigo-500/60',
   },
 }
 
 const trendStyles = {
-  up: { color: 'text-emerald-500 dark:text-emerald-400', icon: <TrendingUp className="h-3.5 w-3.5" /> },
-  down: { color: 'text-red-500 dark:text-red-400', icon: <TrendingDown className="h-3.5 w-3.5" /> },
-  neutral: { color: 'text-foreground/60', icon: <Minus className="h-3.5 w-3.5" /> },
+  up: { color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-500/10', icon: <TrendingUp className="h-4 w-4" /> },
+  down: { color: 'text-red-500 dark:text-red-400', bg: 'bg-red-500/10', icon: <TrendingDown className="h-4 w-4" /> },
+  neutral: { color: 'text-foreground/60', bg: 'bg-muted/50', icon: <Minus className="h-4 w-4" /> },
 }
 
 export function MetricCard({ title, value, subtitle, icon, trend, trendValue, variant = 'status', className }: MetricCardProps) {
@@ -72,7 +72,7 @@ export function MetricCard({ title, value, subtitle, icon, trend, trendValue, va
       className="hover-scale"
     >
       <Card className={cn(
-        'glass-card card-hover-lift depth-shadow card-shine card-glow metric-hover-gradient overflow-hidden transition-all duration-200 border-l-[3px]',
+        'glass-card card-hover-lift depth-shadow card-shine card-glow metric-hover-gradient metric-gradient-border-hover overflow-hidden transition-all duration-200 border-l-[3px]',
         styles.borderAccent,
         styles.leftBorder,
         className
@@ -90,7 +90,7 @@ export function MetricCard({ title, value, subtitle, icon, trend, trendValue, va
               <div className="flex items-baseline gap-2">
                 <p className="text-3xl font-bold tracking-tight text-foreground">{value}</p>
                 {trendStyle && (
-                  <span className={cn('flex items-center gap-0.5 text-xs font-semibold', trendStyle.color)}>
+                  <span className={cn('inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full', trendStyle.color, trendStyle.bg)}>
                     {trendStyle.icon}
                     {trendValue && <span>{trendValue}</span>}
                   </span>

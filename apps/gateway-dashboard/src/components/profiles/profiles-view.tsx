@@ -113,7 +113,8 @@ export function ProfilesView() {
               <Card
                 className={cn(
                   'relative overflow-hidden transition-all duration-300 card-hover-lift depth-shadow card-glow',
-                  isProfileRunning && 'ring-2 ring-primary/50 glow-blue gradient-border'
+                  isProfileRunning && 'ring-2 ring-primary/50 glow-blue gradient-border',
+                  i % 2 === 0 ? 'profile-row-even' : 'profile-row-odd'
                 )}
               >
                 {/* Status line at top */}

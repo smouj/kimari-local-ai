@@ -67,18 +67,18 @@ function ConnectionDiagram({ isRunning, port, host }: { isRunning: boolean; port
       <div className="flex items-center">
         <div className={cn(
           'w-10 h-[3px] rounded-full transition-all duration-300',
-          isRunning ? 'bg-gradient-to-r from-primary/70 to-emerald-500/70 shadow-sm shadow-primary/30' : 'bg-border'
+          isRunning ? 'bg-gradient-to-r from-primary/70 to-primary/50 shadow-sm shadow-primary/30' : 'bg-border'
         )} />
-        <ArrowRight className={cn('h-4 w-4 transition-colors', isRunning ? 'text-emerald-500' : 'text-border')} />
+        <ArrowRight className={cn('h-4 w-4 transition-colors', isRunning ? 'text-primary animate-arrow-flow' : 'text-border')} />
       </div>
 
       {/* Gateway */}
       <div className="flex flex-col items-center gap-1.5 group">
         <div className={cn(
           'w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all duration-300',
-          isRunning ? 'bg-emerald-500/15 border-emerald-500/30 shadow-md shadow-emerald-500/10' : 'bg-muted/50 border-border'
+          isRunning ? 'bg-primary/15 border-primary/30 shadow-md shadow-primary/10' : 'bg-muted/50 border-border'
         )}>
-          <Zap className="h-5 w-5 text-emerald-500" />
+          <Zap className="h-5 w-5 text-primary" />
         </div>
         <span className="text-[11px] font-semibold text-foreground/75">Gateway</span>
       </div>
@@ -87,18 +87,18 @@ function ConnectionDiagram({ isRunning, port, host }: { isRunning: boolean; port
       <div className="flex items-center">
         <div className={cn(
           'w-10 h-[3px] rounded-full transition-all duration-300',
-          isRunning ? 'bg-gradient-to-r from-emerald-500/70 to-cyan-500/70 shadow-sm shadow-emerald-500/30' : 'bg-border'
+          isRunning ? 'bg-gradient-to-r from-primary/50 to-sky-500/50 shadow-sm shadow-primary/30' : 'bg-border'
         )} />
-        <ArrowRight className={cn('h-4 w-4 transition-colors', isRunning ? 'text-cyan-500' : 'text-border')} />
+        <ArrowRight className={cn('h-4 w-4 transition-colors', isRunning ? 'text-sky-500 animate-arrow-flow' : 'text-border')} style={isRunning ? { animationDelay: '0.5s' } : undefined} />
       </div>
 
       {/* llama-server */}
       <div className="flex flex-col items-center gap-1.5 group">
         <div className={cn(
           'w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all duration-300',
-          isRunning ? 'bg-cyan-500/15 border-cyan-500/30 shadow-md shadow-cyan-500/10' : 'bg-muted/50 border-border'
+          isRunning ? 'bg-sky-500/15 border-sky-500/30 shadow-md shadow-sky-500/10' : 'bg-muted/50 border-border'
         )}>
-          <Server className="h-5 w-5 text-cyan-500" />
+          <Server className="h-5 w-5 text-sky-500" />
         </div>
         <span className="text-[11px] font-semibold text-foreground/75">llama.cpp</span>
       </div>
@@ -172,7 +172,7 @@ export function ServerView() {
                 {/* Outer ring - Health indicator with more visual prominence */}
                 <div
                   className={cn(
-                    'h-36 w-36 rounded-full flex items-center justify-center transition-all duration-500',
+                    'h-36 w-36 rounded-full flex items-center justify-center transition-all duration-500 server-ring-light',
                     isRunning
                       ? 'animate-ring-pulse'
                       : isStarting
@@ -181,12 +181,12 @@ export function ServerView() {
                   )}
                   style={{
                     background: isRunning
-                      ? 'conic-gradient(from 0deg, oklch(0.72 0.17 230 / 40%), oklch(0.6 0.15 255 / 25%), oklch(0.72 0.17 230 / 40%))'
+                      ? 'conic-gradient(from 0deg, oklch(0.55 0.17 230 / 50%), oklch(0.5 0.15 250 / 35%), oklch(0.55 0.17 230 / 50%))'
                       : isStarting
                       ? 'conic-gradient(from 0deg, oklch(0.75 0.15 85 / 35%), oklch(0.72 0.13 100 / 25%), oklch(0.75 0.15 85 / 35%))'
                       : 'conic-gradient(from 0deg, oklch(0.5 0.02 230 / 20%), oklch(0.4 0.02 230 / 12%), oklch(0.5 0.02 230 / 20%))',
                     boxShadow: isRunning
-                      ? '0 0 30px oklch(0.72 0.17 230 / 20%)'
+                      ? '0 0 30px oklch(0.55 0.17 230 / 25%)'
                       : isStarting
                       ? '0 0 20px oklch(0.75 0.15 85 / 15%)'
                       : 'none',
@@ -195,7 +195,7 @@ export function ServerView() {
                   {/* Middle ring */}
                   <div className={cn(
                     'h-28 w-28 rounded-full flex items-center justify-center transition-all',
-                    isRunning ? 'bg-emerald-500/8' : isStarting ? 'bg-amber-500/8' : 'bg-muted/30'
+                    isRunning ? 'bg-primary/10' : isStarting ? 'bg-amber-500/8' : 'bg-muted/30'
                   )}>
                     {/* Inner core */}
                     <div className="relative">
@@ -203,7 +203,7 @@ export function ServerView() {
                         className={cn(
                           'h-16 w-16 rounded-full flex items-center justify-center transition-all duration-500',
                           isRunning
-                            ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/40'
+                            ? 'bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/40'
                             : isStarting
                             ? 'bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/40'
                             : 'bg-foreground/25'
@@ -219,7 +219,7 @@ export function ServerView() {
                       </div>
                       {/* Glow effect */}
                       {isRunning && (
-                        <div className="absolute inset-0 h-16 w-16 rounded-full bg-emerald-500/20 animate-ping" />
+                        <div className="absolute inset-0 h-16 w-16 rounded-full bg-primary/20 animate-ping" />
                       )}
                     </div>
                   </div>
@@ -235,7 +235,7 @@ export function ServerView() {
             <div className="text-center">
               <h2 className={cn(
                 'text-2xl font-bold',
-                isRunning ? 'text-emerald-600 dark:text-emerald-400' : isStarting ? 'text-amber-600 dark:text-amber-400' : ''
+                isRunning ? 'text-primary' : isStarting ? 'text-amber-600 dark:text-amber-400' : ''
               )}>
                 {isRunning ? 'Server Running' : isStarting ? 'Server Starting...' : 'Server Offline'}
               </h2>
@@ -450,29 +450,29 @@ export function ServerView() {
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-foreground/70 flex items-center gap-1.5 font-medium">
-                        <Zap className="h-3 w-3 text-emerald-500" /> Prompt Speed
+                        <Zap className="h-3 w-3 text-primary" /> Prompt Speed
                       </span>
-                      <span className="text-xs font-mono font-semibold text-emerald-500">~35 tok/s</span>
+                      <span className="text-xs font-mono font-semibold text-primary">~35 tok/s</span>
                     </div>
-                    <Progress value={70} className="h-1.5 [&>div]:bg-emerald-500" />
+                    <Progress value={70} className="h-1.5 [&>div]:bg-primary" />
                   </div>
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-foreground/70 flex items-center gap-1.5 font-medium">
-                        <Activity className="h-3 w-3 text-cyan-500" /> Gen Speed
+                        <Activity className="h-3 w-3 text-sky-500" /> Gen Speed
                       </span>
-                      <span className="text-xs font-mono font-semibold text-cyan-500">~25 tok/s</span>
+                      <span className="text-xs font-mono font-semibold text-sky-500">~25 tok/s</span>
                     </div>
-                    <Progress value={50} className="h-1.5 [&>div]:bg-cyan-500" />
+                    <Progress value={50} className="h-1.5 [&>div]:bg-sky-500" />
                   </div>
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-foreground/70 flex items-center gap-1.5 font-medium">
-                        <HardDrive className="h-3 w-3 text-amber-500" /> VRAM Usage
+                        <HardDrive className="h-3 w-3 text-blue-500" /> VRAM Usage
                       </span>
-                      <span className="text-xs font-mono font-semibold text-amber-500">4.2 / 8 GB</span>
+                      <span className="text-xs font-mono font-semibold text-blue-500">4.2 / 8 GB</span>
                     </div>
-                    <Progress value={52} className="h-1.5 [&>div]:bg-amber-500" />
+                    <Progress value={52} className="h-1.5 [&>div]:bg-blue-500" />
                   </div>
                 </div>
               )}

@@ -159,15 +159,6 @@ export function SystemResources() {
     return <SystemResourcesLoading />
   }
 
-  const formatMB = (mb: number) => {
-    if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`
-    return `${mb} MB`
-  }
-
-  const formatGB = (gb: number) => {
-    return `${(gb / 1000).toFixed(0)} GB`
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -193,13 +184,13 @@ export function SystemResources() {
               percent={data.memory.percent}
               label="Memory"
               icon={<MemoryStick className="h-3.5 w-3.5 text-primary" />}
-              detail={`${formatMB(data.memory.used)} / ${formatMB(data.memory.total)}`}
+              detail={`${data.memory.used} / ${data.memory.total} GB`}
             />
             <CircularGauge
               percent={data.disk.percent}
               label="Disk"
               icon={<HardDrive className="h-3.5 w-3.5 text-primary" />}
-              detail={formatGB(data.disk.used)}
+              detail={`${data.disk.used} GB`}
             />
             <CircularGauge
               percent={Math.min(
@@ -208,14 +199,14 @@ export function SystemResources() {
               )}
               label="Network"
               icon={<Wifi className="h-3.5 w-3.5 text-primary" />}
-              detail={data.network.downloadSpeed}
+              detail={`${data.network.inMbps} Mbps`}
             />
           </div>
           {/* Detail row */}
           <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border/50">
             <div className="text-center">
               <div className="text-[10px] text-muted-foreground">Cores</div>
-              <div className="text-xs font-mono font-medium">{data.cpu.cores}</div>
+              <div className="text-xs font-mono font-medium">{data.cpu.coreCount}</div>
             </div>
             <div className="text-center">
               <div className="text-[10px] text-muted-foreground">Temp</div>
@@ -223,11 +214,11 @@ export function SystemResources() {
             </div>
             <div className="text-center">
               <div className="text-[10px] text-muted-foreground">R/W</div>
-              <div className="text-xs font-mono font-medium truncate">{data.disk.readSpeed.split(' ')[0]}/{data.disk.writeSpeed.split(' ')[0]}</div>
+              <div className="text-xs font-mono font-medium truncate">{data.disk.readMbps}/{data.disk.writeMbps}</div>
             </div>
             <div className="text-center">
               <div className="text-[10px] text-muted-foreground">Latency</div>
-              <div className="text-xs font-mono font-medium">{data.network.latency}</div>
+              <div className="text-xs font-mono font-medium">{data.network.latency} ms</div>
             </div>
           </div>
         </CardContent>

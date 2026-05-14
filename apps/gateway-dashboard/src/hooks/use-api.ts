@@ -803,51 +803,75 @@ export function useStats() {
   })
 }
 
-// System Resources types
+// System Resources types (enhanced)
+export interface CpuCoreInfo {
+  core: number
+  usage: number
+  frequency: number
+}
+
 export interface CpuResources {
   usage: number
-  cores: number
+  cores: CpuCoreInfo[]
+  coreCount: number
   temperature: number
   frequency: string
 }
 
 export interface MemoryResources {
   used: number
+  cached: number
+  free: number
   total: number
   percent: number
   swapUsed: number
   swapTotal: number
+  swapPercent: number
 }
 
-export interface DiskResources {
-  used: number
-  total: number
-  percent: number
-  readSpeed: string
-  writeSpeed: string
-}
-
-export interface NetworkResources {
-  downloadSpeed: string
-  uploadSpeed: string
-  connections: number
-  latency: string
+export interface VramHistoryPoint {
+  tick: number
+  value: number
 }
 
 export interface GpuResources {
   vramUsed: number
   vramTotal: number
   vramPercent: number
+  vramHistory: VramHistoryPoint[]
   temperature: number
+  hotspot: number
   powerDraw: number
+}
+
+export interface DiskResources {
+  used: number
+  total: number
+  percent: number
+  readMbps: number
+  writeMbps: number
+}
+
+export interface NetworkResources {
+  inMbps: number
+  outMbps: number
+  connections: number
+  latency: number
+}
+
+export interface TemperatureReadings {
+  cpuPackage: number
+  gpuHotspot: number
+  gpuCore: number
 }
 
 export interface SystemResourcesData {
   cpu: CpuResources
   memory: MemoryResources
+  gpu: GpuResources
   disk: DiskResources
   network: NetworkResources
-  gpu: GpuResources
+  temperatures: TemperatureReadings
   uptime: number
 }
 
@@ -859,7 +883,72 @@ export function useSystemResources() {
       if (!res.ok) throw new Error('Failed to fetch system resources')
       return res.json()
     },
-    refetchInterval: 5000,
+    refetchInterval: 3000,
+  })
+}
+
+// Quick Actions types
+export interface QuickAction {
+  id: string
+  label: string
+  description: string
+  icon: string
+  category: 'server' | 'diagnostics' | 'maintenance'
+  shortcut?: string
+  confirmRequired: boolean
+  confirmMessage?: string
+  estimatedDuration: number
+}
+
+export interface QuickActionCategory {
+  id: string
+  label: string
+  description: string
+}
+
+export interface QuickActionsData {
+  actions: QuickAction[]
+  categories: QuickActionCategory[]
+}
+
+export interface QuickActionResult {
+  success: boolean
+  actionId: string
+  message: string
+  details?: string
+  timestamp: string
+}
+
+export function useQuickActions() {
+  return useQuery<QuickActionsData>({
+    queryKey: ['quick-actions'],
+    queryFn: async () => {
+      const res = await fetch('/api/quick-actions')
+      if (!res.ok) throw new Error('Failed to fetch quick actions')
+      return res.json()
+    },
+    staleTime: 60000,
+  })
+}
+
+export function useExecuteQuickAction() {
+  const queryClient = useQueryClient()
+  return useMutation<QuickActionResult, Error, string>({
+    mutationFn: async (actionId: string) => {
+      const res = await fetch('/api/quick-actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to execute action')
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['status'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['logs'] })
+    },
   })
 }
 

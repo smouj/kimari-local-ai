@@ -24,6 +24,7 @@ import {
   PinOff,
   MessageSquare,
   GitCompare,
+  Monitor,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -53,6 +54,7 @@ const navItems: { view: ViewType; label: string; icon: React.ReactNode; group: s
   { view: 'chat', label: 'Chat', icon: <MessageSquare className="h-4 w-4" />, group: 'main' },
   { view: 'stats', label: 'Stats', icon: <Activity className="h-4 w-4" />, group: 'main' },
   { view: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-4 w-4" />, group: 'main' },
+  { view: 'system', label: 'System', icon: <Monitor className="h-4 w-4" />, group: 'main' },
   { view: 'doctor', label: 'Doctor', icon: <Stethoscope className="h-4 w-4" />, group: 'tools' },
   { view: 'modelCompare', label: 'Model Compare', icon: <GitCompare className="h-4 w-4" />, group: 'tools' },
   { view: 'benchmarks', label: 'Benchmarks', icon: <BarChart3 className="h-4 w-4" />, group: 'tools' },
@@ -101,7 +103,7 @@ function SidebarContent({ isMobile = false, onNavClick }: { isMobile?: boolean; 
     <div className="flex flex-col h-full">
       {/* Brand */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-border/50">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/70 shrink-0 shadow-lg shadow-primary/20 overflow-hidden">
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/70 shrink-0 shadow-lg shadow-primary/20 overflow-hidden brand-logo-pulse">
           <img src="/kimari-logo.png" alt="Kimari" className="h-8 w-8 object-contain" />
         </div>
         <AnimatePresence>
@@ -168,7 +170,7 @@ function SidebarContent({ isMobile = false, onNavClick }: { isMobile?: boolean; 
                     {isActive && (
                       <motion.div
                         layoutId="sidebar-active-indicator"
-                        className="absolute left-0 top-1/2 -translate-y-1/2 w-[4px] h-6 rounded-full bg-primary shadow-md shadow-primary/30"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-[4px] h-6 rounded-full bg-primary shadow-md shadow-primary/30 sidebar-active-glow"
                         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                       />
                     )}

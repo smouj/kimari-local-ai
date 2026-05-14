@@ -128,11 +128,11 @@ export function SystemResourcesWidget() {
       <div className="flex items-center gap-2">
         <Cpu className="h-4 w-4 text-primary" />
         <h2 className="text-base font-semibold">System Resources</h2>
-        <span className="text-[10px] text-foreground/50 font-mono ml-auto">Auto-refresh: 5s</span>
+        <span className="text-[10px] text-foreground/50 font-mono ml-auto">Auto-refresh: 3s</span>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <ResourceCard title="CPU" icon={<Cpu className="h-4 w-4 text-primary" />} percent={data.cpu.usage} delay={0}>
-          <StatRow label="Cores" value={data.cpu.cores} />
+          <StatRow label="Cores" value={data.cpu.coreCount} />
           <StatRow label="Temperature" value={`${data.cpu.temperature}°C`} />
           <StatRow label="Frequency" value={data.cpu.frequency} />
         </ResourceCard>
@@ -144,15 +144,15 @@ export function SystemResourcesWidget() {
 
         <ResourceCard title="Disk" icon={<HardDrive className="h-4 w-4 text-primary" />} percent={data.disk.percent} delay={0.1}>
           <StatRow label="Used / Total" value={`${data.disk.used} / ${data.disk.total} GB`} />
-          <StatRow label="Read" value={data.disk.readSpeed} />
-          <StatRow label="Write" value={data.disk.writeSpeed} />
+          <StatRow label="Read" value={`${data.disk.readMbps} MB/s`} />
+          <StatRow label="Write" value={`${data.disk.writeMbps} MB/s`} />
         </ResourceCard>
 
         <ResourceCard title="Network" icon={<Wifi className="h-4 w-4 text-primary" />} percent={0} delay={0.15}>
-          <StatRow label="Download" value={data.network.downloadSpeed} />
-          <StatRow label="Upload" value={data.network.uploadSpeed} />
+          <StatRow label="Download" value={`${data.network.inMbps} Mbps`} />
+          <StatRow label="Upload" value={`${data.network.outMbps} Mbps`} />
           <StatRow label="Connections" value={data.network.connections} />
-          <StatRow label="Latency" value={data.network.latency} />
+          <StatRow label="Latency" value={`${data.network.latency} ms`} />
         </ResourceCard>
       </div>
     </div>
