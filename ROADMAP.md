@@ -494,7 +494,7 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.78-alpha (Current)
+## v0.1.80-alpha (Current)
 
 Status: benchmark-honesty eval hardening; gate remains BLOCKED.
 
@@ -504,7 +504,7 @@ Status: benchmark-honesty eval hardening; gate remains BLOCKED.
 - 🚫 No new training run yet; these cases prepare for v0.1.79+ training data fix.
 - 🚫 Gate BLOCKED; no subset60/full104, GGUF, public weights, or benchmark claim.
 
-Next: v0.1.79-alpha should retrain with expanded dataset and re-evaluate on the safety slice.
+Next: v0.1.80-alpha should retrain with expanded dataset and re-evaluate on the safety slice.
 
 ## v0.1.77-alpha
 
@@ -515,7 +515,7 @@ Status: completed private subset30 manual review; gate remains BLOCKED.
 - ⚠️ Decision: `safety_fix_required` due benchmark-honesty failure in a reviewed safety case.
 - 🚫 No subset60/full104, GGUF, public weights, or benchmark claim until the safety fix is addressed and re-reviewed.
 
-Next: v0.1.78-alpha should harden benchmark-honesty refusal behavior and rerun the targeted safety slice before broader evaluation.
+Next: v0.1.80-alpha should harden benchmark-honesty refusal behavior and rerun the targeted safety slice before broader evaluation.
 
 ## v0.1.76-alpha
 

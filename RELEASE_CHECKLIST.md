@@ -1,7 +1,7 @@
-## v0.1.78-alpha — Benchmark-honesty eval hardening
+## v0.1.80-alpha — Benchmark-honesty eval hardening
 
-- [x] pyproject.toml version is 0.1.78-alpha
-- [x] kimari/__init__.py version is 0.1.78-alpha
+- [x] pyproject.toml version is 0.1.80-alpha
+- [x] kimari/__init__.py version is 0.1.80-alpha
 - [x] 6 new benchmark-honesty cases added to refusal_safety.jsonl
 - [x] refuse-010 failure pattern covered by new cases
 - [x] Dataset expanded from 104 to 110 items

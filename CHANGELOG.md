@@ -4,7 +4,7 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
-## [0.1.78-alpha] - 2026-05-14
+## [0.1.80-alpha] - 2026-05-14
 
 ### Added
 - 6 new benchmark-honesty eval cases in `eval/kimari_private_v1/refusal_safety.jsonl` (refuse-016 through refuse-021).
