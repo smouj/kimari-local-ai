@@ -6,8 +6,8 @@ Evaluate the SFT v1 micro-run adapter (10 steps, QLoRA, Qwen2.5-1.5B-Instruct) a
 
 ## Context
 
-- **SFT v1 micro-run**: Job `6a0501dae48bea4538b9c17a` (10 steps, loss 2.753→2.652 eval)
-- **Adapter status**: Generated but NOT persisted to HuggingFace
+- **SFT v1 micro-run**: Job `6a0512bd3308d79117b8f367` (10 steps, loss 2.753→2.653 eval)
+- **Adapter status**: ✅ Persisted to Smouj013/kimari-runtime-15b-sft-v1-adapter (private)
 - **This is NOT a final model** — it is a pipeline validation micro-run
 - **Gate**: 🔒 BLOCKED
 
@@ -20,14 +20,14 @@ Evaluate the SFT v1 micro-run adapter (10 steps, QLoRA, Qwen2.5-1.5B-Instruct) a
 - [x] Eval readiness validator created
 - [x] Eval infrastructure created (v0.1.65)
 
-### Phase 1.5: Adapter Availability (v0.1.66-alpha) 🔒 BLOCKED
-- [ ] Adapter persisted to HF private repo
+### Phase 1.5: Adapter Availability (v0.1.67-alpha) ✅ COMPLETED
+- [x] Adapter persisted to HF private repo (Smouj013/kimari-runtime-15b-sft-v1-adapter)
 - [x] Adapter load checker created (dry-run passes)
 - [x] Eval runner created (dry-run passes)
-- ⚠️ **Blocker**: SFT v1 micro-run did NOT persist the adapter. Must re-run with `--persist-adapter`.
+- ✅ **Resolved**: SFT v1 micro-run re-run with `--persist-adapter` — adapter uploaded successfully
 
-### Phase 2: Subset10 Evaluation (v0.1.66+ — blocked)
-- [ ] Re-run SFT v1 micro-run with --persist-adapter
+### Phase 2: Subset10 Evaluation (v0.1.68-alpha — ready)
+- [x] Re-run SFT v1 micro-run with --persist-adapter (v0.1.67-alpha ✅)
 - [ ] Download adapter locally
 - [ ] Run KimariEval subset10: base vs adapter
 - [ ] Compare accuracy, exact_match, containment

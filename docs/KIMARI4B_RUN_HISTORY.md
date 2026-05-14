@@ -89,7 +89,7 @@
 | **Loss** | 2.753 → 2.652 (eval) |
 | **Accuracy** | 52.08% |
 | **Adapter repo** | `Smouj013/kimari-runtime-15b-sft-v1-adapter` (private) |
-| **Result** | ⏳ IN PROGRESS — adapter upload pending |
+| **Result** | ✅ COMPLETED — adapter **persisted** to Smouj013/kimari-runtime-15b-sft-v1-adapter (private) |
 | **Gate state** | 🔒 BLOCKED |
 | **Docs** | `docs/KIMARI_RUNTIME_15B_SFT_V1_RESULT.md` |
 

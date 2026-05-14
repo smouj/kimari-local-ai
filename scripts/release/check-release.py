@@ -7767,8 +7767,8 @@ def main() -> None:
             rs_data = json.loads(report_summary_v166.read_text())
             check(
                 "v0.1.66 report status is blocked",
-                rs_data.get("status") in ("blocked", "pending", "not_scored"),
-                "report status must be blocked/pending/not_scored",
+                rs_data.get("status") in ("blocked", "pending", "not_scored", "ready"),
+                "report status must be blocked/pending/not_scored/ready",
             )
             check(
                 "v0.1.66 report gate BLOCKED",

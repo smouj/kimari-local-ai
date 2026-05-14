@@ -1,6 +1,6 @@
 # Kimari Runtime 1.5B SFT v1 — Evaluation Result
 
-> ⚠️ **Status: BLOCKED** — Adapter not available for evaluation. The SFT v1 micro-run (Job `6a0501dae48bea4538b9c17a`) generated the adapter but did not persist it. Re-run with `--persist-adapter` required before evaluation can proceed.
+> ⚠️ **Status: READY FOR EVALUATION** — Adapter persisted to `Smouj013/kimari-runtime-15b-sft-v1-adapter` (private). Evaluation subset10 can now proceed.
 
 ## Objective
 
@@ -8,10 +8,10 @@ Compare the SFT v1 micro-run adapter (10 steps) against the base model (Qwen/Qwe
 
 ## Blocker
 
-- **Adapter not persisted**: The micro-run generated an adapter on the HF Jobs container but did not save it to any repository
-- **adapter_committed: false** in run summary
-- **hf_public_upload_performed: false**
-- **Resolution**: Re-run the micro-run with `--persist-adapter` to save to `Smouj013/kimari-runtime-15b-sft-v1-adapter` (private)
+- **Adapter persisted**: v0.1.67-alpha re-ran micro-run with `--persist-adapter` — adapter uploaded to `Smouj013/kimari-runtime-15b-sft-v1-adapter` (private repo)
+- **Job**: `6a0512bd3308d79117b8f367` (with `--secrets HF_TOKEN`)
+- **adapter_model.safetensors**: 8.73 MB
+- **Ready for subset10 evaluation**
 
 ## Evaluation Setup (Pending)
 
@@ -23,7 +23,7 @@ Compare the SFT v1 micro-run adapter (10 steps) against the base model (Qwen/Qwe
 
 ## Results
 
-> Not yet executable. Blocked on adapter availability.
+> Evaluation now executable. Adapter is available at Smouj013/kimari-runtime-15b-sft-v1-adapter (private).
 
 | Metric | Baseline | Adapter |
 | --- | --- | --- |
