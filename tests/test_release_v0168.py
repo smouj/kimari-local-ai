@@ -58,14 +58,17 @@ def test_eval_summary_ready():
     summary = json.loads(
         (PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_sft_v1_subset10" / "summary.json").read_text()
     )
-    assert summary["status"] == "ready", f"Expected status 'ready', got '{summary['status']}'"
+    assert summary["status"] == "completed", f"Expected status 'completed', got '{summary['status']}'"
     assert summary["adapter_private_repo"] == "Smouj013/kimari-runtime-15b-sft-v1-adapter"
     assert summary["gate_state"] == "BLOCKED"
+    assert summary["baseline_completion_rate"] == 1.0, f"Expected baseline_completion_rate 1.0, got {summary['baseline_completion_rate']}"
+    assert summary["adapter_completion_rate"] == 1.0, f"Expected adapter_completion_rate 1.0, got {summary['adapter_completion_rate']}"
+    assert summary["ready_for_subset30"] is True
 
 
 def test_eval_result_doc_ready():
     result = (PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_SFT_V1_EVAL_RESULT.md").read_text()
-    assert "READY FOR EVALUATION" in result.upper(), "Eval result doc not ready"
+    assert "COMPLETED" in result.upper(), "Eval result doc not completed"
 
 
 def test_hf_jobs_sft_secrets_flag():

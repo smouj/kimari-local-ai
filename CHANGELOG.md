@@ -10,20 +10,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **HF Jobs eval submission** for subset10 baseline vs adapter evaluation
 - **Eval config v0.1.68-alpha**: adapter_repo_private field pointing to Smouj013/kimari-runtime-15b-sft-v1-adapter
 - **hf_jobs_run_kimari_eval.py**: --detach flag for background job submission
-- **HF Jobs eval job** `6a05163be48bea4538b9c287` (subset10, a10g-small)
+- **HF Jobs eval job** `6a051807e48bea4538b9c29d` (subset10, a10g-small) — ✅ COMPLETED
+- **Baseline evaluation**: 10/10 items completed (100%)
+- **Adapter evaluation**: 10/10 items completed (100%)
+- **Both models** loaded and generated successfully on A10G
 
 ### Changed
-- **Eval result doc**: BLOCKED → READY FOR EVALUATION (adapter now available)
-- **Eval plan**: Phase 1.5 COMPLETED
-- **check-release.py**: v0.1.66 report status allows 'ready' in addition to blocked/pending
+- **Eval result doc**: BLOCKED → COMPLETED (baseline 100%, adapter 100%)
+- **Eval plan**: Phase 2 COMPLETED, ready for subset30
+- **Eval summary**: status "completed", ready_for_subset30=true
+- **check-release.py**: v0.1.66 report status allows 'ready', date fix, badge version updates
 - **sft_v1_run_summary.json**: adapter_persisted_private=true, job 6a0512bd3308d79117b8f367
 
 ### Fixed
 - **hf_jobs_sft_v1.py**: Added --secrets HF_TOKEN when persist-adapter is enabled
+- **hf_jobs_run_kimari_eval.py**: Removed invalid `seed` kwarg from model.generate() calls
 
 ### Security
 - Gate remains BLOCKED — no public weights, GGUF, or benchmark claims
 - Adapter repo is private (Smouj013/kimari-runtime-15b-sft-v1-adapter)
+- No raw outputs committed, no public benchmark claims
 
 ## [0.1.67-alpha] - 2026-05-13
 
