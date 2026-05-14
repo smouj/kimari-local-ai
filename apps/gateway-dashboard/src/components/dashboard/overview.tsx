@@ -1,13 +1,13 @@
 'use client'
 
-import { useDashboard, useServerStatus, useStartServer, useStopServer } from '@/hooks/use-api'
+import { useDashboard, useServerStatus, useStartServer, useStopServer, useSystemResources } from '@/hooks/use-api'
 import { MetricCard } from './metric-card'
 import { PerformanceChart } from './performance-chart'
 import { RecentLogs } from './recent-logs'
 import { ActivityTimeline } from './activity-timeline'
 import { IntegrationGrid } from './integration-grid'
 import { QuickLauncher } from './quick-launcher'
-import { SystemResourcesWidget } from './system-resources-widget'
+import { ResourceGauge } from './resource-gauge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -55,7 +55,7 @@ function ArchitectureDiagram() {
         <span className="text-[11px] font-semibold text-foreground/80">Gateway</span>
       </div>
 
-      {/* Animated connecting line with glow */}
+      {/* Animated connecting line with breathing arrow */}
       <div className="flex items-center gap-0.5 relative connection-glow">
         <svg width="40" height="14" className="overflow-visible">
           <line
@@ -66,7 +66,7 @@ function ArchitectureDiagram() {
             className="animate-dash-march"
           />
         </svg>
-        <ArrowRight className="h-4 w-4 text-primary/70" />
+        <ArrowRight className="h-4 w-4 text-primary/70 animate-breathe" />
       </div>
 
       {/* llama-server */}
@@ -77,7 +77,7 @@ function ArchitectureDiagram() {
         <span className="text-[11px] font-semibold text-foreground/80">llama.cpp</span>
       </div>
 
-      {/* Animated connecting line with glow */}
+      {/* Animated connecting line with breathing arrow */}
       <div className="flex items-center gap-0.5 relative connection-glow">
         <svg width="40" height="14" className="overflow-visible">
           <line
@@ -88,7 +88,7 @@ function ArchitectureDiagram() {
             className="animate-dash-march"
           />
         </svg>
-        <ArrowRight className="h-4 w-4 text-emerald-500/70" />
+        <ArrowRight className="h-4 w-4 text-emerald-500/70 animate-breathe" style={{ animationDelay: '1.25s' }} />
       </div>
 
       {/* Integrations */}
@@ -105,6 +105,7 @@ function ArchitectureDiagram() {
 export function DashboardOverview() {
   const { data, isLoading } = useDashboard()
   const { data: serverStatus } = useServerStatus()
+  const { data: systemResources, isLoading: resourcesLoading } = useSystemResources()
   const startServer = useStartServer()
   const stopServer = useStopServer()
   const setActiveView = useKimariStore((s) => s.setActiveView)
@@ -160,6 +161,8 @@ export function DashboardOverview() {
           transition={{ duration: 0.4 }}
         >
           <Card className="glass-card depth-shadow card-shine card-glow overflow-hidden border-primary/30 bg-card/80 relative">
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 pointer-events-none animate-gradient-shift" style={{ background: 'linear-gradient(135deg, oklch(0.65 0.17 230 / 6%), oklch(0.55 0.14 260 / 8%), oklch(0.65 0.17 230 / 4%), oklch(0.60 0.12 200 / 6%))' }} />
             {/* Background pattern */}
             <div className="absolute inset-0 pointer-events-none opacity-30" style={{ backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 10px, oklch(0.65 0.17 230 / 4%) 10px, oklch(0.65 0.17 230 / 4%) 11px)' }} />
             {/* Soft radial glow behind banner */}
@@ -206,97 +209,141 @@ export function DashboardOverview() {
         </motion.div>
       )}
 
-      {/* Quick Launcher (when server stopped) */}
-      {!isRunning && !isStarting && <QuickLauncher />}
+      {/* Quick Launcher (replaces old Quick Actions) */}
+      <QuickLauncher />
 
-      {/* Metric Cards */}
+      {/* Metric Cards — staggered entry */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          title="Server Status"
-          value={isRunning ? 'Running' : isStarting ? 'Starting' : 'Stopped'}
-          subtitle={isRunning ? `Port ${server?.port ?? '-'}` : undefined}
-          icon={<Server className="h-5 w-5" />}
-          trend={isRunning ? 'up' : 'down'}
-          trendValue={isRunning ? 'live' : undefined}
-          variant="status"
-        />
-        <MetricCard
-          title="Active Profile"
-          value={isRunning || isStarting ? (server?.profile ?? 'None') : 'None'}
-          subtitle={isRunning ? `Uptime: ${formatUptime(server?.uptime ?? 0)}` : 'Server not running'}
-          icon={<Cpu className="h-5 w-5" />}
-          variant="profile"
-        />
-        <MetricCard
-          title="Models Available"
-          value={`${models?.downloaded ?? 0} of ${models?.total ?? 0}`}
-          subtitle={`${models?.notDownloaded ?? 0} not downloaded`}
-          icon={<Box className="h-5 w-5" />}
-          trend="neutral"
-          variant="models"
-        />
-        <MetricCard
-          title="Memory Usage"
-          value={isRunning ? `${(0.7 + Math.min((server?.uptime ?? 0) * 0.0001, 0.3)).toFixed(1)} GB / 8 GB` : '0 MB'}
-          subtitle={isRunning ? 'VRAM allocated' : 'No active model'}
-          icon={<HardDrive className="h-5 w-5" />}
-          trend={isRunning ? 'up' : 'neutral'}
-          trendValue={isRunning ? `${Math.round(9 + Math.min((server?.uptime ?? 0) * 0.001, 7))}%` : undefined}
-          variant="memory"
-        />
+        {[
+          <MetricCard
+            key="status"
+            title="Server Status"
+            value={isRunning ? 'Running' : isStarting ? 'Starting' : 'Stopped'}
+            subtitle={isRunning ? `Port ${server?.port ?? '-'}` : undefined}
+            icon={<Server className="h-5 w-5" />}
+            trend={isRunning ? 'up' : 'down'}
+            trendValue={isRunning ? 'live' : undefined}
+            variant="status"
+          />,
+          <MetricCard
+            key="profile"
+            title="Active Profile"
+            value={isRunning || isStarting ? (server?.profile ?? 'None') : 'None'}
+            subtitle={isRunning ? `Uptime: ${formatUptime(server?.uptime ?? 0)}` : 'Server not running'}
+            icon={<Cpu className="h-5 w-5" />}
+            variant="profile"
+          />,
+          <MetricCard
+            key="models"
+            title="Models Available"
+            value={`${models?.downloaded ?? 0} of ${models?.total ?? 0}`}
+            subtitle={`${models?.notDownloaded ?? 0} not downloaded`}
+            icon={<Box className="h-5 w-5" />}
+            trend="neutral"
+            variant="models"
+          />,
+          <MetricCard
+            key="memory"
+            title="Memory Usage"
+            value={isRunning ? `${(0.7 + Math.min((server?.uptime ?? 0) * 0.0001, 0.3)).toFixed(1)} GB / 8 GB` : '0 MB'}
+            subtitle={isRunning ? 'VRAM allocated' : 'No active model'}
+            icon={<HardDrive className="h-5 w-5" />}
+            trend={isRunning ? 'up' : 'neutral'}
+            trendValue={isRunning ? `${Math.round(9 + Math.min((server?.uptime ?? 0) * 0.001, 7))}%` : undefined}
+            variant="memory"
+          />,
+        ].map((card, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: i * 0.08, ease: 'easeOut' }}
+          >
+            {card}
+          </motion.div>
+        ))}
       </div>
 
-      {/* Quick Actions + Server Info */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Actions */}
-        <Card className="glass-card depth-shadow card-glow bg-card/80">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <Zap className="h-4 w-4 text-primary" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              className="w-full justify-start gap-2 btn-press bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-md shadow-emerald-500/15"
-              onClick={handleStartServer}
-              disabled={isRunning || isStarting || startServer.isPending}
-            >
-              <Play className="h-4 w-4" />
-              {isStarting ? 'Starting...' : 'Start Server'}
-            </Button>
-            <Button
-              variant="destructive"
-              className="w-full justify-start gap-2 btn-press"
-              onClick={handleStopServer}
-              disabled={!isRunning || stopServer.isPending}
-            >
-              <Square className="h-4 w-4" />
-              Stop Server
-            </Button>
-            <div className="pt-1 border-t border-border">
-              <Button
-                variant="outline"
-                className="w-full justify-start gap-2 btn-press hover:border-primary/30 hover:bg-primary/5"
-                onClick={() => setActiveView('benchmarks')}
-              >
-                <Activity className="h-4 w-4 text-primary" />
-                Run Benchmark
-              </Button>
-              <div className="mt-2">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-2 btn-press hover:border-primary/30 hover:bg-primary/5"
-                  onClick={() => setActiveView('integrations')}
-                >
-                  <Network className="h-4 w-4 text-primary" />
-                  Manage Integrations
-                </Button>
+      {/* System Resources Monitor — 2x2 gauge grid */}
+      <Card className="glass-card depth-shadow card-glow bg-card/80">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            System Resources
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {resourcesLoading ? (
+            <div className="grid grid-cols-2 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-2">
+                  <Skeleton className="h-[120px] w-[120px] rounded-full shimmer" />
+                  <Skeleton className="h-3 w-16 shimmer" />
+                </div>
+              ))}
+            </div>
+          ) : systemResources ? (
+            <div className="grid grid-cols-2 gap-6">
+              <div className="flex justify-center">
+                <ResourceGauge
+                  value={systemResources.cpu.usage}
+                  max={100}
+                  label="CPU Usage"
+                  unit="%"
+                />
+              </div>
+              <div className="flex justify-center">
+                <ResourceGauge
+                  value={systemResources.memory.percent}
+                  max={100}
+                  label="RAM Usage"
+                  unit="%"
+                />
+              </div>
+              <div className="flex justify-center">
+                <ResourceGauge
+                  value={systemResources.gpu.vramPercent}
+                  max={100}
+                  label="VRAM Usage"
+                  unit="%"
+                />
+              </div>
+              <div className="flex justify-center">
+                <ResourceGauge
+                  value={systemResources.gpu.temperature}
+                  max={95}
+                  label="GPU Temp"
+                  unit="°C"
+                />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          ) : null}
+          {/* Detail row below gauges */}
+          {systemResources && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-border/50">
+              <div className="text-center">
+                <div className="text-[10px] text-muted-foreground">GPU Power</div>
+                <div className="text-xs font-mono font-medium">{systemResources.gpu.powerDraw}W</div>
+              </div>
+              <div className="text-center">
+                <div className="text-[10px] text-muted-foreground">VRAM</div>
+                <div className="text-xs font-mono font-medium">{systemResources.gpu.vramUsed}/{systemResources.gpu.vramTotal} GB</div>
+              </div>
+              <div className="text-center">
+                <div className="text-[10px] text-muted-foreground">CPU Cores</div>
+                <div className="text-xs font-mono font-medium">{systemResources.cpu.cores}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-[10px] text-muted-foreground">Uptime</div>
+                <div className="text-xs font-mono font-medium">{formatUptime(systemResources.uptime)}</div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
+      {/* Server Health + Profile Summary (2-column) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Server Health */}
         <Card className="glass-card depth-shadow card-glow bg-card/80">
           <CardHeader className="pb-4">
@@ -369,26 +416,26 @@ export function DashboardOverview() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-foreground/70">Available</span>
-                <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5">
                   {profiles?.available ?? 0}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-foreground/70">Requires Model</span>
-                <Badge variant="outline" className="border-amber-500/30 text-amber-600 dark:text-amber-400">
+                <Badge variant="outline" className="border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/5">
                   {profiles?.requiresModel ?? 0}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-foreground/70">Network Exposed</span>
-                <Badge variant="outline" className="border-red-500/30 text-red-600 dark:text-red-400">
+                <Badge variant="outline" className="border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/5">
                   {profiles?.networkExposed ?? 0}
                 </Badge>
               </div>
               {profiles?.running && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-foreground/70">Running</span>
-                  <Badge className="bg-primary">{profiles.running}</Badge>
+                  <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">{profiles.running}</Badge>
                 </div>
               )}
             </div>
@@ -406,9 +453,6 @@ export function DashboardOverview() {
           <RecentLogs />
         </div>
       </div>
-
-      {/* System Resources */}
-      <SystemResourcesWidget />
 
       {/* Integration Status */}
       <IntegrationGrid />

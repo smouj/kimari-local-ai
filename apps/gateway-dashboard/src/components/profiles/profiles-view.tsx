@@ -13,9 +13,9 @@ import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const statusColors: Record<string, string> = {
-  available: 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
-  requires_model: 'border-amber-500/30 text-amber-600 dark:text-amber-400',
-  network_exposed: 'border-red-500/30 text-red-600 dark:text-red-400',
+  available: 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
+  requires_model: 'border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/5',
+  network_exposed: 'border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/5',
 }
 
 const statusLineColors: Record<string, string> = {
@@ -25,11 +25,11 @@ const statusLineColors: Record<string, string> = {
 }
 
 const modeColors: Record<string, string> = {
-  safe: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  balanced: 'bg-primary/10 text-primary',
-  fast: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
-  ide: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-  agent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  safe: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30',
+  balanced: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30',
+  fast: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30',
+  ide: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+  agent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
 }
 
 export function ProfilesView() {
@@ -124,33 +124,34 @@ export function ProfilesView() {
 
                 <CardHeader className="pb-3 pt-5 px-5">
                   <div className="flex items-start justify-between">
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <CardTitle className="text-base flex items-center gap-2">
                         <Cpu className="h-4 w-4 text-primary" />
                         {profile.displayName}
                       </CardTitle>
                       <p className="text-xs text-foreground/60 font-mono">{profile.name}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-wrap items-center justify-end gap-1">
+                      {isProfileRunning && (
+                        <Badge className="text-[10px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-medium">
+                          Active
+                        </Badge>
+                      )}
+                      {profile.isDefault && (
+                        <Badge className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-medium">Default</Badge>
+                      )}
                       <Badge
                         variant="outline"
                         className={cn('text-[10px] capitalize font-medium', statusColors[profile.status])}
                       >
                         {profile.status.replace('_', ' ')}
                       </Badge>
-                      {profile.isDefault && (
-                        <Badge className="text-[10px] bg-primary/80 font-medium">Default</Badge>
-                      )}
-                      {isProfileRunning && (
-                        <Badge className="text-[10px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-medium">
-                          Active
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3 px-5 pb-5 pt-0">
-                  <div className="grid grid-cols-2 gap-3 text-xs">
+                <CardContent className="space-y-0 px-5 pb-5 pt-0">
+                  {/* Info Grid */}
+                  <div className="grid grid-cols-2 gap-3 text-xs pb-3">
                     <div className="flex items-center gap-1.5 text-foreground/65 font-medium">
                       <Monitor className="h-3 w-3" />
                       <span>{profile.gpu}</span>
@@ -171,7 +172,7 @@ export function ProfilesView() {
                       <Globe className="h-3 w-3" />
                       <span>{profile.host}</span>
                     </div>
-                    <div>
+                    <div className="flex items-center gap-1.5">
                       <Badge
                         variant="secondary"
                         className={cn('text-[10px] capitalize font-medium', modeColors[profile.mode])}
@@ -180,6 +181,9 @@ export function ProfilesView() {
                       </Badge>
                     </div>
                   </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-border/40" />
 
                   {/* Expandable details */}
                   <AnimatePresence>
@@ -191,7 +195,7 @@ export function ProfilesView() {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="pt-3 border-t border-border/50 space-y-2 text-xs">
+                        <div className="py-3 space-y-2 text-xs">
                           <div className="flex justify-between">
                             <span className="text-foreground/65 font-medium">Cache K</span>
                             <span className="font-mono font-medium">{profile.cacheK}</span>
@@ -213,7 +217,8 @@ export function ProfilesView() {
                     )}
                   </AnimatePresence>
 
-                  <div className="pt-2 border-t border-border/50">
+                  {/* Action Row */}
+                  <div className="pt-3 border-t border-border/40">
                     <div className="flex items-center justify-between">
                       <button
                         onClick={() => setExpandedProfile(isExpanded ? null : profile.id)}
@@ -226,7 +231,7 @@ export function ProfilesView() {
                         size="sm"
                         variant={isProfileRunning ? 'secondary' : 'default'}
                         className={cn(
-                          'h-7 text-xs gap-1 btn-press font-semibold',
+                          'h-8 min-w-[80px] text-xs gap-1.5 btn-press font-semibold',
                           !isProfileRunning && 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-md shadow-emerald-500/15'
                         )}
                         onClick={() => handleStart(profile.name)}

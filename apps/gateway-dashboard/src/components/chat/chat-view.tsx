@@ -146,7 +146,7 @@ export function ChatView() {
   const isServerRunning = serverStatus?.status === 'running'
   const downloadedModels = models?.filter((m) => m.downloaded) ?? []
 
-  // Load messages on mount after hydration.
+  // Load messages on mount
   useEffect(() => {
     queueMicrotask(() => setMessages(loadMessages()))
   }, [])

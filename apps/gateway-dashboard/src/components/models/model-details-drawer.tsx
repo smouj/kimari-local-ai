@@ -34,8 +34,8 @@ import { cn } from '@/lib/utils'
 
 const categoryColors: Record<string, string> = {
   test: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
-  recommended: 'bg-primary/10 text-primary border-primary/30',
-  community: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
+  recommended: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
+  community: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30',
   official: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
 }
 
@@ -134,11 +134,11 @@ export function ModelDetailsDrawer({ model, open, onOpenChange }: ModelDetailsDr
 
               <div className="flex items-center gap-2 mt-3 flex-wrap">
                 {model.downloaded ? (
-                  <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 gap-1">
+                  <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 gap-1">
                     <Check className="h-3 w-3" /> Downloaded
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-muted-foreground">
+                  <Badge variant="outline" className="bg-slate-400/10 text-slate-500 dark:text-slate-400 border-slate-400/30">
                     Not Downloaded
                   </Badge>
                 )}
