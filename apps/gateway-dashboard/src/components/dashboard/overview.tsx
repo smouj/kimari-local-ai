@@ -55,7 +55,7 @@ function ArchitectureDiagram() {
         <span className="text-[11px] font-semibold text-foreground/80">Gateway</span>
       </div>
 
-      {/* Animated connecting line with breathing arrow */}
+      {/* Animated connecting line with flowing arrow */}
       <div className="flex items-center gap-0.5 relative connection-glow">
         <svg width="40" height="14" className="overflow-visible">
           <line
@@ -66,39 +66,70 @@ function ArchitectureDiagram() {
             className="animate-dash-march"
           />
         </svg>
-        <ArrowRight className="h-4 w-4 text-primary/70 animate-breathe" />
+        <ArrowRight className="h-4 w-4 text-primary/70 animate-arrow-flow" />
       </div>
 
       {/* llama-server */}
       <div className="flex flex-col items-center gap-2 group">
-        <div className="w-18 h-18 rounded-xl bg-gradient-to-br from-emerald-500/25 to-emerald-500/5 border-2 border-emerald-500/30 flex items-center justify-center transition-transform duration-200 group-hover:scale-110 shadow-lg shadow-emerald-500/15">
-          <Server className="h-8 w-8 text-emerald-500" />
+        <div className="w-18 h-18 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/25 flex items-center justify-center transition-transform duration-200 group-hover:scale-110 shadow-lg shadow-primary/15">
+          <Server className="h-8 w-8 text-primary" />
         </div>
         <span className="text-[11px] font-semibold text-foreground/80">llama.cpp</span>
       </div>
 
-      {/* Animated connecting line with breathing arrow */}
+      {/* Animated connecting line with flowing arrow */}
       <div className="flex items-center gap-0.5 relative connection-glow">
         <svg width="40" height="14" className="overflow-visible">
           <line
             x1="0" y1="7" x2="30" y2="7"
-            stroke="oklch(0.55 0.14 255 / 60%)"
+            stroke="oklch(0.55 0.14 250 / 60%)"
             strokeWidth="2.5"
             strokeDasharray="5 5"
             className="animate-dash-march"
           />
         </svg>
-        <ArrowRight className="h-4 w-4 text-emerald-500/70 animate-breathe" style={{ animationDelay: '1.25s' }} />
+        <ArrowRight className="h-4 w-4 text-primary/60 animate-arrow-flow" style={{ animationDelay: '0.75s' }} />
       </div>
 
       {/* Integrations */}
       <div className="flex flex-col items-center gap-2 group">
-        <div className="w-18 h-18 rounded-xl bg-gradient-to-br from-cyan-500/25 to-cyan-500/5 border-2 border-cyan-500/30 flex items-center justify-center transition-transform duration-200 group-hover:scale-110 shadow-lg shadow-cyan-500/15">
-          <Plug className="h-8 w-8 text-cyan-500" />
+        <div className="w-18 h-18 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border-2 border-primary/20 flex items-center justify-center transition-transform duration-200 group-hover:scale-110 shadow-lg shadow-primary/10">
+          <Plug className="h-8 w-8 text-primary" />
         </div>
         <span className="text-[11px] font-semibold text-foreground/80">Integrations</span>
       </div>
     </div>
+  )
+}
+
+// Animated particle dots for welcome banner
+function BannerParticles() {
+  const particles = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    size: Math.random() * 4 + 2,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 80 + 10}%`,
+    duration: Math.random() * 6 + 4,
+    delay: Math.random() * 5,
+  }))
+
+  return (
+    <>
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="particle-dot"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: p.left,
+            top: p.top,
+            animationDuration: `${p.duration}s`,
+            animationDelay: `${p.delay}s`,
+          }}
+        />
+      ))}
+    </>
   )
 }
 
@@ -161,12 +192,14 @@ export function DashboardOverview() {
           transition={{ duration: 0.4 }}
         >
           <Card className="glass-card depth-shadow card-shine card-glow overflow-hidden border-primary/30 bg-card/80 relative">
-            {/* Animated gradient background */}
-            <div className="absolute inset-0 pointer-events-none animate-gradient-shift" style={{ background: 'linear-gradient(135deg, oklch(0.65 0.17 230 / 6%), oklch(0.55 0.14 260 / 8%), oklch(0.65 0.17 230 / 4%), oklch(0.60 0.12 200 / 6%))' }} />
+            {/* Animated gradient background - professional Kimari blue */}
+            <div className="absolute inset-0 pointer-events-none animate-gradient-shift" style={{ background: 'linear-gradient(135deg, oklch(0.65 0.17 230 / 8%), oklch(0.55 0.15 250 / 12%), oklch(0.65 0.17 230 / 6%), oklch(0.60 0.13 210 / 10%), oklch(0.65 0.17 230 / 8%))' }} />
             {/* Background pattern */}
             <div className="absolute inset-0 pointer-events-none opacity-30" style={{ backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 10px, oklch(0.65 0.17 230 / 4%) 10px, oklch(0.65 0.17 230 / 4%) 11px)' }} />
             {/* Soft radial glow behind banner */}
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, oklch(0.65 0.17 230 / 10%), transparent)' }} />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 30% 50%, oklch(0.65 0.17 230 / 12%), transparent), radial-gradient(ellipse 40% 40% at 70% 60%, oklch(0.55 0.15 250 / 8%), transparent)' }} />
+            {/* Animated particle dots */}
+            <BannerParticles />
             <CardContent className="p-6 relative">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-primary/25 to-primary/5 shrink-0 shadow-lg shadow-primary/10">
@@ -331,7 +364,7 @@ export function DashboardOverview() {
               </div>
               <div className="text-center">
                 <div className="text-[10px] text-muted-foreground">CPU Cores</div>
-                <div className="text-xs font-mono font-medium">{systemResources.cpu.cores}</div>
+                <div className="text-xs font-mono font-medium">{systemResources.cpu.coreCount}</div>
               </div>
               <div className="text-center">
                 <div className="text-[10px] text-muted-foreground">Uptime</div>

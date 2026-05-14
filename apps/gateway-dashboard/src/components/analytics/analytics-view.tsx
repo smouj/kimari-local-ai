@@ -128,7 +128,7 @@ function StatCard({
             </div>
           )}
         </CardContent>
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-b-xl" style={{ background: color.includes('primary') ? 'oklch(0.65 0.17 165 / 40%)' : color.includes('cyan') ? 'oklch(0.6 0.15 200 / 40%)' : color.includes('amber') ? 'oklch(0.7 0.14 75 / 40%)' : 'oklch(0.6 0.18 25 / 40%)' }} />
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-b-xl" style={{ background: color.includes('primary') ? 'oklch(0.65 0.17 230 / 40%)' : color.includes('sky') ? 'oklch(0.6 0.15 220 / 40%)' : color.includes('blue') ? 'oklch(0.55 0.17 250 / 40%)' : 'oklch(0.6 0.18 25 / 40%)' }} />
       </Card>
     </motion.div>
   )
@@ -275,7 +275,7 @@ export function AnalyticsView() {
             value={`${data.latency.avgTtft}ms`}
             subValue={`TTFT · ${data.latency.avgGenTime}s gen time`}
             trend="down"
-            color="bg-cyan-500/15 text-cyan-500"
+            color="bg-sky-500/15 text-sky-500"
             delay={0.05}
           />
           <StatCard
@@ -284,7 +284,7 @@ export function AnalyticsView() {
             value={`${(data.latency.trendData.reduce((s, d) => s + d.tokensPerSec, 0) / data.latency.trendData.length).toFixed(1)} tok/s`}
             subValue="Token generation speed"
             trend="up"
-            color="bg-amber-500/15 text-amber-500"
+            color="bg-blue-500/15 text-blue-500"
             delay={0.1}
           />
           <StatCard
@@ -409,10 +409,10 @@ export function AnalyticsView() {
           <ChartCard
             title="Request Volume"
             icon={Activity}
-            iconColor="text-cyan-500"
+            iconColor="text-sky-500"
             badge={
               <>
-                <Badge variant="outline" className="text-[10px] h-5 gap-1 border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
+                <Badge variant="outline" className="text-[10px] h-5 gap-1 border-sky-500/30 text-sky-600 dark:text-sky-400">
                   {data.requestHistory.total.toLocaleString()} total
                 </Badge>
                 <Badge variant="outline" className="text-[10px] h-5 border-border/50 text-muted-foreground">
@@ -481,10 +481,10 @@ export function AnalyticsView() {
           <ChartCard
             title="Latency Trends"
             icon={Clock}
-            iconColor="text-amber-500"
+            iconColor="text-sky-500"
             badge={
               <>
-                <Badge variant="outline" className="text-[10px] h-5 gap-1 border-amber-500/30 text-amber-600 dark:text-amber-400">
+                <Badge variant="outline" className="text-[10px] h-5 gap-1 border-sky-500/30 text-sky-600 dark:text-sky-400">
                   TTFT {data.latency.avgTtft}ms
                 </Badge>
                 <Badge variant="outline" className="text-[10px] h-5 border-border/50 text-muted-foreground">
@@ -518,7 +518,7 @@ export function AnalyticsView() {
                     tickLine={false}
                     axisLine={false}
                     tickFormatter={(v) => `${v}ms`}
-                    label={{ value: 'TTFT (ms)', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'oklch(0.7 0.14 75)' } }}
+                    label={{ value: 'TTFT (ms)', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'oklch(0.55 0.15 230)' } }}
                   />
                   <YAxis
                     yAxisId="gen"
@@ -528,7 +528,7 @@ export function AnalyticsView() {
                     tickLine={false}
                     axisLine={false}
                     tickFormatter={(v) => `${v}s`}
-                    label={{ value: 'Gen (s)', angle: 90, position: 'insideRight', style: { fontSize: 11, fill: 'oklch(0.6 0.15 280)' } }}
+                    label={{ value: 'Gen (s)', angle: 90, position: 'insideRight', style: { fontSize: 11, fill: 'oklch(0.5 0.17 250)' } }}
                   />
                   <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'oklch(0.65 0.17 165 / 30%)', strokeWidth: 1 }} />
                   <Legend wrapperStyle={{ fontSize: '12px' }} />
@@ -537,7 +537,7 @@ export function AnalyticsView() {
                     type="monotone"
                     dataKey="ttft"
                     name="TTFT (ms)"
-                    stroke="oklch(0.7 0.14 75)"
+                    stroke="oklch(0.55 0.15 230)"
                     strokeWidth={2}
                     dot={false}
                     activeDot={{ r: 4, strokeWidth: 2 }}
@@ -548,7 +548,7 @@ export function AnalyticsView() {
                     type="monotone"
                     dataKey="genTime"
                     name="Gen Time (s)"
-                    stroke="oklch(0.6 0.15 280)"
+                    stroke="oklch(0.5 0.17 250)"
                     strokeWidth={2}
                     dot={false}
                     activeDot={{ r: 4, strokeWidth: 2 }}
@@ -567,10 +567,10 @@ export function AnalyticsView() {
           <ChartCard
             title="Token Throughput"
             icon={Zap}
-            iconColor="text-emerald-500"
+            iconColor="text-primary"
             badge={
               <>
-                <Badge variant="outline" className="text-[10px] h-5 gap-1 border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                <Badge variant="outline" className="text-[10px] h-5 gap-1 border-primary/30 text-primary">
                   <TrendingUp className="h-2.5 w-2.5" />
                   tok/s
                 </Badge>
@@ -592,9 +592,9 @@ export function AnalyticsView() {
                 >
                   <defs>
                     <linearGradient id="tokGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="oklch(0.6 0.17 155)" stopOpacity={0.35} />
-                      <stop offset="50%" stopColor="oklch(0.6 0.17 155)" stopOpacity={0.1} />
-                      <stop offset="95%" stopColor="oklch(0.6 0.17 155)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="oklch(0.55 0.17 230)" stopOpacity={0.35} />
+                      <stop offset="50%" stopColor="oklch(0.55 0.17 230)" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="oklch(0.55 0.17 230)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" vertical={false} />
@@ -612,15 +612,15 @@ export function AnalyticsView() {
                     axisLine={false}
                     tickFormatter={(v) => `${v}`}
                     domain={[15, 40]}
-                    label={{ value: 'tok/s', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'oklch(0.6 0.17 155)' } }}
+                    label={{ value: 'tok/s', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: 'oklch(0.55 0.17 230)' } }}
                   />
                   <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'oklch(0.65 0.17 165 / 30%)', strokeWidth: 1 }} />
-                  <ReferenceLine y={30} stroke="oklch(0.6 0.17 155 / 30%)" strokeDasharray="4 4" label={{ value: '30 tok/s', position: 'right', style: { fontSize: 10, fill: 'oklch(0.6 0.17 155 / 60%)' } }} />
+                  <ReferenceLine y={30} stroke="oklch(0.55 0.17 230 / 30%)" strokeDasharray="4 4" label={{ value: '30 tok/s', position: 'right', style: { fontSize: 10, fill: 'oklch(0.55 0.17 230 / 60%)' } }} />
                   <Area
                     type="monotone"
                     dataKey="tokensPerSec"
                     name="Tokens/sec"
-                    stroke="oklch(0.6 0.17 155)"
+                    stroke="oklch(0.55 0.17 230)"
                     fill="url(#tokGrad)"
                     strokeWidth={2}
                     dot={false}
@@ -650,7 +650,7 @@ export function AnalyticsView() {
                   'text-[10px] h-5 gap-1',
                   data.errorRate.errorRatePercent > 2
                     ? 'border-rose-500/30 text-rose-600 dark:text-rose-400'
-                    : 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                    : 'border-primary/30 text-primary'
                 )}
               >
                 {data.errorRate.errorRatePercent}% error rate

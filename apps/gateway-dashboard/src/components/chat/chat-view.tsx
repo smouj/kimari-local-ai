@@ -148,7 +148,7 @@ export function ChatView() {
 
   // Load messages on mount
   useEffect(() => {
-    queueMicrotask(() => setMessages(loadMessages()))
+    setMessages(loadMessages())
   }, [])
 
   // Auto-scroll to bottom on new messages or streaming content

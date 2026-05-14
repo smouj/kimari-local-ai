@@ -738,3 +738,132 @@
   background-size: 200% 200%;
   animation: gradient-shift 8s ease infinite;
 }
+
+
+/* ==============================
+   ANIMATED PARTICLES (for welcome banner)
+   ============================== */
+@keyframes particle-float {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-60px) translateX(20px); opacity: 0; }
+}
+.particle-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: oklch(0.65 0.17 230 / 30%);
+  pointer-events: none;
+  animation: particle-float linear infinite;
+}
+.dark .particle-dot {
+  background: oklch(0.65 0.17 230 / 40%);
+}
+
+/* ==============================
+   METRIC CARD GRADIENT BORDER ON HOVER
+   ============================== */
+.metric-gradient-border-hover {
+  position: relative;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.metric-gradient-border-hover:hover {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px oklch(0.65 0.17 230 / 30%), 0 4px 20px oklch(0.65 0.17 230 / 15%);
+}
+.dark .metric-gradient-border-hover:hover {
+  box-shadow: 0 0 0 2px oklch(0.65 0.17 230 / 40%), 0 4px 24px oklch(0.65 0.17 230 / 20%);
+}
+
+/* ==============================
+   SIDEBAR ACTIVE INDICATOR GLOW
+   ============================== */
+.sidebar-active-glow {
+  position: relative;
+}
+.sidebar-active-glow::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  border-radius: 50%;
+  background: oklch(0.65 0.17 230);
+  filter: blur(4px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ==============================
+   BRAND LOGO PULSE ANIMATION
+   ============================== */
+@keyframes brand-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.65 0.17 230 / 30%); }
+  50% { box-shadow: 0 0 0 6px oklch(0.65 0.17 230 / 0%); }
+}
+.brand-logo-pulse {
+  animation: brand-pulse 3s ease-in-out infinite;
+}
+
+/* ==============================
+   FOOTER GRADIENT LINE ANIMATION
+   ============================== */
+@keyframes footer-line-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.footer-animated-line {
+  position: relative;
+  overflow: hidden;
+}
+.footer-animated-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, oklch(0.65 0.17 230 / 60%), oklch(0.72 0.17 260 / 80%), oklch(0.65 0.17 230 / 60%), transparent);
+  animation: footer-line-slide 4s ease-in-out infinite;
+}
+
+/* ==============================
+   SERVER RING LIGHT MODE CONTRAST
+   ============================== */
+.server-ring-light {
+  border: 2px solid oklch(0.75 0.06 230 / 60%);
+}
+.dark .server-ring-light {
+  border: 2px solid oklch(0.3 0.04 230 / 40%);
+}
+
+/* ==============================
+   ANIMATED CONNECTION ARROWS
+   ============================== */
+@keyframes arrow-flow {
+  0% { transform: translateX(-4px); opacity: 0.4; }
+  50% { transform: translateX(2px); opacity: 1; }
+  100% { transform: translateX(-4px); opacity: 0.4; }
+}
+.animate-arrow-flow {
+  animation: arrow-flow 1.5s ease-in-out infinite;
+}
+
+/* ==============================
+   PROFILES ALTERNATING ROW BG
+   ============================== */
+.profile-row-even {
+  background: oklch(0.97 0.01 230 / 50%);
+}
+.profile-row-odd {
+  background: oklch(1 0 0 / 0%);
+}
+.dark .profile-row-even {
+  background: oklch(0.2 0.015 230 / 30%);
+}
+.dark .profile-row-odd {
+  background: oklch(0 0 0 / 0%);
+}
+

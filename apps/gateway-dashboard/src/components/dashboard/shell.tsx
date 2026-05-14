@@ -22,6 +22,7 @@ import { ChatView } from '@/components/chat/chat-view'
 import { StatsView } from '@/components/stats/stats-view'
 import { ModelCompareView } from '@/components/models/model-compare-view'
 import { SettingsView } from '@/components/settings/settings-view'
+import { SystemView } from '@/components/system/system-view'
 import { ExportDialog } from '@/components/dashboard/export-dialog'
 import { NotificationPanel } from '@/components/notifications/notification-panel'
 import { CommandPalette } from '@/components/command-palette/command-palette'
@@ -46,6 +47,7 @@ const viewComponents: Record<string, React.ComponentType> = {
   config: ConfigView,
   logs: LogsView,
   integrations: IntegrationsView,
+  system: SystemView,
   settings: SettingsView,
 }
 
@@ -116,7 +118,7 @@ export function DashboardShell() {
             </motion.div>
           </AnimatePresence>
         </main>
-        <footer className="footer-gradient-border border-t border-border/60 bg-background/90 backdrop-blur-xl py-2.5 sm:py-3.5 px-3 sm:px-6 mt-auto">
+        <footer className="footer-animated-line border-t border-border/60 bg-background/90 backdrop-blur-xl py-2.5 sm:py-3.5 px-3 sm:px-6 mt-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-0">
             <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-foreground/70">
               <div className="flex items-center gap-1.5">
