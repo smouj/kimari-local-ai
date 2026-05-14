@@ -494,7 +494,39 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.73-alpha (Current)
+## v0.1.76-alpha (Current)
+
+- ✅ Version bump for private eval artifact persistence hardening
+- ✅ Added upload/validation tools for private raw artifacts
+- ✅ Added subset30 config with `raw_outputs_private_required: true`
+- ✅ Reran subset30 scoring job `6a0590cce48bea4538b9c7b9` after hardening
+- ✅ Private artifact uploaded and validated; manual review available next
+- No public weights, no GGUF, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.75-alpha (Released)
+
+- ✅ Private raw-output retrieval + manual review execution attempt
+- ✅ Private review directory created outside public repo (`~/kimari-private-review/v0175/`)
+- ✅ HF bucket inspected for scoring job `6a052f5ce48bea4538b9c37d`
+- ✅ Sanitized manual review generator added (`create_manual_review_from_private_raw.py`)
+- ✅ Summary records `manual_review_status=blocked_missing_raw_outputs`
+- ⚠️ Expected `raw_outputs_private.json` was not retrievable from the recorded bucket path
+- No public weights, no GGUF, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.74-alpha (Released)
+
+- ✅ Private manual-review gate prepared
+- ✅ Sanitized manual review summary + template
+- ✅ Manual review validator
+- ✅ Manual review doc
+- ✅ Run history updated for 500-step SFT + subset30 scoring
+- ⚠️ Raw outputs not found locally; manual review remained pending outside public repo
+- No public weights, no GGUF, no public benchmarks
+- Gate BLOCKED
+
+## v0.1.73-alpha (Released)
 
 - 🔧 SFT v1 eval subset10 execution (in progress)
 - Eval load check + generation check

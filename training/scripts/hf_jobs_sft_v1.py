@@ -71,7 +71,13 @@ def shell_join(args: list[str]) -> str:
     return " ".join(quoted)
 
 
-def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path, persist_adapter: bool = False, adapter_repo: str = "", full_run: bool = False) -> list[str]:
+def build_hf_jobs_command_args(
+    config: dict[str, Any],
+    config_path: Path,
+    persist_adapter: bool = False,
+    adapter_repo: str = "",
+    full_run: bool = False,
+) -> list[str]:
     training_command = shell_join(build_training_command_args(config_path, full_run=full_run))
     config_path_str = str(config_path)
     output_dir = config.get("output_dir", "training/runs/kimari-runtime-15b-sft-v1")
@@ -89,9 +95,11 @@ def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path, persis
         # Upload adapter to private repo after training
         # Note: repo must already exist (created manually as private)
         # upload_folder doesn't need private=True if repo is already private
-        steps.extend([
-            f"python -c \"from huggingface_hub import HfApi; HfApi().upload_folder(folder_path='{output_dir}', repo_id='{adapter_repo}', repo_type='model')\"",
-        ])
+        steps.extend(
+            [
+                f"python -c \"from huggingface_hub import HfApi; HfApi().upload_folder(folder_path='{output_dir}', repo_id='{adapter_repo}', repo_type='model')\"",
+            ]
+        )
 
     guarded_command = " && ".join(steps)
     cmd = [
@@ -106,12 +114,14 @@ def build_hf_jobs_command_args(config: dict[str, Any], config_path: Path, persis
     if persist_adapter:
         cmd.extend(["--secrets", "HF_TOKEN"])
 
-    cmd.extend([
-        DEFAULT_IMAGE,
-        "bash",
-        "-c",
-        guarded_command,
-    ])
+    cmd.extend(
+        [
+            DEFAULT_IMAGE,
+            "bash",
+            "-c",
+            guarded_command,
+        ]
+    )
     return cmd
 
 
@@ -219,8 +229,12 @@ def main() -> None:
     parser.add_argument(
         "--require-jobs-access", action="store_true", help="Check HF jobs access (required for real submit)"
     )
-    parser.add_argument("--persist-adapter", action="store_true", help="Upload adapter to private HF repo after training")
-    parser.add_argument("--adapter-repo", type=str, default=DEFAULT_ADAPTER_REPO, help="Private HF repo for adapter upload")
+    parser.add_argument(
+        "--persist-adapter", action="store_true", help="Upload adapter to private HF repo after training"
+    )
+    parser.add_argument(
+        "--adapter-repo", type=str, default=DEFAULT_ADAPTER_REPO, help="Private HF repo for adapter upload"
+    )
     parser.add_argument("--full-run", action="store_true", help="Submit guarded full-run instead of micro-run")
     args = parser.parse_args()
 
@@ -233,7 +247,13 @@ def main() -> None:
         sys.exit(1)
 
     config = parse_simple_yaml(args.config)
-    command_args = build_hf_jobs_command_args(config, args.config, persist_adapter=args.persist_adapter, adapter_repo=args.adapter_repo, full_run=args.full_run)
+    command_args = build_hf_jobs_command_args(
+        config,
+        args.config,
+        persist_adapter=args.persist_adapter,
+        adapter_repo=args.adapter_repo,
+        full_run=args.full_run,
+    )
     safety_errors = validate_safety(config)
     command_str = shell_join(command_args) if args.print_command else ""
     execution_order_errors = validate_execution_order(command_str) if command_str else []

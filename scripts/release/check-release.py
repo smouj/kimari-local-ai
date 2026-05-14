@@ -4256,7 +4256,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.73--alpha" in readme_text_current
+            "version-0.1.76--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -4264,7 +4264,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.73-alpha" in docs_index_text
+            "Kimari Local AI v0.1.76-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.73-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.76-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -4352,6 +4352,94 @@ def main() -> None:
     check("Gate BLOCKED in public docs", "blocked" in public_text, "gate must remain BLOCKED")
     for forbidden in ["kimari-4b released", "public weights available", "production ready"]:
         check(f"No forbidden public phrase: {forbidden}", forbidden not in public_text, f"found {forbidden}")
+
+    # ── [90/90] v0.1.76 private eval artifact persistence fix ───────────────
+    print("\n[90/90] v0.1.76 private eval artifact persistence fix")
+    upload_script = PROJECT_ROOT / "eval" / "scripts" / "upload_private_eval_artifacts.py"
+    artifact_validator = PROJECT_ROOT / "eval" / "scripts" / "validate_private_eval_artifacts.py"
+    subset30_config = PROJECT_ROOT / "eval" / "configs" / "kimari_runtime_15b_sft_v1_eval_subset30.yaml"
+    artifact_summary = (
+        PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_500step_subset30" / "artifact_persistence_summary.json"
+    )
+    check(
+        "v0.1.76 upload_private_eval_artifacts.py exists",
+        upload_script.exists(),
+        "missing private artifact upload script",
+    )
+    check(
+        "v0.1.76 validate_private_eval_artifacts.py exists",
+        artifact_validator.exists(),
+        "missing private artifact validator",
+    )
+    check("v0.1.76 subset30 config exists", subset30_config.exists(), "missing subset30 config")
+    if subset30_config.exists():
+        config_text = subset30_config.read_text().lower()
+        check(
+            "v0.1.76 subset30 requires private raw outputs",
+            "raw_outputs_private_required: true" in config_text,
+            "subset30 config must require private raw outputs",
+        )
+        check(
+            "v0.1.76 subset30 blocks public benchmark",
+            "public_benchmark_allowed: false" in config_text,
+            "public benchmark must be false",
+        )
+        check(
+            "v0.1.76 subset30 gate BLOCKED",
+            'gate_state: "blocked"' in config_text or "gate_state: blocked" in config_text,
+            "gate must remain BLOCKED",
+        )
+    check(
+        "v0.1.76 artifact persistence summary exists", artifact_summary.exists(), "missing artifact persistence summary"
+    )
+    if artifact_summary.exists():
+        try:
+            artifact_data = json.loads(artifact_summary.read_text())
+            check(
+                "v0.1.76 raw_outputs_private_uploaded explicit",
+                "raw_outputs_private_uploaded" in artifact_data,
+                "missing raw_outputs_private_uploaded",
+            )
+            check(
+                "v0.1.76 manual_review_available explicit",
+                "manual_review_available" in artifact_data,
+                "missing manual_review_available",
+            )
+            check(
+                "v0.1.76 raw_outputs_committed=false",
+                artifact_data.get("raw_outputs_committed") is False,
+                "raw outputs must not be committed",
+            )
+            check(
+                "v0.1.76 public_benchmark_allowed=false",
+                artifact_data.get("public_benchmark_allowed") is False,
+                "public benchmark must not be allowed",
+            )
+            check("v0.1.76 gate BLOCKED", artifact_data.get("gate_state") == "BLOCKED", "gate must remain BLOCKED")
+        except json.JSONDecodeError:
+            check("v0.1.76 artifact summary valid JSON", False, "artifact summary is not valid JSON")
+    try:
+        tracked = subprocess.run(["git", "ls-files"], cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30)
+        tracked_files = tracked.stdout.splitlines() if tracked.returncode == 0 else []
+    except Exception:
+        tracked_files = []
+    tracked_raw_v0176 = [line for line in tracked_files if Path(line).name == "raw_outputs_private.json"]
+    check(
+        "v0.1.76 no raw_outputs_private.json tracked",
+        not tracked_raw_v0176,
+        f"tracked raw outputs: {tracked_raw_v0176}",
+    )
+    for artifact_pattern in ("*.safetensors", "*.gguf", "adapter_model.bin"):
+        artifacts = [
+            path
+            for path in PROJECT_ROOT.rglob(artifact_pattern)
+            if ".venv" not in path.parts and "deps" not in path.parts
+        ]
+        check(
+            f"v0.1.76 no public {artifact_pattern}",
+            len(artifacts) == 0,
+            f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
+        )
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
@@ -6790,7 +6878,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.73--alpha" in readme_text_current
+            "version-0.1.76--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -6798,7 +6886,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.73-alpha" in docs_index_text
+            "Kimari Local AI v0.1.76-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -6862,7 +6950,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.73-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.76-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -7853,6 +7941,231 @@ def main() -> None:
         "gate blocked" in release_text or "gate: blocked" in release_text,
         "gate must remain BLOCKED",
     )
+
+    # ── [88/88] v0.1.74 private manual review gate ─────────────────────────
+    print("\n[88/88] v0.1.74 private manual review gate")
+    manual_doc = PROJECT_ROOT / "docs" / "KIMARI_RUNTIME_15B_500STEP_MANUAL_REVIEW.md"
+    manual_summary = (
+        PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_500step_subset30" / "manual_review_summary.json"
+    )
+    manual_validator = PROJECT_ROOT / "eval" / "scripts" / "validate_manual_review_summary.py"
+    check("v0.1.74 manual review doc exists", manual_doc.exists(), "missing manual review doc")
+    check("v0.1.74 manual review summary exists", manual_summary.exists(), "missing manual review summary")
+    check("v0.1.74 manual review validator exists", manual_validator.exists(), "missing manual review validator")
+    if manual_summary.exists():
+        try:
+            manual_data = json.loads(manual_summary.read_text())
+            check(
+                "v0.1.74 raw_outputs_committed=false",
+                manual_data.get("raw_outputs_committed") is False,
+                "raw outputs must not be committed",
+            )
+            check(
+                "v0.1.74 public_benchmark_allowed=false",
+                manual_data.get("public_benchmark_allowed") is False,
+                "public benchmark must not be allowed",
+            )
+            check("v0.1.74 gate BLOCKED", manual_data.get("gate_state") == "BLOCKED", "gate must remain BLOCKED")
+            check(
+                "v0.1.74 reviewed_items <= subset_size",
+                manual_data.get("reviewed_items", 999) <= manual_data.get("subset_size", -1),
+                "reviewed_items must be <= subset_size",
+            )
+        except json.JSONDecodeError:
+            check("v0.1.74 manual summary valid JSON", False, "manual review summary is not valid JSON")
+    if manual_validator.exists() and manual_summary.exists():
+        result = subprocess.run(
+            [sys.executable, str(manual_validator), "--summary", str(manual_summary), "--json"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        check("v0.1.74 manual review validator passes", result.returncode == 0, (result.stdout + result.stderr)[-500:])
+    forbidden_raw_names = {"raw_outputs_private.json", "raw_outputs.json", "raw_responses.json"}
+    tracked_raw = []
+    try:
+        tracked = subprocess.run(["git", "ls-files"], cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30)
+        if tracked.returncode == 0:
+            tracked_raw = [line for line in tracked.stdout.splitlines() if Path(line).name in forbidden_raw_names]
+    except Exception:
+        tracked_raw = []
+    check("v0.1.74 no raw outputs tracked", not tracked_raw, f"tracked raw outputs: {tracked_raw}")
+    for artifact_pattern in ("*.safetensors", "*.gguf", "adapter_model.bin"):
+        artifacts = [
+            path
+            for path in PROJECT_ROOT.rglob(artifact_pattern)
+            if ".venv" not in path.parts and "deps" not in path.parts
+        ]
+        check(
+            f"v0.1.74 no public {artifact_pattern}",
+            len(artifacts) == 0,
+            f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
+        )
+
+    # ── [89/89] v0.1.75 private raw retrieval + manual review execution attempt ──
+    print("\n[89/89] v0.1.75 private raw retrieval + manual review execution attempt")
+    manual_generator = PROJECT_ROOT / "eval" / "scripts" / "create_manual_review_from_private_raw.py"
+    private_review_dir = Path.home() / "kimari-private-review" / "v0175"
+    bucket_listing = private_review_dir / "bucket_listing.txt"
+    check("v0.1.75 manual review generator exists", manual_generator.exists(), "missing manual review generator")
+    check(
+        "v0.1.75 private review dir outside repo",
+        private_review_dir.exists() and PROJECT_ROOT not in private_review_dir.parents,
+        "private review dir missing or inside repo",
+    )
+    check("v0.1.75 bucket listing captured", bucket_listing.exists(), "missing private bucket listing evidence")
+    if manual_summary.exists():
+        try:
+            manual_data = json.loads(manual_summary.read_text())
+            status = manual_data.get("manual_review_status", manual_data.get("review_status"))
+            check("v0.1.75 manual review status explicit", bool(status), "missing manual review status")
+            check("v0.1.75 decision explicit", bool(manual_data.get("decision")), "missing decision")
+            check(
+                "v0.1.75 raw_outputs_committed=false",
+                manual_data.get("raw_outputs_committed") is False,
+                "raw outputs must not be committed",
+            )
+            check(
+                "v0.1.75 public_benchmark_allowed=false",
+                manual_data.get("public_benchmark_allowed") is False,
+                "public benchmark must not be allowed",
+            )
+            check("v0.1.75 gate BLOCKED", manual_data.get("gate_state") == "BLOCKED", "gate must remain BLOCKED")
+            check(
+                "v0.1.75 reviewed_items <= subset_size",
+                manual_data.get("reviewed_items", 999) <= manual_data.get("subset_size", -1),
+                "reviewed_items must be <= subset_size",
+            )
+            if status == "completed":
+                check(
+                    "v0.1.75 completed review covers all 30",
+                    manual_data.get("reviewed_items") == 30,
+                    "completed review must cover 30 items",
+                )
+            if status == "blocked_missing_raw_outputs":
+                check(
+                    "v0.1.75 blocked decision matches missing raw outputs",
+                    manual_data.get("decision") == "blocked_missing_raw_outputs",
+                    "blocked status must use blocked_missing_raw_outputs decision",
+                )
+        except json.JSONDecodeError:
+            check("v0.1.75 manual summary valid JSON", False, "manual review summary is not valid JSON")
+    if manual_validator.exists() and manual_summary.exists():
+        result = subprocess.run(
+            [sys.executable, str(manual_validator), "--summary", str(manual_summary), "--json"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        check("v0.1.75 manual review validator passes", result.returncode == 0, (result.stdout + result.stderr)[-500:])
+    try:
+        tracked = subprocess.run(["git", "ls-files"], cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30)
+        tracked_files = tracked.stdout.splitlines() if tracked.returncode == 0 else []
+    except Exception:
+        tracked_files = []
+    tracked_raw_v0175 = [line for line in tracked_files if Path(line).name in forbidden_raw_names]
+    check("v0.1.75 no raw outputs tracked", not tracked_raw_v0175, f"tracked raw outputs: {tracked_raw_v0175}")
+    for artifact_pattern in ("*.safetensors", "*.gguf", "adapter_model.bin"):
+        artifacts = [
+            path
+            for path in PROJECT_ROOT.rglob(artifact_pattern)
+            if ".venv" not in path.parts and "deps" not in path.parts
+        ]
+        check(
+            f"v0.1.75 no public {artifact_pattern}",
+            len(artifacts) == 0,
+            f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
+        )
+
+    # ── [90/90] v0.1.76 private eval artifact persistence fix ───────────────
+    print("\n[90/90] v0.1.76 private eval artifact persistence fix")
+    upload_script = PROJECT_ROOT / "eval" / "scripts" / "upload_private_eval_artifacts.py"
+    artifact_validator = PROJECT_ROOT / "eval" / "scripts" / "validate_private_eval_artifacts.py"
+    subset30_config = PROJECT_ROOT / "eval" / "configs" / "kimari_runtime_15b_sft_v1_eval_subset30.yaml"
+    artifact_summary = (
+        PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_500step_subset30" / "artifact_persistence_summary.json"
+    )
+    check(
+        "v0.1.76 upload_private_eval_artifacts.py exists",
+        upload_script.exists(),
+        "missing private artifact upload script",
+    )
+    check(
+        "v0.1.76 validate_private_eval_artifacts.py exists",
+        artifact_validator.exists(),
+        "missing private artifact validator",
+    )
+    check("v0.1.76 subset30 config exists", subset30_config.exists(), "missing subset30 config")
+    if subset30_config.exists():
+        config_text = subset30_config.read_text().lower()
+        check(
+            "v0.1.76 subset30 requires private raw outputs",
+            "raw_outputs_private_required: true" in config_text,
+            "subset30 config must require private raw outputs",
+        )
+        check(
+            "v0.1.76 subset30 blocks public benchmark",
+            "public_benchmark_allowed: false" in config_text,
+            "public benchmark must be false",
+        )
+        check(
+            "v0.1.76 subset30 gate BLOCKED",
+            'gate_state: "blocked"' in config_text or "gate_state: blocked" in config_text,
+            "gate must remain BLOCKED",
+        )
+    check(
+        "v0.1.76 artifact persistence summary exists", artifact_summary.exists(), "missing artifact persistence summary"
+    )
+    if artifact_summary.exists():
+        try:
+            artifact_data = json.loads(artifact_summary.read_text())
+            check(
+                "v0.1.76 raw_outputs_private_uploaded explicit",
+                "raw_outputs_private_uploaded" in artifact_data,
+                "missing raw_outputs_private_uploaded",
+            )
+            check(
+                "v0.1.76 manual_review_available explicit",
+                "manual_review_available" in artifact_data,
+                "missing manual_review_available",
+            )
+            check(
+                "v0.1.76 raw_outputs_committed=false",
+                artifact_data.get("raw_outputs_committed") is False,
+                "raw outputs must not be committed",
+            )
+            check(
+                "v0.1.76 public_benchmark_allowed=false",
+                artifact_data.get("public_benchmark_allowed") is False,
+                "public benchmark must not be allowed",
+            )
+            check("v0.1.76 gate BLOCKED", artifact_data.get("gate_state") == "BLOCKED", "gate must remain BLOCKED")
+        except json.JSONDecodeError:
+            check("v0.1.76 artifact summary valid JSON", False, "artifact summary is not valid JSON")
+    try:
+        tracked = subprocess.run(["git", "ls-files"], cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30)
+        tracked_files = tracked.stdout.splitlines() if tracked.returncode == 0 else []
+    except Exception:
+        tracked_files = []
+    tracked_raw_v0176 = [line for line in tracked_files if Path(line).name == "raw_outputs_private.json"]
+    check(
+        "v0.1.76 no raw_outputs_private.json tracked",
+        not tracked_raw_v0176,
+        f"tracked raw outputs: {tracked_raw_v0176}",
+    )
+    for artifact_pattern in ("*.safetensors", "*.gguf", "adapter_model.bin"):
+        artifacts = [
+            path
+            for path in PROJECT_ROOT.rglob(artifact_pattern)
+            if ".venv" not in path.parts and "deps" not in path.parts
+        ]
+        check(
+            f"v0.1.76 no public {artifact_pattern}",
+            len(artifacts) == 0,
+            f"found: {[str(a.relative_to(PROJECT_ROOT)) for a in artifacts[:5]]}",
+        )
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:

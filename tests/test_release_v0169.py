@@ -44,7 +44,7 @@ def test_hf_jobs_wrapper_supports_full_run():
     text = HF_SCRIPT.read_text()
     assert "--full-run" in text
     assert "full_run=args.full_run" in text
-    assert "mode_flag = \"--full-run\" if full_run else \"--micro-run\"" in text
+    assert 'mode_flag = "--full-run" if full_run else "--micro-run"' in text
 
 
 def test_hf_jobs_full_run_command_preview():

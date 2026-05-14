@@ -33,7 +33,7 @@ def test_no_raw_outputs_committed_in_scoring_report():
     text = SUMMARY.read_text().lower()
     assert "generated" not in text
     assert "prompt" not in text
-    assert "\"ideal\"" not in text
+    assert '"ideal"' not in text
     assert "raw_outputs_private.json" in text
 
 

@@ -4,7 +4,6 @@ Focus: SFT v1 eval subset10 submission, adapter persisted, --secrets HF_TOKEN fi
 """
 
 import json
-import re
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -17,7 +16,7 @@ def test_version():
 
 def test_init_version():
     init = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
-    assert "__version__ = \"0.1.68-alpha\"" in init, "__init__.py version mismatch"
+    assert '__version__ = "0.1.68-alpha"' in init, "__init__.py version mismatch"
 
 
 def test_eval_config_exists():
@@ -61,8 +60,12 @@ def test_eval_summary_ready():
     assert summary["status"] == "completed", f"Expected status 'completed', got '{summary['status']}'"
     assert summary["adapter_private_repo"] == "Smouj013/kimari-runtime-15b-sft-v1-adapter"
     assert summary["gate_state"] == "BLOCKED"
-    assert summary["baseline_completion_rate"] == 1.0, f"Expected baseline_completion_rate 1.0, got {summary['baseline_completion_rate']}"
-    assert summary["adapter_completion_rate"] == 1.0, f"Expected adapter_completion_rate 1.0, got {summary['adapter_completion_rate']}"
+    assert summary["baseline_completion_rate"] == 1.0, (
+        f"Expected baseline_completion_rate 1.0, got {summary['baseline_completion_rate']}"
+    )
+    assert summary["adapter_completion_rate"] == 1.0, (
+        f"Expected adapter_completion_rate 1.0, got {summary['adapter_completion_rate']}"
+    )
     assert summary["ready_for_subset30"] is True
 
 

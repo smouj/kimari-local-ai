@@ -4,6 +4,51 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.76-alpha] - 2026-05-14
+
+### Added
+- Private eval artifact persistence hardening for subset30 scoring.
+- `eval/scripts/upload_private_eval_artifacts.py` for mandatory private raw-output upload metadata.
+- `eval/scripts/validate_private_eval_artifacts.py` for private artifact existence/size/hash validation.
+- `eval/configs/kimari_runtime_15b_sft_v1_eval_subset30.yaml` with `raw_outputs_private_required: true`.
+- `docs/KIMARI_PRIVATE_EVAL_ARTIFACTS.md` and sanitized artifact persistence summary.
+
+### Changed
+- Subset30 scoring now treats missing private raw-output upload as a failed/missing-artifact state.
+- `run_sft_v1_eval.py` delegates subset scoring to the HF Jobs scoring runner instead of remaining infrastructure-only.
+
+### Safety
+- No training, public benchmark, public weights, or GGUF.
+- Raw outputs remain private only and are not tracked.
+- Gate remains BLOCKED.
+
+## [0.1.75-alpha] - 2026-05-14
+
+### Added
+- Private raw-output retrieval attempt for the 500-step subset30 scoring run.
+- `eval/scripts/create_manual_review_from_private_raw.py` for sanitized manual-review summary generation from private raw outputs stored outside the public repo.
+- v0.1.75 release checks and tests for explicit `blocked_missing_raw_outputs` handling.
+
+### Safety
+- Raw outputs remain outside the public repo and are not tracked.
+- The expected `raw_outputs_private.json` was not retrievable from the recorded HF bucket path.
+- Manual review remains blocked; no public benchmark, weights, or GGUF.
+- Gate remains BLOCKED; decision is `blocked_missing_raw_outputs`.
+
+## [0.1.74-alpha] - 2026-05-14
+
+### Added
+- Private manual-review gate for the 500-step subset30 scoring run.
+- `docs/KIMARI_RUNTIME_15B_500STEP_MANUAL_REVIEW.md` with sanitized status and BLOCKED gate.
+- `reports/evals/kimari_runtime_15b_500step_subset30/manual_review_summary.json` and template.
+- `eval/scripts/validate_manual_review_summary.py` validator.
+- `tests/test_release_v0174.py` release guard tests.
+
+### Safety
+- Raw outputs remain uncommitted.
+- No public benchmark claim, no public weights, no public GGUF.
+- Gate remains BLOCKED; decision is `inconclusive` until private raw outputs are reviewed.
+
 ## [0.1.73-alpha] - 2026-05-14
 
 ### Added

@@ -11,8 +11,10 @@ SUMMARY = PROJECT_ROOT / "reports" / "evals" / "kimari_runtime_15b_sft_v1_500ste
 
 
 def test_version_bumped():
-    assert 'version = "0.1.73-alpha"' in (PROJECT_ROOT / "pyproject.toml").read_text()
-    assert '__version__ = "0.1.73-alpha"' in (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
+    pyproject = (PROJECT_ROOT / "pyproject.toml").read_text()
+    init = (PROJECT_ROOT / "kimari" / "__init__.py").read_text()
+    assert 'version = "0.1.73-alpha"' in pyproject or 'version = "0.1.74-alpha"' in pyproject
+    assert '__version__ = "0.1.73-alpha"' in init or '__version__ = "0.1.74-alpha"' in init
 
 
 def test_500_step_summary_is_sanitized_and_complete():
@@ -29,7 +31,10 @@ def test_500_step_summary_is_sanitized_and_complete():
 def test_500_step_beats_baseline_and_100_step():
     data = json.loads(SUMMARY.read_text())
     assert data["adapter"]["proxy_score"] > data["baseline"]["proxy_score"]
-    assert data["comparison_to_100_step_adapter"]["new_500_step_proxy_score"] > data["comparison_to_100_step_adapter"]["previous_100_step_proxy_score"]
+    assert (
+        data["comparison_to_100_step_adapter"]["new_500_step_proxy_score"]
+        > data["comparison_to_100_step_adapter"]["previous_100_step_proxy_score"]
+    )
     assert data["comparison_to_100_step_adapter"]["relative_delta_multiplier"] > 1.5
     assert data["decision"]["is_adapter_better_than_base"] is True
     assert data["decision"]["is_500_step_better_than_100_step"] is True
@@ -47,7 +52,7 @@ def test_no_raw_outputs_committed_in_500_step_report():
     text = SUMMARY.read_text().lower()
     assert "generated" not in text
     assert "prompt" not in text
-    assert "\"ideal\"" not in text
+    assert '"ideal"' not in text
     assert "raw_outputs_private.json" in text
 
 

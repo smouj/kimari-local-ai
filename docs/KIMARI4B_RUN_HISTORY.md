@@ -1,5 +1,44 @@
 # Kimari-4B Run History
 
+## Run 12 — v0.1.76-alpha private artifact persistence fix (2026-05-14)
+
+- Purpose: harden subset30 scoring so `raw_outputs_private.json` must be uploaded privately before manual review.
+- New scoring job: `6a0590cce48bea4538b9c7b9` — submitted after hardening.
+- Training: none.
+- Public raw outputs: none.
+- Private artifact target: `hf://buckets/Smouj013/jobs-artifacts/kimari-evals/v0176/subset30/raw_outputs_private.json`.
+- Artifact validation status: validated; manual review available for v0.1.77-alpha.
+- Public benchmark allowed: false.
+- Public weights/GGUF: none.
+- Gate: BLOCKED.
+
+## Run 11 — v0.1.75-alpha private raw retrieval attempt (2026-05-14)
+
+- 500-step SFT job: `6a052ce6e48bea4538b9c365` — completed; private adapter persisted.
+- subset30 scoring job: `6a052f5ce48bea4538b9c37d` — completed; sanitized proxy summary only.
+- Private review directory: `~/kimari-private-review/v0175/` outside the public repo.
+- HF bucket inspected: `Smouj013/jobs-artifacts/20260514T021138-8c30a6`.
+- Retrieval result: `raw_outputs_private.json` was not present at the recorded bucket path.
+- Manual review status: `blocked_missing_raw_outputs`.
+- Decision: `blocked_missing_raw_outputs`.
+- Next step: fix private artifact persistence/retrieval before any subset60, full104, or GGUF work.
+- Raw outputs committed: false.
+- Public benchmark allowed: false.
+- Public weights/GGUF: none.
+- Gate: BLOCKED.
+
+## Run 10 — v0.1.74-alpha manual review gate (2026-05-14)
+
+- 500-step SFT job: `6a052ce6e48bea4538b9c365` — completed; private adapter persisted.
+- subset30 scoring job: `6a052f5ce48bea4538b9c37d` — completed; sanitized proxy summary only.
+- Manual review status: blocked pending private `raw_outputs_private.json` retrieval outside the public repo.
+- Sanitized summary: `reports/evals/kimari_runtime_15b_500step_subset30/manual_review_summary.json`.
+- Raw outputs committed: false.
+- Public benchmark allowed: false.
+- Public weights/GGUF: none.
+- Gate: BLOCKED.
+
+
 > Chronological record of all Kimari-4B training and evaluation runs.
 
 ## Run 1: Micro SFT Smoke (Ephemeral)

@@ -1,0 +1,33 @@
+{
+  "release_id": "v0.1.76-alpha",
+  "purpose": "private_scoring_artifact_persistence_fix",
+  "previous_scoring_job_id": "6a052f5ce48bea4538b9c37d",
+  "scoring_job_id": "6a0590cce48bea4538b9c7b9",
+  "training_job_id": "6a052ce6e48bea4538b9c365",
+  "subset_size": 30,
+  "raw_outputs_private_required": true,
+  "raw_outputs_private_uploaded": true,
+  "raw_outputs_private_path": "hf://buckets/Smouj013/jobs-artifacts/kimari-evals/v0176/subset30/raw_outputs_private.json",
+  "raw_outputs_private_sha256": "0c88803e796ed4adaa0fe55a683659ef45fd40386fb79fae88c7fe1bbc801e37",
+  "raw_outputs_private_size_bytes": 90282,
+  "manual_review_available": true,
+  "artifact_validation_status": "validated",
+  "raw_outputs_committed": false,
+  "public_benchmark_allowed": false,
+  "public_weights_uploaded": false,
+  "public_gguf_uploaded": false,
+  "gate_state": "BLOCKED",
+  "decision": "manual_review_ready",
+  "notes": [
+    "No raw outputs are included in this public summary.",
+    "Private raw outputs were uploaded and validated by SHA256/size.",
+    "Manual review is now available for v0.1.77-alpha; gate remains BLOCKED."
+  ],
+  "base_score": 0.3158,
+  "adapter_100_score": 0.3286,
+  "adapter_500_score": 0.3404,
+  "adapter_500_delta_vs_base": 0.0246,
+  "adapter_500_wins": 17,
+  "base_wins": 12,
+  "ties": 1
+}

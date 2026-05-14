@@ -1,5 +1,59 @@
 # Release Checklist
 
+
+## v0.1.76-alpha — Private eval artifact persistence fix
+
+- [x] pyproject.toml version is 0.1.76-alpha
+- [x] kimari/__init__.py version is 0.1.76-alpha
+- [x] `upload_private_eval_artifacts.py` exists
+- [x] `validate_private_eval_artifacts.py` exists
+- [x] subset30 config exists
+- [x] subset30 config has `raw_outputs_private_required: true`
+- [x] artifact persistence summary exists
+- [x] artifact summary has `raw_outputs_private_uploaded` explicit
+- [x] artifact summary has `manual_review_available` explicit
+- [x] raw_outputs_committed=false
+- [x] public_benchmark_allowed=false
+- [x] no raw_outputs_private.json tracked in public repo
+- [x] no public GGUF
+- [x] no public weights
+- [x] gate BLOCKED
+
+## v0.1.75-alpha — Private raw retrieval + manual review execution attempt
+
+- [x] pyproject.toml version is 0.1.75-alpha
+- [x] kimari/__init__.py version is 0.1.75-alpha
+- [x] private review directory exists outside public repo
+- [x] HF bucket path inspected for `raw_outputs_private.json`
+- [x] manual review doc exists
+- [x] manual review summary exists
+- [x] manual review generator exists
+- [x] manual review validator passes
+- [x] manual_review_status is explicit
+- [x] decision is explicit
+- [x] raw_outputs_committed=false
+- [x] public_benchmark_allowed=false
+- [x] no raw outputs tracked
+- [x] no public GGUF
+- [x] no public weights
+- [x] gate BLOCKED
+- [x] decision `blocked_missing_raw_outputs` if private raw artifact cannot be retrieved
+
+## v0.1.74-alpha — Private manual review gate
+
+- [x] pyproject.toml version is 0.1.74-alpha
+- [x] kimari/__init__.py version is 0.1.74-alpha
+- [x] manual review doc exists
+- [x] manual review summary exists
+- [x] manual review validator passes
+- [x] raw_outputs_committed=false
+- [x] public_benchmark_allowed=false
+- [x] no raw outputs tracked
+- [x] no public GGUF
+- [x] no public weights
+- [x] gate BLOCKED
+- [x] decision inconclusive pending private raw-output review
+
 Use this checklist before publishing any Kimari Local AI release.
 
 ## v0.1.62 Checks — SFT v1 pre-submit hardening

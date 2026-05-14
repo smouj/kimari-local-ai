@@ -8,7 +8,6 @@ SFT v1 micro-run with --persist-adapter:
 - Adapter upload step included in HF Jobs command
 """
 
-import json
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -61,7 +60,9 @@ def test_config_persist_adapter_true():
 def test_config_adapter_repo_value():
     """adapter_repo must point to the private repo."""
     config = TRAINING_CONFIG.read_text()
-    assert "Smouj013/kimari-runtime-15b-sft-v1-adapter" in config, "adapter_repo must be Smouj013/kimari-runtime-15b-sft-v1-adapter"
+    assert "Smouj013/kimari-runtime-15b-sft-v1-adapter" in config, (
+        "adapter_repo must be Smouj013/kimari-runtime-15b-sft-v1-adapter"
+    )
 
 
 def test_huggingface_hub_in_requirements():
@@ -75,8 +76,12 @@ def test_no_private_kwarg_in_upload():
     script = HF_JOBS_SCRIPT.read_text()
     # Check that the upload command doesn't use private=True in actual code
     # (comments mentioning it are OK)
-    lines_with_private_true = [line for line in script.splitlines() if "private=True" in line and not line.strip().startswith("#")]
-    assert len(lines_with_private_true) == 0, f"upload_folder should not use private=True in code: {lines_with_private_true}"
+    lines_with_private_true = [
+        line for line in script.splitlines() if "private=True" in line and not line.strip().startswith("#")
+    ]
+    assert len(lines_with_private_true) == 0, (
+        f"upload_folder should not use private=True in code: {lines_with_private_true}"
+    )
 
 
 def test_safety_still_blocks_public():

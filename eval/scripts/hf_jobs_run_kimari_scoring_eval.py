@@ -46,6 +46,10 @@ def validate_config(config: dict[str, Any]) -> list[str]:
         errors.append("manual_review_required must be true")
     if not config.get("adapter_repo_private"):
         errors.append("adapter_repo_private is required")
+    if config.get("raw_outputs_private_required") is not True:
+        errors.append("raw_outputs_private_required must be true")
+    if not config.get("private_artifact_repo_id"):
+        errors.append("private_artifact_repo_id is required")
     return errors
 
 
@@ -70,6 +74,8 @@ def build_scoring_script(config: dict[str, Any], subset_size: int | None = None)
     top_p = config.get("top_p", 0.9)
     seed = config.get("seed", 42)
     effective_subset = subset_size or config.get("subset_size", 30)
+    private_artifact_repo_id = config.get("private_artifact_repo_id", "Smouj013/jobs-artifacts")
+    private_artifact_bucket_path = config.get("private_artifact_bucket_path", "kimari-evals/v0176/subset30")
 
     items = load_eval_items(config)
     embedded_dataset_b64 = base64.b64encode(json.dumps(items, ensure_ascii=False).encode("utf-8")).decode("ascii")
@@ -91,13 +97,29 @@ Jobs artifact bucket. Logs only sanitized aggregate metrics.
 
 import base64
 import json
-import math
+import hashlib
 import random
+import subprocess
 import re
 import time
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+
+
+def sha256_file(path):
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def upload_private_raw(raw_path, repo_id, artifact_prefix):
+    private_path = f"{{artifact_prefix.strip('/')}}/{{raw_path.name}}" if artifact_prefix else raw_path.name
+    uri = f"hf://buckets/{{repo_id}}/{{private_path}}"
+    proc = subprocess.run(["hf", "buckets", "cp", str(raw_path), uri], capture_output=True, text=True, timeout=180, check=False)
+    return proc.returncode == 0, uri, (proc.stderr or proc.stdout)[-1000:]
 
 STOPWORDS = {{
     "the", "and", "for", "with", "that", "this", "from", "are", "you", "your", "should", "use",
@@ -263,8 +285,8 @@ def main():
     baseline = aggregate(baseline_rows)
     adapter = aggregate(adapter_rows)
     deltas = {{k: round(adapter.get(k, 0) - baseline.get(k, 0), 4) for k in ["token_f1", "keyword_recall", "proxy_score", "completion_rate"]}}
-    adapter_wins = sum(1 for b, a in zip(baseline_rows, adapter_rows) if a["score"]["proxy_score"] > b["score"]["proxy_score"])
-    baseline_wins = sum(1 for b, a in zip(baseline_rows, adapter_rows) if b["score"]["proxy_score"] > a["score"]["proxy_score"])
+    adapter_wins = sum(1 for b, a in zip(baseline_rows, adapter_rows, strict=False) if a["score"]["proxy_score"] > b["score"]["proxy_score"])
+    baseline_wins = sum(1 for b, a in zip(baseline_rows, adapter_rows, strict=False) if b["score"]["proxy_score"] > a["score"]["proxy_score"])
     ties = len(items) - adapter_wins - baseline_wins
 
     raw = {{
@@ -275,7 +297,33 @@ def main():
         "baseline_rows": baseline_rows,
         "adapter_rows": adapter_rows,
     }}
-    Path("raw_outputs_private.json").write_text(json.dumps(raw, indent=2, ensure_ascii=False))
+    raw_path = Path("raw_outputs_private.json")
+    raw_path.write_text(json.dumps(raw, indent=2, ensure_ascii=False))
+    raw_sha256 = sha256_file(raw_path)
+    raw_size_bytes = raw_path.stat().st_size
+    upload_ok, private_artifact_path, upload_error = upload_private_raw(
+        raw_path,
+        "{private_artifact_repo_id}",
+        "{private_artifact_bucket_path}",
+    )
+    if not upload_ok:
+        failure = {{
+            "status": "failed_missing_private_artifact",
+            "raw_outputs_private_uploaded": False,
+            "raw_outputs_private_path": private_artifact_path,
+            "raw_outputs_private_sha256": raw_sha256,
+            "raw_outputs_private_size_bytes": raw_size_bytes,
+            "manual_review_available": False,
+            "raw_outputs_committed": False,
+            "public_benchmark_allowed": False,
+            "gate_state": "BLOCKED",
+            "error": upload_error,
+        }}
+        Path("scoring_summary_private.json").write_text(json.dumps(failure, indent=2, ensure_ascii=False))
+        print("SCORING_SUMMARY_JSON_START")
+        print(json.dumps(failure, indent=2, ensure_ascii=False))
+        print("SCORING_SUMMARY_JSON_END")
+        raise SystemExit(2)
 
     summary = {{
         "run_id": f"kimari-scoring-{{int(time.time())}}",
@@ -292,6 +340,14 @@ def main():
         "baseline_proxy_wins": baseline_wins,
         "proxy_ties": ties,
         "raw_outputs_artifact": "raw_outputs_private.json",
+        "raw_outputs_private_uploaded": True,
+        "raw_outputs_private_path": private_artifact_path,
+        "raw_outputs_private_sha256": raw_sha256,
+        "raw_outputs_private_size_bytes": raw_size_bytes,
+        "manual_review_available": True,
+        "raw_outputs_private_required": True,
+        "private_artifact_repo_id": "{private_artifact_repo_id}",
+        "private_artifact_bucket_path": "{private_artifact_bucket_path}",
         "raw_outputs_committed": False,
         "public_benchmark_allowed": False,
         "manual_review_required": True,
@@ -303,7 +359,7 @@ def main():
         "created_at": datetime.now(timezone.utc).isoformat(),
         "notes": "Private lexical proxy scoring only. Not a public benchmark. Manual review required.",
     }}
-    Path("scoring_summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False))
+    Path("scoring_summary_private.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False))
 
     print("SCORING_SUMMARY_JSON_START")
     print(json.dumps(summary, indent=2, ensure_ascii=False))
@@ -347,6 +403,9 @@ def dry_run(config: dict[str, Any], subset_size: int | None = None) -> dict[str,
         "total_items_available": len(items),
         "subset_size": effective_subset,
         "command": " ".join(cmd),
+        "raw_outputs_private_required": config.get("raw_outputs_private_required") is True,
+        "private_artifact_repo_id": config.get("private_artifact_repo_id"),
+        "private_artifact_bucket_path": config.get("private_artifact_bucket_path"),
         "raw_outputs_committed": False,
         "public_benchmark_allowed": False,
         "gate_state": "BLOCKED",

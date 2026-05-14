@@ -21,16 +21,23 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 EVAL_CONFIG = PROJECT_ROOT / "eval" / "configs" / "kimari_runtime_15b_sft_v1_eval_subset10.yaml"
 
 
-def build_command_args(config_path: str, dry_run: bool = True, allow_submit: bool = False) -> list[str]:
+def build_command_args(
+    config_path: str,
+    dry_run: bool = True,
+    allow_submit: bool = False,
+    require_jobs_access: bool = False,
+) -> list[str]:
     """Build safe command args list (no shell, no .split())."""
-    args = [sys.executable, "-m", "eval.scripts.run_kimari_eval"]
+    args = [sys.executable, "eval/scripts/hf_jobs_run_kimari_scoring_eval.py"]
     args.extend(["--config", str(config_path)])
 
-    if dry_run:
+    if dry_run or not allow_submit:
         args.append("--dry-run")
-
-    if not allow_submit:
-        args.append("--dry-run")
+    if allow_submit:
+        args.append("--allow-submit")
+        args.append("--yes")
+    if require_jobs_access:
+        args.append("--require-jobs-access")
 
     return args
 
@@ -68,6 +75,8 @@ def run_sft_v1_eval(
             errors.append("Eval config must specify gate_state: BLOCKED")
         if "public_benchmark_allowed" not in config_text:
             errors.append("Eval config must specify public_benchmark_allowed")
+        if "subset30" in str(config) and "raw_outputs_private_required: true" not in config_text:
+            errors.append("Subset30 scoring config must require raw_outputs_private_required: true")
 
     result = {
         "dry_run": dry_run,
@@ -89,7 +98,12 @@ def run_sft_v1_eval(
         return False
 
     # Build command
-    cmd_args = build_command_args(str(config), dry_run=dry_run, allow_submit=allow_submit and yes)
+    cmd_args = build_command_args(
+        str(config),
+        dry_run=dry_run,
+        allow_submit=allow_submit and yes,
+        require_jobs_access=require_jobs_access,
+    )
     result["command"] = " ".join(cmd_args)
 
     if print_command:
@@ -100,21 +114,27 @@ def run_sft_v1_eval(
 
     if dry_run:
         result["status"] = "dry_run"
-        result["message"] = "Dry-run: would execute eval with subset10 config"
+        result["message"] = "Dry-run: would execute private scoring eval with configured subset"
         if json_output:
             print(json.dumps(result, indent=2))
         else:
             print(f"DRY-RUN: Would execute: {' '.join(cmd_args)}")
         return True
 
-    # Actual execution would go here — for now, infrastructure only
-    result["status"] = "not_executed"
-    result["message"] = "Eval execution not yet implemented — infrastructure ready"
+    import subprocess
+
+    proc = subprocess.run(cmd_args, cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=180, check=False)
+    result["status"] = "submitted" if proc.returncode == 0 else "failed"
+    result["returncode"] = proc.returncode
+    result["stdout_tail"] = proc.stdout[-2000:]
+    result["stderr_tail"] = proc.stderr[-2000:]
     if json_output:
         print(json.dumps(result, indent=2))
     else:
-        print("Infrastructure ready — eval execution not yet implemented")
-    return True
+        print(proc.stdout)
+        if proc.stderr:
+            print(proc.stderr, file=sys.stderr)
+    return proc.returncode == 0
 
 
 def main():
