@@ -5,7 +5,7 @@ Provides the ``gateway_status()`` function that returns the current state
 of the planned gateway — including whether a server exists, the planned
 host/port, available profiles, and llama-server detection results.
 
-This is a **dry-run** module: no real HTTP server is started.
+The Next.js Gateway Dashboard is implemented separately; the management API remains planned.
 """
 
 from __future__ import annotations
@@ -28,8 +28,7 @@ def gateway_status(config: dict | None = None) -> dict:
     Returns:
         A dict with the following keys:
 
-        - **gateway_available** (bool): Always ``False`` — the gateway
-          server is not yet implemented.
+        - **gateway_available** (bool): Whether the planned management API is available.
         - **planned_host** (str): ``"127.0.0.1"``
         - **planned_port** (int): ``11436``
         - **status** (str): ``"planned"``
@@ -63,10 +62,15 @@ def gateway_status(config: dict | None = None) -> dict:
 
     return {
         "gateway_available": False,
+        "api_status": "planned",
+        "api_planned_host": "127.0.0.1",
+        "api_planned_port": 11436,
+        "dashboard_status": "implemented",
+        "dashboard_default_url": "http://127.0.0.1:3105",
         "planned_host": "127.0.0.1",
         "planned_port": 11436,
-        "status": "planned",
-        "message": "Gateway server is planned for a future release",
+        "status": "planned_api_dashboard_available",
+        "message": "Gateway Dashboard is implemented; Gateway API is planned for a future release",
         "dependencies": ["fastapi", "uvicorn"],
         "config_path": str(CONFIG_PATH),
         "profiles_available": profiles_available,

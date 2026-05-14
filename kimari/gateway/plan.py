@@ -5,8 +5,9 @@ Provides the ``gateway_plan()`` function that returns the full planned
 endpoint map, security constraints, integration relationships, and
 future development notes for the gateway module.
 
-This is a **dry-run** module: no real HTTP server is started, and no
-endpoints are actually served.
+The Next.js Gateway Dashboard is implemented and managed by
+``kimari.gateway.dashboard_manager``. The management HTTP API described here
+remains **planned**: no API endpoints are served by this module.
 """
 
 from __future__ import annotations
@@ -51,8 +52,8 @@ _RELATIONSHIP: dict = {
 # ─── Future Notes ─────────────────────────────────────────────────────────────
 
 _FUTURE_NOTES: list[str] = [
-    "Gateway server is planned for a future release — no HTTP server exists yet",
-    "All endpoints are design-only; none are served at runtime",
+    "Gateway Dashboard is implemented; Gateway API server is planned for a future release",
+    "All API endpoints are design-only; none are served at runtime",
     "FastAPI dependency is not required until the gateway is implemented",
     "Security: gateway binds to 127.0.0.1 only — no public network exposure",
     "Security: no token storage, no model upload, no training execution, no HF publishing",
@@ -83,7 +84,8 @@ def gateway_plan(config: dict | None = None) -> dict:
         - **security** (dict): Security constraints enforced by design.
         - **relationship** (dict): Integration relationships with other
           Kimari modules and external tools.
-        - **planned_only** (bool): Always ``True`` — no server exists.
+        - **api_planned_only** (bool): Always ``True`` — no management API server exists.
+        - **dashboard_status** (dict): Dashboard implementation status.
         - **future_notes** (list[str]): Development notes about the
           planned gateway.
     """
@@ -92,5 +94,12 @@ def gateway_plan(config: dict | None = None) -> dict:
         "security": dict(_SECURITY),
         "relationship": dict(_RELATIONSHIP),
         "planned_only": True,
+        "api_planned_only": True,
+        "dashboard_status": {
+            "implemented": True,
+            "command": "kimari gateway start",
+            "default_url": "http://127.0.0.1:3105",
+            "local_only_default": True,
+        },
         "future_notes": list(_FUTURE_NOTES),
     }

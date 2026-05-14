@@ -1,6 +1,6 @@
 # Kimari Gateway Plan — Local Controller for the Kimari Runtime
 
-> **Status**: Planning — dry-run only. No real gateway server exists yet. All endpoints listed below are **planned** and have not been implemented.
+> **Status**: Gateway Dashboard implemented and managed by `kimari gateway ...`. The management API server remains planning-only; all API endpoints listed below are **planned** and have not been implemented.
 >
 > **Version target**: v0.2.0-alpha (stable gateway release)
 
@@ -8,9 +8,12 @@
 
 ## Objective
 
-Kimari Gateway is a local controller for managing the Kimari runtime. It provides a unified API surface for starting/stopping the inference server, inspecting configuration, querying profiles and models, running benchmarks, and exposing integration-ready status information to tools like Open WebUI, OpenClaw, and Hermes.
+Kimari Gateway has two surfaces:
 
-The gateway is NOT an OpenAI-compatible chat API — that role belongs to llama-server on port `11435`. The gateway is a **management and diagnostic layer** running on port `11436`.
+1. **Gateway Dashboard** — implemented Next.js UI at `127.0.0.1:3105`, managed by `kimari gateway setup/start/stop/status/logs/open/reset`.
+2. **Gateway API** — planned local controller API at `127.0.0.1:11436`. It will provide a unified API surface for starting/stopping the inference server, inspecting configuration, querying profiles and models, running benchmarks, and exposing integration-ready status information to tools like Open WebUI, OpenClaw, and Hermes.
+
+The planned Gateway API is NOT an OpenAI-compatible chat API — that role belongs to llama-server on port `11435`. The gateway is a **management and diagnostic layer** running on port `11436`.
 
 ---
 
@@ -80,11 +83,12 @@ The gateway is NOT an OpenAI-compatible chat API — that role belongs to llama-
 
 ## Security
 
-The gateway follows Kimari's local-first security model:
+The dashboard and planned API follow Kimari's local-first security model:
 
 | Policy | Detail |
 |--------|--------|
-| Default bind address | `127.0.0.1:11436` |
+| Dashboard default bind address | `127.0.0.1:3105` |
+| Planned API default bind address | `127.0.0.1:11436` |
 | Bind scope | Localhost only — never `0.0.0.0` by default |
 | Public exposure | **No** — the gateway must not be exposed to public networks |
 | Token storage | **No** — the gateway does not store or manage authentication tokens |
@@ -106,7 +110,8 @@ Binding to `0.0.0.0` or any non-localhost address:
 
 1. Triggers a security warning on startup
 2. Requires explicit `--host` flag
-3. Requires `--auth` flag (Bearer token enforced for non-localhost connections)
+3. For the dashboard CLI, requires `--allow-public-bind`
+4. For the future API, will require auth before non-localhost exposure
 4. Is documented in `docs/REVERSE_PROXY_AUTH.md` for users who need network access
 
 ---
@@ -129,11 +134,12 @@ See `docs/API_EXPERIMENTAL.md` for the current state of the experimental API.
 
 ### Evolution Path
 
-The gateway will **evolve from** the existing experimental FastAPI implementation:
+The planned Gateway API will **evolve from** the existing experimental FastAPI implementation:
 
 1. **v0.1.x-alpha**: Experimental API (`kimari api --experimental`) — current state
-2. **v0.2.0-alpha**: Gateway replaces `kimari api` with `kimari gateway` — stable endpoint set
-3. **v0.3.0**: Gateway gains integration endpoints, web UI support
+2. **v0.1.81-alpha**: `kimari gateway` manages the local Dashboard; API endpoints remain planned
+3. **v0.2.0-alpha**: Gateway API replaces `kimari api` — stable endpoint set
+4. **v0.3.0**: Gateway gains integration endpoints and deeper web UI support
 
 The `kimari/api/` module will be refactored into `kimari/gateway/` when the gateway becomes the primary API surface. During the transition, both `kimari api --experimental` and `kimari gateway` may coexist temporarily.
 

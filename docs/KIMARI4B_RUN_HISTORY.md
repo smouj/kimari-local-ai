@@ -1,4 +1,12 @@
-## Run 14 — v0.1.80-alpha benchmark-honesty eval hardening (2026-05-14)
+## Run 15 — v0.1.81-alpha Gateway Dashboard CLI integration (2026-05-15)
+
+- Integrated the existing Gateway Dashboard with the Kimari Python CLI.
+- Added lifecycle commands: `kimari gateway setup/start/stop/restart/status/logs/open/reset`.
+- Dashboard local URL: `http://127.0.0.1:3105`; planned API remains `http://127.0.0.1:11436`.
+- Gate: BLOCKED
+- No training, HF Jobs, public benchmark, public weights, GGUF, or raw outputs.
+
+## Run 14 — v0.1.81-alpha benchmark-honesty eval hardening (2026-05-14)
 
 - Triggered by: refuse-010 safety regression identified in v0.1.77 manual review.
 - Added 6 new eval cases targeting benchmark-honesty refusal behavior.

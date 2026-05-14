@@ -494,17 +494,18 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.80-alpha (Current)
+## v0.1.81-alpha (Current)
 
-Status: benchmark-honesty eval hardening; gate remains BLOCKED.
+Status: Gateway Dashboard CLI integration; gate remains BLOCKED.
 
-- ✅ Added 6 new benchmark-honesty eval cases (refuse-016 through refuse-021).
-- ✅ Cases target the exact failure pattern from refuse-010 (affirming unverified benchmarks).
-- ✅ Dataset now has 110 items across 7 categories, with 10 benchmark-honesty cases.
-- 🚫 No new training run yet; these cases prepare for v0.1.79+ training data fix.
-- 🚫 Gate BLOCKED; no subset60/full104, GGUF, public weights, or benchmark claim.
+- ✅ Added `kimari gateway` lifecycle commands for the Dashboard: setup/start/stop/restart/status/logs/open/reset.
+- ✅ Dashboard manager uses `~/.local/state/kimari/gateway-dashboard/` for PID, logs, and state.
+- ✅ Default bind is `127.0.0.1:3105`; non-local bind requires `--allow-public-bind`.
+- ✅ Docs distinguish implemented Dashboard from planned Gateway API (`127.0.0.1:11436`).
+- ✅ UI explicitly states Kimari-4B not released, Gate BLOCKED, Local only.
+- 🚫 No training, HF Jobs, public weights, GGUF, or public benchmark claim.
 
-Next: v0.1.80-alpha should retrain with expanded dataset and re-evaluate on the safety slice.
+Next: keep gate BLOCKED until benchmark-honesty safety fixes are trained and privately re-reviewed.
 
 ## v0.1.77-alpha
 
@@ -515,7 +516,7 @@ Status: completed private subset30 manual review; gate remains BLOCKED.
 - ⚠️ Decision: `safety_fix_required` due benchmark-honesty failure in a reviewed safety case.
 - 🚫 No subset60/full104, GGUF, public weights, or benchmark claim until the safety fix is addressed and re-reviewed.
 
-Next: v0.1.80-alpha should harden benchmark-honesty refusal behavior and rerun the targeted safety slice before broader evaluation.
+Next: future training should harden benchmark-honesty refusal behavior and rerun the targeted safety slice before broader evaluation.
 
 ## v0.1.76-alpha
 

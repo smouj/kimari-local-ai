@@ -1,44 +1,28 @@
-## v0.1.80-alpha — Benchmark-honesty eval hardening
+## v0.1.81-alpha — Gateway Dashboard CLI integration
 
-- [x] pyproject.toml version is 0.1.80-alpha
-- [x] kimari/__init__.py version is 0.1.80-alpha
-- [x] 6 new benchmark-honesty cases added to refusal_safety.jsonl
-- [x] refuse-010 failure pattern covered by new cases
-- [x] Dataset expanded from 104 to 110 items
+- [x] pyproject.toml version is 0.1.81-alpha
+- [x] kimari/__init__.py version is 0.1.81-alpha
+- [x] apps/gateway-dashboard/package.json version is 0.1.81-alpha
+- [x] `kimari gateway setup/start/stop/restart/status/logs/open/reset` implemented
+- [x] Dashboard manager stores runtime state under `~/.local/state/kimari/gateway-dashboard/`
+- [x] Default dashboard bind is `127.0.0.1:3105`
+- [x] Non-local bind requires `--allow-public-bind`
+- [x] `reset` does not touch models, adapters, config, secrets, or private repos
+- [x] Gateway docs separate implemented Dashboard from planned API
+- [x] Dashboard README is CLI-first; npm is development-only
+- [x] UI states Kimari-4B not released, Gate BLOCKED, Local only
 - [x] Gate remains BLOCKED
-- [x] No public benchmark claim
-- [x] No public weights or GGUF
-- [x] No raw outputs committed
+- [x] No public weights, GGUF, training, HF Jobs, or public benchmark claims
 
 Validation:
-- [x] Dataset JSONL validity check
-- [x] `pytest tests/test_release_v0178.py -q`
-- [x] `ruff check kimari/ tests/ training/ eval/ scripts/ dataset/`
-- [x] `ruff format --check kimari/ tests/ training/ eval/ scripts/ dataset/`
+- [x] `python -m kimari gateway start --dry-run --json`
+- [x] `python -m kimari gateway status --json`
+- [x] `pytest tests/test_gateway_cli.py tests/test_release_v0181.py -q`
+- [x] `npm --prefix apps/gateway-dashboard run lint`
+- [x] `npm --prefix apps/gateway-dashboard run build`
+- [x] `ruff check kimari/ tests/`
 - [x] `python scripts/release/check-release.py`
-
-## v0.1.77-alpha — Private subset30 manual review completed
-
-- [x] pyproject.toml version is 0.1.77-alpha
-- [x] kimari/__init__.py version is 0.1.77-alpha
-- [x] Private raw artifact downloaded outside the public repository
-- [x] 30/30 subset30 items manually reviewed
-- [x] Sanitized manual review summary updated
-- [x] Decision recorded as `safety_fix_required`
-- [x] Gate remains BLOCKED
-- [x] No public benchmark claim
-- [x] No public weights or GGUF
-- [x] No raw outputs committed
-
-Validation:
-- [x] `python eval/scripts/validate_manual_review_summary.py --summary reports/evals/kimari_runtime_15b_500step_subset30/manual_review_summary.json --json`
-- [x] `pytest tests/test_release_v0177.py -q`
-- [x] `ruff check kimari/ tests/ training/ eval/ scripts/ dataset/`
-- [x] `ruff format --check kimari/ tests/ training/ eval/ scripts/ dataset/`
-- [x] `python scripts/release/check-release.py`
-
-# Release Checklist
-
+- [x] `python -m build`
 
 ## v0.1.76-alpha — Private eval artifact persistence fix
 

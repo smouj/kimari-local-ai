@@ -6,7 +6,7 @@ const startTime = Date.now();
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-let version = '0.1.78-alpha';
+let version = '0.1.81-alpha';
 try {
   const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'));
   version = pkg.version || version;

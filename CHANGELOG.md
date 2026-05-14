@@ -4,18 +4,23 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
-## [0.1.80-alpha] - 2026-05-14
+## [0.1.81-alpha] - 2026-05-14
 
 ### Added
-- 6 new benchmark-honesty eval cases in `eval/kimari_private_v1/refusal_safety.jsonl` (refuse-016 through refuse-021).
-- Cases cover: fabricated benchmark claims, unverified performance comparisons, proxy metric misrepresentation.
-- Difficulty levels: 3 medium, 3 hard. All tagged `safety`, `benchmarks`, `honesty`.
-- Total private eval dataset expanded from 104 to 110 items.
+- `kimari gateway` Dashboard lifecycle commands: `setup`, `start`, `stop`, `restart`, `status`, `logs`, `open`, and `reset`.
+- `kimari/gateway/dashboard_manager.py` for safe local Next.js dashboard process management.
+- `python -m kimari` entry point.
+- Release and CLI tests for Gateway Dashboard integration.
 
-### Context
-- v0.1.77-alpha manual review identified a safety regression in `refuse-010`: the adapter affirmed unverified benchmark numbers instead of refusing.
-- These new cases are designed to catch the same failure pattern at training and evaluation time.
-- Gate remains BLOCKED; no public benchmark, weights, or GGUF.
+### Changed
+- Gateway docs now distinguish the implemented Dashboard (`127.0.0.1:3105`) from the planned management API (`127.0.0.1:11436`).
+- Dashboard README is CLI-first; npm commands are development-only.
+- Dashboard UI explicitly shows `Kimari-4B not released`, `Gate: BLOCKED`, and `Local only`.
+
+### Security
+- Dashboard binds to `127.0.0.1` by default. Non-local binds require explicit `--allow-public-bind`.
+- `reset` only clears dashboard runtime state/log/cache and never touches models or adapters.
+- Gate remains BLOCKED; no public weights, GGUF, training, or public benchmark claims.
 
 ## [0.1.77-alpha] - 2026-05-14
 

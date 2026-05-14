@@ -126,7 +126,7 @@ function TypingIndicator() {
 }
 
 export function ChatView() {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadMessages())
   const [input, setInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
@@ -146,10 +146,6 @@ export function ChatView() {
   const isServerRunning = serverStatus?.status === 'running'
   const downloadedModels = models?.filter((m) => m.downloaded) ?? []
 
-  // Load messages on mount
-  useEffect(() => {
-    setMessages(loadMessages())
-  }, [])
 
   // Auto-scroll to bottom on new messages or streaming content
   useEffect(() => {

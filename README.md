@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/cuda-11.8+-76b900.svg" alt="CUDA 11.8+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-0.1.80--alpha-9b59b6.svg" alt="v0.1.80-alpha">
+  <img src="https://img.shields.io/badge/version-0.1.81--alpha-9b59b6.svg" alt="v0.1.81-alpha">
   <a href="https://github.com/smouj/kimari-local-ai">
     <img src="https://img.shields.io/github/stars/smouj/kimari-local-ai?style=social" alt="GitHub stars">
   </a>
@@ -32,7 +32,7 @@
 
 Kimari is an open-source framework for running powerful language models locally on consumer-grade NVIDIA GPUs. It delivers maximum useful intelligence per GiB of VRAM through intelligent quantization, the KimariFit scoring system, and pre-tuned GPU profiles — so you don't have to be an ML engineer to get great performance from older hardware.
 
-> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.80-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
+> **⚠️ Alpha Software** — Kimari Local AI is in active early development (v0.1.81-alpha). Expect rough edges, breaking changes between versions, and missing features. The project is usable today but not yet production-ready.
 
 **Important:** Kimari is the *framework*, not the model. **Kimari-4B** is a target model currently under development — it is **not yet released**. Until the final fine-tuned weights are available, Kimari can run any compatible GGUF model (Qwen3, SmolLM3, Llama 3.2, TinyLlama, etc.) on consumer hardware — specifically **NVIDIA GTX 1060 (6 GB)** and **GTX 1080 (8 GB)**.
 
@@ -42,7 +42,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 
 ## 📊 Project Status
 
-> **Kimari Local AI v0.1.80-alpha**
+> **Kimari Local AI v0.1.81-alpha**
 
 ### 🔗 Public Resources
 
@@ -102,7 +102,7 @@ Built on top of [llama.cpp](https://github.com/ggerganov/llama.cpp), Kimari prov
 - **Measured benchmark (experimental)** — `kimari benchmark --measure --endpoint URL --model NAME --yes` runs real benchmarks against OpenAI-compatible servers; requires `--yes` flag; supports `--output`; fails cleanly on connection error; no results saved by default; see docs/MEASURED_BENCHMARKS.md
 - **Doctor deep** — `kimari doctor --deep` runs 14 deep diagnostic checks with structured PASS/WARN/FAIL table and suggested next steps; supports `--json`; no GPU required, no model execution; run before benchmark or training to verify environment
 - **Secret scanner hardening** — Security guides are now scanned line-by-line instead of being skipped entirely
-- **Gateway plan** — `kimari gateway --dry-run` shows planned gateway configuration; `--status --json` shows gateway status; `--plan --json` shows planned endpoints; no real server yet (dry-run only); default 127.0.0.1:11436; see docs/GATEWAY_PLAN.md
+- **Gateway Dashboard** — `kimari gateway setup` and `kimari gateway start --open` manage the local Next.js dashboard on 127.0.0.1:3105; Gateway API endpoints remain planned; see docs/GATEWAY_PLAN.md
 - **Update check** — `kimari update check` shows current version (offline); `--online` checks GitHub for latest release; `--json` output; never auto-updates; see docs/UPDATE.md
 - **Quick config** — See docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md for Open WebUI, OpenClaw, and Hermes one-command integration setup
 - **Benchmark prompts** — Standard safe prompts in `benchmarks/prompts/local_benchmark_prompts.jsonl`
@@ -512,15 +512,17 @@ kimari token show                         # Display the current token
 kimari token delete                       # Remove the token
 ```
 
-### Gateway (Dry-Run Only)
+### Gateway Dashboard
 
 ```bash
-kimari gateway --dry-run                  # Show planned gateway configuration
-kimari gateway --status --json            # Show gateway status (planned)
-kimari gateway --plan --json              # Show planned endpoints
+kimari gateway setup                      # Install dashboard deps, setup SQLite, build
+kimari gateway start --open               # Start local dashboard at 127.0.0.1:3105
+kimari gateway status --json              # Dashboard + backend reachability + gate state
+kimari gateway logs --lines 50            # Recent dashboard logs
+kimari gateway stop                       # Stop dashboard
 ```
 
-> **Note:** No real server yet — dry-run only. Default: `127.0.0.1:11436` (localhost only). See [docs/GATEWAY_PLAN.md](docs/GATEWAY_PLAN.md) for the gateway design.
+> **Note:** The Dashboard is implemented and localhost-only by default. The management Gateway API remains planned at `127.0.0.1:11436`; `kimari gateway --plan --json` still shows the API design.
 
 ### Update Check
 
@@ -904,7 +906,7 @@ Kimari-4B is the project's target model — a 3B–4B class local coding/sysadmi
 
 ## 🖥️ Gateway Dashboard Preview
 
-Kimari now includes an experimental Gateway Dashboard as an isolated Next.js sub-app under [`apps/gateway-dashboard/`](apps/gateway-dashboard/). This keeps the existing Python CLI/runtime, documentation, benchmarks, and release flow intact while allowing dashboard work to evolve safely and incrementally.
+Kimari includes a Gateway Dashboard as an isolated Next.js sub-app under [`apps/gateway-dashboard/`](apps/gateway-dashboard/) and it is now managed from the Python CLI, so users do not need to run npm manually for normal use.
 
 Current dashboard work includes:
 
@@ -913,8 +915,9 @@ Current dashboard work includes:
 - Mobile responsive sidebar and compact header/footer.
 - Keyboard shortcuts help dialog (`?`).
 - Logs export to JSON/CSV.
+- CLI lifecycle: `kimari gateway setup`, `start`, `stop`, `restart`, `status`, `logs`, `open`, and `reset`.
 
-> **Safety note:** The dashboard is UI-only in this branch and should remain isolated from public benchmark/model claims. Gate state for model release remains **BLOCKED**.
+> **Safety note:** Kimari-4B is not released. Gate state remains **BLOCKED**. The dashboard binds to `127.0.0.1` by default and does not publish models, weights, or benchmarks.
 
 <p align="center">
   <img src="docs/assets/screenshots/gateway-dashboard/qa-r12-blue-dashboard.png" alt="Kimari Gateway Dashboard — overview" width="47%">
@@ -929,9 +932,8 @@ Current dashboard work includes:
 Run locally:
 
 ```bash
-cd apps/gateway-dashboard
-bun install
-bun run dev
+kimari gateway setup
+kimari gateway start --open
 ```
 
 ---
@@ -1088,7 +1090,7 @@ See [docs/00-02_kimarifit_formula.md](docs/00-02_kimarifit_formula.md) for the f
 | [Secret Scan Policy](docs/SECRET_SCAN_POLICY.md) | Line-by-line scanning policy for security guides |
 | [Measured Benchmarks](docs/MEASURED_BENCHMARKS.md) | Real benchmark execution against OpenAI-compatible servers |
 | [Doctor Deep](docs/DOCTOR_DEEP.md) | Extended diagnostics documentation |
-| [Gateway Plan](docs/GATEWAY_PLAN.md) | Local controller design, dry-run only, 127.0.0.1:11436 |
+| [Gateway Plan](docs/GATEWAY_PLAN.md) | Dashboard implemented; management API planned, 127.0.0.1:11436 |
 | [Update Check](docs/UPDATE.md) | Version checking, offline by default, never auto-updates |
 | [Open WebUI/OpenClaw Quick Config](docs/OPENWEBUI_OPENCLAW_QUICK_CONFIG.md) | One-command integration setup for Open WebUI, OpenClaw, and Hermes |
 | [Integration Config Generator](docs/INTEGRATION_CONFIG_GENERATOR.md) | Generate configuration snippets for local AI tools |

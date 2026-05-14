@@ -2,21 +2,18 @@
 
 Real-time dashboard for managing and monitoring a local Kimari AI gateway — GPU profiles, models, benchmarks, system resources, and integrations.
 
-## Quick Start
+## Quick Start (CLI-first)
+
+From the Kimari repository or an editable install:
 
 ```bash
-cd apps/gateway-dashboard
-
-# One-command setup (install + DB + build)
-npm run setup
-
-# Start the dashboard
-npm start
+kimari gateway setup
+kimari gateway start --open
 ```
 
-Open **http://localhost:3105** in your browser.
+Open **http://127.0.0.1:3105** in your browser. The dashboard binds to localhost by default; public bind requires an explicit `--allow-public-bind` flag.
 
-## Manual Setup
+## Development only (npm)
 
 ```bash
 # 1. Install dependencies
@@ -32,12 +29,13 @@ npm run build
 npm start
 ```
 
-## Development
+## Development commands
 
 ```bash
 npm run dev        # Hot-reload dev server on port 3105
 npm run lint       # ESLint check
 npm run build      # Production build
+npm start          # Production server bound to 127.0.0.1
 ```
 
 ## What You'll See
@@ -75,7 +73,8 @@ apps/gateway-dashboard/
 
 ## Notes
 
-- This is an isolated Next.js sub-app. The Kimari Python CLI lives in the repository root.
+- This is an isolated Next.js sub-app. Normal users should manage it through `kimari gateway ...`.
 - Database is SQLite (`prisma/dev.db`) — created automatically on `npm run db:setup`.
 - Do not commit `.env`, `.next/`, `node_modules/`, or DB files.
-- Model gate is **BLOCKED** until public release — no weights, GGUF, or benchmark claims.
+- Kimari-4B is **not released**. Gate is **BLOCKED** until public release — no weights, GGUF, or benchmark claims.
+- Local only by default: `127.0.0.1:3105`.

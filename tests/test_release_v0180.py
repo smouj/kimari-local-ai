@@ -1,5 +1,4 @@
 """Release validation tests for v0.1.80-alpha."""
-import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent

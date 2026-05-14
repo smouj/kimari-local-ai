@@ -4256,7 +4256,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.78--alpha" in readme_text_current
+            "version-0.1.81--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -4264,7 +4264,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.78-alpha" in docs_index_text
+            "Kimari Local AI v0.1.81-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -4328,7 +4328,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.78-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.81-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -4564,6 +4564,35 @@ def main() -> None:
         for jsonl_file in sorted(dataset_dir.glob("*.jsonl")):
             total_eval += len([line for line in jsonl_file.read_text().strip().split("\n") if line.strip()])
     check("v0.1.78 dataset expanded to >= 110", total_eval >= 110, f"expected >=110, got {total_eval}")
+
+    # ── [93/93] v0.1.81 Gateway Dashboard CLI integration ───────────────
+    print("\n[93/93] v0.1.81 Gateway Dashboard CLI integration")
+    dashboard_manager = PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py"
+    cli_main = PROJECT_ROOT / "kimari" / "cli" / "main.py"
+    dashboard_readme = PROJECT_ROOT / "apps" / "gateway-dashboard" / "README.md"
+    dashboard_overview = (
+        PROJECT_ROOT / "apps" / "gateway-dashboard" / "src" / "components" / "dashboard" / "overview.tsx"
+    )
+    check("v0.1.81 dashboard_manager exists", dashboard_manager.exists(), "missing dashboard_manager.py")
+    if dashboard_manager.exists():
+        manager_text = dashboard_manager.read_text()
+        for token in ["def start(", "def stop(", "def restart(", "def status(", "def reset(", "127.0.0.1", "BLOCKED"]:
+            check(f"v0.1.81 dashboard_manager contains {token}", token in manager_text, f"missing {token}")
+        check("v0.1.81 dashboard refuses public bind", "allow_public_bind" in manager_text, "missing public bind guard")
+    check("v0.1.81 kimari __main__ exists", (PROJECT_ROOT / "kimari" / "__main__.py").exists(), "python -m kimari missing")
+    if cli_main.exists():
+        cli_text = cli_main.read_text()
+        for token in ["gateway_command", "--allow-public-bind", "run_gateway_dashboard"]:
+            check(f"v0.1.81 CLI contains {token}", token in cli_text, f"missing {token}")
+    if dashboard_readme.exists():
+        readme_text = dashboard_readme.read_text()
+        check("v0.1.81 dashboard README is CLI-first", "kimari gateway setup" in readme_text, "missing CLI setup")
+        check("v0.1.81 dashboard README has npm dev section", "Development only" in readme_text, "missing npm dev section")
+    if dashboard_overview.exists():
+        overview_text = dashboard_overview.read_text()
+        check("v0.1.81 UI shows Kimari-4B not released", "Kimari-4B not released" in overview_text)
+        check("v0.1.81 UI shows Gate BLOCKED", "Gate: BLOCKED" in overview_text)
+        check("v0.1.81 UI shows Local only", "Local only" in overview_text)
 
     # ── Summary ──────────────────────────────────────────────────
     print("\n" + "=" * 50)
@@ -7002,7 +7031,7 @@ def main() -> None:
         readme_text_current = readme_path.read_text()
         check(
             "README version badge matches current",
-            "version-0.1.78--alpha" in readme_text_current
+            "version-0.1.81--alpha" in readme_text_current
             and "version-0.1.59--alpha--alpha" not in readme_text_current,
             "README badge URL must match current version",
         )
@@ -7010,7 +7039,7 @@ def main() -> None:
         docs_index_text = docs_index_path.read_text()
         check(
             "docs/index current status is current version",
-            "Kimari Local AI v0.1.78-alpha" in docs_index_text
+            "Kimari Local AI v0.1.81-alpha" in docs_index_text
             and "Kimari Local AI v0.1.56--alpha" not in docs_index_text
             and "New in v0.1.28-alpha" not in docs_index_text,
             "docs/index.html current visible status must match current package version and not show stale v0.1.28-alpha copy",
@@ -7074,7 +7103,7 @@ def main() -> None:
         ]
         if (PROJECT_ROOT / rel).exists()
     ).lower()
-    check("v0.1.63 appears in public surfaces", "v0.1.78-alpha" in public_text, "current version missing")
+    check("v0.1.63 appears in public surfaces", "v0.1.81-alpha" in public_text, "current version missing")
     check(
         "Kimari-4B not released appears",
         "kimari-4b is not released" in public_text or "not released" in public_text,
@@ -8432,6 +8461,35 @@ def main() -> None:
         for jsonl_file in sorted(dataset_dir.glob("*.jsonl")):
             total_eval += len([line for line in jsonl_file.read_text().strip().split("\n") if line.strip()])
     check("v0.1.78 dataset expanded to >= 110", total_eval >= 110, f"expected >=110, got {total_eval}")
+
+    # ── [93/93] v0.1.81 Gateway Dashboard CLI integration ───────────────
+    print("\n[93/93] v0.1.81 Gateway Dashboard CLI integration")
+    dashboard_manager = PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py"
+    cli_main = PROJECT_ROOT / "kimari" / "cli" / "main.py"
+    dashboard_readme = PROJECT_ROOT / "apps" / "gateway-dashboard" / "README.md"
+    dashboard_overview = (
+        PROJECT_ROOT / "apps" / "gateway-dashboard" / "src" / "components" / "dashboard" / "overview.tsx"
+    )
+    check("v0.1.81 dashboard_manager exists", dashboard_manager.exists(), "missing dashboard_manager.py")
+    if dashboard_manager.exists():
+        manager_text = dashboard_manager.read_text()
+        for token in ["def start(", "def stop(", "def restart(", "def status(", "def reset(", "127.0.0.1", "BLOCKED"]:
+            check(f"v0.1.81 dashboard_manager contains {token}", token in manager_text, f"missing {token}")
+        check("v0.1.81 dashboard refuses public bind", "allow_public_bind" in manager_text, "missing public bind guard")
+    check("v0.1.81 kimari __main__ exists", (PROJECT_ROOT / "kimari" / "__main__.py").exists(), "python -m kimari missing")
+    if cli_main.exists():
+        cli_text = cli_main.read_text()
+        for token in ["gateway_command", "--allow-public-bind", "run_gateway_dashboard"]:
+            check(f"v0.1.81 CLI contains {token}", token in cli_text, f"missing {token}")
+    if dashboard_readme.exists():
+        readme_text = dashboard_readme.read_text()
+        check("v0.1.81 dashboard README is CLI-first", "kimari gateway setup" in readme_text, "missing CLI setup")
+        check("v0.1.81 dashboard README has npm dev section", "Development only" in readme_text, "missing npm dev section")
+    if dashboard_overview.exists():
+        overview_text = dashboard_overview.read_text()
+        check("v0.1.81 UI shows Kimari-4B not released", "Kimari-4B not released" in overview_text)
+        check("v0.1.81 UI shows Gate BLOCKED", "Gate: BLOCKED" in overview_text)
+        check("v0.1.81 UI shows Local only", "Local only" in overview_text)
 
     # ── Summary ──────────────────────────────────────────────────
     if ERRORS:

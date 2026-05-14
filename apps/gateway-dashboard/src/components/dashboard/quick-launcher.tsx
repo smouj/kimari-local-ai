@@ -68,19 +68,15 @@ export function QuickLauncher() {
   const [confirmAction, setConfirmAction] = useState<string | null>(null)
   const [runningActions, setRunningActions] = useState<Set<string>>(new Set())
   const [showHistory, setShowHistory] = useState(false)
-  const [actionHistory, setActionHistory] = useState<ActionHistoryItem[]>([])
-
-  // Load history from localStorage
-  useEffect(() => {
+  const [actionHistory, setActionHistory] = useState<ActionHistoryItem[]>(() => {
     try {
+      if (typeof window === 'undefined') return []
       const stored = localStorage.getItem('kimari-action-history')
-      if (stored) {
-        setActionHistory(JSON.parse(stored))
-      }
+      return stored ? JSON.parse(stored) : []
     } catch {
-      // ignore
+      return []
     }
-  }, [])
+  })
 
   // Save history to localStorage
   const saveHistory = useCallback((history: ActionHistoryItem[]) => {

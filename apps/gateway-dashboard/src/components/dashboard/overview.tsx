@@ -210,7 +210,13 @@ export function DashboardOverview() {
                     <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome to Kimari Gateway</h1>
                     <Badge variant="outline" className="gap-1.5 status-badge-ready text-[11px] h-6 px-2.5 font-semibold border-2">
                       <CheckCircle2 className="h-3 w-3" />
-                      System Ready
+                      Local only
+                    </Badge>
+                    <Badge variant="outline" className="text-[11px] h-6 px-2.5 font-semibold border-amber-500/50 text-amber-500">
+                      Gate: BLOCKED
+                    </Badge>
+                    <Badge variant="outline" className="text-[11px] h-6 px-2.5 font-semibold border-destructive/40 text-destructive">
+                      Kimari-4B not released
                     </Badge>
                   </div>
                   <p className="text-sm text-foreground/70 mt-1.5">

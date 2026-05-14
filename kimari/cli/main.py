@@ -2339,14 +2339,27 @@ def run_benchmark_measure(
 # ─── Gateway ─────────────────────────────────────────────────────────────────
 
 
-def run_gateway(
-    config: dict, dry_run: bool = False, status_only: bool = False, plan_only: bool = False, json_output: bool = False
-):
-    """Gateway local controller (dry-run only — no real server).
+def _print_json(data: dict | list) -> None:
+    print(json.dumps(data, indent=2))
 
-    Provides status, plan, and dry-run views of the planned gateway.
-    Does NOT start any server.
-    """
+
+def _print_dashboard_result(title: str, result: dict) -> None:
+    print(f"\n{Color.BOLD}{Color.CYAN}{title}{Color.RESET}\n")
+    for key, value in result.items():
+        if isinstance(value, (dict, list)):
+            value = json.dumps(value, indent=2)
+        print(f"  {key:22s}: {value}")
+    print()
+
+
+def run_gateway(
+    config: dict,
+    dry_run: bool = False,
+    status_only: bool = False,
+    plan_only: bool = False,
+    json_output: bool = False,
+):
+    """Legacy gateway plan/status view kept for backwards compatibility."""
     from kimari.gateway import gateway_plan, gateway_status
 
     gw_status = gateway_status(config)
@@ -2359,24 +2372,24 @@ def run_gateway(
             "plan": gw_plan,
         }
         if json_output:
-            print(json.dumps(result, indent=2))
+            _print_json(result)
             return
-        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway (dry-run){Color.RESET}\n")
-        print(f"  Status:      {gw_status['status']}")
-        print(f"  Host:        {gw_status['planned_host']}")
-        print(f"  Port:        {gw_status['planned_port']}")
-        print(f"  Available:   {gw_status['gateway_available']}")
-        print(f"  Message:     {gw_status['message']}")
-        print(f"\n  {Color.BOLD}Planned Endpoints:{Color.RESET}")
+        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway API (dry-run){Color.RESET}\n")
+        print(f"  API Status:  {gw_status['api_status']}")
+        print(f"  API Host:    {gw_status['api_planned_host']}")
+        print(f"  API Port:    {gw_status['api_planned_port']}")
+        print(f"  Dashboard:   {gw_status['dashboard_status']} ({gw_status['dashboard_default_url']})")
+        print("  Gate:        BLOCKED")
+        print(f"\n  {Color.BOLD}Planned API Endpoints:{Color.RESET}")
         for ep in gw_plan["planned_endpoints"]:
             print(f"    {ep['method']:6s} {ep['path']:25s} — {ep['status']}")
-        print(f"\n  {Color.DIM}No server is started. Gateway is planned for a future release.{Color.RESET}")
-        print(f"  {Color.DIM}See docs/GATEWAY_PLAN.md for details.{Color.RESET}\n")
+        print(f"\n  {Color.DIM}Dashboard is available via: kimari gateway start{Color.RESET}")
+        print(f"  {Color.DIM}Management API endpoints are still planned.{Color.RESET}\n")
         return
 
     if status_only:
         if json_output:
-            print(json.dumps(gw_status, indent=2))
+            _print_json(gw_status)
             return
         print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway Status{Color.RESET}\n")
         for key, value in gw_status.items():
@@ -2386,26 +2399,115 @@ def run_gateway(
 
     if plan_only:
         if json_output:
-            print(json.dumps(gw_plan, indent=2))
+            _print_json(gw_plan)
             return
-        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway Plan{Color.RESET}\n")
+        print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway API Plan{Color.RESET}\n")
         print(f"  {Color.BOLD}Endpoints:{Color.RESET}")
         for ep in gw_plan["planned_endpoints"]:
             print(f"    {ep['method']:6s} {ep['path']:25s} — {ep['description']}")
+        print(f"\n  {Color.BOLD}Dashboard:{Color.RESET} implemented at http://127.0.0.1:3105")
+        print(f"  {Color.BOLD}API:{Color.RESET} planned at http://127.0.0.1:11436")
         print(f"\n  {Color.BOLD}Security:{Color.RESET}")
         for key, value in gw_plan["security"].items():
             print(f"    {key:25s}: {value}")
-        print(f"\n  {Color.DIM}No server is started. This is a plan only.{Color.RESET}\n")
+        print()
         return
 
-    # Default: show status
-    if json_output:
-        print(json.dumps(gw_status, indent=2))
-        return
-    print(f"\n{Color.BOLD}{Color.CYAN}Kimari Gateway{Color.RESET}\n")
-    for key, value in gw_status.items():
-        print(f"  {key:25s}: {value}")
-    print(f"\n  {Color.DIM}Use --dry-run, --status, or --plan for more details.{Color.RESET}\n")
+    # Default: dashboard status, because the dashboard is now the implemented surface.
+    run_gateway_dashboard("status", json_output=json_output)
+
+
+def run_gateway_dashboard(action: str, json_output: bool = False, **kwargs):
+    """Run implemented Gateway Dashboard lifecycle actions."""
+    from kimari.gateway.dashboard_manager import (
+        DashboardError,
+    )
+    from kimari.gateway.dashboard_manager import (
+        logs as dashboard_logs,
+    )
+    from kimari.gateway.dashboard_manager import (
+        open_browser as dashboard_open_browser,
+    )
+    from kimari.gateway.dashboard_manager import (
+        reset as dashboard_reset,
+    )
+    from kimari.gateway.dashboard_manager import (
+        restart as dashboard_restart,
+    )
+    from kimari.gateway.dashboard_manager import (
+        setup as dashboard_setup,
+    )
+    from kimari.gateway.dashboard_manager import (
+        start as dashboard_start,
+    )
+    from kimari.gateway.dashboard_manager import (
+        status as dashboard_status,
+    )
+    from kimari.gateway.dashboard_manager import (
+        stop as dashboard_stop,
+    )
+
+    try:
+        if action == "start":
+            result = dashboard_start(**kwargs)
+            if json_output:
+                _print_json(result)
+            else:
+                _print_dashboard_result("Kimari Gateway Dashboard", result)
+            return
+        if action == "stop":
+            result = dashboard_stop()
+            if json_output:
+                _print_json(result)
+            else:
+                _print_dashboard_result("Kimari Gateway Dashboard", result)
+            return
+        if action == "restart":
+            result = dashboard_restart(**kwargs)
+            if json_output:
+                _print_json(result)
+            else:
+                _print_dashboard_result("Kimari Gateway Dashboard", result)
+            return
+        if action == "status":
+            result = dashboard_status(host=kwargs.get("host", "127.0.0.1"), port=kwargs.get("port", 3105))
+            if json_output:
+                _print_json(result)
+            else:
+                _print_dashboard_result("Kimari Gateway Dashboard Status", result)
+            return
+        if action == "logs":
+            print(dashboard_logs(lines=kwargs.get("lines", 50)))
+            return
+        if action == "open":
+            result = dashboard_open_browser(host=kwargs.get("host", "127.0.0.1"), port=kwargs.get("port", 3105))
+            if json_output:
+                _print_json(result)
+            else:
+                _print_dashboard_result("Kimari Gateway Dashboard", result)
+            return
+        if action == "reset":
+            result = dashboard_reset(confirm=kwargs.get("confirm", False), clean_deps=kwargs.get("clean_deps", False))
+            if json_output:
+                _print_json(result)
+            else:
+                _print_dashboard_result("Kimari Gateway Dashboard Reset", result)
+            return
+        if action == "setup":
+            result = dashboard_setup()
+            if json_output:
+                _print_json(result)
+            else:
+                _print_dashboard_result("Kimari Gateway Dashboard Setup", result)
+            return
+    except DashboardError as exc:
+        if json_output:
+            _print_json({"status": "error", "error": str(exc)})
+        else:
+            fail(str(exc))
+        raise SystemExit(1) from exc
+
+    raise SystemExit(f"Unknown gateway dashboard action: {action}")
 
 
 # ─── Update ──────────────────────────────────────────────────────────────────
@@ -2748,11 +2850,53 @@ def main():
     tune_parser.add_argument("--json", action="store_true", help="JSON output")
 
     # Gateway command
-    gateway_parser = subparsers.add_parser("gateway", help="Gateway local controller (dry-run only)")
-    gateway_parser.add_argument("--dry-run", action="store_true", help="Show gateway dry-run summary")
-    gateway_parser.add_argument("--status", action="store_true", dest="gateway_status", help="Show gateway status")
-    gateway_parser.add_argument("--plan", action="store_true", dest="gateway_plan", help="Show gateway plan")
+    gateway_parser = subparsers.add_parser("gateway", help="Manage the local Gateway Dashboard")
+    gateway_parser.add_argument("--dry-run", action="store_true", help="Legacy: show gateway API dry-run summary")
+    gateway_parser.add_argument("--status", action="store_true", dest="gateway_status", help="Legacy: show gateway API status")
+    gateway_parser.add_argument("--plan", action="store_true", dest="gateway_plan", help="Legacy: show gateway API plan")
     gateway_parser.add_argument("--json", action="store_true", help="JSON output")
+    gateway_sub = gateway_parser.add_subparsers(dest="gateway_command", help="Gateway Dashboard subcommands")
+
+    gateway_start = gateway_sub.add_parser("start", help="Start the Gateway Dashboard")
+    gateway_start.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
+    gateway_start.add_argument("--port", type=int, default=3105, help="Port (default: 3105)")
+    gateway_start.add_argument("--open", action="store_true", dest="open_browser", help="Open the dashboard in a browser")
+    gateway_start.add_argument("--dev", action="store_true", help="Run next dev instead of production start")
+    gateway_start.add_argument("--dry-run", action="store_true", help="Show command without starting")
+    gateway_start.add_argument("--json", action="store_true", help="JSON output")
+    gateway_start.add_argument("--setup", action="store_true", help="Run setup before starting")
+    gateway_start.add_argument("--allow-public-bind", action="store_true", help="Allow non-local bind address")
+
+    gateway_sub.add_parser("stop", help="Stop the Gateway Dashboard")
+
+    gateway_restart = gateway_sub.add_parser("restart", help="Restart the Gateway Dashboard")
+    gateway_restart.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
+    gateway_restart.add_argument("--port", type=int, default=3105, help="Port (default: 3105)")
+    gateway_restart.add_argument("--open", action="store_true", dest="open_browser", help="Open the dashboard in a browser")
+    gateway_restart.add_argument("--dev", action="store_true", help="Run next dev instead of production start")
+    gateway_restart.add_argument("--dry-run", action="store_true", help="Show command without starting")
+    gateway_restart.add_argument("--json", action="store_true", help="JSON output")
+    gateway_restart.add_argument("--setup", action="store_true", help="Run setup before starting")
+    gateway_restart.add_argument("--allow-public-bind", action="store_true", help="Allow non-local bind address")
+
+    gateway_status_p = gateway_sub.add_parser("status", help="Show Gateway Dashboard status")
+    gateway_status_p.add_argument("--json", action="store_true", help="JSON output")
+
+    gateway_logs = gateway_sub.add_parser("logs", help="Show Gateway Dashboard logs")
+    gateway_logs.add_argument("--lines", type=int, default=50, help="Number of log lines (default: 50)")
+
+    gateway_open = gateway_sub.add_parser("open", help="Open the Gateway Dashboard in a browser")
+    gateway_open.add_argument("--host", default="127.0.0.1", help="Dashboard host (default: 127.0.0.1)")
+    gateway_open.add_argument("--port", type=int, default=3105, help="Dashboard port (default: 3105)")
+    gateway_open.add_argument("--json", action="store_true", help="JSON output")
+
+    gateway_reset = gateway_sub.add_parser("reset", help="Clear dashboard runtime state/log/cache")
+    gateway_reset.add_argument("--yes", action="store_true", help="Confirm reset")
+    gateway_reset.add_argument("--clean-deps", action="store_true", help="Also clear dashboard build caches")
+    gateway_reset.add_argument("--json", action="store_true", help="JSON output")
+
+    gateway_setup = gateway_sub.add_parser("setup", help="Install dependencies, setup DB, and build dashboard")
+    gateway_setup.add_argument("--json", action="store_true", help="JSON output")
 
     # Update command
     update_parser = subparsers.add_parser("update", help="Check for Kimari updates")
@@ -3037,13 +3181,56 @@ def main():
             json_output=args.json,
         )
     elif args.command == "gateway":
-        run_gateway(
-            config,
-            dry_run=args.dry_run if hasattr(args, "dry_run") else False,
-            status_only=args.gateway_status if hasattr(args, "gateway_status") else False,
-            plan_only=args.gateway_plan if hasattr(args, "gateway_plan") else False,
-            json_output=args.json if hasattr(args, "json") else False,
-        )
+        gateway_command = getattr(args, "gateway_command", None)
+        if gateway_command == "start":
+            run_gateway_dashboard(
+                "start",
+                json_output=getattr(args, "json", False),
+                host=args.host,
+                port=args.port,
+                open_browser=args.open_browser,
+                dev=args.dev,
+                dry_run=args.dry_run,
+                setup=args.setup,
+                allow_public_bind=args.allow_public_bind,
+            )
+        elif gateway_command == "stop":
+            run_gateway_dashboard("stop", json_output=False)
+        elif gateway_command == "restart":
+            run_gateway_dashboard(
+                "restart",
+                json_output=getattr(args, "json", False),
+                host=args.host,
+                port=args.port,
+                open_browser=args.open_browser,
+                dev=args.dev,
+                dry_run=args.dry_run,
+                setup=args.setup,
+                allow_public_bind=args.allow_public_bind,
+            )
+        elif gateway_command == "status":
+            run_gateway_dashboard("status", json_output=getattr(args, "json", False))
+        elif gateway_command == "logs":
+            run_gateway_dashboard("logs", lines=args.lines)
+        elif gateway_command == "open":
+            run_gateway_dashboard("open", json_output=getattr(args, "json", False), host=args.host, port=args.port)
+        elif gateway_command == "reset":
+            run_gateway_dashboard(
+                "reset",
+                json_output=getattr(args, "json", False),
+                confirm=args.yes,
+                clean_deps=args.clean_deps,
+            )
+        elif gateway_command == "setup":
+            run_gateway_dashboard("setup", json_output=getattr(args, "json", False))
+        else:
+            run_gateway(
+                config,
+                dry_run=args.dry_run if hasattr(args, "dry_run") else False,
+                status_only=args.gateway_status if hasattr(args, "gateway_status") else False,
+                plan_only=args.gateway_plan if hasattr(args, "gateway_plan") else False,
+                json_output=args.json if hasattr(args, "json") else False,
+            )
     elif args.command == "update":
         if args.update_command == "check":
             run_update_check(
