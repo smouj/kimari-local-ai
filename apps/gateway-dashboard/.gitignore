@@ -53,3 +53,5 @@ server.log
 # Skills directory
 /skills/prisma/dev.db
 package-lock.json
+db/
+custom.db
