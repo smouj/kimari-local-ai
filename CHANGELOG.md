@@ -4,18 +4,26 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
-## [0.1.82-alpha] - 2026-05-14
+## [0.1.82-alpha] - 2026-05-15
 
 ### Added
 - `kimari gateway` Dashboard lifecycle commands: `setup`, `start`, `stop`, `restart`, `status`, `logs`, `open`, and `reset`.
 - `kimari/gateway/dashboard_manager.py` for safe local Next.js dashboard process management.
 - `python -m kimari` entry point.
 - Release and CLI tests for Gateway Dashboard integration.
+- One-command install scripts (`install.sh`, `install.ps1`).
+- Console guide (`docs/KIMARI_CONSOLE.md`).
+- One-command install guide (`docs/INSTALL_ONE_COMMAND.md`).
+- Gateway Dashboard CLI integration docs (`docs/GATEWAY_DASHBOARD_CLI.md`).
+- Next.js landing page for GitHub Pages (replaced static HTML, blue theme).
 
 ### Changed
 - Gateway docs now distinguish the implemented Dashboard (`127.0.0.1:3105`) from the planned management API (`127.0.0.1:11436`).
 - Dashboard README is CLI-first; npm commands are development-only.
 - Dashboard UI explicitly shows `Kimari-4B not released`, `Gate: BLOCKED`, and `Local only`.
+- Stabilized dashboard deps, tests, and build config.
+- Landing page color scheme updated from teal to blue.
+- Professional README reorganization.
 
 ### Security
 - Dashboard binds to `127.0.0.1` by default. Non-local binds require explicit `--allow-public-bind`.

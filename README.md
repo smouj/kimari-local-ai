@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/kimari-logo.png" alt="Kimari" width="180">
+  <img src="public/kimari-logo.png" alt="Kimari" width="180">
 </p>
 
 <h1 align="center">Kimari Local AI</h1>
@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/python-3.10+-2ea043.svg" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-0.1.82--alpha-9b59b6.svg" alt="v0.1.82-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.82--alpha-9b59b6.svg" alt="v0.1.82-alpha">
 </p>
 
 ---
@@ -123,13 +123,15 @@ kimari gateway start --open
 
 ## Screenshots
 
-| Gateway Overview | Gateway Chat |
+| Gateway Overview | Gateway Server |
 |---|---|
 | ![Kimari Gateway Overview](docs/assets/screenshots/gateway-dashboard/qa-r12-blue-dashboard.png) | ![Kimari Gateway Server](docs/assets/screenshots/gateway-dashboard/qa-r12-blue-server.png) |
 
 | Gateway Analytics | Gateway Profiles |
 |---|---|
 | ![Kimari Gateway Analytics](docs/assets/screenshots/gateway-dashboard/qa-r12-blue-analytics.png) | ![Kimari Gateway Profiles](docs/assets/screenshots/gateway-dashboard/qa-r12-blue-profiles.png) |
+
+> **Note:** The Gateway Dashboard runs at `http://127.0.0.1:3105`. Start it with `kimari gateway start --open`.
 
 > See [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md) for the full gallery.
 
@@ -332,12 +334,11 @@ See:
 
 | Stage | Goal |
 |---|---|
-| Current | Local runtime + Gateway Dashboard polish |
+| ✅ Current | Local runtime + Gateway Dashboard + GitHub Pages landing page + Console + Installer |
 | Next | Private adapter runtime preview |
 | Next | Agent Gateway tools and web-search dry-run |
 | Next | Manual review of private outputs |
 | Later | Private GGUF export |
-| Later | GTX 1060 / GTX 1080 validation |
 | Later | Public preview decision |
 
 See [ROADMAP.md](ROADMAP.md) for the full roadmap.

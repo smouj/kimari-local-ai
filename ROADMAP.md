@@ -496,13 +496,17 @@
 
 ## v0.1.82-alpha (Current)
 
-Status: Gateway Dashboard CLI integration; gate remains BLOCKED.
+Status: Gateway Dashboard CLI integration; GitHub Pages landing page; console + installer; gate remains BLOCKED.
 
 - ✅ Added `kimari gateway` lifecycle commands for the Dashboard: setup/start/stop/restart/status/logs/open/reset.
 - ✅ Dashboard manager uses `~/.local/state/kimari/gateway-dashboard/` for PID, logs, and state.
 - ✅ Default bind is `127.0.0.1:3105`; non-local bind requires `--allow-public-bind`.
 - ✅ Docs distinguish implemented Dashboard from planned Gateway API (`127.0.0.1:11436`).
 - ✅ UI explicitly states Kimari-4B not released, Gate BLOCKED, Local only.
+- ✅ Stabilized dashboard deps, tests, and build config.
+- ✅ Next.js landing page replaces static GitHub Pages (blue theme).
+- ✅ Console guide (`docs/KIMARI_CONSOLE.md`) and one-command installer (`install.sh` / `install.ps1`).
+- ✅ Dashboard docs: Gateway Dashboard CLI integration (`docs/GATEWAY_DASHBOARD_CLI.md`).
 - 🚫 No training, HF Jobs, public weights, GGUF, or public benchmark claim.
 
 Next: keep gate BLOCKED until benchmark-honesty safety fixes are trained and privately re-reviewed.
