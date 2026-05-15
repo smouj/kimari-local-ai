@@ -152,6 +152,16 @@ def _base_status(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> dict[str
     }
 
 
+DEFAULT_DATABASE_URL = "file:./.data/kimari-dashboard.db"
+
+
+def _ensure_dotenv(dashboard: Path) -> None:
+    """Create .env with DATABASE_URL if it doesn't exist."""
+    env_path = dashboard / ".env"
+    if not env_path.exists():
+        env_path.write_text(f'DATABASE_URL="{DEFAULT_DATABASE_URL}"\n')
+
+
 def setup(
     dry_run: bool = False,
     start_dashboard: bool = False,
@@ -164,6 +174,7 @@ def setup(
     mode this only reports the commands that would run.
     """
     dashboard = _require_dashboard_dir()
+    _ensure_dotenv(dashboard)
     commands = [["npm", "install"], ["npm", "run", "db:setup"], ["npm", "run", "build"]]
     if dry_run:
         return {
@@ -176,11 +187,13 @@ def setup(
 
     _require_node()
     _ensure_state_dir()
+    db_env = {**os.environ, "DATABASE_URL": DEFAULT_DATABASE_URL}
     with LOG_FILE.open("a", encoding="utf-8") as log:
         for command in commands:
             log.write(f"\n[{_now()}] $ {' '.join(command)}\n")
+            env = db_env if command == ["npm", "run", "db:setup"] else None
             result = subprocess.run(
-                command, cwd=dashboard, stdout=log, stderr=subprocess.STDOUT, text=True, check=False
+                command, cwd=dashboard, stdout=log, stderr=subprocess.STDOUT, text=True, check=False, env=env
             )
             if result.returncode != 0:
                 raise DashboardError(f"Dashboard setup failed during: {' '.join(command)}. See {LOG_FILE}")
