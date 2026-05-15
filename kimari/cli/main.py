@@ -2848,8 +2848,12 @@ def main():
     # token
     token_parser = subparsers.add_parser("token", help="Manage local auth tokens")
     token_sub = token_parser.add_subparsers(dest="token_command", help="Token subcommands")
-    token_sub.add_parser("create", help="Create a new local auth token")
-    token_sub.add_parser("show", help="Show the current auth token")
+    token_create = token_sub.add_parser("create", help="Create a new local auth token")
+    token_create.add_argument("--reveal", action="store_true", help="Show full token (requires --yes)")
+    token_create.add_argument("--yes", action="store_true", help="Confirm --reveal disclosure")
+    token_show = token_sub.add_parser("show", help="Show the current auth token")
+    token_show.add_argument("--reveal", action="store_true", help="Show full token (requires --yes)")
+    token_show.add_argument("--yes", action="store_true", help="Confirm --reveal disclosure")
     token_sub.add_parser("delete", help="Delete the current auth token")
 
     # ─── Benchmark ──────────────────────────────────────────────────────────
@@ -3185,19 +3189,31 @@ def main():
 
         if args.token_command == "create":
             result = create_token()
+            reveal = getattr(args, "reveal", False)
+            yes = getattr(args, "yes", False)
             print(f"\n  {Color.GREEN}✓ Token created{Color.RESET}")
-            print(f"  Token:   {result['token']}")
-            print(f"  Preview: {result['preview']}")
+            if reveal and yes:
+                print(f"  Token:   {result['token']}")
+            else:
+                print(f"  Preview: {result['preview']}")
+                if reveal and not yes:
+                    print(f"  {Color.RED}--reveal requires --yes to disclose full token{Color.RESET}")
             print(f"  Created: {result['created_at']}")
             print(
                 f"\n  {Color.DIM}Note: This token is prepared for future Kimari API / reverse proxy use.{Color.RESET}"
             )
-            print(f"  {Color.DIM}llama-server does not apply auth natively.{Color.RESET}\n")
+            print(f"  {Color.DIM}Enforcement: inactive for llama-server. Use reverse proxy or future kimari api auth.{Color.RESET}\n")
         elif args.token_command == "show":
             result = show_token()
             if result:
-                print(f"\n  Token:   {result['token']}")
-                print(f"  Preview: {result['preview']}")
+                reveal = getattr(args, "reveal", False)
+                yes = getattr(args, "yes", False)
+                if reveal and yes:
+                    print(f"\n  Token:   {result['token']}")
+                else:
+                    print(f"\n  Preview: {result['preview']}")
+                    if reveal and not yes:
+                        print(f"  {Color.RED}--reveal requires --yes to disclose full token{Color.RESET}")
                 print(f"  Created: {result['created_at']}")
                 print(f"  Note:    {result.get('note', 'N/A')}\n")
             else:

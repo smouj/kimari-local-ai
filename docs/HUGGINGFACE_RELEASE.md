@@ -1,7 +1,9 @@
 # Hugging Face Release Guide — Kimari-4B
 
 > **Purpose:** This document defines the process for releasing Kimari-4B model weights to Hugging Face.
-> **Status:** Planning — No release has been made. No model has been trained. No Hugging Face repository exists.
+> **Status:** Planning / blocked — No public Kimari model release has been made.
+> Private SmolLM3-3B SFT v2 experiments exist, but the release gate remains BLOCKED due to safety_fix_required manual review.
+> No public weights, adapters, GGUF files or benchmark claims are available.
 > **Target Repository:** `smouj/kimari-4b` (planned, **not created yet**)
 
 ---
@@ -391,4 +393,4 @@ When all hard blocks in the "Hard Blocks" section above are resolved, the placeh
 
 ---
 
-*This document is part of Kimari Local AI. No Hugging Face release has been made. No model has been trained. This guide exists to ensure a responsible, honest, and license-compliant release process when the time comes.*
+*This document is part of Kimari Local AI. No public Hugging Face model release has been made. Private experiments exist and remain gated. This guide exists to ensure a responsible, honest, and license-compliant release process when the time comes.*

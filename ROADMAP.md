@@ -886,9 +886,6 @@ Next: future training should harden benchmark-honesty refusal behavior and rerun
 
 ## Future Milestones
 
-### v0.1.83-alpha — Trust Hardening
-Focus: security, hash pinning, install-runtime, CI rules.
-
 ### v0.1.84-alpha — Dashboard Lite
 Focus: lightweight dashboard option without heavy dependencies.
 
