@@ -1,3 +1,13 @@
+## Run 16 — v0.1.83-alpha trust hardening & release prep (2026-05-15)
+
+- Version bump across all artifacts: pyproject.toml, __init__.py, package.json, README, docs.
+- Restored truncated PROJECT_TRUTH.md, fixed package.json encoding.
+- Updated docs/index.html static export to v0.1.83-alpha.
+- Updated Hugging Face Space README to v0.1.83-alpha.
+- Dashboard DATABASE_URL fix (auto-created .env during `kimari gateway setup`).
+- Gate: BLOCKED
+- No training, HF Jobs, public benchmark, public weights, GGUF, or raw outputs.
+
 ## Run 15 — v0.1.82-alpha Gateway Dashboard CLI integration (2026-05-15)
 
 - Integrated the existing Gateway Dashboard with the Kimari Python CLI.

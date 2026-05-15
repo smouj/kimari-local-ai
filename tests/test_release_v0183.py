@@ -1,4 +1,4 @@
-"""Release validation tests for v0.1.82-alpha."""
+"""Release validation tests for v0.1.83-alpha."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-VERSION = "0.1.82-alpha"
+VERSION = "0.1.83-alpha"
 
 
 def test_versions_bumped():
