@@ -3,9 +3,10 @@
 
 Ensures gate safety, version consistency, and no false claims before any push.
 """
+
 import json
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -78,7 +79,14 @@ for location, text_getter in [
     ("README.md", lambda: (PROJECT_ROOT / "README.md").read_text()),
     ("CHANGELOG.md", lambda: (PROJECT_ROOT / "CHANGELOG.md").read_text()),
     ("ROADMAP.md", lambda: (PROJECT_ROOT / "ROADMAP.md").read_text()),
-    ("dashboard_manager.py", lambda: (PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py").read_text() if (PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py").exists() else ""),
+    (
+        "dashboard_manager.py",
+        lambda: (
+            (PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py").read_text()
+            if (PROJECT_ROOT / "kimari" / "gateway" / "dashboard_manager.py").exists()
+            else ""
+        ),
+    ),
 ]:
     try:
         text = text_getter()
@@ -95,26 +103,42 @@ for rel_path in ["README.md", "docs/index.html", "CHANGELOG.md"]:
     fpath = PROJECT_ROOT / rel_path
     if fpath.exists():
         text = fpath.read_text()
-        lines = text.split('\n')
+        lines = text.split("\n")
         has_false_claim = False
         for line in lines:
             low = line.lower()
-            if 'kimari-4b' in low and 'released' in low:
+            if "kimari-4b" in low and "released" in low:
                 # Skip if clearly negated
-                negations = ['not released', 'not yet released', 'no public release',
-                           'is not released', 'not available', 'no weights',
-                           'has not been', 'false claim', 'no.*released',
-                           'must not', 'should not', 'does not claim',
-                           'claim detection', '❌', 'forbidden',
-                           'when kimari', 'until kimari', 'if kimari', 'before kimari',
-                           'for when kimari', 'after kimari']
+                negations = [
+                    "not released",
+                    "not yet released",
+                    "no public release",
+                    "is not released",
+                    "not available",
+                    "no weights",
+                    "has not been",
+                    "false claim",
+                    "no.*released",
+                    "must not",
+                    "should not",
+                    "does not claim",
+                    "claim detection",
+                    "❌",
+                    "forbidden",
+                    "when kimari",
+                    "until kimari",
+                    "if kimari",
+                    "before kimari",
+                    "for when kimari",
+                    "after kimari",
+                ]
                 if not any(n in low for n in negations):
                     has_false_claim = True
                     break
-            if 'kimari-4b is available' in low and 'not' not in low:
+            if "kimari-4b is available" in low and "not" not in low:
                 has_false_claim = True
                 break
-            if 'production ready' in low and 'not' not in low:
+            if "production ready" in low and "not" not in low:
                 has_false_claim = True
                 break
         check(
@@ -157,7 +181,8 @@ if readme_path.exists():
     readme_text = readme_path.read_text()
     check(
         f"README version badge shows {current_version}",
-        f"version-{current_version.replace('-', '--')}" in readme_text,
+        f"version-v{current_version.replace('-', '--')}" in readme_text
+        or f"version-{current_version.replace('-', '--')}" in readme_text,
         "badge URL mismatch",
     )
     check(
@@ -167,7 +192,9 @@ if readme_path.exists():
     )
     check(
         "README has Quick Start section",
-        "Quick Start" in readme_text or "quick start" in readme_text.lower() or "one-command install" in readme_text.lower(),
+        "Quick Start" in readme_text
+        or "quick start" in readme_text.lower()
+        or "one-command install" in readme_text.lower(),
         "missing Quick Start section",
     )
     check(
@@ -232,7 +259,11 @@ cli_main = PROJECT_ROOT / "kimari" / "cli" / "main.py"
 if cli_main.exists():
     cli_text = cli_main.read_text()
     check("CLI registers console command", 'add_parser("console"' in cli_text, "missing console parser")
-    check("CLI registers gateway setup", "gateway_command" in cli_text or "run_gateway_dashboard" in cli_text, "missing gateway")
+    check(
+        "CLI registers gateway setup",
+        "gateway_command" in cli_text or "run_gateway_dashboard" in cli_text,
+        "missing gateway",
+    )
     check("CLI registers update apply", "run_update_apply" in cli_text, "missing update apply")
 
 # Dashboard manager
