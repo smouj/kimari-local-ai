@@ -126,3 +126,9 @@ dataset/build/
 !dataset/build/kimari_sft_v1/dataset_summary.json
 dataset/kimari_sft_v1/build/
 !dataset/kimari_sft_v1/license_manifest.json
+
+# Landing page build artifacts (not needed in repo)
+docs/__next.*.txt
+docs/_not-found*
+docs/*.html.teal-backup
+docs/404.html
