@@ -89,14 +89,10 @@ def test_readme_says_gate_blocked():
 def test_readme_no_npm_as_primary_quickstart():
     """README must not mention npm as primary user flow in Quick Start."""
     content = _read(README)
-    quick_start_match = re.search(
-        r"## Quick Start(.*?)## ", content, re.DOTALL
-    )
+    quick_start_match = re.search(r"## Quick Start(.*?)## ", content, re.DOTALL)
     if quick_start_match:
         quick_start_section = quick_start_match.group(1)
-        assert "npm" not in quick_start_section, (
-            "npm should not appear in Quick Start section"
-        )
+        assert "npm" not in quick_start_section, "npm should not appear in Quick Start section"
 
 
 def test_readme_version_matches_pyproject():
