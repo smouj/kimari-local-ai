@@ -4,6 +4,24 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.83-alpha] - 2026-05-15
+
+### Added
+- `docs/PROJECT_TRUTH.md` — honest state document (what Kimari is/isn't)
+- README "Current Truth" box at top
+- Secure install alternative (download+review before pipe to bash)
+- Lane-based forward roadmap (Tracks A–E)
+- GitHub Release v0.1.83-alpha
+
+### Changed
+- `docs/KIMARI4B_RELEASE_GATE.md` — updated current state to reflect private SFT v2 experiments and subset30 manual review (safety_fix_required)
+- `scripts/release/check-release.py` — streamlined from 8650→~350 lines, removed stale version checks
+- Restored deleted screenshots from docs/assets/
+- Version bumped to 0.1.83-alpha across all files
+
+### Security
+- `kimari/security/tokens.py` — chmod 0600 on auth.json file
+
 ## [0.1.82-alpha] - 2026-05-15
 
 ### Added

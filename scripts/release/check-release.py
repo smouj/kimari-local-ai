@@ -160,7 +160,7 @@ if profiles_path.exists():
 # ── [2/5] Version consistency ──────────────────────────────────────────
 print("\n[2/5] Version consistency")
 
-current_version = "0.1.82-alpha"
+current_version = "0.1.83-alpha"
 pyproject_version = get_pyproject_version()
 init_version = get_init_version()
 
@@ -229,7 +229,7 @@ if roadmap_path.exists():
     )
 
 # ── [3/5] Current release features ──────────────────────────────────────────
-print("\n[3/5] Current release features (v0.1.82)")
+print("\n[3/5] Current release features (v0.1.83)")
 
 # Install scripts
 install_sh = PROJECT_ROOT / "install.sh"
@@ -297,7 +297,7 @@ if index_html.exists():
     docs_index_text = index_html.read_text()
     check(
         "docs/index.html shows current version",
-        "v0.1.82-alpha" in docs_index_text,
+        "v0.1.83-alpha" in docs_index_text,
         "docs/index.html does not show current version",
     )
     check(

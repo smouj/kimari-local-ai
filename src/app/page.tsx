@@ -152,7 +152,7 @@ const terminalResponses: Record<string, string> = {
 \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f
 
   [PASS]  Python version          3.10+ \u2705
-  [PASS]  Kimari version          0.1.82-alpha
+  [PASS]  Kimari version          0.1.83-alpha
   [PASS]  Config paths            ~/.config/kimari/
   [PASS]  Config valid            \u2705
   [PASS]  Packaged defaults       Found (6 profiles)
@@ -1054,7 +1054,7 @@ function ParticleField() {
 
 function InteractiveTerminal() {
   const [history, setHistory] = useState<{ type: 'input' | 'output'; text: string }[]>([
-    { type: 'output', text: 'Kimari Terminal Simulator v0.1.82-alpha\nType "help" for available commands.\n' }
+    { type: 'output', text: 'Kimari Terminal Simulator v0.1.83-alpha\nType "help" for available commands.\n' }
   ])
   const [input, setInput] = useState('')
   const [commandHistory, setCommandHistory] = useState<string[]>([])
@@ -1261,7 +1261,7 @@ function AIChatSimulator() {
       if (lower.includes('speed') || lower.includes('performance') || lower.includes('benchmark') || lower.includes('fast')) {
         return 'GTX 1060 6GB: 228 tok/s prompt, 73 tok/s generation. GTX 1080 8GB: 310 tok/s prompt, 98 tok/s generation. Use kimari optimize for GPU-specific settings and kimari perf --matrix to compare all modes.'
       }
-      return 'Kimari is a framework for running local LLMs on older NVIDIA GPUs. It uses llama.cpp/GGUF runtime with an OpenAI-compatible endpoint. Currently v0.1.82-alpha. Ask me about installation, GPU support, integrations, or performance!'
+      return 'Kimari is a framework for running local LLMs on older NVIDIA GPUs. It uses llama.cpp/GGUF runtime with an OpenAI-compatible endpoint. Currently v0.1.83-alpha. Ask me about installation, GPU support, integrations, or performance!'
     }
 
     // Simulate network delay then show response
@@ -5823,7 +5823,7 @@ export default function Home() {
                   </PopoverContent>
                 </Popover>
               </span>
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-mono">v0.1.82-alpha</Badge>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-mono">v0.1.83-alpha</Badge>
             </div>
             <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => (
@@ -5961,7 +5961,7 @@ export default function Home() {
                 <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5, delay: 0.1 }}
                   className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-500 text-xs font-semibold mb-8 relative overflow-hidden">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                  v0.1.82-alpha — gate BLOCKED
+                  v0.1.83-alpha — gate BLOCKED
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-shimmer-sweep" />
                 </motion.div>
                 <StaggeredLetterTitle />
@@ -7177,7 +7177,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <Image src="/kimari-logo.png" alt="Kimari Logo" width={24} height={24} className="rounded-md" />
                 <span className="text-sm font-semibold">Kimari Local AI</span>
-                <Badge variant="outline" className="text-[10px] font-mono">v0.1.82-alpha</Badge>
+                <Badge variant="outline" className="text-[10px] font-mono">v0.1.83-alpha</Badge>
               </div>
               <div className="flex items-center gap-3">
                 <MagneticSocialLink href="https://github.com/smouj/kimari-local-ai" className="p-2 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors">

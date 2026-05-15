@@ -1,4 +1,4 @@
-"""Installer script safety tests for v0.1.82-alpha."""
+"""Installer script safety tests for v0.1.83-alpha."""
 
 from __future__ import annotations
 

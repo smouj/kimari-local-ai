@@ -1,6 +1,6 @@
 {
   "name": "kimari-gateway-dashboard",
-  "version": "0.1.82-alpha",
+  "version": "0.1.83-alpha",
   "private": true,
   "description": "Kimari Local AI Gateway Dashboard — manage and monitor your local LLM inference server",
   "scripts": {

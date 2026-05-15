@@ -1,4 +1,4 @@
-"""Gateway setup CLI tests for v0.1.82-alpha."""
+"""Gateway setup CLI tests for v0.1.83-alpha."""
 
 from __future__ import annotations
 
