@@ -418,6 +418,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <a href="#overview">Overview</a>
       <a href="#quickstart">Quick Start</a>
       <a href="#features">Features</a>
+      <a href="#dashboard">Dashboard</a>
       <a href="#performance">Performance</a>
       <a href="#integrations">Integrations</a>
       <a href="#hardware">Hardware</a>
@@ -439,6 +440,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <a href="#overview" onclick="closeMobile()">Overview</a>
   <a href="#quickstart" onclick="closeMobile()">Quick Start</a>
   <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#dashboard" onclick="closeMobile()">Dashboard</a>
   <a href="#performance" onclick="closeMobile()">Performance</a>
   <a href="#integrations" onclick="closeMobile()">Integrations</a>
   <a href="#hardware" onclick="closeMobile()">Hardware</a>
@@ -561,6 +563,26 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">The Space does not run models. Kimari-4B is not yet released.</p>
       </div>
 
+      <!-- Gateway Dashboard -->
+      <div style="background:var(--kimari-deep);border:1px solid rgba(0,212,170,.3);border-radius:12px;padding:20px;">
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">📊 Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">NEW</span></h4>
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
+          Local web UI at <code>127.0.0.1:3105</code>. System resources, model info, KimariFit scores, chat playground, quick actions. Full CLI lifecycle.
+        </p>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-teal);background:rgba(0,0,0,.3);border-radius:8px;padding:10px 14px;margin-top:8px;">kimari gateway setup && kimari gateway start && kimari gateway open</div>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Localhost only. Zero telemetry. No tokens stored.</p>
+      </div>
+
+      <!-- Console Installer -->
+      <div style="background:var(--kimari-deep);border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:20px;">
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🖥️ Console Installer <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-weight:700;">NEW</span></h4>
+        <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
+          Guided setup detects OS, GPU, CUDA, and llama-server. Persists config with automatic backup. <code>--write --yes</code> for CI/automation.
+        </p>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-purple-light);background:rgba(0,0,0,.3);border-radius:8px;padding:10px 14px;margin-top:8px;">kimari setup --write --yes</div>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Structured PASS/WARN/FAIL output. Zero guesswork.</p>
+      </div>
+
       <!-- Kimari-4B Private Adapter Pipeline -->
       <div style="background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">🧪 Kimari-4B Private Adapter + Eval</h4>
@@ -607,6 +629,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ GTX 1060 Validated</span>
       <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ OpenAI Endpoint</span>
       <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ Local Integrations</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);font-size:.75rem;font-weight:600;color:var(--kimari-teal);">📊 Gateway Dashboard</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);font-size:.75rem;font-weight:600;color:var(--kimari-purple-light);">🖥️ Console Installer</span>
       <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);font-size:.75rem;font-weight:600;color:#ef4444;">🚫 Kimari-4B Not Released</span>
     </div>
   </div>
@@ -855,10 +879,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-title">Measured Benchmark</div>
       <div class="feature-desc"><code>kimari benchmark --measure --endpoint URL --model NAME --yes</code> runs real benchmarks against a running server. Requires <code>--yes</code> flag. Fails cleanly on connection error. No results saved by default.</div>
     </div>
-    <div class="feature-card">
-      <span class="feature-icon">🚪</span>
-      <div class="feature-title">Gateway Plan</div>
-      <div class="feature-desc"><code>kimari gateway --dry-run</code> shows planned gateway configuration. <code>--status --json</code> and <code>--plan --json</code> for structured output. No real server yet — dry-run only. Default: 127.0.0.1:11436.</div>
+    <div class="feature-card" style="border-color:var(--kimari-teal);box-shadow:0 0 20px rgba(0,212,170,.08);">
+      <span class="feature-icon">📊</span>
+      <div class="feature-title">Gateway Dashboard <span style="font-size:.65rem;padding:2px 8px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;letter-spacing:.05em;">NEW</span></div>
+      <div class="feature-desc">Full web dashboard at <code>127.0.0.1:3105</code>. System resources, model status, KimariFit scores, chat playground. Managed via <code>kimari gateway setup/start/stop/status/logs/open/reset</code>.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">🔄</span>
@@ -876,9 +900,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-desc">No weights, adapters, or GGUF files exist. Preview gate is BLOCKED. Kimari-4B is not published. Framework is ready — model is not.</div>
     </div>
     <div class="feature-card">
-      <span class="feature-icon">🖥</span>
-      <div class="feature-title">Console Polish</div>
-      <div class="feature-desc">Cleaner console output for <code>kimari status</code> and <code>kimari doctor --deep</code> with structured PASS/WARN/FAIL tables and suggested next steps.</div>
+      <span class="feature-icon">🖼️</span>
+      <div class="feature-title">Dashboard System Resources</div>
+      <div class="feature-desc">Real-time CPU, RAM, VRAM, GPU temperature monitoring in the dashboard. ResourceGauge SVG with live utilization bars. QuickLauncher for common actions.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">🔌</span>
@@ -886,9 +910,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-desc"><code>kimari integrations generate --target openwebui --json</code> generates configuration snippets for Open WebUI, OpenClaw, Hermes, and Continue.dev. No tokens, localhost only.</div>
     </div>
     <div class="feature-card">
-      <span class="feature-icon">🚪</span>
-      <div class="feature-title">Gateway Prototype Plan</div>
-      <div class="feature-desc">Phased gateway evolution plan from dry-run CLI to local read-only FastAPI gateway. See <code>docs/GATEWAY_PROTOTYPE_PLAN.md</code>.</div>
+      <span class="feature-icon">🖥️</span>
+      <div class="feature-title">Console Installer <span style="font-size:.65rem;padding:2px 8px;border-radius:4px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-weight:700;letter-spacing:.05em;">NEW</span></div>
+      <div class="feature-desc"><code>kimari setup</code> detects OS, GPU, CUDA, and llama-server, then recommends and persists configuration. <code>--write --yes</code> for non-interactive installs. Clean PASS/WARN/FAIL output.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">📸</span>
@@ -965,15 +989,15 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <div style="font-size:.85rem;color:var(--kimari-text-muted);">Generate configuration snippets for Open WebUI, OpenClaw, Hermes, and Continue.dev. No tokens, localhost only by default.</div>
         <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-cyan);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari integrations generate --target openwebui --json</div>
       </div>
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
-        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-door-open" style="color:var(--kimari-purple-light);"></i> Gateway Prototype Plan</div>
-        <div style="font-size:.85rem;color:var(--kimari-text-muted);">Phased gateway evolution from dry-run CLI to local read-only FastAPI gateway. See docs/GATEWAY_PROTOTYPE_PLAN.md.</div>
-        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-purple-light);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">docs/GATEWAY_PROTOTYPE_PLAN.md</div>
+      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-teal);border-radius:12px;padding:20px;">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-chart-line" style="color:var(--kimari-teal);"></i> Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">v0.1.81</span></div>
+        <div style="font-size:.85rem;color:var(--kimari-text-muted);">Local web dashboard at <code>127.0.0.1:3105</code> with system resources, model info, KimariFit scores, chat playground, and quick actions. CLI lifecycle: <code>kimari gateway setup/start/stop/status/logs/open/reset</code>.</div>
+        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-teal);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari gateway setup && kimari gateway start</div>
       </div>
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
-        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-camera" style="color:var(--kimari-text-muted);"></i> Safe Screenshots Plan</div>
-        <div style="font-size:.85rem;color:var(--kimari-text-muted);">Planned CLI screenshot captures with safety checks. No tokens, no real benchmarks in captures.</div>
-        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-text-muted);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">generate_safe_cli_screenshots_plan.py</div>
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-terminal" style="color:var(--kimari-purple-light);"></i> Console Installer <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-weight:700;">v0.1.82</span></div>
+        <div style="font-size:.85rem;color:var(--kimari-text-muted);">Guided setup with auto-detection of OS, GPU, CUDA, and llama-server. <code>--write --yes</code> for non-interactive config persistence with automatic backup.</div>
+        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-purple-light);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari setup --write --yes</div>
       </div>
     </div>
   </div>
@@ -1013,6 +1037,58 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <div class="terminal-header"><span class="terminal-dot" style="background:#ff5f57"></span><span class="terminal-dot" style="background:#febc2e"></span><span class="terminal-dot" style="background:#28c840"></span><span class="terminal-title">terminal</span></div>
         <pre class="terminal-body">kimari start --profile ide-local</pre>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ GATEWAY DASHBOARD ═══════ -->
+<section class="section" id="dashboard">
+  <div class="reveal">
+    <span class="section-label"><i class="fa-solid fa-chart-line"></i> Gateway Dashboard <span style="font-size:.65rem;padding:2px 8px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;letter-spacing:.05em;">NEW IN v0.1.81</span></span>
+    <h2 class="section-title">Local Web Dashboard</h2>
+    <p class="section-desc">Monitor and manage your local AI from a browser. Runs at <code>127.0.0.1:3105</code> — localhost only, zero telemetry.</p>
+  </div>
+  <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;">
+    <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">🖥️</div>
+      <div style="font-weight:700;margin-bottom:6px;">System Resources</div>
+      <div style="font-size:.85rem;color:var(--kimari-text-muted);">Real-time CPU, RAM, VRAM, and GPU temperature monitoring with live utilization gauges.</div>
+    </div>
+    <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">🧠</div>
+      <div style="font-weight:700;margin-bottom:6px;">Model Status</div>
+      <div style="font-size:.85rem;color:var(--kimari-text-muted);">Active model info, profile details, endpoint health, and KimariFit scores at a glance.</div>
+    </div>
+    <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">💬</div>
+      <div style="font-weight:700;margin-bottom:6px;">Chat Playground</div>
+      <div style="font-size:.85rem;color:var(--kimari-text-muted);">Test your local model directly from the dashboard with streaming responses.</div>
+    </div>
+    <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">⚡</div>
+      <div style="font-weight:700;margin-bottom:6px;">Quick Actions</div>
+      <div style="font-size:.85rem;color:var(--kimari-text-muted);">Start/stop server, pull models, run doctor — all from the dashboard UI.</div>
+    </div>
+    <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">📊</div>
+      <div style="font-weight:700;margin-bottom:6px;">KimariFit Lab</div>
+      <div style="font-size:.85rem;color:var(--kimari-text-muted);">Interactive scoring calculator — input GPU specs and model, get useful-intelligence-per-GiB estimates.</div>
+    </div>
+    <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">🔒</div>
+      <div style="font-weight:700;margin-bottom:6px;">Localhost Only</div>
+      <div style="font-size:.85rem;color:var(--kimari-text-muted);">Binds to <code>127.0.0.1</code> by default. No remote access. No tokens stored. No telemetry.</div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:32px;max-width:700px;margin-left:auto;margin-right:auto;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px 24px;">
+      <div style="color:var(--kimari-teal);margin-bottom:8px;"># Dashboard lifecycle</div>
+      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway setup</span> <span style="color:var(--kimari-text-muted);"># Install dependencies</span></div>
+      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway start</span> <span style="color:var(--kimari-text-muted);"># Launch at 127.0.0.1:3105</span></div>
+      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway status</span> <span style="color:var(--kimari-text-muted);"># Check if running</span></div>
+      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway open</span> <span style="color:var(--kimari-text-muted);"># Open in browser</span></div>
+      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway logs</span> <span style="color:var(--kimari-text-muted);"># View output</span></div>
+      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway stop</span> <span style="color:var(--kimari-text-muted);"># Graceful shutdown</span></div>
     </div>
   </div>
 </section>
@@ -1444,6 +1520,22 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <p class="section-desc">Comprehensive guides covering every aspect of Kimari.</p>
   </div>
   <div class="docs-grid reveal">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/CLI_REFERENCE.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">CLI Reference <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">NEW</span></div>
+      <div class="doc-card-desc">Full command reference for all kimari CLI commands and flags.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/GATEWAY_DASHBOARD.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">NEW</span></div>
+      <div class="doc-card-desc">Dashboard features, architecture, and CLI lifecycle management.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_CONSOLE.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Console &amp; Installer</div>
+      <div class="doc-card-desc">Guided setup, console output conventions, and non-interactive install.</div>
+    </a>
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/GATEWAY_DASHBOARD_CLI.md" target="_blank" rel="noopener noreferrer" class="doc-card">
+      <div class="doc-card-title">Gateway Dashboard CLI</div>
+      <div class="doc-card-desc">Dashboard CLI commands: setup, start, stop, status, logs, open, reset.</div>
+    </a>
     <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/00-01_product_vision.md" target="_blank" rel="noopener noreferrer" class="doc-card">
       <div class="doc-card-title">Product Vision</div>
       <div class="doc-card-desc">Project goals, philosophy, and differentiation.</div>
@@ -1566,6 +1658,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Secret scanner</td><td>✅ Line-by-line, no file skips</td></tr>
         <tr><td>Benchmark & tune CLI</td><td>✅ Dry-run by default</td></tr>
         <tr><td>Integration config generator</td><td>✅ <code>kimari integrations generate</code></td></tr>
+        <tr><td><strong>Gateway Dashboard</strong> (<code>kimari gateway</code>)</td><td>✅ <strong>v0.1.81</strong> — setup/start/stop/status/logs/open/reset</td></tr>
+        <tr><td>Dashboard System Resources</td><td>✅ CPU/RAM/VRAM/GPU Temp live monitoring</td></tr>
+        <tr><td>Console Installer</td><td>✅ <strong>v0.1.82</strong> — <code>kimari setup --write --yes</code></td></tr>
         <tr><td>HF Space (kimari-fit-lab)</td><td>✅ Live, GPU compat checker</td></tr>
         <tr><td>HF Jobs access</td><td>✅ Smouj013, a10g-small verified</td></tr>
         <tr><td>Private micro SFT</td><td>✅ A10G training run completed</td></tr>
@@ -1583,7 +1678,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr style="border-left:3px solid var(--kimari-teal);"><td colspan="2" style="font-weight:700;color:var(--kimari-teal);padding-top:20px;">📋 Planned / Experimental</td></tr>
         <tr><td>Experimental API (port 11436)</td><td>🧪 Experimental</td></tr>
         <tr><td>PyPI release</td><td>📋 Gate PENDING</td></tr>
-        <tr><td>Gateway (FastAPI)</td><td>📋 Planned for v0.2</td></tr>
+        <tr><td>Gateway (FastAPI)</td><td>📋 Planned for v0.2 — Dashboard is the current gateway UI</td></tr>
         <tr><td>PWA (own web app)</td><td>📋 Planned for v0.2</td></tr>
         <tr><td>Tauri Desktop</td><td>📋 Planned for v1.0</td></tr>
       </tbody>
@@ -1633,6 +1728,15 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   "cache_type_k": "q8_0"
 <span style="color:#00d4aa;">}</span></div>
       <p style="margin-top:12px;font-size:.85rem;color:var(--kimari-text-muted);"><code>kimari optimize --profile test --json</code> — Performance recommendations</p>
+    </div>
+    <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:24px;overflow:auto;">
+      <div style="font-family:monospace;font-size:.82rem;line-height:1.6;white-space:pre;background:rgba(0,0,0,.3);border-radius:8px;padding:16px;color:#a5f3fc;"><span style="color:#9b59b6;">$</span> kimari gateway start --json
+<span style="color:#00d4aa;">{</span>
+  "status": "running",
+  "url": "http://127.0.0.1:3105",
+  "pid": 42189
+<span style="color:#00d4aa;">}</span></div>
+      <p style="margin-top:12px;font-size:.85rem;color:var(--kimari-text-muted);"><code>kimari gateway start --json</code> — Launch the Gateway Dashboard</p>
     </div>
   </div>
   <div style="max-width:1280px;margin:24px auto 0;text-align:center;">
