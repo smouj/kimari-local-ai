@@ -11,13 +11,10 @@ include SECURITY.md
 include PRIVACY.md
 include RELEASE_CHECKLIST.md
 
-recursive-include docs *.md *.html *.png *.svg
+recursive-include docs *.md *.html *.png
 recursive-include config *.json *.example.json *.example.yaml
 
-exclude *.gguf
-exclude .kimari/*
-exclude kimari-server.log
-exclude .kimari-server.pid
+prune .kimari
 prune dist
 prune build
 prune .git

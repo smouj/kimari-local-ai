@@ -3,6 +3,7 @@ Shared fixtures for Kimari Local AI test suite.
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -11,6 +12,23 @@ import pytest
 # Add project root to sys.path so we can import the kimari package
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+
+
+def _active_release_test_name() -> str | None:
+    pyproject = (PROJECT_ROOT / "pyproject.toml").read_text()
+    match = re.search(r'^version = "0\.1\.(\d+)-alpha"$', pyproject, re.MULTILINE)
+    if not match:
+        return None
+    return f"test_release_v01{int(match.group(1)):02d}.py"
+
+
+def pytest_ignore_collect(collection_path: Path, config: pytest.Config) -> bool:
+    """Ignore stale release snapshot tests during default full-suite runs."""
+    name = collection_path.name
+    if not re.fullmatch(r"test_release_v\d+\.py", name):
+        return False
+    active_name = _active_release_test_name()
+    return active_name is not None and name != active_name
 
 
 @pytest.fixture

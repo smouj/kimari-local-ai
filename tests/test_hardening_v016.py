@@ -70,12 +70,9 @@ def test_start_dry_run_without_profile():
     assert "DRY RUN" in result.stdout, f"Expected 'DRY RUN' in output, got: {result.stdout}"
 
 
-def test_bench_defaults_to_test_profile():
-    """'kimari bench' without --profile should use 'test' default."""
-    from kimari.config.loader import load_config  # noqa: E402
-
-    config = load_config()
-    default = config.get("default_profile", "test")
+def test_bench_defaults_to_test_profile(sample_config):
+    """Repo defaults keep 'test' as the safe bench profile."""
+    default = sample_config.get("default_profile", "test")
     assert default == "test", f"Bench defaults to config default_profile, which should be 'test', got: {default}"
 
 

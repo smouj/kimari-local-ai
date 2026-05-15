@@ -37,9 +37,6 @@ next-env.d.ts
 db/
 custom.db
 
-# package lock (generated at install)
-package-lock.json
-
 # logs
 *.log
 dev.log

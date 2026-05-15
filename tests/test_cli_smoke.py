@@ -4,12 +4,20 @@ Uses subprocess.run with capture_output=True to test the actual CLI.
 """
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CLI_PATH = PROJECT_ROOT / "cli" / "kimari_cli.py"
+
+
+def _project_version() -> str:
+    pyproject = (PROJECT_ROOT / "pyproject.toml").read_text()
+    match = re.search(r'^version = "([^"]+)"$', pyproject, re.MULTILINE)
+    assert match is not None
+    return match.group(1)
 
 
 def _run_cli(*args: str) -> subprocess.CompletedProcess:
@@ -98,7 +106,7 @@ def test_cli_info():
     """'info' command runs and shows version."""
     result = _run_cli("info")
     assert result.returncode == 0
-    assert "0.1.26-alpha" in result.stdout
+    assert _project_version() in result.stdout
 
 
 def test_cli_info_json():
@@ -106,7 +114,7 @@ def test_cli_info_json():
     result = _run_cli("info", "--json")
     assert result.returncode == 0
     data = json.loads(result.stdout)
-    assert data["kimari_version"] == "0.1.26-alpha"
+    assert data["kimari_version"] == _project_version()
 
 
 def test_cli_config_path():

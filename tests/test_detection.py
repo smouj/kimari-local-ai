@@ -18,7 +18,7 @@ from kimari.core.detection import (  # noqa: E402
 
 def test_detect_cuda_without_tools():
     """detect_cuda returns False when nvcc and nvidia-smi are not in PATH."""
-    with patch("shutil.which", return_value=None):
+    with patch("shutil.which", return_value=None), patch.object(Path, "exists", return_value=False):
         assert detect_cuda() is False
 
 
