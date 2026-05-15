@@ -42,9 +42,9 @@
   --kimari-deep: #111827;
   --kimari-surface: #1a2235;
   --kimari-surface-light: #243049;
-  --kimari-teal: #00d4aa;
-  --kimari-teal-light: #00f5c4;
-  --kimari-teal-dim: #00a88a;
+  --kimari-blue: #3b82f6;
+  --kimari-blue-light: #60a5fa;
+  --kimari-blue-dim: #2563eb;
   --kimari-purple: #8b5cf6;
   --kimari-purple-light: #a78bfa;
   --kimari-cyan: #06b6d4;
@@ -61,14 +61,14 @@ body {
   line-height: 1.7;
   overflow-x: hidden;
 }
-a { color: var(--kimari-teal); text-decoration: none; transition: color .2s; }
-a:hover { color: var(--kimari-teal-light); }
+a { color: var(--kimari-blue); text-decoration: none; transition: color .2s; }
+a:hover { color: var(--kimari-blue-light); }
 code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 
 /* ─── Dot Grid Background ─── */
 .dot-grid {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background-image: radial-gradient(circle, rgba(0,212,170,.07) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(59,130,246,.07) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -94,15 +94,15 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .nav-brand span { font-weight: 800; font-size: 1.2rem; color: var(--kimari-text); letter-spacing: -.02em; }
 .nav-links { display: flex; align-items: center; gap: 28px; }
 .nav-links a { font-size: .875rem; font-weight: 500; color: var(--kimari-text-muted); transition: color .2s; }
-.nav-links a:hover { color: var(--kimari-teal); }
+.nav-links a:hover { color: var(--kimari-blue); }
 .nav-gh { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 8px; background: var(--kimari-surface); border: 1px solid var(--kimari-border); font-size: .8rem; font-weight: 600; color: var(--kimari-text); transition: all .2s; }
-.nav-gh:hover { border-color: var(--kimari-teal); color: var(--kimari-teal); background: var(--kimari-surface-light); }
+.nav-gh:hover { border-color: var(--kimari-blue); color: var(--kimari-blue); background: var(--kimari-surface-light); }
 .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
 .hamburger span { display: block; width: 22px; height: 2px; background: var(--kimari-text); border-radius: 2px; transition: all .3s; }
 .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: rgba(10,14,26,.96); backdrop-filter: blur(20px); border-bottom: 1px solid var(--kimari-border); padding: 20px 24px; z-index: 999; }
 .mobile-menu.open { display: flex; flex-direction: column; gap: 16px; }
 .mobile-menu a { font-size: 1rem; font-weight: 500; color: var(--kimari-text-muted); padding: 8px 0; }
-.mobile-menu a:hover { color: var(--kimari-teal); }
+.mobile-menu a:hover { color: var(--kimari-blue); }
 
 /* ─── Hero ─── */
 .hero {
@@ -121,18 +121,18 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 16px; border-radius: 50px;
-  background: rgba(0,212,170,.1); border: 1px solid rgba(0,212,170,.25);
-  font-size: .8rem; font-weight: 600; color: var(--kimari-teal);
+  background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.25);
+  font-size: .8rem; font-weight: 600; color: var(--kimari-blue);
   margin-bottom: 28px;
 }
-.hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--kimari-teal); animation: pulse-dot 2s ease infinite; }
+.hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--kimari-blue); animation: pulse-dot 2s ease infinite; }
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
 .hero h1 {
   font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 900; line-height: 1.08;
   letter-spacing: -.03em; margin-bottom: 20px;
 }
 .hero h1 .gradient-text {
-  background: linear-gradient(135deg, var(--kimari-teal), var(--kimari-cyan), var(--kimari-purple));
+  background: linear-gradient(135deg, var(--kimari-blue), var(--kimari-blue-light), var(--kimari-purple));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .hero p { font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--kimari-text-muted); max-width: 620px; margin: 0 auto 36px; line-height: 1.7; }
@@ -140,19 +140,19 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .btn-primary {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
-  background: linear-gradient(135deg, var(--kimari-teal-dim), var(--kimari-teal));
+  background: linear-gradient(135deg, var(--kimari-blue-dim), var(--kimari-blue));
   color: var(--kimari-midnight); border: none; cursor: pointer;
-  box-shadow: 0 0 30px rgba(0,212,170,.25);
+  box-shadow: 0 0 30px rgba(59,130,246,.25);
   transition: all .25s;
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,212,170,.4); color: var(--kimari-midnight); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(59,130,246,.4); color: var(--kimari-midnight); }
 .btn-secondary {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
   background: transparent; color: var(--kimari-text);
   border: 1px solid var(--kimari-border); cursor: pointer; transition: all .25s;
 }
-.btn-secondary:hover { border-color: var(--kimari-teal); color: var(--kimari-teal); transform: translateY(-2px); }
+.btn-secondary:hover { border-color: var(--kimari-blue); color: var(--kimari-blue); transform: translateY(-2px); }
 .btn-tertiary {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
@@ -167,19 +167,19 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 /* ─── Honesty Strip ─── */
 .honesty-strip {
   padding: 20px 24px; text-align: center;
-  border-top: 1px solid rgba(0,212,170,.15);
-  border-bottom: 1px solid rgba(0,212,170,.15);
-  background: rgba(0,212,170,.03);
+  border-top: 1px solid rgba(59,130,246,.15);
+  border-bottom: 1px solid rgba(59,130,246,.15);
+  background: rgba(59,130,246,.03);
   font-size: .95rem; color: var(--kimari-text-muted);
 }
-.honesty-strip strong { color: var(--kimari-teal); }
+.honesty-strip strong { color: var(--kimari-blue); }
 
 /* ─── Section Shared ─── */
 .section { padding: 100px 24px; max-width: 1280px; margin: 0 auto; }
 .section-label {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
-  color: var(--kimari-teal); margin-bottom: 12px;
+  color: var(--kimari-blue); margin-bottom: 12px;
 }
 .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -.02em; margin-bottom: 16px; }
 .section-desc { font-size: 1.1rem; color: var(--kimari-text-muted); max-width: 640px; margin-bottom: 48px; }
@@ -190,9 +190,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   background: var(--kimari-surface); border: 1px solid var(--kimari-border); border-radius: 16px;
   padding: 28px 24px; text-align: center; transition: all .3s;
 }
-.stat-card:hover { border-color: var(--kimari-teal); transform: translateY(-4px); box-shadow: 0 8px 40px rgba(0,212,170,.08); }
+.stat-card:hover { border-color: var(--kimari-blue); transform: translateY(-4px); box-shadow: 0 8px 40px rgba(59,130,246,.08); }
 .stat-icon { font-size: 1.8rem; margin-bottom: 12px; }
-.stat-value { font-size: 2rem; font-weight: 800; color: var(--kimari-teal); margin-bottom: 4px; }
+.stat-value { font-size: 2rem; font-weight: 800; color: var(--kimari-blue); margin-bottom: 4px; }
 .stat-label { font-size: .85rem; color: var(--kimari-text-muted); }
 
 /* ─── Features ─── */
@@ -203,10 +203,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 }
 .feature-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--kimari-teal), var(--kimari-purple));
+  background: linear-gradient(90deg, var(--kimari-blue), var(--kimari-purple));
   opacity: 0; transition: opacity .3s;
 }
-.feature-card:hover { border-color: var(--kimari-teal); transform: translateY(-4px); box-shadow: 0 8px 40px rgba(0,212,170,.06); }
+.feature-card:hover { border-color: var(--kimari-blue); transform: translateY(-4px); box-shadow: 0 8px 40px rgba(59,130,246,.06); }
 .feature-card:hover::before { opacity: 1; }
 .feature-icon { font-size: 1.8rem; margin-bottom: 16px; display: block; }
 .feature-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
@@ -220,12 +220,12 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   background: var(--kimari-surface); color: var(--kimari-text-muted); border: 1px solid var(--kimari-border);
   border-bottom: none; border-radius: 10px 10px 0 0; cursor: pointer; transition: all .2s;
 }
-.terminal-tab.active { background: var(--kimari-deep); color: var(--kimari-teal); border-color: var(--kimari-teal); }
+.terminal-tab.active { background: var(--kimari-deep); color: var(--kimari-blue); border-color: var(--kimari-blue); }
 .terminal {
   background: var(--kimari-deep); border: 1px solid var(--kimari-border); border-radius: 0 12px 12px 12px;
   padding: 20px 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: .82rem; line-height: 1.7;
 }
-.terminal-prompt { color: var(--kimari-teal); }
+.terminal-prompt { color: var(--kimari-blue); }
 .terminal-cmd { color: var(--kimari-text); }
 .terminal-output { color: var(--kimari-text-muted); }
 .terminal-ok { color: #4ade80; }
@@ -239,7 +239,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   background: var(--kimari-surface-light); color: var(--kimari-text-muted); border: 1px solid var(--kimari-border);
   border-radius: 6px; cursor: pointer; transition: all .2s;
 }
-.copy-btn:hover { border-color: var(--kimari-teal); color: var(--kimari-teal); }
+.copy-btn:hover { border-color: var(--kimari-blue); color: var(--kimari-blue); }
 
 /* ─── Profiles ─── */
 .profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
@@ -247,11 +247,11 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   background: var(--kimari-surface); border: 1px solid var(--kimari-border); border-radius: 16px;
   padding: 24px; transition: all .3s; position: relative;
 }
-.profile-card.featured { border-color: var(--kimari-teal); box-shadow: 0 0 40px rgba(0,212,170,.08); }
+.profile-card.featured { border-color: var(--kimari-blue); box-shadow: 0 0 40px rgba(59,130,246,.08); }
 .profile-card.featured::after {
   content: 'READY TO USE'; position: absolute; top: 14px; right: 14px;
   padding: 3px 10px; border-radius: 6px; font-size: .65rem; font-weight: 700;
-  background: rgba(0,212,170,.15); color: var(--kimari-teal); letter-spacing: .05em;
+  background: rgba(59,130,246,.15); color: var(--kimari-blue); letter-spacing: .05em;
 }
 .profile-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .profile-name .tag { font-size: .7rem; padding: 2px 8px; border-radius: 4px; background: rgba(139,92,246,.15); color: var(--kimari-purple-light); font-weight: 600; }
@@ -262,7 +262,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .vram-bar-wrap { margin-top: 8px; }
 .vram-bar-label { font-size: .75rem; color: var(--kimari-text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
 .vram-bar { height: 6px; border-radius: 3px; background: var(--kimari-surface-light); overflow: hidden; }
-.vram-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--kimari-teal-dim), var(--kimari-teal)); transition: width 1s ease; }
+.vram-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--kimari-blue-dim), var(--kimari-blue)); transition: width 1s ease; }
 
 /* ─── Architecture ─── */
 .arch-diagram {
@@ -272,9 +272,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   border: 1px solid var(--kimari-border); border-radius: 12px; padding: 20px 24px;
   margin-bottom: 8px; text-align: center; transition: all .3s; background: var(--kimari-surface);
 }
-.arch-layer:hover { border-color: var(--kimari-teal); }
+.arch-layer:hover { border-color: var(--kimari-blue); }
 .arch-layer-top { border-color: var(--kimari-purple); background: linear-gradient(135deg, rgba(139,92,246,.08), rgba(6,182,212,.08)); }
-.arch-layer-bottom { border-color: var(--kimari-teal); background: linear-gradient(135deg, rgba(0,212,170,.08), rgba(6,182,212,.08)); }
+.arch-layer-bottom { border-color: var(--kimari-blue); background: linear-gradient(135deg, rgba(59,130,246,.08), rgba(6,182,212,.08)); }
 .arch-layer-title { font-size: .95rem; font-weight: 700; margin-bottom: 4px; }
 .arch-layer-desc { font-size: .78rem; color: var(--kimari-text-muted); }
 .arch-connector { text-align: center; color: var(--kimari-text-muted); font-size: .8rem; padding: 2px 0; }
@@ -284,7 +284,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .step { display: flex; gap: 20px; align-items: flex-start; }
 .step-num {
   flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--kimari-teal-dim), var(--kimari-teal));
+  background: linear-gradient(135deg, var(--kimari-blue-dim), var(--kimari-blue));
   color: var(--kimari-midnight); font-weight: 800; font-size: 1rem;
   display: flex; align-items: center; justify-content: center;
 }
@@ -295,7 +295,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: .82rem;
   overflow-x: auto; position: relative; line-height: 1.6;
 }
-.step-code .prompt { color: var(--kimari-teal); }
+.step-code .prompt { color: var(--kimari-blue); }
 
 /* ─── KimariFit ─── */
 .fit-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
@@ -303,7 +303,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   background: var(--kimari-surface); border: 1px solid var(--kimari-border); border-radius: 16px;
   padding: 32px; font-family: 'JetBrains Mono', monospace;
 }
-.fit-formula code { font-size: 1.1rem; color: var(--kimari-teal); }
+.fit-formula code { font-size: 1.1rem; color: var(--kimari-blue); }
 .fit-formula p { font-size: .88rem; color: var(--kimari-text-muted); margin-top: 8px; }
 .fit-scores { display: flex; flex-direction: column; gap: 12px; }
 .fit-row {
@@ -321,7 +321,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   display: block; padding: 20px; background: var(--kimari-surface); border: 1px solid var(--kimari-border);
   border-radius: 12px; transition: all .3s;
 }
-.doc-card:hover { border-color: var(--kimari-teal); transform: translateY(-3px); }
+.doc-card:hover { border-color: var(--kimari-blue); transform: translateY(-3px); }
 .doc-card-title { font-weight: 700; font-size: .95rem; margin-bottom: 6px; }
 .doc-card-desc { font-size: .82rem; color: var(--kimari-text-muted); }
 
@@ -358,16 +358,16 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .topic-chip {
   display: inline-block;
   padding: 5px 14px;
-  border: 1px solid rgba(0,212,170,.25);
+  border: 1px solid rgba(59,130,246,.25);
   border-radius: 50px;
   font-size: .75rem;
   font-weight: 600;
-  color: var(--kimari-teal);
-  background: rgba(0,212,170,.05);
+  color: var(--kimari-blue);
+  background: rgba(59,130,246,.05);
   letter-spacing: .02em;
   transition: all .2s;
 }
-.topic-chip:hover { background: rgba(0,212,170,.12); border-color: rgba(0,212,170,.45); }
+.topic-chip:hover { background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.45); }
 
 /* ─── Footer ─── */
 .footer {
@@ -379,7 +379,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 .footer-brand span { font-weight: 700; font-size: .95rem; }
 .footer-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
 .footer-links a { font-size: .85rem; color: var(--kimari-text-muted); }
-.footer-links a:hover { color: var(--kimari-teal); }
+.footer-links a:hover { color: var(--kimari-blue); }
 .footer-copy { width: 100%; text-align: center; font-size: .78rem; color: var(--kimari-text-muted); margin-top: 12px; }
 
 /* ─── Responsive ─── */
@@ -493,16 +493,16 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
           Real inference tested on NVIDIA GeForce GTX 1060 6GB (WSL2) with llama-server CUDA.
         </p>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:.8rem;">
-          <div style="text-align:center;padding:8px;background:rgba(16,185,129,.1);border-radius:8px;">
-            <div style="font-weight:700;color:#10b981;">228 tok/s</div>
+          <div style="text-align:center;padding:8px;background:rgba(59,130,246,.1);border-radius:8px;">
+            <div style="font-weight:700;color:#3b82f6;">228 tok/s</div>
             <div style="color:var(--kimari-text-muted);">Prompt (CUDA)</div>
           </div>
-          <div style="text-align:center;padding:8px;background:rgba(16,185,129,.1);border-radius:8px;">
-            <div style="font-weight:700;color:#10b981;">73 tok/s</div>
+          <div style="text-align:center;padding:8px;background:rgba(59,130,246,.1);border-radius:8px;">
+            <div style="font-weight:700;color:#3b82f6;">73 tok/s</div>
             <div style="color:var(--kimari-text-muted);">Generation (CUDA)</div>
           </div>
-          <div style="text-align:center;padding:8px;background:rgba(16,185,129,.1);border-radius:8px;">
-            <div style="font-weight:700;color:#10b981;">~2.2×</div>
+          <div style="text-align:center;padding:8px;background:rgba(59,130,246,.1);border-radius:8px;">
+            <div style="font-weight:700;color:#3b82f6;">~2.2×</div>
             <div style="color:var(--kimari-text-muted);">vs CPU-only</div>
           </div>
         </div>
@@ -524,7 +524,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           Open WebUI · OpenClaw · Continue.dev · curl · OpenAI-compatible clients
         </p>
-        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">See <a href="docs/LOCAL_INTEGRATION_VALIDATION.md" style="color:var(--kimari-teal);">integration docs</a> for setup guides.</p>
+        <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">See <a href="docs/LOCAL_INTEGRATION_VALIDATION.md" style="color:var(--kimari-blue);">integration docs</a> for setup guides.</p>
       </div>
 
       <!-- Kimari SFT v1 Dataset -->
@@ -534,7 +534,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
           Dataset seed with 8 categories, schema validation, and build tooling tracked for the next SFT lane.
         </p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.8rem;">
-          <div style="padding:8px;background:rgba(0,212,170,.1);border-radius:8px;color:var(--kimari-text-muted);"><strong style="color:var(--kimari-teal);">8 categories</strong><br>320+ examples</div>
+          <div style="padding:8px;background:rgba(59,130,246,.1);border-radius:8px;color:var(--kimari-text-muted);"><strong style="color:var(--kimari-blue);">8 categories</strong><br>320+ examples</div>
           <div style="padding:8px;background:rgba(139,92,246,.1);border-radius:8px;color:var(--kimari-text-muted);"><strong style="color:var(--kimari-purple-light);">License manifest</strong><br>Per-source attribution</div>
         </div>
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">No training yet. Gate BLOCKED.</p>
@@ -547,7 +547,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
           QLoRA configuration for Qwen2.5-1.5B-Instruct (Apache-2.0). Dry-run only — no training executed yet.
         </p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.8rem;">
-          <div style="padding:8px;background:rgba(0,212,170,.1);border-radius:8px;color:var(--kimari-text-muted);"><strong style="color:var(--kimari-teal);">Base</strong><br>Qwen2.5-1.5B-Instruct</div>
+          <div style="padding:8px;background:rgba(59,130,246,.1);border-radius:8px;color:var(--kimari-text-muted);"><strong style="color:var(--kimari-blue);">Base</strong><br>Qwen2.5-1.5B-Instruct</div>
           <div style="padding:8px;background:rgba(139,92,246,.1);border-radius:8px;color:var(--kimari-text-muted);"><strong style="color:var(--kimari-purple-light);">Method</strong><br>QLoRA r=16</div>
         </div>
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">No training executed. Dry-run config only. Gate BLOCKED.</p>
@@ -559,17 +559,17 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           GPU compatibility checker — no model execution, no API keys.
         </p>
-        <a href="https://huggingface.co/spaces/kimari-ai/kimari-fit-lab" style="color:var(--kimari-teal);font-size:.9rem;font-weight:600;">kimari-ai/kimari-fit-lab →</a>
+        <a href="https://huggingface.co/spaces/kimari-ai/kimari-fit-lab" style="color:var(--kimari-blue);font-size:.9rem;font-weight:600;">kimari-ai/kimari-fit-lab →</a>
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">The Space does not run models. Kimari-4B is not yet released.</p>
       </div>
 
       <!-- Gateway Dashboard -->
-      <div style="background:var(--kimari-deep);border:1px solid rgba(0,212,170,.3);border-radius:12px;padding:20px;">
-        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">📊 Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">NEW</span></h4>
+      <div style="background:var(--kimari-deep);border:1px solid rgba(59,130,246,.3);border-radius:12px;padding:20px;">
+        <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;">📊 Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-weight:700;">NEW</span></h4>
         <p style="font-size:.85rem;color:var(--kimari-text-muted);margin-bottom:8px;">
           Local web UI at <code>127.0.0.1:3105</code>. System resources, model info, KimariFit scores, chat playground, quick actions. Full CLI lifecycle.
         </p>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-teal);background:rgba(0,0,0,.3);border-radius:8px;padding:10px 14px;margin-top:8px;">kimari gateway setup && kimari gateway start && kimari gateway open</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-blue);background:rgba(0,0,0,.3);border-radius:8px;padding:10px 14px;margin-top:8px;">kimari gateway setup && kimari gateway start && kimari gateway open</div>
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Localhost only. Zero telemetry. No tokens stored.</p>
       </div>
 
@@ -590,9 +590,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
           Private adapter persisted. KimariEval Private v1 ready. No public weights. Gate BLOCKED.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Adapter Run →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_RELEASE_GATE.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Release Gate →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">KimariEval →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_FIRST_PRIVATE_ADAPTER_RUN.md" style="color:var(--kimari-blue);font-size:.8rem;font-weight:600;">Adapter Run →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_RELEASE_GATE.md" style="color:var(--kimari-blue);font-size:.8rem;font-weight:600;">Release Gate →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-blue);font-size:.8rem;font-weight:600;">KimariEval →</a>
         </div>
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Kimari-4B is not released. No public weights, adapters, or GGUF.</p>
       </div>
@@ -604,8 +604,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
           First real LoRA training on A10G. Private adapter persisted to Smouj013/kimari4b-micro-sft-adapter-v0.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/HF_JOBS_MICRO_SFT_REAL_RUN.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Run Doc →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Persisted Result →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/HF_JOBS_MICRO_SFT_REAL_RUN.md" style="color:var(--kimari-blue);font-size:.8rem;font-weight:600;">Run Doc →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI4B_MICRO_SFT_PERSISTED_RESULT.md" style="color:var(--kimari-blue);font-size:.8rem;font-weight:600;">Persisted Result →</a>
         </div>
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Private adapter persisted. Not public. Gate BLOCKED.</p>
       </div>
@@ -617,8 +617,8 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
           104 evaluation cases across 7 categories. Baseline vs adapter eval infrastructure ready.
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Eval Docs →</a>
-          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_REVIEW_PROTOCOL.md" style="color:var(--kimari-teal);font-size:.8rem;font-weight:600;">Review Protocol →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_PRIVATE_V1.md" style="color:var(--kimari-blue);font-size:.8rem;font-weight:600;">Eval Docs →</a>
+          <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_EVAL_REVIEW_PROTOCOL.md" style="color:var(--kimari-blue);font-size:.8rem;font-weight:600;">Review Protocol →</a>
         </div>
         <p style="font-size:.75rem;color:var(--kimari-text-muted);margin-top:8px;">Private eval. No benchmark claims. No raw outputs committed. Gate BLOCKED.</p>
       </div>
@@ -626,10 +626,10 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 
     <!-- Validation Badges -->
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;">
-      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ GTX 1060 Validated</span>
-      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ OpenAI Endpoint</span>
-      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:.75rem;font-weight:600;color:#10b981;">✅ Local Integrations</span>
-      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);font-size:.75rem;font-weight:600;color:var(--kimari-teal);">📊 Gateway Dashboard</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);font-size:.75rem;font-weight:600;color:#3b82f6;">✅ GTX 1060 Validated</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);font-size:.75rem;font-weight:600;color:#3b82f6;">✅ OpenAI Endpoint</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);font-size:.75rem;font-weight:600;color:#3b82f6;">✅ Local Integrations</span>
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);font-size:.75rem;font-weight:600;color:var(--kimari-blue);">📊 Gateway Dashboard</span>
       <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);font-size:.75rem;font-weight:600;color:var(--kimari-purple-light);">🖥️ Console Installer</span>
       <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);font-size:.75rem;font-weight:600;color:#ef4444;">🚫 Kimari-4B Not Released</span>
     </div>
@@ -640,15 +640,15 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <div style="max-width:1280px;margin:0 auto;padding:0 24px 24px;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-size:.75rem;font-weight:700;letter-spacing:.05em;">⚖️ Open License</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-size:.75rem;font-weight:700;letter-spacing:.05em;">⚖️ Open License</span>
       <span style="font-size:1.05rem;font-weight:800;">Open-License Model Policy</span>
     </div>
     <p style="font-size:.88rem;color:var(--kimari-text-muted);margin-bottom:12px;">Official Kimari models will only use permissive-license bases. No non-commercial, research-only, or custom-restrictive bases for public releases.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;font-size:.85rem;">
-      <div style="background:var(--kimari-deep);border-radius:8px;padding:14px;border:1px solid rgba(16,185,129,.2);">
-        <div style="font-weight:700;color:#10b981;margin-bottom:6px;">✅ Approved Bases</div>
+      <div style="background:var(--kimari-deep);border-radius:8px;padding:14px;border:1px solid rgba(59,130,246,.2);">
+        <div style="font-weight:700;color:#3b82f6;margin-bottom:6px;">✅ Approved Bases</div>
         <div style="color:var(--kimari-text-muted);line-height:1.5;">Qwen2.5-1.5B · SmolLM3-3B<br>Qwen3-4B-Instruct · SmolLM2-1.7B</div>
-        <div style="margin-top:6px;font-size:.75rem;color:#10b981;">All Apache 2.0</div>
+        <div style="margin-top:6px;font-size:.75rem;color:#3b82f6;">All Apache 2.0</div>
       </div>
       <div style="background:var(--kimari-deep);border-radius:8px;padding:14px;border:1px solid rgba(239,68,68,.2);">
         <div style="font-weight:700;color:#f87171;margin-bottom:6px;">❌ Blocked for Public</div>
@@ -662,9 +662,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       </div>
     </div>
     <div style="margin-top:14px;font-size:.8rem;color:var(--kimari-text-muted);">
-      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_OPEN_LICENSE_POLICY.md" style="color:var(--kimari-teal);">Full policy →</a> ·
-      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md" style="color:var(--kimari-teal);">License matrix →</a> ·
-      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_OPEN_BASE_BAKEOFF_PLAN.md" style="color:var(--kimari-teal);">Bakeoff plan →</a>
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_OPEN_LICENSE_POLICY.md" style="color:var(--kimari-blue);">Full policy →</a> ·
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_BASE_MODEL_LICENSE_MATRIX.md" style="color:var(--kimari-blue);">License matrix →</a> ·
+      <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_OPEN_BASE_BAKEOFF_PLAN.md" style="color:var(--kimari-blue);">Bakeoff plan →</a>
     </div>
   </div>
 </div>
@@ -673,7 +673,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <div style="max-width:1280px;margin:0 auto;padding:0 24px 24px;">
   <div class="reveal" style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:16px;padding:24px 32px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-size:.75rem;font-weight:700;letter-spacing:.05em;">🧠 Kimari-4B</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-size:.75rem;font-weight:700;letter-spacing:.05em;">🧠 Kimari-4B</span>
       <span style="font-size:1.05rem;font-weight:800;">Model Roadmap</span>
       <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);font-size:.7rem;font-weight:600;color:#f87171;">PLANNED — NO WEIGHTS YET</span>
     </div>
@@ -879,9 +879,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
       <div class="feature-title">Measured Benchmark</div>
       <div class="feature-desc"><code>kimari benchmark --measure --endpoint URL --model NAME --yes</code> runs real benchmarks against a running server. Requires <code>--yes</code> flag. Fails cleanly on connection error. No results saved by default.</div>
     </div>
-    <div class="feature-card" style="border-color:var(--kimari-teal);box-shadow:0 0 20px rgba(0,212,170,.08);">
+    <div class="feature-card" style="border-color:var(--kimari-blue);box-shadow:0 0 20px rgba(59,130,246,.08);">
       <span class="feature-icon">📊</span>
-      <div class="feature-title">Gateway Dashboard <span style="font-size:.65rem;padding:2px 8px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;letter-spacing:.05em;">NEW</span></div>
+      <div class="feature-title">Gateway Dashboard <span style="font-size:.65rem;padding:2px 8px;border-radius:4px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-weight:700;letter-spacing:.05em;">NEW</span></div>
       <div class="feature-desc">Full web dashboard at <code>127.0.0.1:3105</code>. System resources, model status, KimariFit scores, chat playground. Managed via <code>kimari gateway setup/start/stop/status/logs/open/reset</code>.</div>
     </div>
     <div class="feature-card">
@@ -960,9 +960,9 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:16px;">New: Benchmark & Tune Commands</h3>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
-        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-gauge-high" style="color:var(--kimari-teal);"></i> kimari benchmark</div>
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-gauge-high" style="color:var(--kimari-blue);"></i> kimari benchmark</div>
         <div style="font-size:.85rem;color:var(--kimari-text-muted);">Generate benchmark plans without executing models. Dry-run by default.</div>
-        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-teal);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari benchmark --dry-run --json</div>
+        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-blue);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari benchmark --dry-run --json</div>
       </div>
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-sliders" style="color:var(--kimari-cyan);"></i> kimari tune</div>
@@ -980,19 +980,19 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
     <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:16px;">Current alpha milestones</h3>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
-        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-display" style="color:var(--kimari-teal);"></i> Console Polish</div>
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-display" style="color:var(--kimari-blue);"></i> Console Polish</div>
         <div style="font-size:.85rem;color:var(--kimari-text-muted);">Cleaner console output for <code>kimari status</code> and <code>kimari doctor --deep</code> with structured PASS/WARN/FAIL tables and suggested next steps.</div>
-        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-teal);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari status / kimari doctor --deep</div>
+        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-blue);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari status / kimari doctor --deep</div>
       </div>
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-plug" style="color:var(--kimari-cyan);"></i> Integration Config Generator</div>
         <div style="font-size:.85rem;color:var(--kimari-text-muted);">Generate configuration snippets for Open WebUI, OpenClaw, Hermes, and Continue.dev. No tokens, localhost only by default.</div>
         <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-cyan);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari integrations generate --target openwebui --json</div>
       </div>
-      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-teal);border-radius:12px;padding:20px;">
-        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-chart-line" style="color:var(--kimari-teal);"></i> Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">v0.1.81</span></div>
+      <div style="background:var(--kimari-surface);border:1px solid var(--kimari-blue);border-radius:12px;padding:20px;">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-chart-line" style="color:var(--kimari-blue);"></i> Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-weight:700;">v0.1.81</span></div>
         <div style="font-size:.85rem;color:var(--kimari-text-muted);">Local web dashboard at <code>127.0.0.1:3105</code> with system resources, model info, KimariFit scores, chat playground, and quick actions. CLI lifecycle: <code>kimari gateway setup/start/stop/status/logs/open/reset</code>.</div>
-        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-teal);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari gateway setup && kimari gateway start</div>
+        <div style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--kimari-blue);background:var(--kimari-deep);border-radius:8px;padding:10px 14px;">kimari gateway setup && kimari gateway start</div>
       </div>
       <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:20px;">
         <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;"><i class="fa-solid fa-terminal" style="color:var(--kimari-purple-light);"></i> Console Installer <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(139,92,246,.15);color:var(--kimari-purple-light);font-weight:700;">v0.1.82</span></div>
@@ -1044,7 +1044,7 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 <!-- ═══════ GATEWAY DASHBOARD ═══════ -->
 <section class="section" id="dashboard">
   <div class="reveal">
-    <span class="section-label"><i class="fa-solid fa-chart-line"></i> Gateway Dashboard <span style="font-size:.65rem;padding:2px 8px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;letter-spacing:.05em;">NEW IN v0.1.81</span></span>
+    <span class="section-label"><i class="fa-solid fa-chart-line"></i> Gateway Dashboard <span style="font-size:.65rem;padding:2px 8px;border-radius:4px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-weight:700;letter-spacing:.05em;">NEW IN v0.1.81</span></span>
     <h2 class="section-title">Local Web Dashboard</h2>
     <p class="section-desc">Monitor and manage your local AI from a browser. Runs at <code>127.0.0.1:3105</code> — localhost only, zero telemetry.</p>
   </div>
@@ -1082,13 +1082,13 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
   <div class="reveal" style="margin-top:32px;max-width:700px;margin-left:auto;margin-right:auto;">
     <div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;background:var(--kimari-deep);border:1px solid var(--kimari-border);border-radius:12px;padding:20px 24px;">
-      <div style="color:var(--kimari-teal);margin-bottom:8px;"># Dashboard lifecycle</div>
-      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway setup</span> <span style="color:var(--kimari-text-muted);"># Install dependencies</span></div>
-      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway start</span> <span style="color:var(--kimari-text-muted);"># Launch at 127.0.0.1:3105</span></div>
-      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway status</span> <span style="color:var(--kimari-text-muted);"># Check if running</span></div>
-      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway open</span> <span style="color:var(--kimari-text-muted);"># Open in browser</span></div>
-      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway logs</span> <span style="color:var(--kimari-text-muted);"># View output</span></div>
-      <div><span style="color:var(--kimari-teal);">$</span> <span style="color:var(--kimari-text);">kimari gateway stop</span> <span style="color:var(--kimari-text-muted);"># Graceful shutdown</span></div>
+      <div style="color:var(--kimari-blue);margin-bottom:8px;"># Dashboard lifecycle</div>
+      <div><span style="color:var(--kimari-blue);">$</span> <span style="color:var(--kimari-text);">kimari gateway setup</span> <span style="color:var(--kimari-text-muted);"># Install dependencies</span></div>
+      <div><span style="color:var(--kimari-blue);">$</span> <span style="color:var(--kimari-text);">kimari gateway start</span> <span style="color:var(--kimari-text-muted);"># Launch at 127.0.0.1:3105</span></div>
+      <div><span style="color:var(--kimari-blue);">$</span> <span style="color:var(--kimari-text);">kimari gateway status</span> <span style="color:var(--kimari-text-muted);"># Check if running</span></div>
+      <div><span style="color:var(--kimari-blue);">$</span> <span style="color:var(--kimari-text);">kimari gateway open</span> <span style="color:var(--kimari-text-muted);"># Open in browser</span></div>
+      <div><span style="color:var(--kimari-blue);">$</span> <span style="color:var(--kimari-text);">kimari gateway logs</span> <span style="color:var(--kimari-text-muted);"># View output</span></div>
+      <div><span style="color:var(--kimari-blue);">$</span> <span style="color:var(--kimari-text);">kimari gateway stop</span> <span style="color:var(--kimari-text-muted);"># Graceful shutdown</span></div>
     </div>
   </div>
 </section>
@@ -1521,11 +1521,11 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   </div>
   <div class="docs-grid reveal">
     <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/CLI_REFERENCE.md" target="_blank" rel="noopener noreferrer" class="doc-card">
-      <div class="doc-card-title">CLI Reference <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">NEW</span></div>
+      <div class="doc-card-title">CLI Reference <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-weight:700;">NEW</span></div>
       <div class="doc-card-desc">Full command reference for all kimari CLI commands and flags.</div>
     </a>
     <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/GATEWAY_DASHBOARD.md" target="_blank" rel="noopener noreferrer" class="doc-card">
-      <div class="doc-card-title">Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,212,170,.15);color:var(--kimari-teal);font-weight:700;">NEW</span></div>
+      <div class="doc-card-title">Gateway Dashboard <span style="font-size:.6rem;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,.15);color:var(--kimari-blue);font-weight:700;">NEW</span></div>
       <div class="doc-card-desc">Dashboard features, architecture, and CLI lifecycle management.</div>
     </a>
     <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/KIMARI_CONSOLE.md" target="_blank" rel="noopener noreferrer" class="doc-card">
@@ -1669,13 +1669,13 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
         <tr><td>Baseline vs adapter eval (subset10)</td><td>✅ Completion/integrity check</td></tr>
         <tr><td>WSL2 installation guide</td><td>✅ Documented</td></tr>
         <tr><td>Windows packaging</td><td>✅ Helper scripts</td></tr>
-        <tr style="border-left:3px solid var(--kimari-teal);"><td colspan="2" style="font-weight:700;color:var(--kimari-teal);padding-top:20px;">🔒 Not Yet Available</td></tr>
+        <tr style="border-left:3px solid var(--kimari-blue);"><td colspan="2" style="font-weight:700;color:var(--kimari-blue);padding-top:20px;">🔒 Not Yet Available</td></tr>
         <tr><td>Kimari-4B model</td><td>🔨 Planned — weights not yet available</td></tr>
         <tr><td>Real benchmarks</td><td>📋 Pending — need measured data</td></tr>
         <tr><td>Public weights / GGUF</td><td>❌ Not released</td></tr>
         <tr><td>Public benchmarks</td><td>❌ No public claims</td></tr>
         <tr><td>Gate</td><td>🔒 BLOCKED</td></tr>
-        <tr style="border-left:3px solid var(--kimari-teal);"><td colspan="2" style="font-weight:700;color:var(--kimari-teal);padding-top:20px;">📋 Planned / Experimental</td></tr>
+        <tr style="border-left:3px solid var(--kimari-blue);"><td colspan="2" style="font-weight:700;color:var(--kimari-blue);padding-top:20px;">📋 Planned / Experimental</td></tr>
         <tr><td>Experimental API (port 11436)</td><td>🧪 Experimental</td></tr>
         <tr><td>PyPI release</td><td>📋 Gate PENDING</td></tr>
         <tr><td>Gateway (FastAPI)</td><td>📋 Planned for v0.2 — Dashboard is the current gateway UI</td></tr>
@@ -1696,51 +1696,51 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
   <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1280px;margin:0 auto;">
     <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:24px;overflow:auto;">
       <div style="font-family:monospace;font-size:.82rem;line-height:1.6;white-space:pre;background:rgba(0,0,0,.3);border-radius:8px;padding:16px;color:#a5f3fc;"><span style="color:#9b59b6;">$</span> kimari setup --json
-<span style="color:#00d4aa;">{</span>
+<span style="color:#3b82f6;">{</span>
   "profile": "test",
   "gpu_detected": true,
   "cuda_available": true,
   "recommended_profile": "gtx1060"
-<span style="color:#00d4aa;">}</span></div>
+<span style="color:#3b82f6;">}</span></div>
       <p style="margin-top:12px;font-size:.85rem;color:var(--kimari-text-muted);"><code>kimari setup --json</code> — Detect environment and recommend configuration</p>
     </div>
     <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:24px;overflow:auto;">
       <div style="font-family:monospace;font-size:.82rem;line-height:1.6;white-space:pre;background:rgba(0,0,0,.3);border-radius:8px;padding:16px;color:#a5f3fc;"><span style="color:#9b59b6;">$</span> python training/scripts/preflight_private_sft.py --json
-<span style="color:#00d4aa;">✓</span> python_version: 3.12.3
+<span style="color:#3b82f6;">✓</span> python_version: 3.12.3
 <span style="color:#f87171;">⚠</span> torch: missing (install before training)
-<span style="color:#00d4aa;">✓</span> dataset_build: found
-<span style="color:#00d4aa;">✓</span> preview_gate: BLOCKED</div>
+<span style="color:#3b82f6;">✓</span> dataset_build: found
+<span style="color:#3b82f6;">✓</span> preview_gate: BLOCKED</div>
       <p style="margin-top:12px;font-size:.85rem;color:var(--kimari-text-muted);"><code>preflight_private_sft.py --json</code> — Check SFT readiness before training</p>
     </div>
     <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:24px;overflow:auto;">
       <div style="font-family:monospace;font-size:.82rem;line-height:1.6;white-space:pre;background:rgba(0,0,0,.3);border-radius:8px;padding:16px;color:#a5f3fc;"><span style="color:#9b59b6;">$</span> python training/scripts/postrun_private_sft.py --dry-run --json
-<span style="color:#00d4aa;">○</span> create_adapter_manifest (dry_run)
-<span style="color:#00d4aa;">○</span> create_eval_summary (dry_run)
-<span style="color:#00d4aa;">✓</span> verify_gate_blocked: PASS</div>
+<span style="color:#3b82f6;">○</span> create_adapter_manifest (dry_run)
+<span style="color:#3b82f6;">○</span> create_eval_summary (dry_run)
+<span style="color:#3b82f6;">✓</span> verify_gate_blocked: PASS</div>
       <p style="margin-top:12px;font-size:.85rem;color:var(--kimari-text-muted);"><code>postrun_private_sft.py --dry-run --json</code> — Orchestrate post-training steps</p>
     </div>
     <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:24px;overflow:auto;">
       <div style="font-family:monospace;font-size:.82rem;line-height:1.6;white-space:pre;background:rgba(0,0,0,.3);border-radius:8px;padding:16px;color:#a5f3fc;"><span style="color:#9b59b6;">$</span> kimari optimize --profile test --json
-<span style="color:#00d4aa;">{</span>
+<span style="color:#3b82f6;">{</span>
   "mode": "balanced",
   "vram_estimated_gb": 5.8,
   "context_window": 4096,
   "cache_type_k": "q8_0"
-<span style="color:#00d4aa;">}</span></div>
+<span style="color:#3b82f6;">}</span></div>
       <p style="margin-top:12px;font-size:.85rem;color:var(--kimari-text-muted);"><code>kimari optimize --profile test --json</code> — Performance recommendations</p>
     </div>
     <div style="background:var(--kimari-surface);border:1px solid var(--kimari-border);border-radius:12px;padding:24px;overflow:auto;">
       <div style="font-family:monospace;font-size:.82rem;line-height:1.6;white-space:pre;background:rgba(0,0,0,.3);border-radius:8px;padding:16px;color:#a5f3fc;"><span style="color:#9b59b6;">$</span> kimari gateway start --json
-<span style="color:#00d4aa;">{</span>
+<span style="color:#3b82f6;">{</span>
   "status": "running",
   "url": "http://127.0.0.1:3105",
   "pid": 42189
-<span style="color:#00d4aa;">}</span></div>
+<span style="color:#3b82f6;">}</span></div>
       <p style="margin-top:12px;font-size:.85rem;color:var(--kimari-text-muted);"><code>kimari gateway start --json</code> — Launch the Gateway Dashboard</p>
     </div>
   </div>
   <div style="max-width:1280px;margin:24px auto 0;text-align:center;">
-    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/SCREENSHOTS.md" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;background:var(--kimari-surface);border:1px solid var(--kimari-border);color:var(--kimari-teal);font-weight:600;font-size:.9rem;text-decoration:none;">
+    <a href="https://github.com/smouj/kimari-local-ai/blob/main/docs/SCREENSHOTS.md" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;background:var(--kimari-surface);border:1px solid var(--kimari-border);color:var(--kimari-blue);font-weight:600;font-size:.9rem;text-decoration:none;">
       <i class="fa-solid fa-images"></i> Full Screenshots Gallery
     </a>
   </div>
