@@ -6,7 +6,7 @@
 
 | State | Description | Can advance to |
 |-------|-------------|---------------|
-| `BLOCKED` | Initial state. No weights exist. No eval. | `PRIVATE_ADAPTER_READY` |
+| `BLOCKED` | Initial state or blocked by safety/license concerns. | `PRIVATE_ADAPTER_READY` |
 | `PRIVATE_ADAPTER_READY` | Private adapter trained and validated. Not public. | `EVAL_PENDING` |
 | `EVAL_PENDING` | Adapter eval in progress. | `REVIEW_PENDING` |
 | `REVIEW_PENDING` | Eval complete. Awaiting human review. | `PUBLIC_PREVIEW_ALLOWED` |
@@ -21,7 +21,23 @@
 
 ## Current State
 
-**BLOCKED** — No adapter trained yet. Pipeline preparation in progress.
+**BLOCKED**
+
+**Reason:**
+Private SmolLM3-3B adapter experiments (SFT v2, 150 steps, train=1.26/eval=1.41) have been completed and a 30-item private manual review was conducted on the KimariEval subset30 evaluation. The review found safety/factual regressions requiring fixes before any larger evaluation (subset60/full104), GGUF export, public weights, or public benchmark claim.
+
+**What exists:**
+- Private SmolLM3-3B SFT v2 adapter (HF: `Smouj013/kimari4b-smollm3-sft-v2-adapter`, private)
+- Private KimariEval subset30 scoring (raw outputs not committed)
+- Manual review: 30/30 reviewed, safety_fix_required decision
+
+**What does NOT exist:**
+- No public Kimari-4B weights
+- No public GGUF
+- No public benchmark claims
+- No released model
+
+Gate remains **BLOCKED** until safety regressions are addressed via corrective training and re-reviewed.
 
 ## Requirements per State
 

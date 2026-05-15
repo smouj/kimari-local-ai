@@ -827,34 +827,75 @@ Next: future training should harden benchmark-honesty refusal behavior and rerun
 - ✅ JSON schema updated with `setup_info`, `integrations`, `paths` properties — fixes `doctor --deep` "Additional properties not allowed" warning
 - ✅ Gate BLOCKED
 
-## v0.2.0-alpha (Planned)
+---
 
-- Local REST API via FastAPI (`kimari api`)
-- VRAM reporting in real-time
-- Benchmark result comparison
-- Improved documentation for IDE integration
+## Forward Roadmap — By Track
 
-## v0.3.0-alpha
+### Track A — Runtime Framework
+- ✅ CLI-first local AI workflow
+- ✅ GPU-aware profiles (gtx1060, gtx1080, test)
+- ✅ llama.cpp / GGUF runtime support
+- ✅ OpenAI-compatible local endpoint
+- ✅ Model registry with download verification
+- ⬜ `kimari install-runtime` — auto-install llama-server
+- ⬜ Measured benchmark tooling (not estimates)
+- ⬜ Stable CLI API for external tooling
 
-- Minimal web dashboard (status, start/stop, model list, logs)
-- Based on `docs/WEB_UI_PLAN.md`
-- React/Tailwind or Svelte frontend
+### Track B — Gateway Dashboard
+- ✅ Local Next.js dashboard (127.0.0.1:3105)
+- ✅ CLI lifecycle management (setup/start/stop/restart/status/logs/open/reset)
+- ✅ Security defaults (localhost bind, gate BLOCKED)
+- ⬜ Real GPU telemetry (VRAM, temp, utilization)
+- ⬜ Command builder for training/inference
+- ⬜ Log viewer with filtering
+- ⬜ Lite mode (static, no Prisma dependency)
 
-## v0.4.0-alpha
+### Track C — Model Work
+- ✅ SmolLM3-3B SFT v2 adapter trained (private, 150 steps)
+- ✅ Private KimariEval subset30 scoring completed
+- ✅ Manual review: safety_fix_required decision
+- ⬜ Corrective training for safety/factual regressions
+- ⬜ Re-run subset30 eval after fix
+- ⬜ Subset60 evaluation (only if subset30 passes)
+- ⬜ Full104 evaluation (only if subset60 passes)
+- ⬜ Private GGUF export (only if full104 passes)
+- ⬜ GTX 1060/1080 validation with Kimari model
+- ⬜ Public preview decision
 
-- PWA with model management
-- Benchmark launcher from web UI
-- Diagnostics export
+### Track D — Security & Trust
+- ✅ No telemetry, localhost defaults, gate BLOCKED
+- ✅ Honest documentation (PROJECT_TRUTH.md)
+- ✅ Local token management (chmod 0600)
+- ⬜ SHA256 hashes pinned for recommended models
+- ⬜ CI rule: recommended model requires sha256
+- ⬜ Reverse proxy auth docs
+- ⬜ Dependency audit (Python + npm)
+- ⬜ Secret scanning in CI
 
-## v0.5.0-alpha
+### Track E — Distribution
+- ✅ install.sh with dry-run and gates
+- ✅ install.ps1 for Windows
+- ✅ GitHub Pages landing page
+- ✅ CI with lint, test, build, release validation
+- ⬜ PyPI release
+- ⬜ GitHub Releases with signed artifacts
+- ⬜ One-command upgrade (`kimari update apply`)
+- ⬜ Homebrew / apt packaging
 
-- Tauri desktop application
-- System tray integration
-- Native notifications
+---
 
-## v1.0.0
+## Future Milestones
 
-- Stable API
-- Production-ready desktop app
-- Community benchmarks and model contributions
-- Full documentation in multiple languages
+### v0.1.83-alpha — Trust Hardening
+Focus: security, hash pinning, install-runtime, CI rules.
+
+### v0.1.84-alpha — Dashboard Lite
+Focus: lightweight dashboard option without heavy dependencies.
+
+### v0.1.85-alpha — Corrective SFT
+Focus: safety regression fix training, re-eval.
+
+### v0.2.0-alpha
+Focus: stable CLI API, measured benchmarks, real GPU telemetry.
+
+> **No timeline commitments.** Each stage depends on the previous one passing safety gates.

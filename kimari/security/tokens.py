@@ -12,13 +12,13 @@ until a reverse-proxy or application-layer auth mechanism is added.
 Security guidelines
 -------------------
 - Never print the full token in logs; only the *preview* (first 8 chars) is safe.
-- Only ``show_token()`` (and the ``kimari token show`` CLI command) should
-  reveal the full token to the user.
-- Tests must use ``tmp_path`` or ``monkeypatch`` — never write to the real
-  user state directory during testing.
+- Token files are stored with ``0600`` permissions (owner read/write only).
+- CLI commands should show preview by default; use ``--reveal`` to show full token.
+- Tests must use ``tmp_path`` or ``monkeypatch`` — never write to the real user state directory during testing.
 """
 
 import json
+import os
 import secrets
 from datetime import datetime, timezone
 
@@ -37,6 +37,8 @@ def create_token() -> dict:
 
     If an ``auth.json`` already exists it will be **overwritten** — call
     :func:`show_token` first if you want to check for an existing token.
+
+    File permissions are set to 0600 (owner read/write only).
     """
     token = secrets.token_urlsafe(32)
     created_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -53,6 +55,8 @@ def create_token() -> dict:
     auth_path.parent.mkdir(parents=True, exist_ok=True)
     with open(auth_path, "w") as f:
         json.dump(auth_data, f, indent=2)
+    # Lock down file permissions: owner read/write only (0600)
+    os.chmod(auth_path, 0o600)
 
     return auth_data
 

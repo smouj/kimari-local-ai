@@ -42,6 +42,24 @@ Kimari provides:
 
 ---
 
+## Current Truth
+
+**Kimari today is:**
+- A local AI framework and CLI.
+- A GGUF/llama.cpp workflow for old NVIDIA GPUs.
+- A local OpenAI-compatible endpoint helper.
+- A Gateway Dashboard preview.
+
+**Kimari today is not:**
+- A new inference engine replacing llama.cpp.
+- A public Kimari-4B model.
+- A production server.
+- A benchmark leaderboard.
+
+See [docs/PROJECT_TRUTH.md](docs/PROJECT_TRUTH.md) for the full honesty document.
+
+---
+
 ## Why Kimari?
 
 - **Older GPU support** — Designed specifically for GTX 1060 and GTX 1080, not just the latest cards.
@@ -79,6 +97,15 @@ No public Kimari weights, adapters or GGUF files are available at this stage.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/smouj/kimari-local-ai/main/install.sh | bash
+```
+
+Or the **secure alternative** (recommended for review):
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/smouj/kimari-local-ai/main/install.sh
+less install.sh
+bash install.sh --dry-run
+bash install.sh --with-test-model --yes
 ```
 
 Then open the guided console:
