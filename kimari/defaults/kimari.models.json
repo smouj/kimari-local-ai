@@ -20,8 +20,8 @@
       "sha256": null
     },
     {
-      "id": "recommended",
-      "display_name": "Qwen3-4B Q4_K_M (Recommended)",
+      "id": "qwen3-4b-q4-experimental",
+      "display_name": "Qwen3-4B Q4_K_M (Experimental)",
       "family": "Qwen3",
       "repo": "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
       "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/qwen3-4b-q4_k_m.gguf",

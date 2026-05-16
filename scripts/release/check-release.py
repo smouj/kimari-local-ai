@@ -157,10 +157,93 @@ if profiles_path.exists():
         f"default_profile is {profiles.get('default_profile')}",
     )
 
+# ── [1b] MODEL_CARD.md coherence ──────────────────────────────────────
+print("[1b] MODEL_CARD.md coherence")
+
+import re as _re
+from datetime import date as _date
+
+model_card_path = PROJECT_ROOT / "MODEL_CARD.md"
+if model_card_path.exists():
+    model_card_text = model_card_path.read_text()
+
+    stale_versions = ["v0.1.23-alpha", "v0.1.22-alpha", "v0.1.21-alpha", "v0.1.20-alpha"]
+    for stale in stale_versions:
+        check(
+            f"MODEL_CARD.md does not contain stale version {stale}",
+            stale not in model_card_text,
+            f"found stale version {stale}",
+        )
+
+    check(
+        "MODEL_CARD.md does not claim training not started while private SFT exists",
+        "has not been trained" not in model_card_text.lower() and "training has not begun" not in model_card_text.lower(),
+        "stale 'has not been trained' claim while private SFT v2 exists",
+    )
+
+    date_match = _re.search(r'Last Updated:\s*(\d{4}-\d{2}-\d{2})', model_card_text)
+    if date_match:
+        doc_date = _date.fromisoformat(date_match.group(1))
+        today = _date.today()
+        check(
+            f"MODEL_CARD.md date is not in the future ({date_match.group(1)})",
+            doc_date <= today,
+            f"date {date_match.group(1)} is in the future (today: {today.isoformat()})",
+        )
+
+# ── [1c] MODEL_LICENSES.md coherence ──────────────────────────────────
+print("[1c] MODEL_LICENSES.md coherence")
+
+model_licenses_path = PROJECT_ROOT / "MODEL_LICENSES.md"
+if model_licenses_path.exists():
+    model_licenses_text = model_licenses_path.read_text()
+
+    check(
+        "MODEL_LICENSES.md does not reference v0.1.17-alpha",
+        "v0.1.17-alpha" not in model_licenses_text,
+        "stale v0.1.17-alpha reference found",
+    )
+
+    check(
+        "MODEL_LICENSES.md does not claim no base model selected",
+        "no base model has been selected" not in model_licenses_text.lower(),
+        'stale "no base model selected" while SmolLM3-3B accepted for private SFT',
+    )
+
+# ── [1d] Model registry integrity ──────────────────────────────────────
+print("[1d] Model registry integrity")
+
+for models_path in [
+    PROJECT_ROOT / "config" / "kimari.models.json",
+    PROJECT_ROOT / "kimari" / "defaults" / "kimari.models.json",
+]:
+    if models_path.exists():
+        models = json.loads(models_path.read_text())
+        for model in models.get("models", []):
+            if model.get("status") == "recommended":
+                check(
+                    f"Model {model.get('id', '?')} is not recommended with null sha256",
+                    model.get("sha256") is not None,
+                    f"recommended model {model.get('id')} has null sha256",
+                )
+            if model.get("id") == "recommended":
+                warn(f"Model id 'recommended' found in {models_path.name} — consider renaming")
+
+# ── [1e] Secret and dangerous file scanning ─────────────────────────────
+print("[1e] Secret and dangerous file scanning")
+
+# tracked_files is set later at line ~370, but we need it now for these checks
+# Re-run git ls-files here for early availability
+_tracked = subprocess.run(["git", "ls-files"], cwd=PROJECT_ROOT, capture_output=True, text=True, timeout=30)
+_tracked_files = _tracked.stdout.splitlines() if _tracked.returncode == 0 else []
+
+dangerous_tracked = [f for f in _tracked_files if any(end in f for end in ["raw_outputs_private.json", "auth.json"])]
+check("No raw_outputs_private.json or auth.json tracked", len(dangerous_tracked) == 0, f"tracked: {dangerous_tracked[:5]}")
+
 # ── [2/5] Version consistency ──────────────────────────────────────────
 print("\n[2/5] Version consistency")
 
-current_version = "0.1.83-alpha"
+current_version = "0.1.84-alpha"
 pyproject_version = get_pyproject_version()
 init_version = get_init_version()
 

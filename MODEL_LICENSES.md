@@ -1,6 +1,6 @@
 # Model Licensing
 
-This document explains the licensing of models used with Kimari, including specific base model candidates under consideration for v0.1.17-alpha.
+This document explains the licensing of models used with Kimari, including base model candidates and private SFT experiments (v0.1.84-alpha).
 
 ## Overview
 
@@ -22,11 +22,13 @@ Any fine-tuned models, LoRA adapters, or training recipes produced by the Kimari
 
 ### 3. Base Model Weights — Base Model License
 
-Base model weights are **not** included in this repository and **no base model has been selected yet**. Each base model has its own license, which governs how you may use, modify, and redistribute derivative weights.
+Base model weights are **not** included in this repository. SmolLM3-3B has been accepted for private SFT training, but **not for public release**. Each base model has its own license, which governs how you may use, modify, and redistribute derivative weights.
 
-## Base Model Candidates (v0.1.17-alpha)
+## Base Model Status (v0.1.84-alpha)
 
-The following base models are under consideration. **None have been selected.** License details are provided to help evaluate compatibility with project goals.
+**SmolLM3-3B** has been accepted for private SFT training (v0.1.19-alpha), and a private SFT v2 experiment was completed (150 steps). **It has NOT been accepted for public release.** Public release remains contingent on corrective training passing safety review.
+
+The following candidates remain under evaluation for potential future use:
 
 ### SmolLM3 (HuggingFace)
 
@@ -57,15 +59,15 @@ The following base models are under consideration. **None have been selected.** 
 
 | Candidate | License | Commercial use | Derivative redistribution | Key consideration |
 |-----------|---------|---------------|---------------------------|-------------------|
-| SmolLM3 | Apache 2.0 (verify) | ✅ Permitted | ✅ Permitted with attribution | Verify exact checkpoint license |
+| SmolLM3 | Apache 2.0 (verify) | ✅ Permitted | ✅ Permitted with attribution | Used for private SFT v2; public release pending safety review |
 | Qwen | qwen-research | ⚠️ Restricted | ⚠️ Review required | Not Apache 2.0; research-oriented |
 | Llama | Meta Community License | ✅ With limits | ✅ With compliance | User thresholds, naming, use policy |
 
 > **Important**: This table is for evaluation purposes only. It does not constitute legal advice. Always read the original license text.
 
-## No Weights Released Yet
+## No Public Weights Released
 
-As of v0.1.17-alpha, **no Kimari model weights have been released**. Any references to specific model sizes (e.g., "Kimari-4B") describe planned targets, not available downloads. The license that will apply to future Kimari weights depends entirely on which base model is ultimately selected.
+As of v0.1.84-alpha, **no Kimari model weights have been publicly released**. Private training experiments (SmolLM3-3B SFT v2) have been conducted, but safety regressions were found during manual review. **No public safetensors, GGUF, or benchmark claims exist.** The license that will apply to any future public Kimari weights depends on successful completion of corrective training, safety review, and license verification before release.
 
 ## Dataset Redistribution
 
@@ -85,6 +87,7 @@ The license for Kimari model weights is determined by this process:
 4. **Apply the most restrictive applicable terms** — The Kimari project cannot grant rights that the base model license does not permit
 5. **Document the final license** — Once a base model is selected, this document will be updated with the definitive license for Kimari weights
 6. **Verify before every release** — Licenses can change or specific checkpoints may differ; always re-verify
+7. **Safety gate requirement** — No public safetensors or GGUF release is permitted until manual review passes without safety regressions (see `docs/KIMARI4B_RELEASE_GATE.md`)
 
 ### Decision flowchart
 

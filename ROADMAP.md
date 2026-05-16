@@ -886,10 +886,13 @@ Next: future training should harden benchmark-honesty refusal behavior and rerun
 
 ## Future Milestones
 
-### v0.1.84-alpha — Dashboard Lite
+### v0.1.84-alpha — Truth & Security Polish
+Focus: MODEL_CARD coherence, MODEL_LICENSES updates, registry integrity, release check hardening.
+
+### v0.1.85-alpha — Dashboard Lite
 Focus: lightweight dashboard option without heavy dependencies.
 
-### v0.1.85-alpha — Corrective SFT
+### v0.1.86-alpha — Corrective SFT
 Focus: safety regression fix training, re-eval.
 
 ### v0.2.0-alpha

@@ -1,16 +1,16 @@
 # Model Card: Kimari-4B
 
-> **Version:** v0.1.23-alpha (project framework)
-> **Last Updated:** 2026-05-25
+> **Version:** v0.1.84-alpha (project framework)
+> **Last Updated:** 2026-05-16
 > **Developer:** Smouj ([@smouj013](https://x.com/smouj013))
 
 ---
 
 ## Status
 
-**Planned / Training Design**
+**Private Experiments / Not Released**
 
-Kimari-4B has **not been trained yet**. No model weights exist, no training run has been started, and no benchmarks have been measured. This model card describes the **design targets and planned architecture** for a future fine-tuned local LLM. All specifications below are aspirational and subject to change during development.
+Kimari-4B has **no public weights** (no safetensors, no GGUF, no public benchmark claims). Private training experiments have been conducted using SmolLM3-3B SFT v2 (150 steps). Manual review found safety/factual regressions requiring corrective training before any public release. All specifications below are **design targets** for the future Kimari-4B model.
 
 > **Important:** Until Kimari-4B is released, the Kimari framework can run compatible GGUF base models for testing. See `models/README.md` for recommended test models.
 
@@ -112,26 +112,24 @@ The Kimari **software** (CLI, scripts, configurations) is released under the MIT
 | Aspect | Status |
 |--------|--------|
 | Base model selection | **Accepted for private SFT (SmolLM3-3B)** |
-| Training data curation | **Not started** |
-| Fine-tuning run | **Not started** |
-| Evaluation | **Not started** |
-| Weight release | **Not started** |
-
-Training has not begun. No GPUs have been allocated, no training scripts have been executed, and no checkpoints exist. The project is currently in the **training design** phase — defining requirements, evaluating base models, and planning data curation.
+| Training data curation | **v0 synthetic prepared; corrective dataset pending** |
+| Fine-tuning run | **Private SFT v2 completed (150 steps, train=1.26/eval=1.41); safety_fix_required** |
+| Evaluation | **Private KimariEval subset30 completed; manual review done (safety_fix_required)** |
+| Weight release | **Not started (gate BLOCKED)** |
 
 ---
 
-## Pipeline Status (v0.1.23-alpha)
+## Pipeline Status (v0.1.84-alpha)
 
 | Aspect | Status |
 |--------|--------|
 | Current model work | v0.1.21 adapter manifest template, eval summary policy, SFT→ORPO decision |
 | Base selection status | SmolLM3-3B accepted for first private SFT candidate |
-| Dataset status | v0 synthetic dataset prepared (SFT + preference + holdout) |
-| Training status | Not started (configs and validation ready) |
-| Evaluation status | KimariFit scoring plan prepared, dimensions defined |
-| GGUF export | Plan defined (Q4_K_M, Q5_K_M, IQ4_XS) |
-| HF release | Placeholder plan defined, not executed |
+| Dataset status | v0 synthetic dataset prepared; 110-case eval suite with safety/refusal cases |
+| Training status | Private SFT v2 completed (150 steps); corrective training pending safety review |
+| Evaluation status | Private KimariEval v1 complete (110 cases, 7 categories); subset30 manual review done |
+| GGUF export | Pending corrective training and passing manual review |
+| HF release | Not started; gate BLOCKED |
 
 ---
 
@@ -261,9 +259,7 @@ The following items must be completed before Kimari-4B weights can be released:
 | 14 | Kimari framework model registry updated | ❌ Not started |
 | 15 | Community announcement published | ❌ Not started |
 
-> This checklist will be updated as progress is made. No item has been started as of v0.1.17-alpha.
->
-> As of v0.1.19-alpha, SmolLM3-3B has been accepted for first private SFT training. No real training, evaluation, or public release has occurred.
+> As of v0.1.84-alpha: private SFT v2 completed, subset30 manual review done with safety_fix_required, gate BLOCKED.
 
 ---
 
@@ -271,7 +267,12 @@ The following items must be completed before Kimari-4B weights can be released:
 
 | Version | Date | Status | Changes |
 |---------|------|--------|---------|
-| 0.1.23-alpha | 2026-05-25 | Current | Postrun --json fix; preflight config-aware dataset_build_dir; screenshots documentation; release-check improvements |
+| 0.1.84-alpha | 2026-05-16 | Current | Truth/security polish — MODEL_CARD coherence, MODEL_LICENSES updates, registry integrity, release check hardening |
+| 0.1.83-alpha | 2026-05-15 | Released | PROJECT_TRUTH.md, release gate hardened, secure install alternative, screenshots restored |
+| 0.1.82-alpha | 2026-05-15 | Released | Gateway Dashboard CLI, one-command install, console guide |
+| 0.1.81-alpha | 2026-05-15 | Released | Dashboard lifecycle commands (setup/start/stop/restart/status/logs/open/reset) |
+| 0.1.80-alpha | 2026-05-15 | Released | Dashboard with real system APIs, standalone build fix |
+| 0.1.23-alpha | 2026-05-25 | Released | Postrun --json fix; preflight config-aware dataset_build_dir; screenshots documentation |
 | 0.1.22-alpha | 2026-05-24 | Released | Private SFT execution package; remote GPU guide; preflight/postrun scripts; training requirements; private run artifacts/failures policy; baseline/adapter eval plan scripts |
 | 0.1.21-alpha | 2026-05-23 | Released | Adapter manifest template; eval summary policy; SFT→ORPO decision framework; private SFT execution checklist; create_adapter_manifest and create_eval_summary scripts |
 | 0.1.20-alpha | 2026-05-22 | Released | Private SFT runbook; baseline eval plan; adapter artifact policy; preview gate; compare runs tool; pipeline dry-run orchestration |

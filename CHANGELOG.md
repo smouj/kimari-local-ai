@@ -4,6 +4,24 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.84-alpha] - 2026-05-16
+
+### Added
+- `tests/test_release_v0184.py` — coherence tests for MODEL_CARD, MODEL_LICENSES, registry, and gate
+- Release check additions: MODEL_CARD.md coherence, MODEL_LICENSES.md coherence, model registry integrity, secret scanning, no-dangerous-tracked-files
+
+### Changed
+- `MODEL_CARD.md` — updated to v0.1.84-alpha; corrected training status, pipeline status, version history; removed stale claims
+- `MODEL_LICENSES.md` — updated to v0.1.84-alpha; added private SFT context; removed stale claims; added license review requirement for public release
+- `config/kimari.models.json` and `kimari/defaults/kimari.models.json` — renamed model id `recommended` to `qwen3-4b-q4-experimental`, display_name to `Qwen3-4B Q4_K_M (Experimental)`
+- `scripts/release/check-release.py` — hardened with coherence, registry integrity, and secret scanning checks; version bumped to 0.1.84-alpha
+- GitHub Pages docs updated to v0.1.84-alpha
+
+### Security
+- Model registry: no model with `status=recommended` can have `sha256=null`
+- Model registry: confusing `id="recommended"` renamed to `id="qwen3-4b-q4-experimental"`
+- Gate remains BLOCKED; no public weights, GGUF, or benchmark claims
+
 ## [0.1.83-alpha] - 2026-05-15
 
 ### Added
