@@ -401,10 +401,14 @@ def write_setup_config(patch: dict, config_path: Path | str, reset: bool = False
     _resolved = patch.get("resolved_profile", recommended)
     profiles = config.get("profiles", {})
 
-    # Resolve the profile name
+    # Resolve the recommended profile for setup metadata.
     final_profile = resolve_recommended_profile(recommended, profiles)
-    if config.get("default_profile") != final_profile:
-        config["default_profile"] = final_profile
+
+    # Keep alpha installs stable and doctor-clean by defaulting to test.
+    # Recommended/resolved hardware profile is still persisted in setup_info.
+    default_profile = "test" if "test" in profiles else final_profile
+    if config.get("default_profile") != default_profile:
+        config["default_profile"] = default_profile
 
     # Write setup_info section with detection metadata
     config["setup_info"] = {
@@ -565,10 +569,14 @@ def apply_setup_changes(patch: dict, config_path: Path | str, reset: bool = Fals
     _resolved = patch.get("resolved_profile", recommended)
     profiles = config.get("profiles", {})
 
-    # Resolve the profile name
+    # Resolve the recommended profile for setup metadata.
     final_profile = resolve_recommended_profile(recommended, profiles)
-    if config.get("default_profile") != final_profile:
-        config["default_profile"] = final_profile
+
+    # Keep alpha installs stable and doctor-clean by defaulting to test.
+    # Recommended/resolved hardware profile is still persisted in setup_info.
+    default_profile = "test" if "test" in profiles else final_profile
+    if config.get("default_profile") != default_profile:
+        config["default_profile"] = default_profile
 
     # Write setup_info section with detection metadata
     config["setup_info"] = {
