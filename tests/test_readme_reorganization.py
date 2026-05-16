@@ -100,10 +100,10 @@ def test_readme_version_matches_pyproject():
     readme_content = _read(README)
     pyproject_content = _read(PYPROJECT)
 
-    # Extract version from README badge
-    readme_version_match = re.search(r"version-([0-9.]+-?alpha?)", readme_content)
+    # Extract version from README shield URL, e.g. version-v0.1.83--alpha-9b59b6.svg
+    readme_version_match = re.search(r"version-v?([0-9.]+(?:--|-)?alpha)", readme_content)
     assert readme_version_match, "Version badge not found in README"
-    readme_version = readme_version_match.group(1)
+    readme_version = readme_version_match.group(1).replace("--", "-")
 
     # Extract version from pyproject.toml
     pyproject_version_match = re.search(r'version\s*=\s*"([^"]+)"', pyproject_content)
