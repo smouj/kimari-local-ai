@@ -8,7 +8,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 
 # Single source of truth — must match pyproject.toml
-EXPECTED_VERSION = "0.1.85-alpha"
+EXPECTED_VERSION = "0.1.86-alpha"
 
 
 def _pyproject_version() -> str:

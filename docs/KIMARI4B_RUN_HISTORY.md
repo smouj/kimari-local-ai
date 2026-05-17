@@ -1,3 +1,14 @@
+## Run 19 — v0.1.86-alpha CPU inference validation and API endpoint verification (2026-05-17)
+
+- Built llama.cpp server (CPU-only, no CUDA/GPU in validation environment).
+- Validated llama-server startup with Qwen3-4B Q4_K_M and SmolLM3 Q4_K_M.
+- Verified /health, /v1/models, and /v1/chat/completions endpoints.
+- Measured CPU inference speed (not GPU — no GPU available).
+- GPU inference validation remains pending for real GTX 1060/1080 hardware.
+- Gate: BLOCKED.
+- No training, HF Jobs, public benchmark, public weights, GGUF, or raw outputs.
+- CPU tokens/s measurements documented but NOT equivalent to GPU performance.
+
 ## Run 18 — v0.1.85-alpha public GGUF hash pinning and partial validation (2026-05-17)
 
 - Verified public GGUF downloads for Qwen3-4B Q4_K_M and SmolLM3 Q4_K_M.

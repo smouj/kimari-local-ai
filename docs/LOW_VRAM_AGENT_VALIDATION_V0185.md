@@ -1,4 +1,4 @@
-# Low-VRAM Agent Validation — v0.1.85-alpha
+# Low-VRAM Agent Validation — v0.1.86-alpha
 
 > **Last updated:** 2026-05-17
 > **Status:** Partial — download and hash verification complete. GPU inference not yet tested.
@@ -58,7 +58,7 @@
 | OS | Linux (sandbox, no GPU) |
 | Python | 3.12 |
 | Kimari used for download/hash verification | v0.1.84-alpha local checkout before v0.1.85 bump |
-| Release target | v0.1.85-alpha |
+| Release target | v0.1.86-alpha |
 | NVIDIA GPU | None available |
 | CUDA | None available |
 | llama-server | Not installed |

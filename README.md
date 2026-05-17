@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/python-3.10+-2ea043.svg" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.85--alpha-9b59b6.svg" alt="v0.1.85-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.86--alpha-9b59b6.svg" alt="v0.1.86-alpha">
 </p>
 
 ---
