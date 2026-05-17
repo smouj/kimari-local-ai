@@ -160,7 +160,7 @@ if profiles_path.exists():
 # ── [2/5] Version consistency ──────────────────────────────────────────
 print("\n[2/5] Version consistency")
 
-current_version = "0.1.84-alpha"
+current_version = "0.1.85-alpha"
 pyproject_version = get_pyproject_version()
 init_version = get_init_version()
 

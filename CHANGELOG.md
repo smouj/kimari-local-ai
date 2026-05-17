@@ -4,6 +4,25 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.85-alpha] - 2026-05-17
+
+### Added
+- `docs/LOW_VRAM_AGENT_VALIDATION_V0185.md` — partial hardware validation (download + hash verification)
+- Real SHA256 hashes pinned for Qwen3-4B Q4_K_M and SmolLM3 Q4_K_M in model registry
+- `tests/test_release_v0185.py` — release validation tests for v0.1.85-alpha
+
+### Changed
+- Version bumped to 0.1.85-alpha across all files
+- `config/kimari.models.json` — `sha256` updated from `null` to computed hashes for public models
+- CI workflow updated to run `test_release_v0185.py`
+
+### Safety
+- No GGUF models committed
+- SHA256 hashes are computed from real downloaded files (not invented)
+- Kimari-4B is NOT published
+- Gate remains BLOCKED
+- No GPU inference claims (validation environment has no GPU)
+
 ## [0.1.84-alpha] - 2026-05-17
 
 ### Added
@@ -17,12 +36,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - Version unified to 0.1.84-alpha across all files (pyproject.toml, __init__.py, package.json, README, docs)
-- `config/kimari.models.json` — `recommended_profile` for Qwen3-4B changed from `gtx1060` to `agent-qwen1060`
-- `config/kimari.models.json` — `recommended_profile` for SmolLM3-3B changed from `gtx1060` to `agent-smollm1060`
+- GGUF registry filenames aligned with upstream Hugging Face repos (`Qwen3-4B-Q4_K_M.gguf`, `SmolLM3-Q4_K_M.gguf`)
+- SmolLM3 source switched from `HuggingFaceTB` (401 Unauthorized) to `ggml-org` (verified working)
+- `config/kimari.models.json` — `recommended_profile` for Qwen3-4B changed to `agent-qwen1060`
+- `config/kimari.models.json` — `recommended_profile` for SmolLM3-3B changed to `agent-smollm1060`
 - `apps/gateway-dashboard/README.md` — Node.js requirement updated from 18+ to 20.9+ (Next.js 16 requires Node 20.9+)
 - `scripts/linux/build-llamacpp-cuda.sh` — refactored CMake flags to array, conditional CUDA architecture targeting
 - README updated with "Run agents today with public GGUF models" section and expanded GPU profiles table
-- `scripts/release/check-release.py` — version references updated to 0.1.84-alpha
+- CI workflow updated to run `test_release_v0184.py`
 
 ### Safety
 - No GGUF models committed or published

@@ -1,21 +1,21 @@
-## Run 17 — v0.1.84-alpha public low-VRAM agent profiles (2026-05-17)
+## Run 17 — v0.1.85-alpha public low-VRAM agent profiles (2026-05-17)
 
 - Added public agent profiles: agent-qwen1060, agent-qwen1080, agent-smollm1060
 - Models registry now recommends agent profiles over Kimari-4B-requiring profiles
 - docs/RUN_AGENTS_NOW.md created for public GGUF agent guide
 - CUDA build script supports KIMARI_CUDA_ARCH for Pascal (sm_61)
 - Dashboard Node requirement corrected to 20.9+
-- Version unified to 0.1.84-alpha across all files
+- Version unified to 0.1.85-alpha across all files
 - Gate: BLOCKED
 - No training, HF Jobs, public benchmark, public weights, GGUF, or raw outputs.
 - No SHA256 hashes invented.
 
-## Run 16 — v0.1.84-alpha trust hardening & release prep (2026-05-15)
+## Run 16 — v0.1.85-alpha trust hardening & release prep (2026-05-15)
 
 - Version bump across all artifacts: pyproject.toml, __init__.py, package.json, README, docs.
 - Restored truncated PROJECT_TRUTH.md, fixed package.json encoding.
-- Updated docs/index.html static export to v0.1.84-alpha.
-- Updated Hugging Face Space README to v0.1.84-alpha.
+- Updated docs/index.html static export to v0.1.85-alpha.
+- Updated Hugging Face Space README to v0.1.85-alpha.
 - Dashboard DATABASE_URL fix (auto-created .env during `kimari gateway setup`).
 - Gate: BLOCKED
 - No training, HF Jobs, public benchmark, public weights, GGUF, or raw outputs.

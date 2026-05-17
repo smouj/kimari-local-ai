@@ -183,7 +183,7 @@ Hash verification ensures model integrity after download.
 
 ### Important Notes
 
-- **Hashes are `null` in the registry until models are downloaded and verified.** A null hash does not mean something is wrong — it means the model has not yet been checked.
+- **Qwen3-4B Q4_K_M and SmolLM3 Q4_K_M have SHA256 hashes pinned in the registry** (computed from real downloaded files). The test model (TinyLlama) still has `null` until verified.
 - **Do NOT invent or guess hashes.** Only use hashes computed by the tool or provided by the upstream model publisher.
 
 ### Commands
