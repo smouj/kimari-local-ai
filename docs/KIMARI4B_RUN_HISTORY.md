@@ -1,3 +1,14 @@
+## Run 18 — v0.1.85-alpha public GGUF hash pinning and partial validation (2026-05-17)
+
+- Verified public GGUF downloads for Qwen3-4B Q4_K_M and SmolLM3 Q4_K_M.
+- Computed real SHA256 hashes from downloaded files.
+- Pinned SHA256 hashes in the public model registry.
+- Created docs/LOW_VRAM_AGENT_VALIDATION_V0185.md.
+- GPU inference validation remains pending because no GTX 1060/1080 was available in the validation environment.
+- Gate: BLOCKED.
+- No training, HF Jobs, public benchmark, public weights, GGUF, or raw outputs.
+- No GPU inference, VRAM, or tokens/s claims added.
+
 ## Run 17 — v0.1.84-alpha public low-VRAM agent profiles (2026-05-17)
 
 - Added public agent profiles: agent-qwen1060, agent-qwen1080, agent-smollm1060
