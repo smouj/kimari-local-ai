@@ -57,7 +57,8 @@
 |-------|-------|
 | OS | Linux (sandbox, no GPU) |
 | Python | 3.12 |
-| Kimari | v0.1.84-alpha |
+| Kimari used for download/hash verification | v0.1.84-alpha local checkout before v0.1.85 bump |
+| Release target | v0.1.85-alpha |
 | NVIDIA GPU | None available |
 | CUDA | None available |
 | llama-server | Not installed |
