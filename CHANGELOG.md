@@ -4,7 +4,24 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
-## [0.1.86-alpha] - 2026-05-17
+## [0.1.87-alpha] - 2026-05-17
+
+### Added
+- Real CUDA inference validation on local GTX 1060 6GB with full GPU offload (-ngl all).
+- Measured VRAM/utilization snapshots during GPU generation on GTX 1060.
+- Measured generation throughput from runtime timings on real GPU execution.
+- docs/CUDA_INFERENCE_VALIDATION_V0187.md.
+
+### Changed
+- Validation scope advanced from CPU-only checks to real GPU runtime validation.
+
+### Safety
+- No GGUF models committed.
+- No claim that GTX 1060 metrics generalize to all models.
+- Qwen3-4B and SmolLM3 GPU measurements remain pending local download completion.
+- Kimari-4B is not released; gate remains BLOCKED.
+
+## [0.1.87-alpha] - 2026-05-17
 
 ### Added
 - CPU inference validation with Qwen3-4B Q4_K_M and SmolLM3 Q4_K_M
