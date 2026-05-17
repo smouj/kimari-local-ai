@@ -1,4 +1,4 @@
-# Real Inference Validation — v0.1.86-alpha
+# CPU Inference Validation — v0.1.86-alpha
 
 > **Last updated:** 2026-05-17
 > **Validation type:** CPU inference (no GPU available in test environment)
@@ -25,7 +25,7 @@
 | GPU tokens/s measurement | ❌ Not tested — requires GPU |
 | Stability test (5+ min) | ❌ Not tested — server shuts down after idle timeout |
 
-**Important:** CPU tokens/s measurements below are NOT representative of GPU performance. GTX 1060/1080 with CUDA offload would be significantly faster.
+**Important:** CPU tokens/s measurements below are NOT representative of GPU performance. GPU performance on GTX 1060/1080 must be measured separately before any GPU performance claim is made.
 
 ---
 
@@ -158,7 +158,7 @@ Content: "Kimari is a traditional Hawaiian dance characterized by its fluid, flo
 2. **All three critical endpoints work**: `/health`, `/v1/models`, `/v1/chat/completions`.
 3. **SmolLM3 is ~30% faster** than Qwen3-4B on CPU generation (13.7 vs 10.7 tokens/s), consistent with its smaller size.
 4. **Both models use thinking/reasoning mode** by default, which affects response format.
-5. **CPU performance is NOT representative** of GTX 1060/1080 GPU performance. With `-ngl all` on a CUDA GPU, expect 5-20x faster generation.
+5. **CPU performance is NOT representative** of GTX 1060/1080 GPU performance. With `-ngl all` on a CUDA GPU, performance must be measured on real GTX 1060/1080 hardware before publishing any GPU speed claim.
 
 ---
 

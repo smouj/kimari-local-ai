@@ -11,14 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - llama-server built from source (CPU-only, no CUDA in validation environment)
 - Verified /health, /v1/models, /v1/chat/completions endpoints
 - CPU tokens/s measurements for both models
-- `docs/REAL_GTX1060_INFERENCE_VALIDATION_V0186.md`
+- `docs/CPU_INFERENCE_VALIDATION_V0186.md`
 - `tests/test_release_v0186.py`
 
 ### Safety
 - No GGUF models committed
 - No GPU inference claims (CPU-only environment, no GTX 1060/1080 available)
 - CPU tokens/s are NOT equivalent to GPU performance
-- Kimari-4B remains unreleased, gate BLOCKED
+- Kimari-4B is not released; gate remains BLOCKED
 
 ## [0.1.85-alpha] - 2026-05-17
 

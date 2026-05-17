@@ -40,11 +40,11 @@ def test_public_model_hashes_are_real():
 
 
 def test_inference_validation_doc_exists():
-    assert (REPO / "docs" / "REAL_GTX1060_INFERENCE_VALIDATION_V0186.md").exists()
+    assert (REPO / "docs" / "CPU_INFERENCE_VALIDATION_V0186.md").exists()
 
 
 def test_inference_validation_doc_is_honest():
-    doc = (REPO / "docs" / "REAL_GTX1060_INFERENCE_VALIDATION_V0186.md").read_text()
+    doc = (REPO / "docs" / "CPU_INFERENCE_VALIDATION_V0186.md").read_text()
     # Must NOT claim GPU inference was tested
     assert "NOT TESTED" in doc or "not tested" in doc.lower() or "no GPU" in doc.lower()
     # Must mention CPU-only
