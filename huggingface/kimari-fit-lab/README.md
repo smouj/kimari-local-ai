@@ -12,11 +12,11 @@ license: mit
 
 # Kimari Fit Lab
 
-Static compatibility helper for Kimari Local AI v0.1.83-alpha.
+Static compatibility helper for Kimari Local AI v0.1.84-alpha.
 
 This Space does **not** run models, does **not** download models, and does **not** use API keys. It estimates compatibility from GPU/VRAM/RAM and suggests safe local commands.
 
-## Current Status (v0.1.83-alpha)
+## Current Status (v0.1.84-alpha)
 
 | Milestone | Status |
 |---|---|

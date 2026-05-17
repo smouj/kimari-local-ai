@@ -52,10 +52,22 @@ npm start          # Production server bound to 127.0.0.1
 
 ## Requirements
 
-- **Node.js** 18+ and npm
+- **Node.js** 20.9+ and npm (Next.js 16 requires Node 20.9+)
 - **Ollama** (optional, for chat — runs on port 11434)
 - **llama-server** from llama.cpp (optional, for direct inference — port 11435)
 - **NVIDIA GPU** with CUDA (for GPU-accelerated inference)
+
+## Troubleshooting
+
+### Node.js version too old
+
+If `kimari gateway setup` fails with Node.js errors, ensure you have Node.js 20.9 or newer:
+
+```bash
+node --version   # must be >= 20.9.0
+```
+
+If your system Node is too old, use [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm) to install a recent version. Kimari's `gateway setup` will attempt to use the system Node automatically.
 
 The dashboard works standalone — it reads real system data and probes services automatically. No gateway needs to be running to explore the UI.
 

@@ -4,6 +4,34 @@ All notable changes to Kimari Local AI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
+## [0.1.84-alpha] - 2026-05-17
+
+### Added
+- Public low-VRAM agent profiles: `agent-qwen1060`, `agent-qwen1080`, `agent-smollm1060` in `config/kimari.profiles.json`
+- `docs/RUN_AGENTS_NOW.md` — comprehensive guide for running agents with public GGUF models
+- `KIMARI_CUDA_ARCH` environment variable in `scripts/linux/build-llamacpp-cuda.sh` for Pascal GPU targeting (e.g., `KIMARI_CUDA_ARCH=61` for GTX 1060/1080)
+- Troubleshooting section for Node.js version in `apps/gateway-dashboard/README.md`
+- `tests/test_version_consistency.py` — version consistency tests across all project files
+- `tests/test_public_agent_profiles.py` — tests for new agent profiles
+- `tests/test_release_v0184.py` — release validation tests for v0.1.84-alpha
+
+### Changed
+- Version unified to 0.1.84-alpha across all files (pyproject.toml, __init__.py, package.json, README, docs)
+- `config/kimari.models.json` — `recommended_profile` for Qwen3-4B changed from `gtx1060` to `agent-qwen1060`
+- `config/kimari.models.json` — `recommended_profile` for SmolLM3-3B changed from `gtx1060` to `agent-smollm1060`
+- `apps/gateway-dashboard/README.md` — Node.js requirement updated from 18+ to 20.9+ (Next.js 16 requires Node 20.9+)
+- `scripts/linux/build-llamacpp-cuda.sh` — refactored CMake flags to array, conditional CUDA architecture targeting
+- README updated with "Run agents today with public GGUF models" section and expanded GPU profiles table
+- `scripts/release/check-release.py` — version references updated to 0.1.84-alpha
+
+### Safety
+- No GGUF models committed or published
+- No SHA256 hashes invented (sha256 remains null in models registry until verified)
+- Kimari-4B is NOT published — all agent profiles use public community GGUF models
+- Gate remains BLOCKED
+- No public benchmark claims
+- All agent profiles bind to 127.0.0.1 (localhost only)
+
 ## [0.1.83-alpha] - 2026-05-15
 
 ### Added

@@ -20,7 +20,7 @@
 - **Not a benchmark leaderboard.** No public benchmark claims are made. Performance numbers shown in documentation are validated test results (TinyLlama), not Kimari-4B benchmarks.
 - **Not a replacement for Ollama, LM Studio or text-generation-webui.** Kimari is a complementary tool focused on older GPU optimization and honest alpha development.
 
-## Current State (v0.1.83-alpha)
+## Current State (v0.1.84-alpha)
 
 | Area | Status |
 |---|---|

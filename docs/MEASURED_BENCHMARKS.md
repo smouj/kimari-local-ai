@@ -31,7 +31,7 @@ kimari start
 kimari start --profile gtx1060
 
 # Or use llama-server directly
-llama-server -m models/qwen3-4b-q4_k_m.gguf --port 11435 -ngl all -c 8192
+llama-server -m models/Qwen3-4B-Q4_K_M.gguf --port 11435 -ngl all -c 8192
 ```
 
 Verify the server is ready:

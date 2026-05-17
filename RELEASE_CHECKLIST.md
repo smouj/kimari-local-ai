@@ -1,8 +1,39 @@
-## v0.1.83-alpha — Gateway Dashboard CLI integration
+## v0.1.84-alpha — Public low-VRAM agent profiles
 
-- [x] pyproject.toml version is 0.1.83-alpha
-- [x] kimari/__init__.py version is 0.1.83-alpha
-- [x] apps/gateway-dashboard/package.json version is 0.1.83-alpha
+- [x] pyproject.toml version is 0.1.84-alpha
+- [x] kimari/__init__.py version is 0.1.84-alpha
+- [x] apps/gateway-dashboard/package.json version is 0.1.84-alpha
+- [x] Agent profiles `agent-qwen1060`, `agent-qwen1080`, `agent-smollm1060` added to `config/kimari.profiles.json`
+- [x] Agent profiles do NOT reference Kimari-4B models
+- [x] Agent profiles do NOT reference TinyLlama
+- [x] Agent profiles bind to 127.0.0.1 only
+- [x] Agent profiles have parallel=1
+- [x] GTX 1060 profiles have ctx <= 4096
+- [x] `config/kimari.models.json` recommended_profile points to agent profiles
+- [x] No SHA256 hashes invented (sha256 remains null)
+- [x] `docs/RUN_AGENTS_NOW.md` exists
+- [x] README has "Run agents today" section
+- [x] Dashboard README requires Node.js 20.9+ (not 18+)
+- [x] `KIMARI_CUDA_ARCH` support in build-llamacpp-cuda.sh
+- [x] Build script backward compatible without KIMARI_CUDA_ARCH
+- [x] Version consistency tests exist (`tests/test_version_consistency.py`)
+- [x] Agent profile tests exist (`tests/test_public_agent_profiles.py`)
+- [x] Release tests exist (`tests/test_release_v0184.py`)
+- [x] Gate remains BLOCKED
+- [x] No GGUF models committed
+- [x] No public weights/adapter claims
+- [x] Kimari-4B NOT declared as published
+
+Validation:
+- [x] `python3 -c "import json; json.load(open('config/kimari.profiles.json'))"` passes
+- [x] `python3 -c "import json; json.load(open('config/kimari.models.json'))"` passes
+- [x] `pytest tests/test_version_consistency.py tests/test_public_agent_profiles.py tests/test_release_v0184.py -q`
+
+## v0.1.84-alpha — Gateway Dashboard CLI integration
+
+- [x] pyproject.toml version is 0.1.84-alpha
+- [x] kimari/__init__.py version is 0.1.84-alpha
+- [x] apps/gateway-dashboard/package.json version is 0.1.84-alpha
 - [x] `kimari gateway setup/start/stop/restart/status/logs/open/reset` implemented
 - [x] Dashboard manager stores runtime state under `~/.local/state/kimari/gateway-dashboard/`
 - [x] Default dashboard bind is `127.0.0.1:3105`
