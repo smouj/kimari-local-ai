@@ -1,6 +1,6 @@
 # Run Agents Now — Public GGUF Models
 
-> **Last updated:** 2025-03-04
+> **Last updated:** 2026-05-17
 > **Audience:** Anyone who wants to run local AI agents today using Kimari's runtime with publicly available models.
 
 ---

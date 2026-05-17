@@ -102,9 +102,13 @@ def test_recommended_profiles_updated():
     models = _models()
     for m in models:
         if m["id"] == "recommended":
-            assert m["recommended_profile"] == "agent-qwen1060", f"Qwen3-4B recommended_profile should be agent-qwen1060, got {m['recommended_profile']}"
+            assert m["recommended_profile"] == "agent-qwen1060", (
+                f"Qwen3-4B recommended_profile should be agent-qwen1060, got {m['recommended_profile']}"
+            )
         if m["id"] == "smollm3-3b-q4":
-            assert m["recommended_profile"] == "agent-smollm1060", f"SmolLM3 recommended_profile should be agent-smollm1060, got {m['recommended_profile']}"
+            assert m["recommended_profile"] == "agent-smollm1060", (
+                f"SmolLM3 recommended_profile should be agent-smollm1060, got {m['recommended_profile']}"
+            )
 
 
 def test_no_invented_hashes():
@@ -120,7 +124,9 @@ def test_no_invented_hashes():
 def test_dashboard_readme_node_version():
     """Dashboard README must not say Node 18+ since Next 16 needs 20.9+."""
     readme = (REPO / "apps" / "gateway-dashboard" / "README.md").read_text()
-    assert "18+" not in readme or "20.9+" in readme, "Dashboard README still references Node 18+ without 20.9+ correction"
+    assert "18+" not in readme or "20.9+" in readme, (
+        "Dashboard README still references Node 18+ without 20.9+ correction"
+    )
 
 
 def test_run_agents_now_doc_exists():
