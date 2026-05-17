@@ -1,3 +1,15 @@
+## Run 20 — v0.1.87-alpha GTX 1060 CUDA runtime validation (2026-05-17)
+
+- Validated real CUDA offload on GTX 1060 6GB with -ngl all.
+- Confirmed CUDA compute capability 6.1.
+- Confirmed offloaded 23/23 layers to GPU.
+- Measured VRAM: 2203 MiB loaded, 2194 MiB after generation.
+- Measured throughput: 1159.20 tok/s prompt, 103.63 tok/s generation.
+- Qwen3-4B and SmolLM3 GPU inference remain pending due to incomplete local downloads.
+- Gate: BLOCKED.
+- No Kimari-4B release, no public weights, no GGUF committed.
+- No GPU claims for Qwen3/SmolLM3 public agent profiles.
+
 ## Run 19 — v0.1.86-alpha CPU inference validation and API endpoint verification (2026-05-17)
 
 - Built llama.cpp server (CPU-only, no CUDA/GPU in validation environment).

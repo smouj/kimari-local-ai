@@ -1,8 +1,25 @@
-## v0.1.86-alpha — Public low-VRAM agent profiles
+## v0.1.87-alpha — GTX 1060 CUDA runtime validation
 
-- [x] pyproject.toml version is 0.1.86-alpha
-- [x] kimari/__init__.py version is 0.1.86-alpha
-- [x] apps/gateway-dashboard/package.json version is 0.1.86-alpha
+- [x] pyproject.toml version is 0.1.87-alpha
+- [x] kimari/__init__.py version is 0.1.87-alpha
+- [x] apps/gateway-dashboard/package.json version is 0.1.87-alpha
+- [x] docs/CUDA_INFERENCE_VALIDATION_V0187.md exists
+- [x] Scope explicitly excludes Qwen3/SmolLM3 GPU validation
+- [x] Scope explicitly excludes agent-qwen1060/agent-smollm1060 validation
+- [x] Document includes exact model tested and source
+- [x] Document includes port 11436 and reason for port
+- [x] Document includes offloaded 23/23 layers to GPU
+- [x] Document includes VRAM measurements (2203 MiB loaded, 2194 MiB after generation)
+- [x] Document includes measured prompt and generation throughput
+- [x] No GGUF committed
+- [x] No Qwen3/SmolLM3 GPU performance claims
+- [x] Gate remains BLOCKED
+
+## v0.1.87-alpha — Public low-VRAM agent profiles
+
+- [x] pyproject.toml version is 0.1.87-alpha
+- [x] kimari/__init__.py version is 0.1.87-alpha
+- [x] apps/gateway-dashboard/package.json version is 0.1.87-alpha
 - [x] Agent profiles `agent-qwen1060`, `agent-qwen1080`, `agent-smollm1060` added to `config/kimari.profiles.json`
 - [x] Agent profiles do NOT reference Kimari-4B models
 - [x] Agent profiles do NOT reference TinyLlama
@@ -29,11 +46,11 @@ Validation:
 - [x] `python3 -c "import json; json.load(open('config/kimari.models.json'))"` passes
 - [x] `pytest tests/test_version_consistency.py tests/test_public_agent_profiles.py tests/test_release_v0184.py -q`
 
-## v0.1.86-alpha — Gateway Dashboard CLI integration
+## v0.1.87-alpha — Gateway Dashboard CLI integration
 
-- [x] pyproject.toml version is 0.1.86-alpha
-- [x] kimari/__init__.py version is 0.1.86-alpha
-- [x] apps/gateway-dashboard/package.json version is 0.1.86-alpha
+- [x] pyproject.toml version is 0.1.87-alpha
+- [x] kimari/__init__.py version is 0.1.87-alpha
+- [x] apps/gateway-dashboard/package.json version is 0.1.87-alpha
 - [x] `kimari gateway setup/start/stop/restart/status/logs/open/reset` implemented
 - [x] Dashboard manager stores runtime state under `~/.local/state/kimari/gateway-dashboard/`
 - [x] Default dashboard bind is `127.0.0.1:3105`

@@ -6,9 +6,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Repo version** | v0.1.86-alpha |
-| **HF org card version** | v0.1.86-alpha |
-| **Space version** | v0.1.86-alpha |
+| **Repo version** | v0.1.87-alpha |
+| **HF org card version** | v0.1.87-alpha |
+| **Space version** | v0.1.87-alpha |
 | **Gate** | BLOCKED |
 | **Kimari-4B** | NOT released |
 
@@ -47,7 +47,7 @@
 
 The `kimari-ai` organization card at `kimari-ai/README` includes:
 
-- Framework version: v0.1.86-alpha
+- Framework version: v0.1.87-alpha
 - Kimari-4B: Not released yet
 - GTX 1060 validation: Completed
 - HF Jobs smoke: Completed

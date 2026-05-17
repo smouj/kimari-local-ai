@@ -112,7 +112,7 @@ jobs:
       - name: Run active release tests
         run: |
           python -m pytest \
-            tests/test_release_v0186.py \
+            tests/test_release_v0187.py \
             tests/test_install_scripts.py \
             tests/test_console_cli.py \
             tests/test_gateway_setup_cli.py \

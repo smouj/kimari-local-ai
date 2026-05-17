@@ -494,7 +494,7 @@
 - ✅ No raw outputs, no benchmark claims
 - Gate BLOCKED
 
-## v0.1.86-alpha (Current)
+## v0.1.87-alpha (Current)
 
 Status: Gateway Dashboard CLI integration; GitHub Pages landing page; console + installer; gate remains BLOCKED.
 
@@ -886,10 +886,10 @@ Next: future training should harden benchmark-honesty refusal behavior and rerun
 
 ## Future Milestones
 
-### v0.1.86-alpha — Dashboard Lite
+### v0.1.87-alpha — Dashboard Lite
 Focus: lightweight dashboard option without heavy dependencies.
 
-### v0.1.86-alpha — Corrective SFT
+### v0.1.87-alpha — Corrective SFT
 Focus: safety regression fix training, re-eval.
 
 ### v0.2.0-alpha
