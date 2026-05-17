@@ -25,6 +25,14 @@ INSTALL_DIR="$PROJECT_ROOT/bin"
 DEFAULT_LLAMA_CPP_REF="b4683"
 KIMARI_LLAMA_CPP_REF="${KIMARI_LLAMA_CPP_REF:-$DEFAULT_LLAMA_CPP_REF}"
 
+# Override CUDA architecture for specific GPU generations.
+# Examples:
+#   KIMARI_CUDA_ARCH=61  — Pascal (GTX 1060, GTX 1080)
+#   KIMARI_CUDA_ARCH=75  — Turing (RTX 2060, RTX 2070)
+#   KIMARI_CUDA_ARCH=86  — Ampere (RTX 3060, RTX 3070)
+# If not set, CMake defaults are used (usually all supported architectures).
+KIMARI_CUDA_ARCH="${KIMARI_CUDA_ARCH:-}"
+
 # ---------------------------------------------------------------------------
 # Color helpers
 # ---------------------------------------------------------------------------
@@ -83,11 +91,19 @@ info "Configuring build with CUDA support..."
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-cmake .. \
-    -DGGML_CUDA=ON \
-    -DGGML_CUDA_F16=ON \
-    -DCMAKE_BUILD_TYPE=Release \
+CMAKE_ARGS=(
+    -DGGML_CUDA=ON
+    -DGGML_CUDA_F16=ON
+    -DCMAKE_BUILD_TYPE=Release
     -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
+)
+
+if [ -n "$KIMARI_CUDA_ARCH" ]; then
+    info "CUDA architecture override: sm_${KIMARI_CUDA_ARCH} (KIMARI_CUDA_ARCH=$KIMARI_CUDA_ARCH)"
+    CMAKE_ARGS+=("-DCMAKE_CUDA_ARCHITECTURES=${KIMARI_CUDA_ARCH}")
+fi
+
+cmake .. "${CMAKE_ARGS[@]}"
 
 info "Compiling llama.cpp (this may take 10-30 minutes)..."
 NPROC=$(nproc 2>/dev/null || echo 4)
@@ -131,7 +147,11 @@ echo "============================================="
 ok  "Build completed successfully!"
 echo "============================================="
 echo "  Binary:    $PROJECT_ROOT/llama-server"
-echo "  CUDA:      enabled (sm_${CUDA_VERSION:-unknown})"
+if [ -n "$KIMARI_CUDA_ARCH" ]; then
+    echo "  CUDA:      enabled (sm_${KIMARI_CUDA_ARCH}, compute capability ${KIMARI_CUDA_ARCH})"
+else
+    echo "  CUDA:      enabled (sm_${CUDA_VERSION:-unknown}, default architectures)"
+fi
 echo "  Install:   $INSTALL_DIR"
 echo ""
 echo "Next step:"

@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/python-3.10+-2ea043.svg" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/runtime-llama.cpp-orange.svg" alt="llama.cpp">
   <img src="https://img.shields.io/badge/API-OpenAI--compatible-00d4aa.svg" alt="OpenAI-compatible API">
-  <img src="https://img.shields.io/badge/version-v0.1.83--alpha-9b59b6.svg" alt="v0.1.83-alpha">
+  <img src="https://img.shields.io/badge/version-v0.1.84--alpha-9b59b6.svg" alt="v0.1.84-alpha">
 </p>
 
 ---
@@ -285,16 +285,36 @@ See:
 
 ---
 
+## Run agents today with public GGUF models
+
+Kimari-4B is not public yet. For real local agent workflows today, use:
+
+- `agent-qwen1060` — GTX 1060 6GB, Qwen3-4B Q4_K_M, 4K context
+- `agent-qwen1080` — GTX 1080 8GB, Qwen3-4B Q4_K_M, 8K context
+- `agent-smollm1060` — safer 3B fallback for GTX 1060
+
+```bash
+kimari pull recommended
+kimari start --profile agent-qwen1060
+```
+
+See [docs/RUN_AGENTS_NOW.md](docs/RUN_AGENTS_NOW.md).
+
+---
+
 ## GPU Profiles
 
 | Profile | GPU | VRAM | Quantization | Context | Status |
 |---|---|---|---|---|---|
 | `test` | Any 6 GB+ | 6 GB | Q4_K_M | 4,096 | **Default (alpha)** |
+| `agent-qwen1060` | GTX 1060 | 6 GB | Q4_K_M | 4,096 | ✅ Public model |
+| `agent-qwen1080` | GTX 1080 | 8 GB | Q4_K_M | 8,192 | ✅ Public model |
+| `agent-smollm1060` | GTX 1060 | 6 GB | Q4_K_M | 4,096 | ✅ Public model (low VRAM) |
 | `gtx1060` | GTX 1060 | 6 GB | Q4_K_M | 8,192 | Requires Kimari-4B |
 | `gtx1080` | GTX 1080 | 8 GB | Q5_K_M | 16,384 | Requires Kimari-4B |
 | `turbo` | 6 GB+ | 6 GB | IQ4_XS | 8,192 | Requires Kimari-4B |
 
-> The `test` profile is the default during alpha, using TinyLlama 1.1B. When Kimari-4B is published, `gtx1060` will become the new default.
+> The `test` profile is the default during alpha, using TinyLlama 1.1B. For real agent work, use `agent-qwen1060` or `agent-smollm1060` with public GGUF models. When Kimari-4B is published, `gtx1060` will become the new default.
 
 ---
 
@@ -309,6 +329,7 @@ See:
 | Gateway dashboard | [docs/GATEWAY_DASHBOARD.md](docs/GATEWAY_DASHBOARD.md) |
 | CLI reference | [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md) |
 | Local endpoint test | [docs/LOCAL_OPENAI_ENDPOINT_TEST.md](docs/LOCAL_OPENAI_ENDPOINT_TEST.md) |
+| Run agents now | [docs/RUN_AGENTS_NOW.md](docs/RUN_AGENTS_NOW.md) |
 
 ### Integrations
 
