@@ -73,21 +73,21 @@ Without `--output`, results are auto-saved to `benchmarks/results/<profile>-<YYY
 Before sanitization:
 ```json
 {
-  "notes": "Model at /home/alice/.local/share/kimari/models/qwen3-4b-q4_k_m.gguf"
+  "notes": "Model at /home/alice/.local/share/kimari/models/Qwen3-4B-Q4_K_M.gguf"
 }
 ```
 
 After sanitization:
 ```json
 {
-  "notes": "Model at ~/.local/share/kimari/models/qwen3-4b-q4_k_m.gguf"
+  "notes": "Model at ~/.local/share/kimari/models/Qwen3-4B-Q4_K_M.gguf"
 }
 ```
 
 Or even better, use only the filename:
 ```json
 {
-  "notes": "Model: qwen3-4b-q4_k_m.gguf"
+  "notes": "Model: Qwen3-4B-Q4_K_M.gguf"
 }
 ```
 

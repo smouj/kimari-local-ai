@@ -84,7 +84,7 @@ Server status — equivalent to `kimari status --json`.
   "running": true,
   "pid": 12345,
   "profile": "gtx1060",
-  "model": "qwen3-4b-q4_k_m.gguf",
+  "model": "Qwen3-4B-Q4_K_M.gguf",
   "host": "127.0.0.1",
   "port": 11435,
   "uptime_s": null,
@@ -143,7 +143,7 @@ List available GPU profiles — equivalent to `kimari profiles --json`.
     },
     {
       "name": "gtx1060",
-      "model": "qwen3-4b-q4_k_m.gguf",
+      "model": "Qwen3-4B-Q4_K_M.gguf",
       "host": "127.0.0.1",
       "port": 11435,
       "ctx": 8192,
@@ -249,7 +249,7 @@ Performance dry-run — equivalent to `kimari perf --dry-run --json`. Runs perfo
 ```json
 {
   "profile": "gtx1060",
-  "model": "qwen3-4b-q4_k_m.gguf",
+  "model": "Qwen3-4B-Q4_K_M.gguf",
   "vram_total_gb": 6.0,
   "dry_run": true,
   "modes": [

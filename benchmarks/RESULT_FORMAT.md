@@ -14,7 +14,7 @@ When sharing benchmark results, use the following JSON structure:
 {
   "kimari_version": "0.1.15-alpha",
   "profile": "gtx1060",
-  "model_filename": "qwen3-4b-q4_k_m.gguf",
+  "model_filename": "Qwen3-4B-Q4_K_M.gguf",
   "model_sha256": "a1b2c3d4e5f6...",
   "quantization": "Q4_K_M",
 
@@ -52,7 +52,7 @@ When sharing benchmark results, use the following JSON structure:
 |---|---|---|---|
 | `kimari_version` | `string` | Yes | Kimari release version (e.g. `"0.1.15-alpha"`) |
 | `profile` | `string` | Yes | Active GPU profile name (e.g. `"gtx1060"`, `"gtx1080"`) |
-| `model_filename` | `string` | Yes | GGUF model filename only — **no directory path** (e.g. `"qwen3-4b-q4_k_m.gguf"`) |
+| `model_filename` | `string` | Yes | GGUF model filename only — **no directory path** (e.g. `"Qwen3-4B-Q4_K_M.gguf"`) |
 | `model_sha256` | `string \| null` | No | SHA-256 hash of the model file. Omit if unknown. |
 | `quantization` | `string \| null` | No | Quantization method (e.g. `"Q4_K_M"`, `"Q5_K_S"`) |
 
@@ -110,8 +110,8 @@ When sharing benchmark results, use the following JSON structure:
 
 - **No private prompts.** The sharing format does not include prompt text or response content. If you add a `notes` field, do not paste actual prompts or model outputs.
 - **No sensitive local paths.** Use only filenames, not full filesystem paths. For example:
-  - ✅ `"model_filename": "qwen3-4b-q4_k_m.gguf"`
-  - ❌ `"model_filename": "/home/user/.kimari/models/qwen3-4b-q4_k_m.gguf"`
+  - ✅ `"model_filename": "Qwen3-4B-Q4_K_M.gguf"`
+  - ❌ `"model_filename": "/home/user/.kimari/models/Qwen3-4B-Q4_K_M.gguf"`
 - **No auth tokens.** Never include API keys, Bearer tokens, or any authentication credentials in shared results.
 - **No personally identifying information.** Do not include usernames, hostnames, IP addresses, or any data that could identify you.
 

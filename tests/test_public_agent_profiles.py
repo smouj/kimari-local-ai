@@ -89,12 +89,12 @@ def test_agent_profiles_models_exist_in_registry():
 def test_qwen_profiles_use_qwen3_model():
     profiles = _profiles()
     for name in ["agent-qwen1060", "agent-qwen1080"]:
-        assert "qwen3-4b" in profiles[name]["model"], f"Profile {name} does not use Qwen3-4B"
+        assert "Qwen3-4B" in profiles[name]["model"], f"Profile {name} does not use Qwen3-4B"
 
 
 def test_smollm_profile_uses_smollm_model():
     profiles = _profiles()
-    assert "smolm3-3b" in profiles["agent-smollm1060"]["model"]
+    assert "SmolLM3" in profiles["agent-smollm1060"]["model"]
 
 
 def test_recommended_profiles_updated():
@@ -143,3 +143,53 @@ def test_readme_does_not_claim_kimari4b_published():
     assert "kimari-4b has been released" not in lower
     # "Kimari-4B is not public yet" or "when Kimari-4B is published" are acceptable (conditional/future)
     assert "Kimari-4B is not public yet" in readme or "not released" in lower
+
+
+def test_public_model_registry_urls_use_expected_upstream_filenames():
+    """Public model registry must use exact upstream GGUF filenames and valid repos."""
+    models = _models()
+    for m in models:
+        if m["id"] == "recommended":
+            assert m["filename"] == "Qwen3-4B-Q4_K_M.gguf", (
+                f"Qwen3 filename should be Qwen3-4B-Q4_K_M.gguf, got {m['filename']}"
+            )
+            assert m["target_path"] == f"models/{m['filename']}", (
+                f"target_path must match models/{{filename}}, got {m['target_path']}"
+            )
+            assert m["url"].endswith(f"/{m['filename']}"), f"URL must end with filename, got {m['url']}"
+            assert "Qwen/Qwen3-4B-GGUF" in m["url"], f"Qwen3 URL must use Qwen/Qwen3-4B-GGUF repo, got {m['url']}"
+
+        if m["id"] == "smollm3-3b-q4":
+            assert m["filename"] == "SmolLM3-Q4_K_M.gguf", (
+                f"SmolLM3 filename should be SmolLM3-Q4_K_M.gguf, got {m['filename']}"
+            )
+            assert m["target_path"] == f"models/{m['filename']}", (
+                f"target_path must match models/{{filename}}, got {m['target_path']}"
+            )
+            assert m["url"].endswith(f"/{m['filename']}"), f"URL must end with filename, got {m['url']}"
+            assert "ggml-org/SmolLM3-3B-GGUF" in m["url"], (
+                f"SmolLM3 URL must use ggml-org/SmolLM3-3B-GGUF repo, got {m['url']}"
+            )
+            assert m["source"] == "ggml-org/SmolLM3-3B-GGUF", (
+                f"SmolLM3 source must be ggml-org/SmolLM3-3B-GGUF, got {m['source']}"
+            )
+
+
+def test_no_old_lowercase_filenames_remain():
+    """No references to old lowercase filenames should remain in config files."""
+    old_names = ["qwen3-4b-q4_k_m.gguf", "smolm3-3b-q4_k_m.gguf"]
+    for name in old_names:
+        models_text = MODELS_PATH.read_text()
+        profiles_text = PROFILES_PATH.read_text()
+        assert name not in models_text, f"Old filename {name} still in kimari.models.json"
+        assert name not in profiles_text, f"Old filename {name} still in kimari.profiles.json"
+
+
+def test_profile_model_paths_match_registry_target_paths():
+    """Each agent profile model path must exactly match a model's target_path in the registry."""
+    profiles = _profiles()
+    models = _models()
+    target_paths = {m["target_path"] for m in models}
+    for name in NEW_AGENT_PROFILES:
+        model_path = profiles[name]["model"]
+        assert model_path in target_paths, f"Profile {name} model path {model_path} not found in registry target_paths"

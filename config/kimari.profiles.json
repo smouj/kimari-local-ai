@@ -259,7 +259,7 @@
       "parallel": 1,
       "mlock": false,
       "no_mmap": false,
-      "notes": "Profile optimized for autonomous agents (OpenClaw, Hermes). Prioritizes stable, non-blocking responses. Uses TinyLlama during alpha; configure --model for better agent models. Low temperature (0.2–0.4) recommended."
+      "notes": "Profile optimized for autonomous agents (OpenClaw, Hermes). Prioritizes stable, non-blocking responses. Uses TinyLlama during alpha; configure --model for better agent models. Low temperature (0.2\u20130.4) recommended."
     },
     "openclaw-local": {
       "name": "OpenClaw Local",
@@ -309,7 +309,7 @@
     },
     "agent-qwen1060": {
       "name": "Agent Qwen3 4B GTX 1060",
-      "model": "models/qwen3-4b-q4_k_m.gguf",
+      "model": "models/Qwen3-4B-Q4_K_M.gguf",
       "ctx": 4096,
       "batch": 128,
       "ubatch": 64,
@@ -332,7 +332,7 @@
     },
     "agent-qwen1080": {
       "name": "Agent Qwen3 4B GTX 1080",
-      "model": "models/qwen3-4b-q4_k_m.gguf",
+      "model": "models/Qwen3-4B-Q4_K_M.gguf",
       "ctx": 8192,
       "batch": 256,
       "ubatch": 128,
@@ -355,7 +355,7 @@
     },
     "agent-smollm1060": {
       "name": "Agent SmolLM3 3B GTX 1060 Safe",
-      "model": "models/smolm3-3b-q4_k_m.gguf",
+      "model": "models/SmolLM3-Q4_K_M.gguf",
       "ctx": 4096,
       "batch": 128,
       "ubatch": 64,

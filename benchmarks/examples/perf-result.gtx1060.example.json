@@ -1,7 +1,7 @@
 {
   "kimari_version": "0.1.16-alpha",
   "profile": "gtx1060",
-  "model_filename": "qwen3-4b-q4_k_m.gguf",
+  "model_filename": "Qwen3-4B-Q4_K_M.gguf",
   "model_sha256": null,
   "quantization": "Q4_K_M",
 

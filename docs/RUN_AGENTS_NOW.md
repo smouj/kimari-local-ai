@@ -120,7 +120,7 @@ curl http://127.0.0.1:11435/v1/models
 curl http://127.0.0.1:11435/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "qwen3-4b-q4_k_m.gguf",
+    "model": "Qwen3-4B-Q4_K_M.gguf",
     "messages": [
       {"role": "system", "content": "Responde breve."},
       {"role": "user", "content": "Di OK y una frase sobre Kimari."}

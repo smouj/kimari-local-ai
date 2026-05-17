@@ -75,10 +75,10 @@ Verifying the SHA-256 hash of a downloaded model file ensures it matches the exp
 
    ```bash
    # Linux / macOS
-   sha256sum models/qwen3-4b-q4_k_m.gguf
+   sha256sum models/Qwen3-4B-Q4_K_M.gguf
 
    # Windows (PowerShell)
-   Get-FileHash models\qwen3-4b-q4_k_m.gguf -Algorithm SHA256
+   Get-FileHash models\Qwen3-4B-Q4_K_M.gguf -Algorithm SHA256
    ```
 
 3. **Compare the hashes.** The output must match the published checksum exactly. If it does not match, **do not use the file** — delete it and re-download.
@@ -91,12 +91,12 @@ Even without a published hash, you can detect obvious tampering:
 
 ```bash
 # Check that the file size is plausible
-ls -la models/qwen3-4b-q4_k_m.gguf
+ls -la models/Qwen3-4B-Q4_K_M.gguf
 
 # Inspect GGUF metadata
 python -c "
 from gguf import GGUFReader
-reader = GGUFReader('models/qwen3-4b-q4_k_m.gguf')
+reader = GGUFReader('models/Qwen3-4B-Q4_K_M.gguf')
 for field in reader.fields.values():
     print(field)
 "
