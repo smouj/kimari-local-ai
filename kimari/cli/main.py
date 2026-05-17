@@ -3202,7 +3202,9 @@ def main():
             print(
                 f"\n  {Color.DIM}Note: This token is prepared for future Kimari API / reverse proxy use.{Color.RESET}"
             )
-            print(f"  {Color.DIM}Enforcement: inactive for llama-server. Use reverse proxy or future kimari api auth.{Color.RESET}\n")
+            print(
+                f"  {Color.DIM}Enforcement: inactive for llama-server. Use reverse proxy or future kimari api auth.{Color.RESET}\n"
+            )
         elif args.token_command == "show":
             result = show_token()
             if result:
